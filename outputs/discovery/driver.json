@@ -1,0 +1,185 @@
+{
+  "stakeholder": "driver",
+  "discoveries": [
+    {
+      "category": "AMBIGUITY",
+      "title": "Delivery and acknowledgement method for critical safety notices",
+      "discovery": "It is unclear how critical safety notices are delivered and acknowledged prior to shift start, and mandatory auditable confirmation needs to be established.",
+      "source_basis": "The driver notes a missing requirement regarding how critical safety notices are delivered and acknowledged and that it needs to be mandatory and auditable.",
+      "origin": "EXPLICIT",
+      "open_question": "How are critical safety notices delivered and acknowledged before proceeding?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "System assignment provider downtime during pre-assignment",
+      "discovery": "The system providing shift assignments might experience downtime, requiring a robust, reliable, manual fallback process.",
+      "source_basis": "The driver identifies a scenario where the system providing assignments is down and highlights the need for a manual fallback process.",
+      "origin": "EXPLICIT",
+      "open_question": "What is the exact manual fallback process if the assignment system is down?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Definition of active acknowledgement mechanism for journey assignments",
+      "discovery": "It remains ambiguous whether acknowledgement of a journey assignment is a simple button press or requires active review and confirmation of key details.",
+      "source_basis": "The driver asks how acknowledgement is handled and suggests it should be an active confirmation rather than a simple button press.",
+      "origin": "EXPLICIT",
+      "open_question": "Is acknowledgement a simple button press or an active confirmation of key details?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "CONFLICT",
+      "title": "Single source of truth precedence for journey information",
+      "discovery": "Discrepancies may occur between the on-board system, Control, or paper documents, and a clear precedence must be defined.",
+      "source_basis": "The driver questions what the single source of truth is if the on-board system differs from Control or paper documents.",
+      "origin": "EXPLICIT",
+      "open_question": "Which source takes precedence if on-board system data differs from Control or paper documents?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "DMI journey data loading and error handling",
+      "discovery": "The Driver Machine Interface (DMI) must support loading journey details during pre-departure checks and handle potential loading errors.",
+      "source_basis": "The driver lists loading journey details into the DMI as an action and identifies DMI loading failure or display errors as potential failure scenarios.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "DMI complete failure protocol and manual operation fallback",
+      "discovery": "The protocol and fallback information available to the driver if the DMI fails completely during checks are unclear.",
+      "source_basis": "The driver asks what the protocol is if the DMI fails completely during checks and whether manual operation is still possible.",
+      "origin": "EXPLICIT",
+      "open_question": "Can the train be operated manually with fallback information if the DMI fails completely?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Distinction between minor and major train defects",
+      "discovery": "A clear distinction between a minor defect allowing cautious operation and a major defect requiring attention is currently missing.",
+      "source_basis": "The driver highlights a missing requirement for a clear distinction between 'minor defect' and 'major defect'.",
+      "origin": "EXPLICIT",
+      "open_question": "What criteria define a minor defect versus a major defect?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "System role in preventing early departures",
+      "discovery": "The extent of the system's role in detecting or preventing early departures beyond displaying scheduled times is undefined.",
+      "source_basis": "The driver questions what the system's role is in detecting/preventing early departures beyond just displaying scheduled time.",
+      "origin": "EXPLICIT",
+      "open_question": "What role does the system play in actively preventing early departures?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Platform clear verification integration",
+      "discovery": "Verification of platform clear status is primarily visual, but potential integration with platform edge detection needs clarification.",
+      "source_basis": "The driver notes that platform clear verification is primarily visual and asks about any integration with platform edge detection.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": "Is there any integration with platform edge detection systems for verifying platform clear status?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Connectivity loss during en-route operations",
+      "discovery": "Loss of connectivity prevents receiving new instructions or reporting issues, requiring the system to degrade gracefully by holding last valid instructions and warning the driver.",
+      "source_basis": "The driver identifies connectivity loss as a failure scenario where the system must degrade gracefully and hold valid instructions.",
+      "origin": "EXPLICIT",
+      "open_question": "How long can the system operate on cached data during connectivity loss?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "SECURITY",
+      "title": "Precedence of safety-critical conflicting information",
+      "discovery": "When conflicting information occurs (e.g., DMI speed vs. trackside sign), safety-critical information must have clear precedence.",
+      "source_basis": "The driver notes that safety-critical information must have clear precedence when DMI and trackside signs conflict.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Door side selection verification and alert",
+      "discovery": "The system should ideally provide visual confirmation and an audible alert if the incorrect door side is selected during station stops.",
+      "source_basis": "The driver states that visual confirmation and an audible alert if an incorrect side is selected would be good to ensure correct door opening.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Precision stopping guidance support",
+      "discovery": "The system could potentially support precision stopping via dynamic braking guides.",
+      "source_basis": "The driver asks how the system supports precision stopping, citing examples like dynamic braking guides.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": "Should the system provide dynamic braking guides for precision stopping?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Emergency communications and reporting priority",
+      "discovery": "SmartRail must prioritize emergency communications and reports so they take precedence over all other data.",
+      "source_basis": "The driver states that SmartRail must prioritize emergency communications and reports, ensuring they take precedence over other data.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "DMI emergency stop button and automatic reporting",
+      "discovery": "The DMI needs a clear emergency stop button/interface that automatically reports to Control during emergencies.",
+      "source_basis": "The driver asks if the DMI provides a clear 'Emergency Stop' button/interface that automatically reports to Control.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Post-journey checklist enforcement on DMI",
+      "discovery": "The system needs to ensure proper train securing procedures are followed, potentially through a mandatory DMI checklist.",
+      "source_basis": "The driver asks how the system ensures proper securing procedures are followed, suggesting a checklist that must be completed on the DMI.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": "Should train securing procedures be enforced via a mandatory DMI checklist?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Integration between DMI and post-journey reporting systems",
+      "discovery": "Integration is required between DMI real-time data and post-journey reporting systems to determine auto-population and driver validation roles.",
+      "source_basis": "The driver highlights a missing requirement regarding the integration between DMI real-time data and post-journey reporting systems, including auto-population.",
+      "origin": "EXPLICIT",
+      "open_question": "How much auto-population happens from the DMI to reporting systems, and what is the driver's validation role?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "OPERATIONAL",
+      "title": "Strict operational boundaries and prohibitions",
+      "discovery": "Drivers are restricted from performing specific actions without explicit authority, such as modifying schedules, bypassing safety interlocks, permanently silencing critical alarms, changing train identity, exceeding speed limits, passing signals at danger, overriding safety systems, modifying other crew data, disabling reporting, or editing events without an audit trail.",
+      "source_basis": "The driver lists specific actions they should NOT be allowed to perform without explicit, auditable authority across all stages.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "OPERATIONAL",
+      "title": "Degraded mode and automatic report buffering during connectivity loss",
+      "discovery": "During connectivity loss, the system must buffer reports locally (arrival/departure times) and transmit them upon reconnection while providing clear visual or audible connectivity status indicators.",
+      "source_basis": "The driver specifies that reports should be automatically buffered on the DMI during connectivity drops and transmitted later, alongside clear status indications.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "MISSING_ACTOR",
+      "title": "Signaller, Duty Manager, Shunter, and Maintenance staff interaction",
+      "discovery": "The workflow relies on interactions with external operational roles such as Control, Signallers, Duty Managers, Shunters, Maintenance staff, and Medical personnel who provide authority, clearances, or briefs.",
+      "source_basis": "Throughout the journey stages, the driver references interactions and required authorities involving Control, Signallers, Duty Managers, shunt teams, and maintenance staff.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": "Are these external operational roles direct users of SmartRail or interfacing via separate systems?",
+      "scope_signal": "REVIEW_NEEDED"
+    }
+  ]
+}

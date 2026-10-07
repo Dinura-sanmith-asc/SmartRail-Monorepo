@@ -1,0 +1,122 @@
+{
+  "stakeholder": "catering_provider",
+  "discoveries": [
+    {
+      "category": "FUNCTIONAL",
+      "title": "Comprehensive Catering Catalog Integration",
+      "discovery": "The catering provider's independent system maintains and provides a structured catalog of menus, dishes, pricing, allergen information, preparation instructions, and availability rules, which must be integrated with SmartRail.",
+      "source_basis": "The catering provider states their system maintains menus, pricing, allergen info, and availability, and provides a structured list of available menus to SmartRail.",
+      "origin": "EXPLICIT",
+      "open_question": "How often must menu data be refreshed if SmartRail caches the data?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Station Identifier Mapping",
+      "discovery": "There is a need to ensure a consistent mapping of station identifiers between the SmartRail system and the catering provider's independent system.",
+      "source_basis": "The provider explicitly lists 'Mismatch in Station IDs' as a failure scenario/ambiguity requiring consistent mapping.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Station Eligibility and Order Deadlines",
+      "discovery": "The catering provider cross-references train stops with supported stations to supply SmartRail with valid collection points and associated order cut-off times for specific journeys.",
+      "source_basis": "The provider mentions cross-referencing train stops with supported stations and providing valid collection points and order deadlines.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Payment Responsibility and Refunds",
+      "discovery": "It is unclear whether SmartRail handles payment and sends pre-paid orders or if the catering provider needs payment details directly via SmartRail's API, which directly impacts refund liabilities.",
+      "source_basis": "The provider highlights payment responsibility as an unclear ownership area where it must be decided who handles transactions and refund processing.",
+      "origin": "EXPLICIT",
+      "open_question": "Who handles the actual financial transaction with the passenger and processes refunds for cancellations and errors?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Idempotent Order Creation and Processing",
+      "discovery": "Both SmartRail's API calls and the catering system must support idempotency to handle retries safely without creating duplicate orders or sending duplicate status updates.",
+      "source_basis": "The provider specifies that their system must be idempotent against retries for order creation and needs to handle duplicate status updates.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "STATE",
+      "title": "Real-time Order Status Tracking",
+      "discovery": "The catering system pushes asynchronous order status updates (\"Accepted\", \"In Preparation\", \"Ready for Collection\", \"Missed Collection\", etc.) to SmartRail.",
+      "source_basis": "The provider explains that their system pushes status updates like Accepted, In Preparation, and Ready for Collection to SmartRail.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "OPERATIONAL",
+      "title": "Real-time Train Status and Delay Notifications",
+      "discovery": "The catering provider relies on real-time, push notifications from SmartRail regarding train status changes and delays to adjust kitchen preparation schedules dynamically.",
+      "source_basis": "The provider states they need real-time push notifications from SmartRail about delays or schedule changes affecting collection station arrival times.",
+      "origin": "EXPLICIT",
+      "open_question": "Does SmartRail provide a new estimated arrival time or just a delayed flag?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "CONFLICT",
+      "title": "Liability for Spoiled Food and Missed Collection",
+      "discovery": "Unclear ownership regarding who bears the financial loss if food is prepared and spoils due to a severe train delay or if a passenger misses collection.",
+      "source_basis": "The provider flags liability for spoiled food due to delays and liability for payment upon a passenger missing collection as unclear ownership areas.",
+      "origin": "EXPLICIT",
+      "open_question": "Who covers the cost of wasted food due to severe train delays or missed collections?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Collection Confirmation via Verification Token",
+      "discovery": "Collection point staff must validate the passenger's SmartRail-generated QR code or order number against order details during physical collection.",
+      "source_basis": "The provider mentions staff confirming collection by scanning a QR code or noting passenger name/order ID, validated against order details.",
+      "origin": "EXPLICIT",
+      "open_question": "What is the fallback procedure if dedicated staff are not present at the collection point or scanners fail?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Order Cancellation Cut-off Enforcement",
+      "discovery": "It is ambiguous whether SmartRail's UI should fully enforce cancellation cut-off times or if the catering system should act as the final arbiter of cancellation requests.",
+      "source_basis": "The provider notes an ambiguity on whether SmartRail's UI should grey out cancellation options or if validation should rely solely on the catering system.",
+      "origin": "EXPLICIT",
+      "open_question": "Should SmartRail enforce cut-offs in the UI or act purely informatively while letting the catering system enforce rules?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "System Downtime and Guaranteed Messaging",
+      "discovery": "If SmartRail's or the catering provider's system experiences critical downtime, mechanisms like polling, guaranteed messaging, or pausing catering service offerings are required.",
+      "source_basis": "The provider discusses integration failures, lost order acknowledgments, and notification of critical system downtime to pause services.",
+      "origin": "EXPLICIT",
+      "open_question": "How do SmartRail and the catering provider reconcile lost order creation messages or achieve eventual consistency during network failures?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Advanced Catering Features and Partial Cancellations",
+      "discovery": "The integration might need to support complex operations such as partial item cancellations within an order and passenger-specific preference management.",
+      "source_basis": "The provider queries whether it is possible to cancel individual items from an order and notes passenger class/special requests from previous orders as optional context.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": "Should the system support partial cancellations of individual order items?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Customer Support Escalation and Dispute Resolution",
+      "discovery": "There is a lack of clarity on who serves as the primary point of contact for the passenger when order issues (like missing or incorrect items) arise and how issues are escalated between parties.",
+      "source_basis": "The provider lists dispute resolution for order issues as an ambiguous responsibility affecting customer satisfaction and operational workload.",
+      "origin": "EXPLICIT",
+      "open_question": "Who is the primary contact point for the passenger when resolving order disputes, and how are issues escalated?",
+      "scope_signal": "REVIEW_NEEDED"
+    }
+  ]
+}

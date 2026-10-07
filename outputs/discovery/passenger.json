@@ -1,0 +1,185 @@
+{
+  "stakeholder": "passenger",
+  "discoveries": [
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Unified Journey Planner",
+      "discovery": "A single national platform that aggregates all routes, schedules, and real-time prices from all operators to help passengers find and compare options.",
+      "source_basis": "Stage 1 outlines a unified journey planner aggregating routes, schedules, and prices.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Transparent Fares Display",
+      "discovery": "Clearly display all ticket types, their terms, and the total cost upfront, including applicable railcard discounts.",
+      "source_basis": "Stage 1 and 2 mention transparent cost estimates, total cost, and automatic application of registered railcard discounts.",
+      "origin": "EXPLICIT",
+      "open_question": "How will SmartRail manage existing multi-operator fare structures and potential split-ticketing options to ensure passengers get the best value?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Detailed Accessibility Information and Filtering",
+      "discovery": "Integrate comprehensive, verified accessibility information for every station and rolling stock type, enabling passengers to filter by specific needs such as step-free access or accessible toilets.",
+      "source_basis": "Stage 1 details accessibility information and filtering requirements.",
+      "origin": "EXPLICIT",
+      "open_question": "What level of granular detail will accessibility information provide (e.g., specific measurements vs. general tags)?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Proactive Disruption Warnings",
+      "discovery": "Highlight planned engineering works or long-term disruptions upfront during the planning stage and suggest suitable alternatives.",
+      "source_basis": "Stage 1 highlights the need for proactive disruption warnings and engineering work summaries.",
+      "origin": "EXPLICIT",
+      "open_question": "How frequently will engineering work schedules be updated and verified by SmartRail from all operators?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Service and Occupancy Details",
+      "discovery": "Display information on available on-board services like WiFi, catering, and power sockets, along with estimated train occupancy levels.",
+      "source_basis": "Stage 1 mentions displaying on-board services and occupancy levels.",
+      "origin": "EXPLICIT",
+      "open_question": "Will SmartRail provide predictive occupancy levels based on historical data and current booking trends, or just current real-time data?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Integrated Onward Travel Information",
+      "discovery": "Provide basic information about local transport links at origin and destination stations.",
+      "source_basis": "Stage 1 notes integrated onward travel and local transport links.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Multi-operator Journey Handling",
+      "discovery": "Uncertainty regarding how SmartRail will handle scenarios where an optimal journey involves travel with multiple operators that do not traditionally integrate ticketing.",
+      "source_basis": "Stage 1 asks how SmartRail will handle non-integrated multi-operator journeys.",
+      "origin": "EXPLICIT",
+      "open_question": "How will SmartRail handle scenarios where an optimal journey involves travel with multiple operators that don't traditionally integrate their ticketing?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Visual Seat Selection",
+      "discovery": "Allow passengers to select specific seats from a visual coach layout highlighting amenities, accessible spaces, and proximity to toilets.",
+      "source_basis": "Stage 2 discusses options to select specific seats and visual seat maps.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Special Assistance Integration",
+      "discovery": "Provide a dedicated section within the booking process to request and confirm special assistance directly with clear confirmation messages.",
+      "source_basis": "Stage 2 describes assistance integration during booking.",
+      "origin": "EXPLICIT",
+      "open_question": "Will the system differentiate between different types of assistance needs and tailor the request accordingly?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Direct Retailer vs. Redirect Role",
+      "discovery": "It is unclear whether SmartRail will act as a direct retailer for all train tickets or redirect users to individual operator sites.",
+      "source_basis": "Stage 2 asks if SmartRail will act as a direct retailer or redirect to individual operator sites.",
+      "origin": "EXPLICIT",
+      "open_question": "Will SmartRail act as a direct retailer for all train tickets, or will it redirect to individual operator sites for final purchase?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "SECURITY",
+      "title": "Data Security and Privacy Protocols",
+      "discovery": "Protocols must be defined for data security and privacy when storing passenger payment details and personal information.",
+      "source_basis": "Stage 2 question about data security and privacy protocols for payment and personal details.",
+      "origin": "EXPLICIT",
+      "open_question": "What protocols will be in place for data security and privacy when storing payment details and personal information?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Proactive Notifications for Day of Travel",
+      "discovery": "Send push notifications for significant delays, cancellations, or platform changes affecting a specific booked journey.",
+      "source_basis": "Stage 3 outlines proactive notifications for day of travel updates.",
+      "origin": "EXPLICIT",
+      "open_question": "What threshold constitutes a significant delay for a push notification and can passengers customize this?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Signal Loss and Device Failure",
+      "discovery": "Passengers facing phone battery failure, missing tickets, or signal loss at the station when trying to present mobile tickets.",
+      "source_basis": "Stage 3 mentions ticket troubles such as dying phone batteries or missing tickets, and asks about offline mode.",
+      "origin": "EXPLICIT",
+      "open_question": "Will SmartRail have an offline mode for displaying mobile tickets in case of signal loss at the station?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Interactive Station Maps and Coach Stopping Positions",
+      "discovery": "Provide interactive, GPS-enabled station maps showing facilities, assistance points, accessible routes, and estimated coach stopping positions on the platform.",
+      "source_basis": "Stage 4 covers interactive station maps and estimated coach stopping positions.",
+      "origin": "EXPLICIT",
+      "open_question": "What is the accuracy level of coach stopping position predictions given varied train lengths and platform designs?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Facility and Lift Out-of-Order Alerts",
+      "discovery": "Real-time alerts for out-of-order station facilities such as lifts, escalators, and accessible toilets.",
+      "source_basis": "Stage 4 mentions facility alerts for out-of-order station facilities.",
+      "origin": "EXPLICIT",
+      "open_question": "How will SmartRail ensure that real-time lift/escalator status is consistently and accurately reported from all stations?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Real-Time Train Tracking and In-Journey Updates",
+      "discovery": "A live map showing the train's current location, speed, and estimated arrival times, alongside push notifications for delays and disruption explanations.",
+      "source_basis": "Stage 5 specifies real-time train tracking and proactive in-journey updates.",
+      "origin": "EXPLICIT",
+      "open_question": "What level of detail will be provided in disruption explanations and how will this be communicated consistently?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Discreet Issue Reporting on Board",
+      "discovery": "A discreet feature allowing passengers to report non-emergency issues like heating problems or anti-social behavior directly to on-board staff.",
+      "source_basis": "Stage 5 mentions reporting non-emergency issues directly to on-board staff.",
+      "origin": "EXPLICIT",
+      "open_question": "What is the service level agreement for responses to issues reported via the app?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Missed Connections and Connection Risks",
+      "discovery": "Delays on initial trains putting connections at risk or causing missed connections without clear alternative guidance or protected status.",
+      "source_basis": "Stage 6 identifies risks of missed connections, unprotected connections, and lack of guidance.",
+      "origin": "EXPLICIT",
+      "open_question": "Will SmartRail clearly indicate if a connection is protected and what level of automatic re-booking will be facilitated?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Centralized Compensation Claims (Delay Repay)",
+      "discovery": "A centralized, simplified process for claiming Delay Repay, potentially auto-populating journey details from booking history.",
+      "source_basis": "Stage 8 details simplified compensation and centralized Delay Repay claims.",
+      "origin": "EXPLICIT",
+      "open_question": "Will SmartRail directly manage compensation claims or redirect to operators, and how will dispute resolution be handled?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Consolidated Lost Property Search",
+      "discovery": "A consolidated lost property search portal across all participating operators to track and retrieve lost items.",
+      "source_basis": "Stage 8 notes centralized lost property search portal.",
+      "origin": "EXPLICIT",
+      "open_question": "Will the lost property portal require real-time updates from all operators, and how will its effectiveness be measured?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    }
+  ]
+}

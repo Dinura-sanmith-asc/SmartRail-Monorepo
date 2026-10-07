@@ -1,0 +1,221 @@
+{
+  "stakeholder": "railway_controller",
+  "discoveries": [
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Passenger compensation management",
+      "discovery": "TOCs manage passenger compensation during delays and incidents, but it represents a broader operational subsystem that could be linked.",
+      "source_basis": "Mentioned during delay management and operational incidents where TOCs handle passenger compensation.",
+      "origin": "EXPLICIT",
+      "open_question": "Should the system track or integrate with passenger compensation workflows?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "On-board ticket purchasing or fare management",
+      "discovery": "The stakeholder interview touches on passenger management and alternative transport arrangements, but does not explicitly detail ticket purchasing functions.",
+      "source_basis": "Mention of ticket acceptance on other routes and alternative travel options.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Indoor station navigation",
+      "discovery": "Station staff manage passenger flow and communicate platform changes, but specialized indoor navigation for passengers was not discussed.",
+      "source_basis": "Platform changes and station staff responsibilities in guiding passengers.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Advanced passenger seat reservations",
+      "discovery": "Short-forming, journey terminations, and cancellations impact passenger seating, but seat reservations are not part of the network controller's core toolset.",
+      "source_basis": "Short-forming and train cancellations affecting passenger capacity.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "MISSING_ACTOR",
+      "title": "Emergency Services",
+      "discovery": "Emergency services (police, fire, ambulance) take command of life safety aspects during unexpected journey terminations and major incidents.",
+      "source_basis": "Mentioned under unexpected journey terminations and operational incidents as taking command of life safety.",
+      "origin": "EXPLICIT",
+      "open_question": "What level of direct system access or communication interface do emergency services require?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "MISSING_ACTOR",
+      "title": "Infrastructure Engineers",
+      "discovery": "Infrastructure teams are responsible for carrying out repairs, assessing track/signal safety, and accessing the track following incidents.",
+      "source_basis": "Mentioned in operational incidents and unexpected journey terminations regarding repairs and track access.",
+      "origin": "EXPLICIT",
+      "open_question": "How will engineering teams log onto the system to request and release track access authority?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Real-time Network Map display",
+      "discovery": "The system needs to provide a visual display of all active trains, schedules, actual positions, speeds, and signal indications.",
+      "source_basis": "Listed under general information and tools for a network controller.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Incident Management System",
+      "discovery": "The controller uses an incident management system to log, track, and manage all operational disruptions.",
+      "source_basis": "Listed under general tools as the Incident Management System.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Communication systems integration",
+      "discovery": "Direct links are required to drivers (GSMR/radio), signallers, station managers, TOC control rooms, and emergency services.",
+      "source_basis": "Listed under communication systems in the controller's general tools.",
+      "origin": "EXPLICIT",
+      "open_question": "Which specific communication protocols (GSMR, radio, text, voice) must be integrated directly into the software interface?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Performance monitoring and dashboards",
+      "discovery": "Dashboards showing network punctuality, delay attribution, and resource availability are necessary for strategic monitoring.",
+      "source_basis": "Listed under performance monitoring tools.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Infrastructure and weather status monitoring",
+      "discovery": "The system must display real-time information on track conditions, signalling faults, power supply, engineering works, and live weather updates.",
+      "source_basis": "Described under infrastructure status and weather monitoring sections.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "STATE",
+      "title": "Missing journey states during incidents",
+      "discovery": "Journey states such as 'Incident-affected - Stationary', 'Awaiting recovery', 'Passenger evacuation underway', and 'Line Blocked' need to be tracked.",
+      "source_basis": "Explicitly listed under missing journey states in section 7.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Late notification of cancellation",
+      "discovery": "Late notification of cancellation can lead to passengers waiting unnecessarily at stations.",
+      "source_basis": "Identified explicitly under failure scenarios in the cancellations section.",
+      "origin": "EXPLICIT",
+      "open_question": "What automated alerts can reduce the window between a cancellation decision and passenger notification?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Unclear authority during cancellations",
+      "discovery": "Unclear authority can lead to delays in decision-making and inefficient network use during service cancellations.",
+      "source_basis": "Mentioned under failure scenarios in the cancellations section.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "CONFLICT",
+      "title": "Station staff resistance to platform changes",
+      "discovery": "Station staff may resist platform changes due to accessibility challenges, overcrowding, or insufficient passenger notification time, posing safety concerns.",
+      "source_basis": "Described under conflicting responsibilities in the platform changes section.",
+      "origin": "EXPLICIT",
+      "open_question": "How should the system handle a veto or warning raised by station staff against a controller-initiated platform change?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "CONFLICT",
+      "title": "TOC service maintenance vs. Infrastructure safety",
+      "discovery": "Pressure from TOCs to maintain services can conflict with safety concerns from infrastructure engineers, requiring the controller to act as arbiter prioritizing safety.",
+      "source_basis": "Described under conflicting responsibilities in the operational incidents section.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "CONFLICT",
+      "title": "Passenger train diversions vs. Freight service priorities",
+      "discovery": "Diverting a critical passenger train might necessitate delaying or cancelling a vital freight service on the alternative route.",
+      "source_basis": "Described under conflicting responsibilities in the route changes section.",
+      "origin": "EXPLICIT",
+      "open_question": "Does the system provide automated decision support to weigh the priority trade-offs between passenger and freight services?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "SECURITY",
+      "title": "Strict audit logging of all actions",
+      "discovery": "Every decision, instruction, and authorization must be logged with a precise timestamp and the identity of the authorizing individual.",
+      "source_basis": "Listed under key audit requirements across all scenarios.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "SECURITY",
+      "title": "Communication and data archiving",
+      "discovery": "All voice and text communications, real-time train movement data, and infrastructure status data must be archived for later analysis.",
+      "source_basis": "Listed under communication records and real-time data archiving requirements.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "ACCESSIBILITY",
+      "title": "Reduced mobility passenger platform evaluation",
+      "discovery": "Alternative platforms must be checked for accessibility and specific needs for passengers with reduced mobility during platform changes.",
+      "source_basis": "Mentioned under information needed for platform changes.",
+      "origin": "EXPLICIT",
+      "open_question": "How will accessibility metadata for each platform be maintained and queried by the system?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Passenger Information Systems integration",
+      "discovery": "Updated plans, diversions, cancellations, and platform changes must be communicated to Passenger Information Systems and station staff.",
+      "source_basis": "Mentioned across delay mitigation, platform changes, and route changes.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Multi-party operational authorization flow",
+      "discovery": "Departures, running order adjustments, and emergency stops rely on a strict chain of authority involving the Network Controller, Signallers, Station Staff, Drivers, and TOCs.",
+      "source_basis": "Detailed throughout sections 1 through 8 regarding who provides information, makes decisions, and authorizes actions.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "ASSUMPTION",
+      "title": "Driver route competence verification",
+      "discovery": "It is assumed that the network controller or TOC can reliably verify whether an assigned driver is competent and familiar with a diversionary route before authorizing it.",
+      "source_basis": "Mentioned under route changes where driver familiarity with the route must be confirmed.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": "Is driver route competence tracked automatically within the system or verified manually?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Commercial vs Operational cancellation distinction",
+      "discovery": "Cancellations involve a commercial decision by TOCs based on resources and a separate operational cancellation by the Network Controller to free up paths, but the exact workflow boundary is fluid.",
+      "source_basis": "Described in the cancellations section regarding TOC commercial decisions versus network controller operational cancellations.",
+      "origin": "EXPLICIT",
+      "open_question": "Can an operational cancellation be triggered automatically if a TOC fails to confirm resource availability by a specific threshold time?",
+      "scope_signal": "REVIEW_NEEDED"
+    }
+  ]
+}
