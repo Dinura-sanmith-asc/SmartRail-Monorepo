@@ -14,6 +14,13 @@ OUTPUT_DIR.mkdir(
 )
 
 
+# Only analyse these stakeholders
+TARGET_STAKEHOLDERS = {
+    "customer_service",
+    "product_owner",
+}
+
+
 def create_markdown(report):
     stakeholder_name = report.stakeholder.replace(
         "_",
@@ -62,6 +69,22 @@ for input_file in files:
 
     stakeholder = input_file.stem
 
+    # Only process the required stakeholders
+    if stakeholder not in TARGET_STAKEHOLDERS:
+        continue
+
+    # Define output paths before making the API call
+    json_file = OUTPUT_DIR / f"{stakeholder}.json"
+    markdown_file = OUTPUT_DIR / f"{stakeholder}.md"
+
+    # Skip API call if discovery already exists
+    if json_file.exists() and markdown_file.exists():
+        print(
+            f"Discovery already exists for {stakeholder}. "
+            f"Skipping API call."
+        )
+        continue
+
     print()
     print("=" * 60)
     print(f"Analysing: {stakeholder}")
@@ -77,8 +100,6 @@ for input_file in files:
     )
 
     # Save machine-readable JSON
-    json_file = OUTPUT_DIR / f"{stakeholder}.json"
-
     json_file.write_text(
         json.dumps(
             report.model_dump(),
@@ -89,8 +110,6 @@ for input_file in files:
     )
 
     # Save human-readable Markdown
-    markdown_file = OUTPUT_DIR / f"{stakeholder}.md"
-
     markdown_file.write_text(
         create_markdown(report),
         encoding="utf-8",

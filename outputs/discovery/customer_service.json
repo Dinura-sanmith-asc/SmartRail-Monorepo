@@ -1,0 +1,167 @@
+{
+  "stakeholder": "customer_service",
+  "discoveries": [
+    {
+      "category": "FUNCTIONAL",
+      "title": "Access to Real-Time Schedule and Infrastructure Data",
+      "discovery": "Customer service representatives need quick access to real-time schedule data, platform assignments, station layout details, and train-specific amenities to answer passenger enquiries.",
+      "source_basis": "The stakeholder requires real-time schedule data, platform numbers, station layout, and train amenities to perform enquiries.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Access to Delay Reasons and Duration",
+      "discovery": "CSRs require the specific reason for delays and estimated durations to properly inform and advise passengers.",
+      "source_basis": "The stakeholder mentions requiring real-time status of delayed trains and crucially the reason for the delay.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Single Source of Truth and Data Consistency",
+      "discovery": "Inconsistencies between the CSR system, public screens, and mobile apps erode passenger trust. A single authoritative source is required.",
+      "source_basis": "The stakeholder notes failure scenarios involving conflicting info where their system shows one thing and public screens another.",
+      "origin": "EXPLICIT",
+      "open_question": "What is the definitive authoritative source for real-time journey information?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Ticketing, Refunds, and Compensation Support",
+      "discovery": "Processing refunds, issuing compensation, and handling complex ticketing or routing are outside direct CSR control and need definition regarding system inclusion.",
+      "source_basis": "The stakeholder explicitly mentions that ticketing support, direct compensation, and refunds are scope candidates or questions for future definition.",
+      "origin": "EXPLICIT",
+      "open_question": "Should SmartRail include ticketing support, refunds, and compensation management?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Hotel Accommodation and Private Taxi Arrangement",
+      "discovery": "Arranging hotel accommodation or private taxis for individuals stranded by major disruptions is noted as a potential scope item or policy question.",
+      "source_basis": "The stakeholder states that arranging hotel accommodation or private taxis is a scope candidate/question.",
+      "origin": "EXPLICIT",
+      "open_question": "Are hotel and taxi arrangements part of the system or operator policy scope?",
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "System Slowdown and Downtime Impact",
+      "discovery": "System slowdowns or downtime prevent CSRs from accessing information, leading to delays and passenger frustration.",
+      "source_basis": "The stakeholder identifies system slowdown/downtime as a failure scenario where information cannot be accessed.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Language Barrier and Translation Support",
+      "discovery": "Inability to communicate effectively with passengers who speak different languages without translation support.",
+      "source_basis": "The stakeholder lists language barrier as a failure scenario causing communication difficulties.",
+      "origin": "EXPLICIT",
+      "open_question": "How should language barriers be handled within the system?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Real-time Facility Status Updates",
+      "discovery": "Unclear how quickly CSRs are informed about out-of-order facilities like broken lifts and whether a real-time status update system exists.",
+      "source_basis": "The stakeholder lists facility status as an unclear responsibility regarding real-time status updates.",
+      "origin": "EXPLICIT",
+      "open_question": "How are broken or out-of-order station facilities reported in real time to customer service?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "MISSING_ACTOR",
+      "title": "Dedicated Ticketing Agent",
+      "discovery": "Complex ticketing and routing issues are escalated to a dedicated ticketing agent if SmartRail does not include ticketing support.",
+      "source_basis": "Escalation paths mention a dedicated ticketing agent.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": null,
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "MISSING_ACTOR",
+      "title": "Station Management, First Aid, and BTP",
+      "discovery": "Medical issues, security concerns, lost children, and unruly passengers require escalation to Station Management, First Aid, or British Transport Police.",
+      "source_basis": "Escalation paths outline medical/security and lost children handoffs to Station Management, First Aid, or BTP.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Alternative Transport Activation Process",
+      "discovery": "A defined process is missing for when and how alternative transport (buses, taxis) is activated and communicated during significant delays or cancellations.",
+      "source_basis": "The stakeholder notes alternative transport activation as a missing business process.",
+      "origin": "EXPLICIT",
+      "open_question": "Who decides on and arranges replacement transport, and how is it communicated?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "ACCESSIBILITY",
+      "title": "Real-time Accessibility and Lift Status Tracking",
+      "discovery": "CSRs need real-time operational status of all accessibility equipment, such as lifts and ramps, to assist passengers with mobility needs.",
+      "source_basis": "The stakeholder highlights the need for real-time status of station accessibility features and notes out-of-date information as a failure scenario.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "ACCESSIBILITY",
+      "title": "Spontaneous and Pre-booked Assistance Protocols",
+      "discovery": "Protocols are needed for managing both pre-booked and spontaneous mobility assistance, including handling assistance no-shows.",
+      "source_basis": "The stakeholder discusses verifying pre-booked assistance, arranging spontaneous assistance, and failure scenarios like assistance no-shows.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Unified Booking and Tracking Assistance System",
+      "discovery": "A unified system is desired for booking and tracking assistance requests across journeys, potentially involving multiple operators.",
+      "source_basis": "Unclear responsibilities mention an integrated booking system for assistance requests across operators.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Inter-Operator Ticket Acceptance and Rules",
+      "discovery": "Rules for ticket acceptance across different operators during disruptions are often unclear and vary widely.",
+      "source_basis": "Failure scenarios and missing processes note unclear ticket acceptance rules for alternative routes or operators.",
+      "origin": "EXPLICIT",
+      "open_question": "How can inter-operator ticket validity rules be easily viewed and communicated during disruptions?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Complaint Logging System",
+      "discovery": "CSRs need access to a designated system to accurately and efficiently log complaints and track escalations.",
+      "source_basis": "Information required for complaints includes access to a complaint logging system.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "STATE",
+      "title": "Dynamic and Constantly Changing Estimates",
+      "discovery": "Constantly shifting arrival or departure time estimates erode passenger trust and CSR credibility.",
+      "source_basis": "Failure scenarios under delays list 'Constantly Changing Times' where estimates keep shifting.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Vulnerable Passenger Support Protocol",
+      "discovery": "A defined process is needed for identifying and proactively supporting vulnerable passengers, unaccompanied minors, the elderly, or those with cognitive disabilities during major cancellations or platform changes.",
+      "source_basis": "Unclear responsibilities mention vulnerable passenger support during cancellations and specific handoff procedures.",
+      "origin": "EXPLICIT",
+      "open_question": "What are the specific handover and support protocols for vulnerable passengers?",
+      "scope_signal": "CORE_CANDIDATE"
+    }
+  ]
+}
