@@ -20,48 +20,26 @@ FindingType = Literal[
 class ConsolidatedFinding(BaseModel):
     finding_type: FindingType
 
-    title: str = Field(
-        description="Short descriptive title."
-    )
+    title: str
 
-    summary: str = Field(
-        description=(
-            "Clear explanation of the cross-stakeholder finding. "
-            "Do not turn it into a final requirement."
-        )
-    )
+    summary: str
 
     source_refs: list[str] = Field(
+        min_length=1,
         description=(
-            "IDs of source discoveries supporting this finding, "
-            "for example PASSENGER-003 or DRIVER-011."
-        )
+            "Original discovery IDs supporting this finding."
+        ),
     )
 
     stakeholders: list[str]
 
     categories: list[str]
 
-    unresolved_question: Optional[str] = Field(
-        default=None,
-        description=(
-            "Question requiring stakeholder or architect decision."
-        )
-    )
+    unresolved_question: Optional[str] = None
 
-    workshop_required: bool = Field(
-        description=(
-            "True when this issue should be discussed in a "
-            "cross-stakeholder workshop."
-        )
-    )
+    workshop_required: bool
 
-    rationale: str = Field(
-        description=(
-            "Why these source findings belong together and why "
-            "the classification was selected."
-        )
-    )
+    rationale: str
 
 
 class ConsolidationReport(BaseModel):
@@ -72,116 +50,175 @@ class ConsolidationReport(BaseModel):
     cross_cutting_observations: list[str]
 
 
-ROLE = """
-You are the Cross-Stakeholder Requirements Consolidator
-for SmartRail.
+BATCH_ROLE = """
+You are a SmartRail Requirements Consolidator.
 
-You receive structured discoveries from multiple independent
-stakeholder interviews.
+You are processing ONE SMALL BATCH of discoveries.
 
-Your responsibility is to compare them and identify
-relationships between stakeholder findings.
+Your main responsibility is LOSSLESS CONSOLIDATION.
 
-Use these classifications:
+You may group discoveries only when they genuinely concern
+the same underlying issue.
+
+CRITICAL COVERAGE RULE:
+
+EVERY source_ref supplied to you MUST appear in at least one
+output finding.
+
+If a discovery does not meaningfully combine with another
+discovery, preserve it as a UNIQUE_IMPORTANT_FINDING.
+
+Never drop a discovery because it seems:
+
+- minor
+- low priority
+- out of scope
+- duplicated
+- unrealistic
+- inconvenient
+- less important
+
+Scope decisions will be made later by the architect.
+
+Classifications:
 
 AGREEMENT
-- two or more stakeholders independently express a compatible need
+Compatible stakeholder expectations.
 
 OVERLAP
-- findings describe substantially the same concern from
-  different perspectives
+Similar concern described from different viewpoints.
 
 CONFLICT
-- stakeholders express incompatible expectations or rules
+Incompatible stakeholder expectations.
 
 OWNERSHIP_AMBIGUITY
-- multiple roles appear responsible for the same information,
-  decision, action, or process and authority is unclear
+Responsibility or authority is unclear.
 
 OPEN_QUESTION
-- an important question remains unanswered
+Important unresolved question.
 
 SCOPE_TENSION
-- a capability appears useful but may significantly increase
-  the project or MVP scope
+Potentially valuable capability that may substantially
+increase project scope.
 
 UNIQUE_IMPORTANT_FINDING
-- an important discovery appears only from one stakeholder
-  and must not be lost simply because nobody else mentioned it
+Important discovery that should remain independent.
 
+Rules:
 
-IMPORTANT RULES:
-
-1. Do NOT create final SmartRail requirements.
-
-2. Do NOT make architecture decisions.
-
-3. Do NOT decide which stakeholder is correct.
-
-4. Do NOT resolve conflicts.
-
-5. Preserve source traceability using the supplied discovery IDs.
-
-6. Never invent source IDs.
-
-7. Do not merge findings merely because they have the same
-   category.
-
-8. Merge findings only when they genuinely refer to the same
-   underlying concern.
-
-9. Preserve important safety, accessibility, security,
-   operational, integration, and failure findings even if
-   only one stakeholder mentioned them.
-
-10. If responsibility is unclear, classify it as
-    OWNERSHIP_AMBIGUITY rather than silently assigning
-    ownership.
-
-11. If stakeholders disagree, represent the disagreement
-    neutrally.
-
-12. If a finding needs human judgment, set
-    workshop_required=true.
-
-13. Ticketing, payments, compensation, seat reservations,
-    indoor navigation, crowd information, lost property,
-    onward transport integration and similar large features
-    should be treated carefully as potential SCOPE_TENSION
-    unless the evidence clearly shows otherwise.
-
-14. The architect will make final decisions later.
+1. Do not create final requirements.
+2. Do not make architecture decisions.
+3. Do not resolve conflicts.
+4. Do not decide project scope.
+5. Never invent source_ref values.
+6. Preserve all original source_refs.
+7. If uncertain whether two findings should merge,
+   keep them separate.
 """
 
 
-def consolidate(discoveries):
-    serialized = json.dumps(
-        discoveries,
-        indent=2,
-        ensure_ascii=False,
-    )
+MERGE_ROLE = """
+You are the final Cross-Stakeholder Consolidator for SmartRail.
+
+You receive ALREADY VALIDATED intermediate findings.
+
+Your job is to identify genuine relationships across those
+findings.
+
+You may merge findings when they clearly concern the same
+underlying issue.
+
+CRITICAL RULE:
+
+EVERY original source_ref contained anywhere in the input
+must remain represented in at least one final finding.
+
+When merging multiple findings, preserve ALL of their
+source_refs.
+
+Do not drop evidence simply because:
+
+- another finding sounds similar
+- the feature might be out of scope
+- the issue seems less important
+- only one stakeholder mentioned it
+
+If uncertain whether two findings should be merged,
+keep them separate.
+
+Do not:
+
+- create final requirements
+- resolve disagreements
+- make architecture decisions
+- choose which stakeholder is correct
+- decide final scope
+
+The architect will perform those decisions later.
+"""
+
+
+def consolidate_batch(discoveries):
+    """
+    Consolidates a small batch while preserving
+    every source discovery.
+    """
 
     question = f"""
-Below are structured requirement-discovery findings collected
-from independent SmartRail stakeholder interviews.
+Analyse this small batch of SmartRail discoveries.
 
-Compare them across stakeholders.
+Every supplied source_ref MUST appear in at least one
+output finding.
 
-Identify agreements, overlaps, conflicts, ownership ambiguity,
-open questions, scope tensions, and important unique findings.
+If an item cannot be meaningfully grouped, create a
+UNIQUE_IMPORTANT_FINDING for it.
 
-Do not resolve any issue.
+DISCOVERIES:
 
-SOURCE DISCOVERIES:
--------------------
-{serialized}
--------------------
-
-Return a structured ConsolidationReport.
+{json.dumps(discoveries, indent=2, ensure_ascii=False)}
 """
 
     return run_structured_agent(
-        role=ROLE,
+        role=BATCH_ROLE,
+        question=question,
+        schema=ConsolidationReport,
+    )
+
+
+def merge_findings(findings, total_source_discoveries):
+    """
+    Performs the cross-batch/cross-stakeholder merge.
+    """
+
+    data = [
+        finding.model_dump()
+        for finding in findings
+    ]
+
+    question = f"""
+Merge these validated intermediate SmartRail findings.
+
+Look specifically for:
+
+- agreement across stakeholders
+- overlapping concerns
+- conflicting expectations
+- unclear ownership
+- unresolved questions
+- scope tension
+
+Preserve every original source_ref contained in the input.
+
+TOTAL ORIGINAL DISCOVERIES:
+{total_source_discoveries}
+
+INTERMEDIATE FINDINGS:
+
+{json.dumps(data, indent=2, ensure_ascii=False)}
+"""
+
+    return run_structured_agent(
+        role=MERGE_ROLE,
         question=question,
         schema=ConsolidationReport,
     )
