@@ -1,0 +1,30 @@
+As the external Catering Provider integrating with SmartRail, here is our independent position for Round 1 of the workshop:
+
+### 1. What matters from our stakeholder perspective
+- **Menu and Inventory Accuracy:** We own the culinary catalog, pricing, allergen details, preparation instructions, and station-specific availability. It is vital that SmartRail does not alter or stale-date this information.
+- **Kitchen Preparation Windows:** We need reliable, real-time coordination with train movements so our kitchens can time food preparation properly (freshness is paramount) without wasting labor and ingredients.
+- **Financial Protection:** We operate independently and cannot absorb the costs of wasted food caused by uncommunicated train disruptions, sudden cancellations past our cut-offs, or passengers missing their collection windows due to railway operations.
+
+### 2. What responsibility our role has
+- **Catalog Management:** Providing structured menus, pricing, allergen data, collection deadlines, and supported station identifiers to SmartRail.
+- **Order Fulfillment & Kitchen State:** Managing food preparation within our own independent system and providing asynchronous status updates (e.g., *Order Accepted*, *Preparing*, *Ready for Collection*) back to SmartRail.
+- **Rule Enforcement:** Defining and enforcing our own cancellation cut-offs and business logic regarding whether an order can be modified or canceled.
+
+### 3. What responsibility our role should NOT have
+- **Railway Operations:** We do *not* manage train schedules, track assignments, signaling, or railway delay predictions.
+- **Passenger Ticketing/Travel Validation:** We do not determine if a passenger’s rail journey is valid, nor do we track train locations on the rail network.
+- **Direct Financial Liability for Rail Disruption:** We should not be held financially responsible for wasted food or refunds when a train is delayed, rerouted, or canceled by SmartRail outside of our agreed preparation cut-off windows.
+
+### 4. What risks or failure cases concern us
+- **Stale Menu Caching:** If SmartRail aggressively caches our menu catalogs without a synchronized refresh interval, passengers might order items that are out of stock or priced incorrectly, leading to kitchen rejections and poor passenger experience.
+- **Ambiguous Train Delays:** Receiving a simple "delayed" flag without a Revised Estimated Time of Arrival (ETA) makes it impossible for our kitchens to pause or hold food preparation, leading to either cold/spoiled food or unnecessary waste.
+- **Disputed Financial Liability:** Lack of clarity on who collects passenger payments and processes refunds leaves us vulnerable to absorbing costs for orders canceled too late by passengers or disrupted by railway failures.
+- **API/Integration Failures & Duplicates:** Missing webhook acks or duplicate order submissions due to network retries could result in duplicate kitchen preparations or missed order fulfillments.
+
+### 5. What decision you believe needs clarification
+- **Transaction & Financial Ownership:** We need a binding agreement on whether SmartRail acts as the merchant of record (handling payments and passenger refunds) and how compensation for disrupted/wasted food is structured between SmartRail and the catering provider.
+- **Delay Data Granularity:** We need SmartRail to explicitly confirm whether they will provide dynamic, real-time Estimated Times of Arrival (ETAs) during disruptions, rather than binary delay flags.
+- **Cut-off Enforcement:** We need to establish whether the catering system acts as the absolute arbiter for cancellation cut-offs (rejecting invalid late cancellations via API response) or if SmartRail's UI is expected to enforce those rules locally.
+
+### 6. Any assumption you disagree with
+- **Assumption that the Catering Provider should absorb disruption costs:** We strongly disagree with any implication that our independent business should bear the financial burden of food waste caused by railway delays, operational cancellations, or passengers missing their trains. Financial liability must follow operational ownership: SmartRail owns the journey; we own the meal preparation.

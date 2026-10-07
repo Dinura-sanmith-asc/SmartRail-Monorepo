@@ -1,0 +1,27 @@
+As the Product Owner Stakeholder Agent for SmartRail, here is my independent position for Round 1 regarding **Catering Integration, Operations, and Financial Liability**:
+
+### 1. What matters from my stakeholder perspective
+Passenger value and financial risk mitigation are my primary concerns. Passengers expect a seamless ordering experience where they can browse menus, pay securely, and trust that their food will be ready at their collection point. From a business and operational standpoint, SmartRail cannot become bogged down in complex commercial disputes with third-party catering providers over wasted food, nor can we absorb merchant-of-record liabilities that belong to the vendor. The product scope must remain commercially viable and operationally streamlined.
+
+### 2. What responsibility I believe my role has
+* Defining the baseline passenger-facing ordering workflow and user experience within the SmartRail app.
+* Establishing clear service-level expectations and data synchronization requirements for third-party partners.
+* Deciding what features are in-scope for the MVP versus what must be deferred to protect delivery timelines.
+* Protecting SmartRail from operational and financial exposure during train disruptions.
+
+### 3. What responsibility my role should NOT have
+* I am **not** responsible for designing the underlying technical architecture, API protocols (e.g., webhook vs. polling intervals), or data caching mechanisms (CF-001).
+* I do not arbitrate commercial contract terms, tax liabilities, or merchant-of-record banking arrangements between SmartRail and individual catering providers (CF-002).
+* I do not manage kitchen preparation workflows or food safety compliance.
+
+### 4. What risks or failure cases concern me
+* **Financial and Legal Exposure:** If SmartRail acts as the merchant of record without proper contractual backing, we risk absorbing refund liabilities and the cost of wasted food caused by railway delays that are outside our direct control (CF-002).
+* **Scope Creep:** Allowing complex edge-case features—such as partial item-level cancellations (CF-007)—will bloat the MVP, complicate the user interface, and create fragile integration dependencies with kitchen systems.
+* **Passenger Trust Erosion:** If a train is delayed and the catering system silently discards an order without clear communication or automated refund handling, the passenger blames SmartRail, damaging our brand.
+
+### 5. What decision needs clarification
+* **Commercial and Transaction Ownership:** We must officially clarify whether SmartRail is merely an affiliate discovery/ordering portal (passing payment details directly to the vendor) or the merchant of record. 
+* **Disruption Liability:** A firm business rule must be established regarding who absorbs the cost of food prepared in good faith when a train suffers a severe last-minute disruption or cancellation.
+
+### 6. Any assumption I disagree with
+* **Assumption to Challenge (CF-007):** The suggestion that we should support *partial cancellations of individual order items* is out of scope for the MVP. Kitchens operating under tight train-station collection windows cannot manage piecemeal order adjustments efficiently. The MVP must treat orders as atomic units (all-or-nothing cancellation before the cut-off time).
