@@ -7,7 +7,7 @@ from google.genai.errors import ServerError
 load_dotenv()
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-chat = client.chats.create(model="gemini-2.5-flash")
+chat = client.chats.create(model="gemini-3.5-flash-lite")
 
 prompt = "Explain in one short sentence what a railway passenger needs from a digital railway application."
 
