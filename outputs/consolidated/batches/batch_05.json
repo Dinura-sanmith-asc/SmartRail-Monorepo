@@ -1,0 +1,146 @@
+{
+  "batch_number": 5,
+  "input_count": 20,
+  "ai_missing_refs": [],
+  "invalid_refs": [],
+  "findings": [
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Advanced Post-MVP Feature Scope Candidates",
+      "summary": "Multiple discoveries identify complex, resource-intensive features such as full AI-powered predictive maintenance, personalized journey planning, passenger CRM, dynamic pricing, automated compensation, and end-to-end asset management that should be excluded from core incident response scope and deferred to later phases.",
+      "source_refs": [
+        "PRODUCT_OWNER-012",
+        "PRODUCT_OWNER-013",
+        "PRODUCT_OWNER-014",
+        "PRODUCT_OWNER-015",
+        "PRODUCT_OWNER-016",
+        "PRODUCT_OWNER-018",
+        "RAILWAY_CONTROLLER-001"
+      ],
+      "stakeholders": [
+        "product_owner",
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE",
+        "OPERATIONAL"
+      ],
+      "unresolved_question": "Should passenger compensation workflows be tracked or integrated at a later phase?",
+      "workshop_required": true,
+      "rationale": "These items represent significant scope expansion vectors that require careful prioritization and alignment between product vision and core incident response delivery."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Unresolved Implementation, Latency, and Integration Requirements",
+      "summary": "Critical uncertainties remain concerning the precise definition of real-time latency, legacy system integration extent and capabilities, primary KPIs, budget, timeline, and regulatory compliance constraints.",
+      "source_refs": [
+        "PRODUCT_OWNER-010",
+        "PRODUCT_OWNER-011",
+        "PRODUCT_OWNER-019"
+      ],
+      "stakeholders": [
+        "product_owner"
+      ],
+      "categories": [
+        "AMBIGUITY",
+        "INTEGRATION",
+        "ASSUMPTION"
+      ],
+      "unresolved_question": "What are the exact latency thresholds, legacy integration requirements, KPIs, and regulatory constraints?",
+      "workshop_required": true,
+      "rationale": "These technical and strategic unknowns pose significant architectural and planning risks that must be addressed prior to full implementation."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Core MVP Incident Management and Dashboard Capabilities",
+      "summary": "Both product owner and railway controller expectations align on core functional capabilities required for the MVP, including incident reporting, status tracking, centralised dashboards, network map displays, internal communications, and performance monitoring.",
+      "source_refs": [
+        "PRODUCT_OWNER-017",
+        "RAILWAY_CONTROLLER-007",
+        "RAILWAY_CONTROLLER-008",
+        "RAILWAY_CONTROLLER-010"
+      ],
+      "stakeholders": [
+        "product_owner",
+        "railway_controller"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "The core functional scope for operations and incident tracking is well-understood and mutually supported across stakeholder categories."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "Integration of External Actors: Emergency Services and Infrastructure Engineers",
+      "summary": "External entities such as emergency services (life safety command) and infrastructure engineers (track access and repairs) play critical operational roles, but their required system access levels, integration protocols, and communication workflows are currently undefined.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-005",
+        "RAILWAY_CONTROLLER-006",
+        "RAILWAY_CONTROLLER-009"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "MISSING_ACTOR",
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What direct system access, communication protocols, and track access logging mechanisms do emergency services and infrastructure engineers require?",
+      "workshop_required": true,
+      "rationale": "Clarifying how external safety-critical actors interact with SmartRail is essential for safety compliance and system design."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "On-board Ticket Purchasing and Fare Management Scope Exclusion",
+      "summary": "Passenger management and alternative travel options are discussed, but on-board ticket purchasing functions are not part of network controller workflows or core incident management.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-002"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Represents a distinct edge-case scope inference that must be explicitly tracked to prevent feature creep."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Indoor Station Navigation Scope Exclusion",
+      "summary": "While station staff manage passenger flow and platform changes during incidents, specialized indoor navigation systems for passengers were not included in operational requirements.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-003"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Captures a distinct passenger-facing capability boundary identified during controller interviews."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Advanced Passenger Seat Reservations Scope Exclusion",
+      "summary": "Short-forming and train cancellations affect capacity, but granular seat reservations fall outside the network controller's core toolset and initial system scope.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-004"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Ensures seat reservation features are consciously separated from operational network disruption management."
+    }
+  ]
+}

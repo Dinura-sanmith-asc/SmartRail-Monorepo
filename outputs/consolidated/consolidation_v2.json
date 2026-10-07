@@ -1,0 +1,1582 @@
+{
+  "total_source_discoveries": 134,
+  "final_findings": [
+    {
+      "finding_type": "OVERLAP",
+      "title": "Catering System Integration, Menus, and Catalog Management",
+      "summary": "The catering provider's system integrates with SmartRail by providing structured catalogs containing menus, pricing, allergen information, preparation instructions, availability rules, station identifiers, and collection deadlines.",
+      "source_refs": [
+        "CATERING_PROVIDER-001",
+        "CATERING_PROVIDER-002",
+        "CATERING_PROVIDER-003"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "FUNCTIONAL",
+        "INTEGRATION",
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "How often must menu data be refreshed if SmartRail caches the data?",
+      "workshop_required": true,
+      "rationale": "These discoveries cover the core catalog setup, station identifier mapping, and eligibility/order deadlines which form the foundational integration requirements for catering."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "Payment Responsibility, Refunds, and Financial Liabilities",
+      "summary": "Ambiguity regarding whether SmartRail handles transactions directly or passes payment details to the catering provider, how refunds are processed, and who bears financial liability for wasted food due to delays or missed collections.",
+      "source_refs": [
+        "CATERING_PROVIDER-004",
+        "CATERING_PROVIDER-008"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "AMBIGUITY",
+        "CONFLICT"
+      ],
+      "unresolved_question": "Who handles the actual financial transaction with the passenger and processes refunds, and who covers the cost of wasted food due to severe train delays or missed collections?",
+      "workshop_required": true,
+      "rationale": "Both findings address financial accountability, transaction flow, and loss liabilities between SmartRail and the catering provider."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Real-time Order Lifecycle and Status Tracking",
+      "summary": "Both SmartRail and the catering provider require robust real-time tracking, including idempotent order creation, asynchronous status updates from the kitchen, and dynamic adjustments based on train status and delay notifications.",
+      "source_refs": [
+        "CATERING_PROVIDER-005",
+        "CATERING_PROVIDER-006",
+        "CATERING_PROVIDER-007"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "FUNCTIONAL",
+        "STATE",
+        "OPERATIONAL"
+      ],
+      "unresolved_question": "Does SmartRail provide a new estimated arrival time or just a delayed flag to the catering provider?",
+      "workshop_required": true,
+      "rationale": "These items deal with the operational mechanics of real-time bidirectional communication, order state management, and idempotency."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Catering Collection Verification and Validation",
+      "summary": "Collection point staff must validate passengers' QR codes or order numbers against order details during physical collection.",
+      "source_refs": [
+        "CATERING_PROVIDER-009"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What is the fallback procedure if dedicated staff are not present at the collection point or scanners fail?",
+      "workshop_required": false,
+      "rationale": "Specific functional requirement for the physical handoff and verification phase of catering orders that does not overlap with ordering or system-level messaging."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Catering Cancellation Cut-off Enforcement and Arbitration",
+      "summary": "Unclear whether SmartRail's UI should fully enforce cancellation cut-offs or if the catering system should act as the final arbiter.",
+      "source_refs": [
+        "CATERING_PROVIDER-010"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Should SmartRail enforce cut-offs in the UI or act purely informatively while letting the catering system enforce rules?",
+      "workshop_required": true,
+      "rationale": "Deals specifically with user interface logic versus backend system rule enforcement for cancellations."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "System Downtime, Resiliency, and Guaranteed Messaging",
+      "summary": "Both catering and customer service contexts highlight risks associated with system slowdowns, downtime, and the need for robust recovery mechanisms or fallback options.",
+      "source_refs": [
+        "CATERING_PROVIDER-011",
+        "CUSTOMER_SERVICE-006"
+      ],
+      "stakeholders": [
+        "catering_provider",
+        "customer_service"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "How do SmartRail and the catering provider reconcile lost order creation messages or achieve eventual consistency during network failures?",
+      "workshop_required": true,
+      "rationale": "Both findings focus on system availability, performance degradation, and the operational impact of downtime."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Advanced Catering Features and Partial Cancellations",
+      "summary": "Potential extension scope to support complex order operations such as partial item cancellations and passenger-specific preference management.",
+      "source_refs": [
+        "CATERING_PROVIDER-012"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": "Should the system support partial cancellations of individual order items?",
+      "workshop_required": true,
+      "rationale": "Represents a capability that expands complexity and project scope beyond standard whole-order management."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "Customer Support Escalation, Dispute Resolution, and Support Ownership",
+      "summary": "Lack of clarity on who serves as the primary point of contact for passengers during order disputes and how support inquiries are handled.",
+      "source_refs": [
+        "CATERING_PROVIDER-013"
+      ],
+      "stakeholders": [
+        "catering_provider",
+        "customer_service"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Who is the primary contact point for the passenger when resolving order disputes, and how are issues escalated?",
+      "workshop_required": true,
+      "rationale": "Highlights organizational boundaries and responsibilities for resolving customer complaints and order disputes."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "Customer Service Access to Real-Time Journey and Delay Information",
+      "summary": "Customer service representatives require quick access to real-time schedule data, platform assignments, station layouts, train amenities, delay reasons, and estimated durations.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-001",
+        "CUSTOMER_SERVICE-002"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Both findings outline core information requirements for CSR staff to adequately answer passenger inquiries."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Single Source of Truth and Data Consistency Across Channels",
+      "summary": "Inconsistencies between CSR systems, public screens, and mobile apps erode trust, necessitating a definitive authoritative source for real-time information.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-003"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": "What is the definitive authoritative source for real-time journey information?",
+      "workshop_required": true,
+      "rationale": "Addresses cross-channel data consistency and architecture governance which is unique to multi-channel information delivery."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Extended Passenger Services: Ticketing, Compensation, and Travel Disruptions",
+      "summary": "Potential inclusion of advanced support scope such as ticketing support, refunds, compensation management, hotel accommodations, and private taxi arrangements for stranded passengers.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-004",
+        "CUSTOMER_SERVICE-005"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": "Should SmartRail include ticketing support, refunds, and compensation management, and are hotel/taxi arrangements part of system or operator policy scope?",
+      "workshop_required": true,
+      "rationale": "Both items introduce significant scope expansion possibilities regarding major passenger disruptions, ticketing, and financial compensation."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Language Barrier and Translation Support in Customer Service",
+      "summary": "Inability to communicate effectively with passengers who speak different languages without dedicated translation support.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-007"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "How should language barriers be handled within the system?",
+      "workshop_required": false,
+      "rationale": "Focuses specifically on multi-lingual communication challenges during customer service interactions."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Real-time Facility Status and Accessibility Equipment Updates",
+      "summary": "There is a lack of clarity on how quickly customer service representatives are informed about out-of-order station facilities and accessibility equipment such as lifts and ramps in real time.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-008",
+        "CUSTOMER_SERVICE-012"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS",
+        "ACCESSIBILITY"
+      ],
+      "unresolved_question": "How are broken or out-of-order station facilities and accessibility equipment reported in real time to customer service?",
+      "workshop_required": true,
+      "rationale": "Both discoveries concern real-time tracking and visibility of station facility and accessibility equipment statuses."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Dedicated Ticketing Agent Escalation",
+      "summary": "Complex ticketing and routing issues require escalation paths to a dedicated ticketing agent if SmartRail does not cover ticketing support directly.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-009"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "MISSING_ACTOR"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Addresses a specific missing actor escalation path for complex ticketing that does not overlap with other findings."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "External Handoffs for Medical, Security, and Lost Children",
+      "summary": "Medical issues, security concerns, lost children, and unruly passengers require clear handoff and escalation protocols to Station Management, First Aid, or British Transport Police.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-010"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "MISSING_ACTOR"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Defines vital emergency and safety handoff actors that must be preserved independently."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Alternative Transport Activation Process",
+      "summary": "A defined process is missing for deciding when and how replacement transport like buses or taxis is activated and communicated during significant service disruptions.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-011"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "Who decides on and arranges replacement transport, and how is it communicated?",
+      "workshop_required": true,
+      "rationale": "Focuses specifically on the operational business process for replacement transport during major delays."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Spontaneous and Pre-booked Assistance Protocols",
+      "summary": "Clear operational protocols are required to handle both pre-booked and spontaneous mobility assistance, including management of assistance no-shows.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-013"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "ACCESSIBILITY"
+      ],
+      "unresolved_question": null,
+      "workshop_required": true,
+      "rationale": "Distinctly targets assistance handling workflows and failure scenarios rather than equipment status tracking."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Unified Booking and Tracking Assistance System",
+      "summary": "An integrated system is desired for booking and tracking mobility assistance requests across multi-operator journeys.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-014"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": null,
+      "workshop_required": true,
+      "rationale": "Represents an extension candidate scope item for cross-operator assistance integration."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Inter-Operator Ticket Acceptance and Rules",
+      "summary": "Rules for ticket validity and acceptance across alternative routes or different operators during disruptions are unclear and require easy visibility and communication.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-015"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": "How can inter-operator ticket validity rules be easily viewed and communicated during disruptions?",
+      "workshop_required": true,
+      "rationale": "Deals with inter-operator ticketing rules during disruptions, distinct from assistance bookings."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Complaint Logging System",
+      "summary": "Customer service representatives need access to a designated system to accurately log complaints and track escalations.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-016"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Specifies core functional tooling requirements for complaint handling."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Dynamic and Constantly Changing Estimates",
+      "summary": "Constantly shifting arrival and departure time estimates erode passenger trust and diminish customer service credibility during delays.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-017"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "STATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Captures a state stability issue affecting passenger trust and CSR communications."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Vulnerable Passenger Support Protocol",
+      "summary": "A defined procedure and handover protocol is needed to proactively support vulnerable passengers, children, the elderly, or those with cognitive disabilities during major cancellations or platform changes.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-018"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "What are the specific handover and support protocols for vulnerable passengers?",
+      "workshop_required": true,
+      "rationale": "Focuses on specialized care processes for vulnerable groups distinct from general alternative transport."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Critical Safety Notices Delivery and Acknowledgement",
+      "summary": "The mechanism for delivering and receiving mandatory auditable acknowledgements for critical safety notices prior to shift start is currently unclear.",
+      "source_refs": [
+        "DRIVER-001"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "How are critical safety notices delivered and acknowledged before proceeding?",
+      "workshop_required": true,
+      "rationale": "Identifies critical pre-shift safety notice requirements for drivers."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "System Assignment Provider Downtime and Manual Fallback",
+      "summary": "A robust and reliable manual fallback process must be established for shift assignments in the event of provider system downtime.",
+      "source_refs": [
+        "DRIVER-002"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "What is the exact manual fallback process if the assignment system is down?",
+      "workshop_required": true,
+      "rationale": "Highlights system resilience and fallback needs during assignment outages."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Journey Assignment Acknowledgement Mechanism",
+      "summary": "It is ambiguous whether journey assignment acknowledgement should be a basic button press or require an active review and confirmation of key details.",
+      "source_refs": [
+        "DRIVER-003"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Is acknowledgement a simple button press or an active confirmation of key details?",
+      "workshop_required": false,
+      "rationale": "Addresses the specific interaction design ambiguity for journey assignments."
+    },
+    {
+      "finding_type": "CONFLICT",
+      "title": "Single Source of Truth Precedence for Journey Information",
+      "summary": "Discrepancies can occur between on-board systems, Control, and paper documents, requiring a clearly defined order of precedence.",
+      "source_refs": [
+        "DRIVER-004"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "CONFLICT"
+      ],
+      "unresolved_question": "Which source takes precedence if on-board system data differs from Control or paper documents?",
+      "workshop_required": true,
+      "rationale": "Directly represents a conflicting information source scenario requiring governance decisions."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "DMI Journey Data Loading and Error Handling",
+      "summary": "The Driver Machine Interface must support loading journey details during pre-departure checks and provide proper error handling for display or loading failures.",
+      "source_refs": [
+        "DRIVER-005"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Outlines core functional expectations for DMI journey initialization."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "DMI Complete Failure Protocol and Manual Operation Fallback",
+      "summary": "Protocols and fallback guidelines are unclear in the event of a complete DMI failure during pre-departure checks, specifically regarding manual train operation capability.",
+      "source_refs": [
+        "DRIVER-006"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Can the train be operated manually with fallback information if the DMI fails completely?",
+      "workshop_required": true,
+      "rationale": "Presents a critical safety-related operational ambiguity during total system failure."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Distinction Between Minor and Major Train Defects",
+      "summary": "Clear operational criteria are missing to distinguish between minor defects that permit cautious operation and major defects requiring immediate attention.",
+      "source_refs": [
+        "DRIVER-007"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "What criteria define a minor defect versus a major defect?",
+      "workshop_required": true,
+      "rationale": "Clarifies definitions needed for fault management and safe train dispatch."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "System Role in Preventing Early Departures",
+      "summary": "The extent of automated system enforcement or active prevention regarding early departures, beyond displaying scheduled times, is undefined.",
+      "source_refs": [
+        "DRIVER-008"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What role does the system play in actively preventing early departures?",
+      "workshop_required": false,
+      "rationale": "Explores the functional boundaries of system enforcement versus advisory displays."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Platform Clear Verification Integration",
+      "summary": "Platform clear verification is primarily visual, but potential integration options with platform edge detection systems need clarification.",
+      "source_refs": [
+        "DRIVER-009"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": "Is there any integration with platform edge detection systems for verifying platform clear status?",
+      "workshop_required": false,
+      "rationale": "Investigates potential safety system integrations for platform departure checks."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "System Behavior and Data Buffering During Connectivity Loss",
+      "summary": "Both discoveries address how the system should handle connectivity drops during operations by gracefully degrading, holding or caching valid instructions, buffering reports locally, and indicating status clearly.",
+      "source_refs": [
+        "DRIVER-010",
+        "DRIVER-019"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO",
+        "OPERATIONAL"
+      ],
+      "unresolved_question": "How long can the system operate on cached data during connectivity loss?",
+      "workshop_required": true,
+      "rationale": "These two discoveries share the same underlying issue of network disconnections and operational continuity for the driver."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Precedence of Safety-Critical Conflicting Information",
+      "summary": "Safety-critical information must have clear precedence when conflicting information occurs, such as between DMI speed and trackside signs.",
+      "source_refs": [
+        "DRIVER-011"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "SECURITY"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Stands alone as a specific requirement regarding information conflict priority."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Door Side Selection Verification and Alert",
+      "summary": "The system should provide visual confirmation and an audible alert if an incorrect door side is selected during station stops.",
+      "source_refs": [
+        "DRIVER-012"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Unique functional safety/operational aid for station stops."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Precision Stopping Guidance Support",
+      "summary": "Potential system capability to support precision stopping via dynamic braking guides.",
+      "source_refs": [
+        "DRIVER-013"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": "Should the system provide dynamic braking guides for precision stopping?",
+      "workshop_required": true,
+      "rationale": "Represents an extension candidate that impacts scope and braking system integration."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "Emergency Communications and DMI Emergency Interfacing",
+      "summary": "SmartRail must prioritize emergency communications and reports over all other data, backed by a clear DMI emergency stop interface that automatically reports to Control.",
+      "source_refs": [
+        "DRIVER-014",
+        "DRIVER-015"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Both cover driver-initiated emergency signaling and reporting priorities."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Post-Journey Checklist Enforcement on DMI",
+      "summary": "The system needs to ensure proper train securing procedures are followed through a mandatory DMI checklist.",
+      "source_refs": [
+        "DRIVER-016"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "Should train securing procedures be enforced via a mandatory DMI checklist?",
+      "workshop_required": true,
+      "rationale": "Focuses specifically on post-journey secure-down procedures."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Integration Between DMI and Post-Journey Reporting Systems",
+      "summary": "Integration is required between DMI real-time data and post-journey reporting systems regarding auto-population and driver validation roles.",
+      "source_refs": [
+        "DRIVER-017"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": "How much auto-population happens from the DMI to reporting systems, and what is the driver's validation role?",
+      "workshop_required": true,
+      "rationale": "Highlights an interface and workflow gap for reporting data."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Strict Operational Boundaries and Prohibitions",
+      "summary": "Drivers are restricted from performing specific actions without explicit authority, such as modifying schedules, bypassing safety interlocks, silencing critical alarms, or overriding safety systems.",
+      "source_refs": [
+        "DRIVER-018"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "OPERATIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Enumerates core operational governance and system safety restrictions for drivers."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "External Operational Roles Interaction",
+      "summary": "The workflow relies on interactions with external operational roles such as Control, Signallers, Duty Managers, Shunters, Maintenance staff, and Medical personnel who provide authority, clearances, or briefs.",
+      "source_refs": [
+        "DRIVER-020"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "MISSING_ACTOR"
+      ],
+      "unresolved_question": "Are these external operational roles direct users of SmartRail or interfacing via separate systems?",
+      "workshop_required": true,
+      "rationale": "Identifies actor scope ambiguities across multiple railway personnel."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Unified Journey Planner Platform",
+      "summary": "A single national platform aggregates all routes, schedules, and real-time prices from all operators to help passengers find and compare options.",
+      "source_refs": [
+        "PASSENGER-001"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Core passenger journey planning platform concept."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Transparent Fares and Multi-Operator Handling",
+      "summary": "Display all ticket types, terms, total cost upfront, and railcard discounts, while resolving how SmartRail handles non-integrated multi-operator ticketing and best value options.",
+      "source_refs": [
+        "PASSENGER-002",
+        "PASSENGER-007"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FUNCTIONAL",
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "How will SmartRail handle scenarios where an optimal journey involves travel with multiple operators that don't traditionally integrate their ticketing?",
+      "workshop_required": true,
+      "rationale": "Directly linked expectations around fare displays and the commercial complexities of multi-operator ticketing."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Detailed Accessibility Information and Filtering",
+      "summary": "Integrate comprehensive, verified accessibility information for every station and rolling stock type, enabling passengers to filter by specific needs.",
+      "source_refs": [
+        "PASSENGER-003"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What level of granular detail will accessibility information provide (e.g., specific measurements vs. general tags)?",
+      "workshop_required": true,
+      "rationale": "Specific passenger requirement focused on accessibility data depth."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Proactive Disruption Warnings and Alternatives",
+      "summary": "Highlight planned engineering works or long-term disruptions upfront during the planning stage and suggest suitable alternatives.",
+      "source_refs": [
+        "PASSENGER-004"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "How frequently will engineering work schedules be updated and verified by SmartRail from all operators?",
+      "workshop_required": false,
+      "rationale": "Focuses on disruption management during passenger planning."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Service and Occupancy Details",
+      "summary": "Display information on available on-board services like WiFi, catering, and power sockets, along with estimated train occupancy levels.",
+      "source_refs": [
+        "PASSENGER-005"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "Will SmartRail provide predictive occupancy levels based on historical data and current booking trends, or just current real-time data?",
+      "workshop_required": false,
+      "rationale": "Details on-board amenities and occupancy visibility."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Integrated Onward Travel Information",
+      "summary": "Provide basic information about local transport links at origin and destination stations.",
+      "source_refs": [
+        "PASSENGER-006"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Expands system reach into multi-modal local transport links."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Visual Seat Selection",
+      "summary": "Allow passengers to select specific seats from a visual coach layout highlighting amenities, accessible spaces, and proximity to toilets.",
+      "source_refs": [
+        "PASSENGER-008"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Represents an advanced passenger booking feature affecting inventory integration."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Special Assistance Integration",
+      "summary": "Provide a dedicated section within the booking process to request and confirm special assistance directly with clear confirmation messages.",
+      "source_refs": [
+        "PASSENGER-009"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "Will the system differentiate between different types of assistance needs and tailor the request accordingly?",
+      "workshop_required": false,
+      "rationale": "Covers dedicated special assistance workflows for bookings."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Direct Retailer vs. Redirect Role",
+      "summary": "It is unclear whether SmartRail will act as a direct retailer for all train tickets or redirect users to individual operator sites.",
+      "source_refs": [
+        "PASSENGER-010"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Will SmartRail act as a direct retailer for all train tickets, or will it redirect to individual operator sites for final purchase?",
+      "workshop_required": true,
+      "rationale": "Represents an unmerged business model ambiguity regarding ticketing functionality."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Data Security and Privacy Protocols",
+      "summary": "Protocols must be defined for data security and privacy when storing passenger payment details and personal information.",
+      "source_refs": [
+        "PASSENGER-011"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "SECURITY"
+      ],
+      "unresolved_question": "What protocols will be in place for data security and privacy when storing payment details and personal information?",
+      "workshop_required": true,
+      "rationale": "Standalone security compliance discovery that requires explicit definition."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "Day of Travel Proactive Notifications and Disruption Updates",
+      "summary": "Send push notifications for significant delays, cancellations, platform changes, live train tracking updates, and disruption explanations.",
+      "source_refs": [
+        "PASSENGER-012",
+        "PASSENGER-016"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What threshold constitutes a significant delay for a push notification and what level of detail will be provided in disruption explanations?",
+      "workshop_required": true,
+      "rationale": "Both findings deal with proactive passenger notifications regarding live train status and disruptions."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Signal Loss and Device Failure",
+      "summary": "Passengers facing phone battery failure, missing tickets, or signal loss at the station when trying to present mobile tickets.",
+      "source_refs": [
+        "PASSENGER-013"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "Will SmartRail have an offline mode for displaying mobile tickets in case of signal loss at the station?",
+      "workshop_required": true,
+      "rationale": "Unique failure scenario concerning offline access and device troubles."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Station Navigation, Maps, and Facility Status",
+      "summary": "Provide interactive GPS-enabled station maps with facilities, accessible routes, coach stopping positions, and real-time out-of-order alerts for lifts, escalators, and accessible toilets.",
+      "source_refs": [
+        "PASSENGER-014",
+        "PASSENGER-015"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What is the accuracy level of coach stopping position predictions and how will real-time lift status be consistently reported from all stations?",
+      "workshop_required": true,
+      "rationale": "Both items relate to station-level passenger navigation and facility status features."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Discreet Issue Reporting on Board",
+      "summary": "A discreet feature allowing passengers to report non-emergency issues like heating problems or anti-social behavior directly to on-board staff.",
+      "source_refs": [
+        "PASSENGER-017"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What is the service level agreement for responses to issues reported via the app?",
+      "workshop_required": false,
+      "rationale": "Distinct extension capability for passenger-to-staff communication."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Missed Connections and Connection Risks",
+      "summary": "Delays on initial trains putting connections at risk or causing missed connections without clear alternative guidance or protected status.",
+      "source_refs": [
+        "PASSENGER-018"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "Will SmartRail clearly indicate if a connection is protected and what level of automatic re-booking will be facilitated?",
+      "workshop_required": true,
+      "rationale": "Specific failure scenario focusing on journey continuation and re-booking risks."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "Centralized Compensation and Support Services",
+      "summary": "Centralized and simplified processes for claiming Delay Repay, auto-populating journey details, and consolidated lost property searches.",
+      "source_refs": [
+        "PASSENGER-019",
+        "PASSENGER-020"
+      ],
+      "stakeholders": [
+        "passenger"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS",
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": "Will SmartRail directly manage compensation claims or redirect to operators, and will the lost property portal require real-time updates from all operators?",
+      "workshop_required": true,
+      "rationale": "Both findings address post-journey administrative services and support platforms."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Assumed Initial Business Problem",
+      "summary": "The railway currently suffers from inefficient and siloed incident management processes, leading to delayed responses, poor real-time communication with passengers, increased operational costs, and diminished customer satisfaction during disruptions.",
+      "source_refs": [
+        "PRODUCT_OWNER-001"
+      ],
+      "stakeholders": [
+        "product_owner"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "What is the official baseline business problem description for SmartRail?",
+      "workshop_required": true,
+      "rationale": "Foundational product assumption that sets the baseline rationale for the system."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Core Incident Management and Operational Capabilities",
+      "summary": "Authorized personnel can log incidents with details, track their lifecycle from reported to resolved, automatically alert operational teams, allocate basic resources, and view operational dashboards.",
+      "source_refs": [
+        "PRODUCT_OWNER-002",
+        "PRODUCT_OWNER-003",
+        "PRODUCT_OWNER-004",
+        "PRODUCT_OWNER-006",
+        "PRODUCT_OWNER-007"
+      ],
+      "stakeholders": [
+        "product_owner"
+      ],
+      "categories": [
+        "FUNCTIONAL",
+        "STATE"
+      ],
+      "unresolved_question": "What are the precise triggers, recipients, and escalation paths for different incident types and severities?",
+      "workshop_required": true,
+      "rationale": "Cohesive set of core operational capabilities requested by the product owner for managing incidents."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "Basic Passenger Information Dissemination (Operational View)",
+      "summary": "Broadcast standardised, accurate delay and cancellation messages to passengers via multiple channels like station displays, app notifications, and website updates.",
+      "source_refs": [
+        "PRODUCT_OWNER-005"
+      ],
+      "stakeholders": [
+        "product_owner"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What specific channels are included and what level of detail is provided?",
+      "workshop_required": false,
+      "rationale": "Defines the operational perspective of passenger communications."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Additional Operational Actors and Governance Processes",
+      "summary": "Identification of additional essential actors (train drivers, station staff, emergency services, etc.) and vital governance processes (emergency response, training, system integrations).",
+      "source_refs": [
+        "PRODUCT_OWNER-008",
+        "PRODUCT_OWNER-009"
+      ],
+      "stakeholders": [
+        "product_owner"
+      ],
+      "categories": [
+        "MISSING_ACTOR",
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": null,
+      "workshop_required": true,
+      "rationale": "Both findings highlight structural gaps regarding operational stakeholders and institutional processes."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Advanced Post-MVP Feature Scope Candidates",
+      "summary": "Multiple discoveries identify complex, resource-intensive features such as full AI-powered predictive maintenance, personalized journey planning, passenger CRM, dynamic pricing, automated compensation, and end-to-end asset management that should be excluded from core incident response scope and deferred to later phases.",
+      "source_refs": [
+        "PRODUCT_OWNER-012",
+        "PRODUCT_OWNER-013",
+        "PRODUCT_OWNER-014",
+        "PRODUCT_OWNER-015",
+        "PRODUCT_OWNER-016",
+        "PRODUCT_OWNER-018",
+        "RAILWAY_CONTROLLER-001"
+      ],
+      "stakeholders": [
+        "product_owner",
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE",
+        "OPERATIONAL"
+      ],
+      "unresolved_question": "Should passenger compensation workflows be tracked or integrated at a later phase?",
+      "workshop_required": true,
+      "rationale": "These items represent significant scope expansion vectors that require careful prioritization and alignment between product vision and core incident response delivery."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Unresolved Implementation, Latency, and Integration Requirements",
+      "summary": "Critical uncertainties remain concerning the precise definition of real-time latency, legacy system integration extent and capabilities, primary KPIs, budget, timeline, and regulatory compliance constraints.",
+      "source_refs": [
+        "PRODUCT_OWNER-010",
+        "PRODUCT_OWNER-011",
+        "PRODUCT_OWNER-019"
+      ],
+      "stakeholders": [
+        "product_owner"
+      ],
+      "categories": [
+        "AMBIGUITY",
+        "INTEGRATION",
+        "ASSUMPTION"
+      ],
+      "unresolved_question": "What are the exact latency thresholds, legacy integration requirements, KPIs, and regulatory constraints?",
+      "workshop_required": true,
+      "rationale": "These technical and strategic unknowns pose significant architectural and planning risks that must be addressed prior to full implementation."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Core MVP Incident Management and Dashboard Capabilities",
+      "summary": "Both product owner and railway controller expectations align on core functional capabilities required for the MVP, including incident reporting, status tracking, centralised dashboards, network map displays, internal communications, and performance monitoring.",
+      "source_refs": [
+        "PRODUCT_OWNER-017",
+        "RAILWAY_CONTROLLER-007",
+        "RAILWAY_CONTROLLER-008",
+        "RAILWAY_CONTROLLER-010"
+      ],
+      "stakeholders": [
+        "product_owner",
+        "railway_controller"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "The core functional scope for operations and incident tracking is well-understood and mutually supported across stakeholder categories."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "Integration of External Actors: Emergency Services and Infrastructure Engineers",
+      "summary": "External entities such as emergency services (life safety command) and infrastructure engineers (track access and repairs) play critical operational roles, but their required system access levels, integration protocols, and communication workflows are currently undefined.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-005",
+        "RAILWAY_CONTROLLER-006",
+        "RAILWAY_CONTROLLER-009"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "MISSING_ACTOR",
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What direct system access, communication protocols, and track access logging mechanisms do emergency services and infrastructure engineers require?",
+      "workshop_required": true,
+      "rationale": "Clarifying how external safety-critical actors interact with SmartRail is essential for safety compliance and system design."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "On-board Ticket Purchasing and Fare Management Scope Exclusion",
+      "summary": "Passenger management and alternative travel options are discussed, but on-board ticket purchasing functions are not part of network controller workflows or core incident management.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-002"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Represents a distinct edge-case scope inference that must be explicitly tracked to prevent feature creep."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Indoor Station Navigation Scope Exclusion",
+      "summary": "While station staff manage passenger flow and platform changes during incidents, specialized indoor navigation systems for passengers were not included in operational requirements.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-003"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Captures a distinct passenger-facing capability boundary identified during controller interviews."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Advanced Passenger Seat Reservations Scope Exclusion",
+      "summary": "Short-forming and train cancellations affect capacity, but granular seat reservations fall outside the network controller's core toolset and initial system scope.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-004"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Ensures seat reservation features are consciously separated from operational network disruption management."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Infrastructure, Weather, and Station Health Monitoring",
+      "summary": "Railway controllers and station managers both require real-time visibility into track conditions, signalling faults, power supply, engineering works, live weather updates, and station accessibility facilities such as lifts and escalators.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-011",
+        "STATION_MANAGER-003",
+        "STATION_MANAGER-004"
+      ],
+      "stakeholders": [
+        "railway_controller",
+        "station_manager"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Direct alignment between controllers and station staff on the need for real-time operational status dashboards."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "Real-Time Train Manifests and Journey States",
+      "summary": "Station managers expect a real-time manifest of early trains and pre-planned changes, while controllers highlight the need to track detailed journey states like incident-affected, stationary, awaiting recovery, and evacuation underway.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-012",
+        "STATION_MANAGER-002"
+      ],
+      "stakeholders": [
+        "railway_controller",
+        "station_manager"
+      ],
+      "categories": [
+        "FUNCTIONAL",
+        "STATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Both findings concern the tracking and display of train operational states and schedules, looking at it from station operations and network control perspectives respectively."
+    },
+    {
+      "finding_type": "CONFLICT",
+      "title": "Platform Changes and Station Staff Resistance",
+      "summary": "Controller-initiated platform changes can conflict with station staff concerns regarding accessibility, overcrowding, and insufficient notification time, posing safety and passenger experience issues.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-015",
+        "RAILWAY_CONTROLLER-020"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "CONFLICT",
+        "ACCESSIBILITY"
+      ],
+      "unresolved_question": "How should the system handle a veto or warning raised by station staff against a controller-initiated platform change?",
+      "workshop_required": true,
+      "rationale": "Direct operational conflict between automated or controller-led routing and station-level constraints/accessibility requirements."
+    },
+    {
+      "finding_type": "CONFLICT",
+      "title": "Operational vs Commercial and Priority Trade-Offs",
+      "summary": "Competing priorities exist between TOC service maintenance, infrastructure safety, freight service priorities versus passenger diversions, and commercial versus operational cancellation boundaries.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-016",
+        "RAILWAY_CONTROLLER-017",
+        "RAILWAY_CONTROLLER-024"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "CONFLICT",
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Can an operational cancellation be triggered automatically if a TOC fails to confirm resource availability by a specific threshold time?",
+      "workshop_required": true,
+      "rationale": "Groups multiple stakeholder and priority conflicts regarding conflicting resource demands, safety obligations, and commercial decisions."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Late Cancellation Notifications and Passenger Impact",
+      "summary": "Late notification of cancellations leads to passengers waiting unnecessarily, raising questions on automated alerts to reduce the notification window.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-013"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "What automated alerts can reduce the window between a cancellation decision and passenger notification?",
+      "workshop_required": true,
+      "rationale": "Highlights a critical failure scenario centered around timing and communication gaps."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "Unclear Authority and Manual Override Procedures",
+      "summary": "Unclear authority during cancellations, data discrepancies between system predictions and visual reality, and the lack of a defined manual override procedure create ambiguity in operational decision-making.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-014",
+        "STATION_MANAGER-006"
+      ],
+      "stakeholders": [
+        "railway_controller",
+        "station_manager"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO",
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "What is the formal procedure and audit trail for overriding incorrect automated system predictions?",
+      "workshop_required": true,
+      "rationale": "Combines issues concerning authority, command hierarchies, and manual corrections when system predictions mismatch reality."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Strict Audit Logging and Comprehensive Data Archiving",
+      "summary": "All decisions, instructions, authorizations, communications, and real-time transit data must be logged with precise timestamps and identities for later analysis and security compliance.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-018",
+        "RAILWAY_CONTROLLER-019"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "SECURITY"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Consistently aligned requirements around audit trails, logging, and data archiving."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Passenger Information Systems Integration and Business Process Flows",
+      "summary": "System updates must integrate with Passenger Information Systems, station staff terminals, and respect the multi-party operational authorization flow involving controllers, signallers, staff, drivers, and TOCs.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-021",
+        "RAILWAY_CONTROLLER-022"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "INTEGRATION",
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Both relate to core integration channels and multi-party stakeholder communication workflows."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Automated Driver Route Competence Verification",
+      "summary": "Assumption that drivers are verified for route competence prior to authorization raises scope questions regarding whether route competence should be tracked automatically within the system.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-023"
+      ],
+      "stakeholders": [
+        "railway_controller"
+      ],
+      "categories": [
+        "ASSUMPTION"
+      ],
+      "unresolved_question": "Is driver route competence tracked automatically within the system or verified manually?",
+      "workshop_required": true,
+      "rationale": "Introduces an external competency check that could significantly expand system integration scope."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Station Pre-Opening Physical Walk-Through",
+      "summary": "Station staff execute a manual pre-opening walk-through procedure to inspect physical infrastructure, ticket gates, amenities, and print out daily schedules.",
+      "source_refs": [
+        "STATION_MANAGER-001"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Important foundational station operations process that must be understood in system design."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Input Mechanism for Locally Discovered Station Issues",
+      "summary": "It is currently ambiguous how station staff can input unprompted local incidents or infrastructure failures (e.g., broken ticket machine) into SmartRail for network-wide visibility.",
+      "source_refs": [
+        "STATION_MANAGER-005"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Is there a dedicated local station status module for staff to input unprompted local incidents or infrastructure failures?",
+      "workshop_required": true,
+      "rationale": "Unique discovery regarding input mechanisms for station-specific faults that lacks a defined feature mapping."
+    },
+    {
+      "finding_type": "CONFLICT",
+      "title": "Platform Allocation and Network Flow vs Local Safety",
+      "summary": "SmartRail may propose network optimization platform changes that conflict with local safety, capacity constraints, or blocked platforms, requiring station managers to have veto or challenge authority.",
+      "source_refs": [
+        "STATION_MANAGER-007",
+        "STATION_MANAGER-017"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "CONFLICT",
+        "OPERATIONAL"
+      ],
+      "unresolved_question": "Who has ultimate authority to override platform allocation disputes between local safety constraints and network optimization algorithms?",
+      "workshop_required": true,
+      "rationale": "Both sources address the tension between central network optimization and local platform safety/overcrowding, highlighting a direct operational conflict."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "Division of Authority for Platform Changes and Major Actions",
+      "summary": "Clear boundaries are needed between local operational authority for single train adjustments and central authorization required for major line-wide re-shuffles and station closures.",
+      "source_refs": [
+        "STATION_MANAGER-008",
+        "STATION_MANAGER-016"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "OPERATIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "These discoveries complement each other by outlining the spectrum of authority delegation between local and central control."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Automated PA Announcement Capabilities and Error Handling",
+      "summary": "Uncertainty surrounds whether the automated PA system supports ad-hoc typing or pre-recorded messages, and how the system prevents or corrects panic-inducing announcement inaccuracies.",
+      "source_refs": [
+        "STATION_MANAGER-009",
+        "STATION_MANAGER-010"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "AMBIGUITY",
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "Can staff broadcast ad-hoc or pre-recorded messages, and does the system feature automated verification for announcements?",
+      "workshop_required": true,
+      "rationale": "Both findings focus on the functionality and risk profile of automated passenger announcements."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Local Control of Station Displays and Messaging",
+      "summary": "It is unclear if station displays are entirely network-controlled or if local staff can utilize portions of displays for local operational or informational messages.",
+      "source_refs": [
+        "STATION_MANAGER-011"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Can local staff override sections of network-controlled station displays to publish local operational messages?",
+      "workshop_required": true,
+      "rationale": "Unique finding regarding local management of customer-facing visual displays."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Direct Incident Entry and Infrastructure Repair Loop Closure",
+      "summary": "Staff require capabilities to directly log facility outages and incidents into SmartRail, alongside a defined workflow to ensure maintenance issues are resolved and status is updated.",
+      "source_refs": [
+        "STATION_MANAGER-012",
+        "STATION_MANAGER-013"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "FUNCTIONAL",
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "What is the formal workflow to close the loop on reported infrastructure failures and update their operational status?",
+      "workshop_required": true,
+      "rationale": "Combines direct incident logging with the lifecycle maintenance tracking and loop closure requirements."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Tiered Incident Management Workflows",
+      "summary": "It is unspecified how SmartRail manages and distinguishes between varying levels of local incidents, such as minor platform spills versus major security alerts.",
+      "source_refs": [
+        "STATION_MANAGER-014"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Does SmartRail contain distinct tiered incident management workflows for varying levels of local severity?",
+      "workshop_required": true,
+      "rationale": "Unique finding addressing severity-based workflow categorizations for local incidents."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Local Offline Resilience and Connectivity Continuity",
+      "summary": "The system must provide a robust offline mode with backup power support to maintain core local functionality if network connections or power fail during major disruptions.",
+      "source_refs": [
+        "STATION_MANAGER-015"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "What core functionality can be maintained locally via backup power and offline cache if network connectivity is completely severed?",
+      "workshop_required": true,
+      "rationale": "Unique resilience requirement focusing on complete loss of local infrastructure connectivity."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Granular Disruption Information Requirements for Staff",
+      "summary": "Staff require precise operational details during disruptions—such as affected trains, recovery plans, alternative transport locations, and resolution times—rather than generic delay notices.",
+      "source_refs": [
+        "STATION_MANAGER-018"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Represents a clear functional expectation for disruption communication tools."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Integration with Local Safety Systems",
+      "summary": "SmartRail needs integration with local security assets including CCTV and access control to support effective station incident response.",
+      "source_refs": [
+        "STATION_MANAGER-019"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Unique integration requirement concerning physical security systems."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Automatic Ingestion of Local Context in Network Algorithms",
+      "summary": "There is an implicit assumption that network-wide optimization solutions must automatically incorporate local station context, density, and safety metrics without requiring manual intervention.",
+      "source_refs": [
+        "STATION_MANAGER-020"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "ASSUMPTION"
+      ],
+      "unresolved_question": "To what extent can network optimization algorithms ingest real-time local station density metrics automatically?",
+      "workshop_required": true,
+      "rationale": "Highlights a major scope tension regarding automated data ingestion versus manual oversight."
+    }
+  ],
+  "traceability": {
+    "uncovered_refs": [],
+    "invalid_refs": [],
+    "restored_intermediate_findings": 0
+  }
+}
