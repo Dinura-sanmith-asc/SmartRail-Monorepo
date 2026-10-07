@@ -1,5 +1,6 @@
 import os
 import time
+import random
 
 from dotenv import load_dotenv
 from google import genai
@@ -54,46 +55,72 @@ def run_structured_agent(
     role,
     question,
     schema,
-    model="gemini-2.5-flash",
-    max_retries=3,
+    max_retries=2,
 ):
     """
-    Runs an agent and forces the response to follow
-    a supplied Pydantic schema.
+    Runs an agent with structured output.
+
+    Uses free-tier lightweight Gemini models and
+    automatically falls back if one model is overloaded.
     """
+
+    models = [
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash-lite",
+    ]
 
     config = types.GenerateContentConfig(
         system_instruction=role,
         response_mime_type="application/json",
         response_schema=schema,
-        automatic_function_calling=types.AutomaticFunctionCallingConfig(
-            disable=True
-        ),
     )
 
-    for attempt in range(max_retries):
-        try:
-            response = client.models.generate_content(
-                model=model,
-                contents=question,
-                config=config,
-            )
+    last_error = None
 
-            if response.parsed is not None:
-                return response.parsed
+    for model in models:
 
-            return schema.model_validate_json(response.text)
+        print(f"Using model: {model}")
 
-        except ServerError as e:
-            if e.code == 503 and attempt < max_retries - 1:
-                wait_time = 2 ** attempt
+        for attempt in range(max_retries):
 
-                print(
-                    f"Server busy (503). "
-                    f"Retrying in {wait_time}s..."
+            try:
+                response = client.models.generate_content(
+                    model=model,
+                    contents=question,
+                    config=config,
                 )
 
-                time.sleep(wait_time)
+                if response.parsed is not None:
+                    return response.parsed
 
-            else:
-                raise
+                return schema.model_validate_json(
+                    response.text
+                )
+
+            except ServerError as e:
+                last_error = e
+
+                if e.code == 503:
+                    wait_time = (
+                        (2 ** attempt) * 3
+                        + random.uniform(0, 2)
+                    )
+
+                    print(
+                        f"{model} unavailable (503). "
+                        f"Retrying in "
+                        f"{wait_time:.1f}s..."
+                    )
+
+                    time.sleep(wait_time)
+
+                else:
+                    raise
+
+        print(
+            f"{model} still unavailable. "
+            f"Trying fallback model..."
+        )
+
+    raise last_error
