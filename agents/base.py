@@ -15,10 +15,21 @@ client = genai.Client(
 )
 
 
-def run_agent(role, question, model="gemini-2.5-flash", max_retries=3):
+def run_agent(
+    role,
+    question,
+    max_retries=2,
+):
     """
-    Runs one stakeholder agent interview.
+    Runs a normal text-based agent using free-tier
+    Gemini models with fallback support.
     """
+
+    models = [
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash-lite",
+    ]
 
     config = types.GenerateContentConfig(
         system_instruction=role,
@@ -27,29 +38,48 @@ def run_agent(role, question, model="gemini-2.5-flash", max_retries=3):
         ),
     )
 
-    for attempt in range(max_retries):
-        try:
-            response = client.models.generate_content(
-                model=model,
-                contents=question,
-                config=config,
-            )
+    last_error = None
 
-            return response.text
+    for model in models:
 
-        except ServerError as e:
-            if e.code == 503 and attempt < max_retries - 1:
-                wait_time = 2 ** attempt
+        print(f"Using model: {model}")
 
-                print(
-                    f"Server busy (503). "
-                    f"Retrying in {wait_time}s..."
+        for attempt in range(max_retries):
+
+            try:
+                response = client.models.generate_content(
+                    model=model,
+                    contents=question,
+                    config=config,
                 )
 
-                time.sleep(wait_time)
+                return response.text
 
-            else:
-                raise
+            except ServerError as e:
+                last_error = e
+
+                if e.code == 503:
+                    wait_time = (
+                        (2 ** attempt) * 3
+                        + random.uniform(0, 2)
+                    )
+
+                    print(
+                        f"{model} unavailable (503). "
+                        f"Retrying in {wait_time:.1f}s..."
+                    )
+
+                    time.sleep(wait_time)
+
+                else:
+                    raise
+
+        print(
+            f"{model} still unavailable. "
+            f"Trying fallback model..."
+        )
+
+    raise last_error
 
 def run_structured_agent(
     role,
