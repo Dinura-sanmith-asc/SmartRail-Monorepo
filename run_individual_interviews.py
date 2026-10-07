@@ -5,6 +5,8 @@ from agents import driver
 from agents import station_manager
 from agents import railway_controller
 from agents import catering_provider
+from agents import customer_service
+from agents import product_owner
 
 
 OUTPUT_DIR = Path("outputs/individual")
@@ -121,6 +123,54 @@ Identify unclear ownership between SmartRail and the
 external catering platform.
 """
     ),
+    (
+    "customer_service",
+    customer_service,
+    """
+Walk through how customer service supports passengers during
+both normal and disrupted railway journeys.
+
+Consider:
+
+1. Passenger information enquiries.
+2. Delays.
+3. Train cancellations.
+4. Missed connections.
+5. Platform changes.
+6. Accessibility problems.
+7. Catering-related passenger problems.
+8. Incorrect or conflicting information.
+9. Complaints and escalation.
+
+Identify information you need, actions you perform,
+things you cannot control, escalation paths, failure
+scenarios, and unclear responsibilities.
+"""
+    ),
+
+(
+    "product_owner",
+    product_owner,
+    """
+Review SmartRail as the product owner after hearing the
+initial business problem.
+
+Identify:
+
+1. The most important business outcomes.
+2. Essential capabilities.
+3. Important missing actors or processes.
+4. Ambiguous requirements.
+5. Stakeholder requests that may unnecessarily expand scope.
+6. Capabilities that belong in an MVP.
+7. Capabilities that could reasonably be deferred.
+8. Important questions that must be answered before
+   implementation.
+
+Do not design the technical architecture and do not make
+final architecture decisions.
+"""
+),
 ]
 
 
@@ -131,9 +181,14 @@ for name, agent, question in interviews:
     print(f"Interviewing: {name}")
     print("=" * 60)
 
-    result = agent.interview(question)
-
     output_file = OUTPUT_DIR / f"{name}.md"
+
+    if output_file.exists():
+        print(f"Already exists -> {output_file}")
+        print("Skipping API call.")
+        continue
+
+    result = agent.interview(question)
 
     output_file.write_text(
         f"# {name.replace('_', ' ').title()} Interview\n\n"
