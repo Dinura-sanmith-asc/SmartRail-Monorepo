@@ -1,0 +1,309 @@
+{
+  "total_source_discoveries": 102,
+  "consolidated_findings": [
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Real-time Operational Status and Delay Visibility",
+      "summary": "Multiple stakeholders including customer service, station managers, railway controllers, drivers, and catering providers independently emphasize the critical need for real-time schedule tracking, delay notifications, and delay reasons to perform their operational duties and inform passengers.",
+      "source_refs": [
+        "CATERING_PROVIDER-007",
+        "CUSTOMER_SERVICE-001",
+        "CUSTOMER_SERVICE-002",
+        "PASSENGER-016",
+        "RAILWAY_CONTROLLER-007",
+        "STATION_MANAGER-002",
+        "STATION_MANAGER-018"
+      ],
+      "stakeholders": [
+        "catering_provider",
+        "customer_service",
+        "driver",
+        "passenger",
+        "railway_controller",
+        "station_manager"
+      ],
+      "categories": [
+        "FUNCTIONAL",
+        "OPERATIONAL",
+        "STATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "All these sources highlight the fundamental functional dependency on real-time train movement, accurate delay flags, and operational status to drive local decisions and customer communications."
+    },
+    {
+      "finding_type": "AGREEMENT",
+      "title": "Infrastructure and Accessibility Status Monitoring",
+      "summary": "Station managers, customer service, and passengers all independently require real-time status tracking of station accessibility equipment such as lifts, ramps, and escalators to assist mobility-impaired passengers effectively.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-012",
+        "PASSENGER-015",
+        "STATION_MANAGER-003"
+      ],
+      "stakeholders": [
+        "customer_service",
+        "passenger",
+        "station_manager"
+      ],
+      "categories": [
+        "ACCESSIBILITY",
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Independent discoveries across passenger and operational roles converge on the necessity of real-time monitoring for out-of-order lifts and accessibility facilities."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "Single Source of Truth and Data Discrepancies",
+      "summary": "Customer service, railway controllers, station managers, and drivers all raise concerns about conflicting information between on-board systems, central control, paper documents, and public displays, emphasizing the need for an authoritative single source of truth.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-003",
+        "DRIVER-004",
+        "RAILWAY_CONTROLLER-021",
+        "STATION_MANAGER-006"
+      ],
+      "stakeholders": [
+        "customer_service",
+        "driver",
+        "railway_controller",
+        "station_manager"
+      ],
+      "categories": [
+        "CONFLICT",
+        "FAILURE_SCENARIO",
+        "INTEGRATION"
+      ],
+      "unresolved_question": "What is the definitive authoritative source and precedence hierarchy when on-board, trackside, and central systems report conflicting data?",
+      "workshop_required": true,
+      "rationale": "Each stakeholder approaches the problem from a different operational angle (CSR trust, driver safety precedence, controller data feeds, station manager visual reality), but all describe the same underlying data consistency risk."
+    },
+    {
+      "finding_type": "OVERLAP",
+      "title": "System Connectivity Loss and Degraded Operation Modes",
+      "summary": "Drivers, station managers, and catering providers all highlight the operational risk of network connectivity or power loss, specifying that systems must degrade gracefully by caching data, buffering reports locally, and providing offline capabilities.",
+      "source_refs": [
+        "CATERING_PROVIDER-011",
+        "DRIVER-010",
+        "DRIVER-019",
+        "PASSENGER-013",
+        "STATION_MANAGER-015"
+      ],
+      "stakeholders": [
+        "catering_provider",
+        "driver",
+        "passenger",
+        "station_manager"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO",
+        "OPERATIONAL"
+      ],
+      "unresolved_question": "How long can individual operational terminals and mobile apps operate on cached data during severe, prolonged connectivity or power outages?",
+      "workshop_required": true,
+      "rationale": "These findings share the same technical failure concern across distinct operational contexts, requiring a unified resilience strategy."
+    },
+    {
+      "finding_type": "CONFLICT",
+      "title": "Network Optimization versus Local Station Safety and Capacity",
+      "summary": "Railway controllers prioritize network-wide flow, re-routing, and platform changes, whereas station managers and drivers report that these actions can create severe local platform overcrowding, passenger safety hazards, and resource conflicts that require a local veto or negotiation mechanism.",
+      "source_refs": [
+        "RAILWAY_CONTROLLER-015",
+        "RAILWAY_CONTROLLER-017",
+        "STATION_MANAGER-007",
+        "STATION_MANAGER-017"
+      ],
+      "stakeholders": [
+        "railway_controller",
+        "station_manager"
+      ],
+      "categories": [
+        "CONFLICT",
+        "OPERATIONAL"
+      ],
+      "unresolved_question": "Who has ultimate authority and what is the exact system workflow when a central network optimization directive conflicts with local station safety constraints?",
+      "workshop_required": true,
+      "rationale": "Direct operational conflict exists between central network control goals and local station safety mandates."
+    },
+    {
+      "finding_type": "CONFLICT",
+      "title": "Liability and Financial Loss for Spoiled Food and Missed Collections",
+      "summary": "Catering providers highlight a financial risk regarding who absorbs the cost when food is prepared and spoils due to sudden train delays or when passengers miss their collection windows.",
+      "source_refs": [
+        "CATERING_PROVIDER-004",
+        "CATERING_PROVIDER-008"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "CONFLICT",
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Who bears the financial liability for wasted food and uncollected orders caused by severe train delays or operational disruptions?",
+      "workshop_required": true,
+      "rationale": "Incompatible business expectations between SmartRail / operators and the external catering supplier regarding financial risk allocation."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "Customer Support Escalation and Dispute Resolution Ownership",
+      "summary": "It is unclear whether SmartRail, individual train operating companies, or external suppliers (such as catering providers) act as the primary point of contact for passenger disputes, refunds, and order errors.",
+      "source_refs": [
+        "CATERING_PROVIDER-004",
+        "CATERING_PROVIDER-013"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "AMBIGUITY",
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "Which entity serves as the primary customer support escalation point and handles financial refunds for integrated services like catering?",
+      "workshop_required": true,
+      "rationale": "Multiple organizational roles are touched by dispute resolution, but operational ownership and liability boundaries are undefined."
+    },
+    {
+      "finding_type": "OWNERSHIP_AMBIGUITY",
+      "title": "Local Infrastructure Incident Logging and Maintenance Closure",
+      "summary": "Station managers report ambiguity regarding how to log unprompted local incidents into SmartRail and who is ultimately responsible for ensuring engineers resolve issues and clear them in the system.",
+      "source_refs": [
+        "STATION_MANAGER-005",
+        "STATION_MANAGER-013"
+      ],
+      "stakeholders": [
+        "station_manager"
+      ],
+      "categories": [
+        "AMBIGUITY",
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "Is there a dedicated local station status module, and who holds responsibility for closing the loop on maintenance work orders in SmartRail?",
+      "workshop_required": true,
+      "rationale": "Unclear process boundaries between local station staff actions and external maintenance repair workflows."
+    },
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "System Baseline, KPIs, and Regulatory Integration Scope",
+      "summary": "The product owner notes a lack of a formal baseline business problem, agreed KPIs, regulatory constraints, and legacy integration boundaries, while controllers and customer service report similar foundational unknowns.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-004",
+        "PRODUCT_OWNER-001",
+        "PRODUCT_OWNER-011",
+        "PRODUCT_OWNER-019"
+      ],
+      "stakeholders": [
+        "customer_service",
+        "product_owner",
+        "railway_controller"
+      ],
+      "categories": [
+        "ASSUMPTION",
+        "BUSINESS_PROCESS",
+        "INTEGRATION"
+      ],
+      "unresolved_question": "What are the official baseline business problem, KPIs, target user definitions, and initial legacy system integration boundaries for SmartRail?",
+      "workshop_required": true,
+      "rationale": "Fundamental project-level unknowns that require immediate cross-stakeholder and architectural alignment."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Scope Expansion into Commercial Retail, Ticketing, and Compensation",
+      "summary": "Passengers, customer service, railway controllers, and product owners express tension between keeping SmartRail focused strictly on core incident response versus expanding into full ticketing retail, delay repay compensation claims, lost property portals, and advanced loyalty CRM features.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-004",
+        "PASSENGER-001",
+        "PASSENGER-010",
+        "PASSENGER-019",
+        "PASSENGER-020",
+        "PRODUCT_OWNER-013",
+        "PRODUCT_OWNER-014",
+        "PRODUCT_OWNER-015",
+        "RAILWAY_CONTROLLER-001"
+      ],
+      "stakeholders": [
+        "customer_service",
+        "passenger",
+        "product_owner",
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": "Should SmartRail act as a direct ticket retailer and compensation manager in MVP, or should these capabilities be deferred?",
+      "workshop_required": true,
+      "rationale": "Matches rule 13 regarding ticketing, payments, compensation, and onward travel integration posing significant scope expansion risks for the MVP."
+    },
+    {
+      "finding_type": "SCOPE_TENSION",
+      "title": "Advanced Passenger Features (Indoor Navigation, Seat Selection, and Onward Travel)",
+      "summary": "Passengers request advanced convenience features such as visual seat selection, indoor station navigation, precise coach stopping positions, and onward travel connections, which present potential MVP scope expansion tensions.",
+      "source_refs": [
+        "PASSENGER-006",
+        "PASSENGER-008",
+        "PASSENGER-014",
+        "RAILWAY_CONTROLLER-003",
+        "RAILWAY_CONTROLLER-004"
+      ],
+      "stakeholders": [
+        "passenger",
+        "railway_controller"
+      ],
+      "categories": [
+        "SCOPE_CANDIDATE"
+      ],
+      "unresolved_question": "To what extent should granular passenger-facing features like indoor navigation and visual seat selection be included in initial releases?",
+      "workshop_required": true,
+      "rationale": "Matches rule 13 regarding indoor navigation, seat reservations, and onward transport integration being treated carefully as potential scope tensions."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Strict Operational Prohibitions and Audit Logging for Drivers",
+      "summary": "The driver stakeholder specifies strict operational boundaries prohibiting actions like bypassing safety interlocks, silencing critical alarms, or modifying schedules without explicit auditable authority, alongside comprehensive audit requirements from railway controllers.",
+      "source_refs": [
+        "DRIVER-018",
+        "RAILWAY_CONTROLLER-018",
+        "RAILWAY_CONTROLLER-019"
+      ],
+      "stakeholders": [
+        "driver",
+        "railway_controller"
+      ],
+      "categories": [
+        "OPERATIONAL",
+        "SECURITY"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Crucial safety and security requirement ensuring safety-critical rule enforcement and tamper-evident audit trails must not be lost."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Catering Catalog Integration and Idempotent Order Processing",
+      "summary": "The catering provider requires robust integration for structured menus, allergen data, station eligibility mapping, verification tokens, and idempotent API retries to prevent duplicate kitchen orders.",
+      "source_refs": [
+        "CATERING_PROVIDER-001",
+        "CATERING_PROVIDER-002",
+        "CATERING_PROVIDER-003",
+        "CATERING_PROVIDER-005",
+        "CATERING_PROVIDER-009"
+      ],
+      "stakeholders": [
+        "catering_provider"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS",
+        "FUNCTIONAL",
+        "INTEGRATION"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Essential integration specifications for third-party supply chain connectivity that must be preserved for architectural planning."
+    }
+  ],
+  "cross_cutting_observations": [
+    "There is a fundamental tension between the Product Owner's desire to keep the MVP strictly focused on core incident response and operational logging, and the extensive passenger and supplier feature requests covering retail, ticketing, catering, and compensation.",
+    "Data consistency and single-source-of-truth challenges appear across multiple stakeholder domains (CSR screens, station displays, DMI devices, and public apps), highlighting the need for a centralized, authoritative data distribution architecture.",
+    "Operational roles (Drivers, Station Managers, Railway Controllers) emphasize strict safety protocols, audit trails, and local override capabilities, which must not be overridden by automated network optimization algorithms without adequate governance."
+  ]
+}
