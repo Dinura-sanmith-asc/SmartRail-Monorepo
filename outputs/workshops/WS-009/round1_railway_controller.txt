@@ -1,0 +1,32 @@
+As a Railway Network Controller participating in this workshop, my position focuses strictly on network-wide safety, active journey tracking, and the operational control required to keep the railway fluid and safe during disruptions. 
+
+Here is my independent evaluation of the discussion topics:
+
+### 1. What matters from my stakeholder perspective
+*   **Network-Wide Visibility:** I need absolute, real-time visibility across all active train journeys, platform assignments, route statuses, and temporary station disruptions. Siloed information is a direct threat to safe and efficient network regulation.
+*   **Operational Integrity during Incidents:** When an operational incident occurs, I need immediate, unambiguous event triggers and rapid lines of communication to drivers and station staff. 
+*   **Authoritative Control:** There must be absolute clarity on *who* has the authority to change operational data (e.g., authorizing a route change, cancellation, or unexpected journey termination). 
+
+### 2. What responsibility my role has
+*   Monitoring active train journeys and identifying deviations from the schedule (service delays, unexpected stoppages).
+*   Authorizing and coordinating operational interventions such as route changes, platform changes, temporary station closures, and emergency service integration.
+*   Issuing mandatory operational instructions and safety communications directly to train drivers and station staff.
+*   Triggering public and passenger-information updates regarding network disruptions, delays, and cancellations to ensure consistency between operational reality and what passengers see.
+
+### 3. What responsibility my role should NOT have
+*   **Passenger CRM and Financial Transactions:** I am an operational controller, not a customer service agent or commercial manager. I should not handle passenger compensation claims, dynamic pricing, CRM data, or individual ticket refunds.
+*   **Detailed Asset Maintenance Scheduling:** While I need to know if infrastructure is broken or restricted, I do not manage predictive maintenance algorithms or field engineering rosters.
+*   **Personalized Passenger Routing:** I manage network paths and timetables for trains, not individual, personalized door-to-door journey planning for passengers.
+
+### 4. What risks or failure cases concern you
+*   **Conflicting Authority:** Confusion over whether a driver, station staff member, or controller has the authority to alter a route or terminate a journey unexpectedly, leading to contradictory commands.
+*   **Information Lag (Latency):** If operational events (like a sudden track obstruction or train fault) take too long to reach my dashboard, or if my dispatch of passenger information is delayed, secondary delays cascade across the network.
+*   **Communication Breakdown:** Relying on fragmented or informal channels to communicate with drivers and station teams during high-stress incident responses.
+*   **Scope Creep into Non-Operational Domains:** Diluting the MVP by trying to embed commercial passenger features (like compensation tracking) into the core rail-control workspace, distracting from life-safety and traffic regulation.
+
+### 5. What decision you believe needs clarification
+*   We must establish exact, unambiguous operational triggers and escalation paths for different incident types and severities, specifically defining *who* initiates an incident, *who* is automatically alerted, and *who* holds ultimate decision-making authority during multi-agency responses (e.g., emergency services).
+*   We need a strict definition of "real-time latency" from an operational standpoint—network state updates and safety-critical commands cannot afford multi-second transmission delays.
+
+### 6. Any assumption you disagree with
+*   I caution against treating "incident management" merely as an administrative logging tool (as suggested in CF-058). For a railway controller, incident management is an active, real-time operational control loop. If SmartRail treats incidents as passive tickets rather than active disruptions tied directly to live train journeys and network topology, the system will fail to solve the baseline business problem of fragmented disruption management.

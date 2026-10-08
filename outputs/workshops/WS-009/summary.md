@@ -1,0 +1,74 @@
+# WS-009 — Core Incident Management, Baselines, and MVP Scope Boundaries
+
+## Participants
+
+- product_owner
+- railway_controller
+
+## Agreements
+
+- Both stakeholders strongly agree that advanced commercial and financial features—such as passenger CRM, dynamic pricing, ticket refunds, and automated compensation workflows—must be strictly excluded from the MVP and deferred to a post-MVP phase (CF-061).
+- There is shared consensus that incident management within SmartRail must function as an active operational control loop and live disruption process rather than a static, passive administrative logging tool (CF-058).
+- Both stakeholders recognize the critical importance of matching system workflows with real-world operational realities to prevent friction for train drivers, station staff, and controllers (CF-060).
+
+## Disagreements
+
+- The Product Owner advocates for scoping the MVP to avoid over-engineering and suggests that certain legacy integrations or data feeds might be manually bypassed or phased in to protect the project timeline, whereas the Railway Controller warns that manual workarounds for core tracking and signaling telemetry introduce severe operational risks, cognitive overload, and latency.
+- The Product Owner is primarily focused on minimizing scope creep and balancing time-to-market with core business outcomes, while the Railway Controller prioritizes absolute network-wide visibility, zero-latency safety commands, and strict technical enforcement of the operational hierarchy.
+
+## Ownership Questions
+
+- Who owns the responsibility of formatting, reviewing, and holding ultimate authority over public passenger information updates triggered by operational decisions?
+- Does SmartRail automatically publish passenger alerts based on controller inputs, or is a dedicated customer communications officer required in the workflow?
+- How does the system legally and operationally manage zone handovers during multi-agency incidents (e.g., emergency services returning a track zone to the network controller)?
+
+## Scope Questions
+
+- Which specific legacy data feeds (such as live GPS versus fixed-block signaling) are absolute day-one deal-breakers for the MVP passenger notification loop versus those that can be manually managed?
+- Where is the exact boundary between safety-critical signaling systems and SmartRail's incident management and communication orchestration layer?
+
+## Assumptions to Validate
+
+- The assumption that passenger compensation workflows might be needed early in the lifecycle (challenged by the Product Owner, who insists they must be strictly post-MVP).
+- The assumption that basic administrative incident logging alone can solve the baseline business problem of siloed and inefficient railway disruptions (challenged by the Railway Controller, who insists incidents must be actively tied to live network topology and train journeys).
+
+## Decision Points
+
+### Decision 1
+
+What is the official baseline business problem description and primary KPI framework for SmartRail?
+
+**Options:**
+
+- Focus strictly on rapid incident response times and accurate real-time passenger communication as the primary MVP outcome.
+- Expand the baseline problem to explicitly encompass comprehensive network-wide operational fluidity and multi-agency coordination from day one.
+
+**Affected findings:** CF-057, CF-062
+
+### Decision 2
+
+To what extent can legacy system integrations be manually bypassed during the MVP phase?
+
+**Options:**
+
+- Allow manual workarounds and controller data entry for non-critical legacy feeds to protect the MVP delivery timeline.
+- Mandate deep, real-time integration for all core tracking and state-change data from day one to eliminate manual controller burden and latency.
+
+**Affected findings:** CF-061, CF-062
+
+### Decision 3
+
+How should SmartRail technically enforce the operational authority matrix?
+
+**Options:**
+
+- Implement strict role-based access control where only the authorized Network Controller can override routes or terminate journeys, preventing unverified modifications by station staff or drivers.
+- Provide a more flexible, collaborative override structure across actors with notifications rather than hard technical blocks.
+
+**Affected findings:** CF-058, CF-060
+
+
+## Unresolved Questions
+
+- What are the precise technical latency thresholds required for state-change propagation and safety-critical incident alerts?
+- How will the system handle network disconnections or degraded operational states at remote stations without breaking the active incident management loop?
