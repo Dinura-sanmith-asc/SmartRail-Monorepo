@@ -1,0 +1,26 @@
+**1. What matters from your stakeholder perspective:**
+From a customer service representative perspective, what matters most is having a single source of accurate, real-time journey information to give stranded or confused passengers. When things go wrong—such as missed connections (CF-055), platform changes, or sudden cancellations (CF-051)—passengers come straight to customer service desks or contact channels looking for empathy, clear explanations, and actionable recovery plans (alternative routes, protected connections, or assistance). Outdated or conflicting information directly increases passenger frustration and escalates volatile situations.
+
+**2. What responsibility your role has:**
+* Accessing accurate, real-time railway operations data to inform passengers correctly.
+* Guiding passengers through disruptions, helping them navigate station facilities, and explaining alternative routes or connection options.
+* Providing human empathy and practical problem-solving when passengers are lost, confused, or facing accessibility hurdles (CF-043).
+* Assisting passengers with immediate journey recovery steps where operational policy allows.
+
+**3. What responsibility your role should NOT have:**
+* **Controlling operational assets:** Customer service agents do not drive trains, alter signaling, control the dispatch of rolling stock, or physically fix broken lifts and escalators. 
+* **Owning financial compensation policies:** While we can guide passengers on how to submit a claim, customer service agents should not independently approve, fund, or guarantee Delay Repay or financial compensation payouts unless a clear, automated business process is formally established (CF-056).
+* **Dictating technical system architecture:** We do not decide how offline ticket modes (CF-052) or push notification thresholds (CF-051) are coded.
+
+**4. What risks or failure cases concern me:**
+* **The "Information Silo" Trap:** Passengers receiving push notifications about delays or platform changes (CF-051) that do not match what customer service screens show, leading to distrust and arguments at the desk.
+* **Signal Loss & Dead Batteries (CF-052):** Passengers trapped at ticket barriers or unable to board because their mobile ticket won't load due to station signal loss, resulting in frantic customer service queues and potential unfair penalty fare disputes.
+* **Accessibility Failures (CF-043, CF-053):** A passenger relying on real-time lift status data arriving at a station only to find the lift out of order unexpectedly, leaving them stranded with no immediate accessible staff support.
+* **Unclear Connection Protection Rules (CF-055):** Vague policies regarding whether a connection is "protected" leave frontline staff unable to definitively tell a stressed passenger whether they will be accommodated on the next service or forced to buy a new ticket.
+
+**5. What decision needs clarification:**
+* **Connection Protection & Re-booking Authority (CF-055):** We urgently need clarification on whether SmartRail (or the operating staff) will provide automated or guaranteed re-booking guidance for missed connections, or if frontline staff are expected to manually issue authorities.
+* **Compensation Handling (CF-056):** Is SmartRail acting as the centralized manager for compensation claims, or are we merely an information desk redirecting passengers to individual train operating companies? 
+
+**6. Any assumption I disagree with:**
+* I disagree with any implicit assumption that passengers can smoothly self-serve out of every disruption via an app. When signal fails, devices die, or stress peaks (CF-052, CF-055), passengers will always fall back on human customer service. Therefore, digital notification and offline strategies must account for the reality that frontline staff will have to clean up the operational gaps when digital tools fail.

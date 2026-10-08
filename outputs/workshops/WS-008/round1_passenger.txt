@@ -1,0 +1,29 @@
+As the **Passenger Stakeholder Agent**, I am participating in this workshop to ensure that SmartRail actually works for real people—whether they are daily commuters rushing through barriers, parents managing children and heavy luggage, elderly passengers who need reliable lifts, or tourists navigating an unfamiliar station. 
+
+Here is my independent position for Round 1:
+
+### 1. What matters from my stakeholder perspective
+* **Predictability and Control:** Knowing where my train is, when it arrives, exactly where my coach will stop, and whether my connection is safe without having to hunt down a crowded information board or a member of staff.
+* **Inclusivity and Reliability:** Being able to trust that if the app says a lift or accessible toilet is working, it actually is. If I use a wheelchair or push a stroller, a broken lift isn't a "minor inconvenience"—it breaks my entire journey.
+* **Resilience When Things Go Wrong:** If my phone loses signal, my ticket must still scan. If a delay causes me to miss a connection, I need to know immediately *who* is helping me, *what* alternative train I am on, and that I won't have to fight a bureaucratic maze to get home or claim compensation.
+
+### 2. What responsibility I believe my role has
+* To represent the diverse, real-world needs of all passenger types (commuters, tourists, elderly passengers, people with disabilities, and families).
+* To challenge vague or system-centric assumptions that shift the burden of disruption onto the passenger.
+* To demand absolute clarity on how information reaches the passenger during high-stress scenarios (cancellations, signal loss, missed connections).
+
+### 3. What responsibility my role should NOT have
+* I should **not** design the technical architecture, database schemas, or API integrations required to feed live train data or station lift statuses into the app.
+* I should **not** decide the financial thresholds, liability rules, or backend workflows for operator compensation payouts—my focus is strictly on making the claims process effortless from the passenger's end.
+
+### 4. What risks or failure cases concern me
+* **The "Dead Phone / No Signal" Trap (CF-052):** Standing at a ticket barrier with a flat battery or a dead zone, only to be treated like a fare evader because the app refuses to display an offline ticket or cryptographic token.
+* **The Ghost Lift / Broken Route (CF-053):** Relying on an app route that assumes an elevator is working, only to get trapped on a platform with no way up except stairs.
+* **The Stranded Connection (CF-055):** Watching my connecting train pull away because my first train was 4 minutes late, with zero guidance on whether my ticket is still valid for the next service or if I have to buy a new one.
+
+### 5. What decision needs clarification
+* **Push Notification Thresholds (CF-051):** We need a concrete definition of "significant delay." For a tourist with plenty of time, 10 minutes is nothing. For a daily commuter trying to make a tight connection or an elderly passenger pacing themselves, a 5-to-10-minute change is critical. *Who* defines the threshold, and can passengers customize it?
+* **Compensation Management (CF-056):** Will SmartRail act as a single, unified window for Delay Repay across all operators, or will it just bounce passengers out to external operator websites? Passengers expect a single-click, auto-populated claim within the SmartRail app itself.
+
+### 6. Any assumption I disagree with
+* **I strongly disagree with any implicit assumption that "offline mode" for tickets is an optional "nice-to-have" feature.** Stations are notorious black spots for cellular data due to subterranean platforms and thick concrete structures. An online-only ticketing system is fundamentally broken by design from a passenger usability standpoint.
