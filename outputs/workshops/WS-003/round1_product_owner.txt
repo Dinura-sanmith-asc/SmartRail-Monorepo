@@ -1,0 +1,25 @@
+As the Product Owner Stakeholder Agent for SmartRail, here is my independent position for Round 1 regarding **Customer Service Journey Information, Ticketing, and Disruption Support**.
+
+### 1. What matters from my stakeholder perspective
+Passenger trust and operational resilience are paramount. When disruption strikes, passengers need a single, unambiguous version of the truth across all channels (mobile apps, station screens, and customer service desks) to prevent confusion and frustration. Furthermore, during major disruptions, managing the stranded passenger lifecycle—ticket acceptance, compensation, and alternative transport—directly impacts our brand reputation, regulatory compliance (e.g., passenger rights obligations), and station congestion levels.
+
+### 2. What responsibility my role has
+*   Defining clear business priorities and measurable outcomes for passenger communication and disruption handling.
+*   Enforcing a realistic MVP scope to ensure we deliver core value quickly without getting bogged down in complex, edge-case operational workflows.
+*   Establishing clear boundaries between what SmartRail automates digitally versus what remains manual operator policy or human-driven customer service intervention.
+*   Ensuring regulatory compliance regarding passenger rights, ticket validity transparency, and compensation transparency.
+
+### 3. What responsibility my role should NOT have
+*   I am *not* responsible for designing the software architecture, database schemas, or API integrations (e.g., choosing which specific data bus or microservice architecture serves the real-time feed).
+*   I do not dictate internal operational rosters or physical logistics (e.g., how station staff physically procure hotel rooms or call taxis, though I define the digital workflow support for it).
+
+### 4. What risks or failure cases concern me
+*   **Scope Creep (The "Everything App" Trap):** Attempting to build a fully automated, end-to-end hotel booking, taxi dispatch, and multi-tier compensation clearinghouse for the MVP. This will blow out budgets, delay delivery, and fail due to third-party integration complexities.
+*   **Conflicting Information Channels:** If mobile apps show one departure time while station departure boards and customer service reps show another, passenger panic and desk queues will escalate dramatically.
+*   **Regulatory Penalties & Brand Damage:** Failing to clearly communicate inter-operator ticket validity rules during a major disruption leaves passengers stranded and exposes SmartRail to regulatory breaches.
+
+### 5. What decision you believe needs clarification
+We must urgently clarify **the strict MVP boundary for extended passenger services (CF-011)**. Specifically: Are we building automated compensation payouts and direct hotel/taxi booking engines for the MVP, or are we limiting the MVP to *informing* the passenger of their rights, displaying ticket validity rules, and providing deep-links or reference codes for manual claims?
+
+### 6. Any assumption you disagree with
+I challenge the assumption that SmartRail needs to own and automate the physical supply chain of disruption recovery (such as direct integration with hotel inventory or real-time taxi dispatch) within the initial release. For the MVP, SmartRail’s responsibility should be **communication, guidance, and eligibility transparency**, while actual fulfillment can rely on existing operator policies and manual or semi-automated processes.
