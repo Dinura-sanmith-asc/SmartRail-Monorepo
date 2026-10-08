@@ -1,0 +1,28 @@
+As a Railway Network Controller participating in this workshop, I am examining these driver-centric findings strictly through the lens of network-wide safety, active journey visibility, and operational continuity. 
+
+Here is my independent position:
+
+### 1. What matters from my stakeholder perspective
+From the central control room, I need absolute certainty that every active train on the network is manned by a driver who is fully briefed, legally authorized, and operating under valid safety conditions. When driver systems, Driver Machine Interfaces (DMIs), or communication links fail, my primary concern is that blind spots instantly form across the network. I need to know immediately if a train is operating under degraded conditions, manual fallbacks, or cached data so I can adjust signaling, spacing, and timetable execution accordingly.
+
+### 2. What responsibility my role has
+* **Operational Authorization:** Retaining the absolute authority to clear a train for movement, authorize route changes, or order journey termination when unexpected failures (such as total DMI failure or severe defects) occur.
+* **Network Coordination:** Managing train separation, speed restrictions, and conflicting paths if a driver has to revert to manual operations or radio-based instructions due to system outages.
+* **Incident Tracking:** Logging and monitoring degraded operational states across the network and coordinating with depots and stations when a train must be delayed, sidelined, or cancelled due to unresolved pre-departure defects or safety notice acknowledgements.
+
+### 3. What responsibility my role should NOT have
+* **Verifying Shift Acknowledgements:** I should not be responsible for manually tracking or collecting individual driver signatures or electronic acknowledgements for routine critical safety notices prior to shift start. That is an administrative and operational compliance task for depot management and dispatchers.
+* **Diagnosing Technical Defects:** I am not a rolling stock engineer or technical helpdesk. I must not be burdened with deciding whether a technical defect is "minor" or "major" based on raw telemetry; I only need to know the operational impact (e.g., speed restriction, route clearance, or mandatory withdrawal from service).
+* **Direct DMI Troubleshooting:** I cannot troubleshoot or authorize workarounds for hardware or software failures on the train.
+
+### 4. What risks or failure cases concern me
+* **Unacknowledged Safety Hazards:** If a driver proceeds onto the active network without acknowledging a critical safety notice (due to system downtime or fallback confusion), they may violate temporary speed restrictions or safety zones, risking catastrophic collisions.
+* **Communication Blackouts with Cached Data:** If a train operates indefinitely on cached data during connectivity loss, I lose real-time visibility and control over its journey state. This creates ghost trains or unpredictable movements relative to live timetable adjustments.
+* **Uncoordinated Manual Fallbacks:** If assignment or DMI system failures lead drivers to commence journeys or execute manual operations without coordinating with central control, my view of active network capacity becomes completely inaccurate, invalidating automated conflict detection.
+
+### 5. What decision you believe needs clarification
+* **Authority and Protocol During Total DMI Failure:** We must explicitly define whether a train with a complete DMI failure is permitted to enter or continue on the active mainline under manual fallback instructions, and *who* explicitly holds the authority to authorize that movement (Control vs. Depot Supervisor).
+* **Connectivity and Caching Time Limits:** We need a strict operational limit (e.g., maximum minutes) for how long a train may operate on cached data during a connectivity loss before it is legally required to halt or be talked through to the nearest safe siding by network control.
+
+### 6. Any assumption you disagree with
+* **Assumption that drivers can independently manage fallback operations:** I disagree with any implication that fallback operations (such as manual assignment overrides or DMI failures) can be handled purely as a local transaction between the driver and a standalone tool without real-time notification to the Network Controller. Any departure from standard digital control loops directly impacts active network safety and must be visible to central operations.
