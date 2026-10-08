@@ -1,0 +1,29 @@
+As a Train Driver participating in this discovery workshop, here is my operational perspective on the five discussion items:
+
+### 1. What matters from my stakeholder perspective
+* **Absolute clarity of instructions:** When I am operating a train at speed, I cannot hesitate or cross-reference conflicting sources of truth. 
+* **Minimizing cognitive load:** My primary duty is looking out the window, reading signals, and managing the train safely. Information on the Driver Machine Interface (DMI) must be direct, uncluttered, and free of ambiguity.
+* **Efficient post-journey handover:** After securing the train, I need a streamlined way to complete handover tasks without unnecessary paperwork, but without sacrificing safety verification.
+
+### 2. What responsibility I believe my role has
+* **Operating the train safely:** Complying with signal aspects, speed limits, and stopping the train accurately at platforms.
+* **Validating journey data and reports:** Reviewing auto-populated journey logs and defect reports to ensure accuracy before final submission.
+* **Executing physical safety checks:** Visually and physically verifying that the train is properly secured (e.g., parking brakes applied, cab shut down) during post-journey routines.
+
+### 3. What responsibility my role should NOT have
+* **Resolving data discrepancies on the fly:** I should *not* be responsible for debugging discrepancies between paper timetables, Control instructions, and on-board data while operating. That is a systemic failure that must be resolved upstream.
+* **System administration or manual data entry of routine telemetry:** I should not be typing in data that the train's sensors or scheduling systems already know.
+* **Acting as a dispatcher or signaller:** I receive authorities; I do not grant them.
+
+### 4. What risks or failure cases concern me
+* **Conflicting Information (CF-026):** If the DMI says proceed at 60 mph, but Control verbally instructs 30 mph due to an emergency, or a paper notice contradicts both, hesitation can lead to a SPAD (Signal Passed At Danger) or a collision. 
+* **DMI Distraction (CF-035):** Over-engineered or overly sensitive dynamic braking guides could cause "screen-watching" instead of outward observation of the track, platform hazards, and signals.
+* **Locked-out Workflows (CF-037):** If a mandatory DMI post-journey checklist suffers a software freeze or connectivity loss, I could be physically locked out of completing my sign-off or securing my train log, stranding me on the roster.
+
+### 5. What decision needs clarification
+* **Precedence Rule (CF-026):** We need a hard, unambiguous rule inscribed in operating rules: **Verbal/Written instructions from Control/Signallers override on-board systems, which override static paper documents.** Furthermore, any critical data conflict must force the system to flag a safety alert, prompting Control to resolve it before movement authority is granted.
+* **External Role Boundaries (CF-040):** Whether Shunters, Maintenance, or Control use SmartRail directly or via separate systems, the DMI *must* clearly display when their clearance or authority has been granted to me. I need to know *who* gave me permission to move or secure the train.
+
+### 6. Assumptions I disagree with
+* **Assumption that "more auto-population is always better" (CF-038):** While auto-populating delay times and arrival/departure events saves time, assuming the driver will blindly validate a massive auto-generated report is dangerous. If the system auto-populates incident logs, I must have an extremely fast, frictionless way to edit or reject incorrect text so I don't sign off on inaccurate legal/operational records.
+* **Assumption that dynamic braking guides are purely helpful (CF-035):** If a braking guide is implemented, it must be advisory only. If it attempts to mandate or enforce braking curves that conflict with real-time adhesion (e.g., wet rails, leaf fall), it creates a severe operational hazard.
