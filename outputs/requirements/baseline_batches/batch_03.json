@@ -1,0 +1,65 @@
+[
+  {
+    "source_ref": "BRIEF-7",
+    "title": "Station Terminal Application Capability",
+    "statement": "Provide interactive public terminals at selected railway stations allowing passengers to explore railway information without installing the mobile application.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "selected railway stations may contain interactive public terminals. These terminals should allow passengers to explore railway information without requiring them to install the passenger mobile application.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-7",
+    "title": "Station Terminal Deployment",
+    "statement": "Design the station terminal as an application suitable for deployment on dedicated station devices.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The terminal should be designed as an application suitable for deployment on dedicated station devices.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-7",
+    "title": "Station Terminal Technology and Interaction Model",
+    "statement": "Determine the appropriate technology and interaction model for the station terminal application.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should determine the appropriate technology and interaction model.",
+    "clarification_question": "What are the specific hardware constraints, accessibility standards, and preferred technology stacks for dedicated station devices?"
+  },
+  {
+    "source_ref": "BRIEF-8",
+    "title": "Driver and Train Operator Application Access",
+    "statement": "Provide train drivers and relevant operational personnel with access to a dedicated application supporting their operational responsibilities during a train journey.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Train drivers or relevant train operational personnel should have access to a dedicated application. The application should support their operational responsibilities during a train journey.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-8",
+    "title": "Driver Application Scope and Permissions",
+    "statement": "Investigate and define the information required by drivers and operators, and specify which information they should be permitted to update.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should investigate what information the driver or train operator would reasonably require and which information they should be permitted to update.",
+    "clarification_question": "What are the regulatory and safety requirements governing what data a train operator is permitted to modify while on duty?"
+  },
+  {
+    "source_ref": "BRIEF-9",
+    "title": "Railway Operations Platform",
+    "statement": "Provide a web-based system for managing and overseeing railway operations that allows authorized users to understand what is currently happening across the railway network.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The railway organization requires a web-based system for managing and overseeing railway operations. The operations platform should allow authorized users to understand what is currently happening across the railway network.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-9",
+    "title": "Operations Platform Roles and Responsibilities",
+    "statement": "Identify appropriate user roles and responsibilities for the railway operations platform, supporting multiple access levels beyond a single administrator role.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "The users of this system should not simply be treated as a single Administrator role... You should identify appropriate user roles and responsibilities.",
+    "clarification_question": "What is the complete organizational hierarchy and required permission matrix for each operational department?"
+  }
+]

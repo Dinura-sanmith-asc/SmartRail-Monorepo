@@ -1,0 +1,38 @@
+[
+  {
+    "source_ref": "BRIEF-16",
+    "title": "Unreliable Network Environments",
+    "statement": "Determine how relevant applications behave under conditions of unreliable network connectivity.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should determine how relevant applications behave under these conditions.",
+    "clarification_question": "What specific behaviors or offline modes are required for applications during network outages?"
+  },
+  {
+    "source_ref": "BRIEF-17",
+    "title": "Lifecycle Security Integration",
+    "statement": "Incorporate security throughout the development lifecycle rather than only after development completion.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Security should be incorporated throughout the development lifecycle.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-18",
+    "title": "Structured Quality Engineering Approach",
+    "statement": "Demonstrate a structured quality engineering approach for the project.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The project should demonstrate a structured quality engineering approach.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-18",
+    "title": "Test Selection and Justification",
+    "statement": "Decide which tests provide the most value and justify the selected approach.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should decide which tests provide the most value and justify the selected approach.",
+    "clarification_question": "What specific criteria or stakeholder requirements should be used to determine test value and justify the approach?"
+  }
+]

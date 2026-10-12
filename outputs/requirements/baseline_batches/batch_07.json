@@ -1,0 +1,38 @@
+[
+  {
+    "source_ref": "BRIEF-19",
+    "title": "Platform Operation Capability",
+    "statement": "The railway organization must be capable of operating the platform in production.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The railway organization must be capable of operating the platform in production.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-20",
+    "title": "Data Collection Identification and Classification",
+    "statement": "Identify what information the platform collects and classify the data appropriately.",
+    "classification": "PRODUCT_DATA",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "You must identify what information the platform collects and classify the data appropriately.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-20",
+    "title": "Data Privacy and Handling Documentation",
+    "statement": "Document important privacy and data-handling decisions.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Important privacy and data-handling decisions should be documented.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-21",
+    "title": "AI Usage Demonstration",
+    "statement": "Demonstrate where AI was used, how generated output was validated, and where your own judgment changed or rejected AI suggestions.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "You should demonstrate where AI was used, how generated output was validated, and where your own judgment changed or rejected AI suggestions.",
+    "clarification_question": null
+  }
+]

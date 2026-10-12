@@ -1,0 +1,164 @@
+[
+  {
+    "source_ref": "BRIEF-1",
+    "title": "Independent Solution Design and Build",
+    "statement": "Independently design and build a solution for a fictional public railway transportation organization as an individual assessment.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "you are expected to independently design and build a solution for a fictional public railway transportation organization. This is an individual assessment.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "Requirements Discovery and Refinement",
+    "statement": "Discover and refine requirements from the initial business problem and identify missing information and assumptions.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Understand an initial business problem. Discover and refine requirements. Identify missing information and assumptions.",
+    "clarification_question": "What mechanisms or processes should be used to document discovered requirements and assumptions?"
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "AI Assistant Utilization",
+    "statement": "Use AI assistants and agents effectively throughout the development lifecycle.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Use AI assistants and agents effectively throughout the development lifecycle.",
+    "clarification_question": "Are there any specific logging or reporting requirements regarding how AI assistants were utilized?"
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "User Experience Design",
+    "statement": "Design appropriate user experiences across the solution.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Design appropriate user experiences.",
+    "clarification_question": "Are there specific design systems, branding guidelines, or accessibility standards to follow?"
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "Software Architecture Design",
+    "statement": "Design a maintainable software architecture.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Design a maintainable software architecture.",
+    "clarification_question": "Are there preferred technology stacks or architectural patterns required for the backend, web, and mobile solutions?"
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "Multi-Tier Solution Implementation",
+    "statement": "Implement backend, web, and mobile solutions.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Implement backend, web, and mobile solutions.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "External System Integration",
+    "statement": "Integrate with external systems.",
+    "classification": "PRODUCT_INTEGRATION",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Integrate with external systems.",
+    "clarification_question": "What specific external systems need to be integrated, and what are their interface specifications?"
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "Quality Assurance Practices",
+    "statement": "Establish appropriate quality assurance practices.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Establish appropriate quality assurance practices.",
+    "clarification_question": "What is the expected test coverage or specific testing frameworks to be used?"
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "Non-Functional Engineering Considerations",
+    "statement": "Consider security, reliability, accessibility, observability, and operational requirements in the solution.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Consider security, reliability, accessibility, observability, and operational requirements.",
+    "clarification_question": "What are the specific quantitative targets for reliability and security compliance?"
+  },
+  {
+    "source_ref": "BRIEF-1",
+    "title": "Technical Decision Justification",
+    "statement": "Make technical decisions and justify them.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Make technical decisions and justify them.",
+    "clarification_question": "In what format should technical decisions and justifications be documented?"
+  },
+  {
+    "source_ref": "BRIEF-2",
+    "title": "Modernize Passenger Experience and Operations",
+    "statement": "Provide a digital platform called SmartRail to modernize the passenger experience and improve visibility into railway operations.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The organization wants to modernize the passenger experience and improve visibility into railway operations through a new digital platform called SmartRail.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-2",
+    "title": "Passenger Information Provision",
+    "statement": "Provide passengers with accurate information about train services, routes, stations, upcoming trains, expected arrival and departure times, current train locations, and service disruptions.",
+    "classification": "PRODUCT_DATA",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The platform should provide passengers with accurate information about: Train services. Routes. Stations. Upcoming trains. Expected arrival and departure times. Current train locations where appropriate. Service disruptions and changes.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-2",
+    "title": "Multi-User System Digital Capabilities",
+    "statement": "Provide digital systems for passengers, train drivers and operational staff, railway stations, central railway operations, and external service providers.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The organization also wants digital systems for: Passengers. Train drivers and operational staff. Railway stations. Central railway operations. External service providers.",
+    "clarification_question": "Which of these multi-user systems are in-scope for implementation versus high-level design?"
+  },
+  {
+    "source_ref": "BRIEF-2",
+    "title": "Multi-Application Architecture",
+    "statement": "Deliver multiple applications and services rather than a single application as the complete solution.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The complete solution will therefore contain multiple applications and services rather than being a single application.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-3",
+    "title": "Passenger Mobile Application",
+    "statement": "Provide a mobile application that helps passengers understand the railway network and their journeys.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Passengers should have access to a mobile application that helps them understand the railway network and their journeys.",
+    "clarification_question": "Should the mobile application target iOS, Android, or both?"
+  },
+  {
+    "source_ref": "BRIEF-3",
+    "title": "Passenger Journey Inquiry Support",
+    "statement": "Enable passengers to determine train choices, next train times, punctuality, train locations, stopping stations, arrival times, disruptions, platform changes, and connections.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "A passenger may want to understand questions such as: Which train should I take? When is the next train? Is my train currently running on time? Where is the train now? Which stations will the train stop at? When will it reach my station? Are there service disruptions? Has the platform or departure time changed? What are the available connections from another station?",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-3",
+    "title": "Intuitive Passenger Experience",
+    "statement": "Provide an intuitive mobile application experience suitable for everyday commuters as well as occasional travelers.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The passenger application should provide an intuitive experience suitable for everyday commuters as well as occasional travelers.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-3",
+    "title": "Determine Passenger Information and Functionality",
+    "statement": "Determine what information and functionality would be valuable to passengers.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should determine what information and functionality would be valuable to passengers.",
+    "clarification_question": "What specific user research or feature prioritization criteria should be applied to determine valuable passenger functionality?"
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Individual Ownership of Submitted Work",
+    "statement": "The submitted work must represent the candidate's own understanding and decision-making.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "the submitted work must represent **your own understanding and decision-making**",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Explain Generated Code",
+    "statement": "The engineer may be asked to explain generated code during the assessment or final review.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Explain generated code.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Modify an Existing Feature",
+    "statement": "The engineer may be asked to modify an existing feature during the assessment or final review.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Modify an existing feature.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Debug an Issue",
+    "statement": "The engineer may be asked to debug an issue during the assessment or final review.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Debug an issue.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Explain Architectural Decisions",
+    "statement": "The engineer may be asked to explain an architectural decision during the assessment or final review.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Explain an architectural decision.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Change a Requirement",
+    "statement": "The engineer may be asked to change a requirement during the assessment or final review.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Change a requirement.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Explain the Data Model",
+    "statement": "The engineer may be asked to explain their data model during the assessment or final review.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Explain your data model.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Demonstrate Integrations",
+    "statement": "The engineer may be asked to demonstrate how an integration works during the assessment or final review.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Demonstrate how an integration works.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Explain AI Recommendation Decisions",
+    "statement": "The engineer may be asked to explain why a particular AI recommendation was accepted or rejected.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Explain why a particular AI recommendation was accepted or rejected.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-28",
+    "title": "Capability to Describe Alternative Approaches",
+    "statement": "The engineer may be asked to describe alternative approaches they considered.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Describe alternative approaches you considered.",
+    "clarification_question": null
+  }
+]

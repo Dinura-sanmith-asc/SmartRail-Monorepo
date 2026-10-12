@@ -1,0 +1,1167 @@
+{
+  "total_sections": 28,
+  "candidate_count": 116,
+  "uncovered_sections": [],
+  "items": [
+    {
+      "source_ref": "BRIEF-1",
+      "title": "Independent Solution Design and Build",
+      "statement": "Independently design and build a solution for a fictional public railway transportation organization as an individual assessment.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "you are expected to independently design and build a solution for a fictional public railway transportation organization. This is an individual assessment.",
+      "clarification_question": null,
+      "candidate_id": "BASE-001"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "Requirements Discovery and Refinement",
+      "statement": "Discover and refine requirements from the initial business problem and identify missing information and assumptions.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Understand an initial business problem. Discover and refine requirements. Identify missing information and assumptions.",
+      "clarification_question": "What mechanisms or processes should be used to document discovered requirements and assumptions?",
+      "candidate_id": "BASE-002"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "AI Assistant Utilization",
+      "statement": "Use AI assistants and agents effectively throughout the development lifecycle.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Use AI assistants and agents effectively throughout the development lifecycle.",
+      "clarification_question": "Are there any specific logging or reporting requirements regarding how AI assistants were utilized?",
+      "candidate_id": "BASE-003"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "User Experience Design",
+      "statement": "Design appropriate user experiences across the solution.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Design appropriate user experiences.",
+      "clarification_question": "Are there specific design systems, branding guidelines, or accessibility standards to follow?",
+      "candidate_id": "BASE-004"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "Software Architecture Design",
+      "statement": "Design a maintainable software architecture.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Design a maintainable software architecture.",
+      "clarification_question": "Are there preferred technology stacks or architectural patterns required for the backend, web, and mobile solutions?",
+      "candidate_id": "BASE-005"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "Multi-Tier Solution Implementation",
+      "statement": "Implement backend, web, and mobile solutions.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Implement backend, web, and mobile solutions.",
+      "clarification_question": null,
+      "candidate_id": "BASE-006"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "External System Integration",
+      "statement": "Integrate with external systems.",
+      "classification": "PRODUCT_INTEGRATION",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Integrate with external systems.",
+      "clarification_question": "What specific external systems need to be integrated, and what are their interface specifications?",
+      "candidate_id": "BASE-007"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "Quality Assurance Practices",
+      "statement": "Establish appropriate quality assurance practices.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Establish appropriate quality assurance practices.",
+      "clarification_question": "What is the expected test coverage or specific testing frameworks to be used?",
+      "candidate_id": "BASE-008"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "Non-Functional Engineering Considerations",
+      "statement": "Consider security, reliability, accessibility, observability, and operational requirements in the solution.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Consider security, reliability, accessibility, observability, and operational requirements.",
+      "clarification_question": "What are the specific quantitative targets for reliability and security compliance?",
+      "candidate_id": "BASE-009"
+    },
+    {
+      "source_ref": "BRIEF-1",
+      "title": "Technical Decision Justification",
+      "statement": "Make technical decisions and justify them.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Make technical decisions and justify them.",
+      "clarification_question": "In what format should technical decisions and justifications be documented?",
+      "candidate_id": "BASE-010"
+    },
+    {
+      "source_ref": "BRIEF-2",
+      "title": "Modernize Passenger Experience and Operations",
+      "statement": "Provide a digital platform called SmartRail to modernize the passenger experience and improve visibility into railway operations.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The organization wants to modernize the passenger experience and improve visibility into railway operations through a new digital platform called SmartRail.",
+      "clarification_question": null,
+      "candidate_id": "BASE-011"
+    },
+    {
+      "source_ref": "BRIEF-2",
+      "title": "Passenger Information Provision",
+      "statement": "Provide passengers with accurate information about train services, routes, stations, upcoming trains, expected arrival and departure times, current train locations, and service disruptions.",
+      "classification": "PRODUCT_DATA",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The platform should provide passengers with accurate information about: Train services. Routes. Stations. Upcoming trains. Expected arrival and departure times. Current train locations where appropriate. Service disruptions and changes.",
+      "clarification_question": null,
+      "candidate_id": "BASE-012"
+    },
+    {
+      "source_ref": "BRIEF-2",
+      "title": "Multi-User System Digital Capabilities",
+      "statement": "Provide digital systems for passengers, train drivers and operational staff, railway stations, central railway operations, and external service providers.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The organization also wants digital systems for: Passengers. Train drivers and operational staff. Railway stations. Central railway operations. External service providers.",
+      "clarification_question": "Which of these multi-user systems are in-scope for implementation versus high-level design?",
+      "candidate_id": "BASE-013"
+    },
+    {
+      "source_ref": "BRIEF-2",
+      "title": "Multi-Application Architecture",
+      "statement": "Deliver multiple applications and services rather than a single application as the complete solution.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The complete solution will therefore contain multiple applications and services rather than being a single application.",
+      "clarification_question": null,
+      "candidate_id": "BASE-014"
+    },
+    {
+      "source_ref": "BRIEF-3",
+      "title": "Passenger Mobile Application",
+      "statement": "Provide a mobile application that helps passengers understand the railway network and their journeys.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Passengers should have access to a mobile application that helps them understand the railway network and their journeys.",
+      "clarification_question": "Should the mobile application target iOS, Android, or both?",
+      "candidate_id": "BASE-015"
+    },
+    {
+      "source_ref": "BRIEF-3",
+      "title": "Passenger Journey Inquiry Support",
+      "statement": "Enable passengers to determine train choices, next train times, punctuality, train locations, stopping stations, arrival times, disruptions, platform changes, and connections.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "A passenger may want to understand questions such as: Which train should I take? When is the next train? Is my train currently running on time? Where is the train now? Which stations will the train stop at? When will it reach my station? Are there service disruptions? Has the platform or departure time changed? What are the available connections from another station?",
+      "clarification_question": null,
+      "candidate_id": "BASE-016"
+    },
+    {
+      "source_ref": "BRIEF-3",
+      "title": "Intuitive Passenger Experience",
+      "statement": "Provide an intuitive mobile application experience suitable for everyday commuters as well as occasional travelers.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The passenger application should provide an intuitive experience suitable for everyday commuters as well as occasional travelers.",
+      "clarification_question": null,
+      "candidate_id": "BASE-017"
+    },
+    {
+      "source_ref": "BRIEF-3",
+      "title": "Determine Passenger Information and Functionality",
+      "statement": "Determine what information and functionality would be valuable to passengers.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should determine what information and functionality would be valuable to passengers.",
+      "clarification_question": "What specific user research or feature prioritization criteria should be applied to determine valuable passenger functionality?",
+      "candidate_id": "BASE-018"
+    },
+    {
+      "source_ref": "BRIEF-4",
+      "title": "Domain Model Representation",
+      "statement": "Determine an appropriate domain model for representing the railway network and its operations.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should determine an appropriate domain model for representing the railway network and its operations.",
+      "clarification_question": "What are the specific bounds and persistence expectations for the railway network domain model?",
+      "candidate_id": "BASE-019"
+    },
+    {
+      "source_ref": "BRIEF-5",
+      "title": "Live Train Journey Information",
+      "statement": "Provide passengers with information about active train journeys including current progress.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "An important part of the system is providing passengers with information about active train journeys.",
+      "clarification_question": null,
+      "candidate_id": "BASE-020"
+    },
+    {
+      "source_ref": "BRIEF-5",
+      "title": "Live Information Mechanism",
+      "statement": "Investigate and design the mechanism used to obtain, calculate, communicate, and update live information.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "The mechanism used to obtain, calculate, communicate, and update live information should be investigated and designed by you.",
+      "clarification_question": "What are the source data feeds and latency requirements for live train information updates?",
+      "candidate_id": "BASE-021"
+    },
+    {
+      "source_ref": "BRIEF-6",
+      "title": "Digital Passenger-Information Displays",
+      "statement": "Railway stations must contain digital passenger-information displays.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Railway stations should contain digital passenger-information displays.",
+      "clarification_question": null,
+      "candidate_id": "BASE-022"
+    },
+    {
+      "source_ref": "BRIEF-6",
+      "title": "Display Information Prioritization",
+      "statement": "Investigate what information is most important for digital displays in different locations.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "However, you should investigate what information is most important in different locations.",
+      "clarification_question": "What stakeholder requirements define the specific information needs for each display location type?",
+      "candidate_id": "BASE-023"
+    },
+    {
+      "source_ref": "BRIEF-6",
+      "title": "Display Connectivity and Resiliency",
+      "statement": "Consider how displays receive updated information and how they behave when connectivity is unreliable.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The solution should consider how these displays receive updated information and how they behave when connectivity is unreliable.",
+      "clarification_question": "What fallback behavior or cached information must displays show during network outages?",
+      "candidate_id": "BASE-024"
+    },
+    {
+      "source_ref": "BRIEF-7",
+      "title": "Station Terminal Application Capability",
+      "statement": "Provide interactive public terminals at selected railway stations allowing passengers to explore railway information without installing the mobile application.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "selected railway stations may contain interactive public terminals. These terminals should allow passengers to explore railway information without requiring them to install the passenger mobile application.",
+      "clarification_question": null,
+      "candidate_id": "BASE-025"
+    },
+    {
+      "source_ref": "BRIEF-7",
+      "title": "Station Terminal Deployment",
+      "statement": "Design the station terminal as an application suitable for deployment on dedicated station devices.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The terminal should be designed as an application suitable for deployment on dedicated station devices.",
+      "clarification_question": null,
+      "candidate_id": "BASE-026"
+    },
+    {
+      "source_ref": "BRIEF-7",
+      "title": "Station Terminal Technology and Interaction Model",
+      "statement": "Determine the appropriate technology and interaction model for the station terminal application.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should determine the appropriate technology and interaction model.",
+      "clarification_question": "What are the specific hardware constraints, accessibility standards, and preferred technology stacks for dedicated station devices?",
+      "candidate_id": "BASE-027"
+    },
+    {
+      "source_ref": "BRIEF-8",
+      "title": "Driver and Train Operator Application Access",
+      "statement": "Provide train drivers and relevant operational personnel with access to a dedicated application supporting their operational responsibilities during a train journey.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Train drivers or relevant train operational personnel should have access to a dedicated application. The application should support their operational responsibilities during a train journey.",
+      "clarification_question": null,
+      "candidate_id": "BASE-028"
+    },
+    {
+      "source_ref": "BRIEF-8",
+      "title": "Driver Application Scope and Permissions",
+      "statement": "Investigate and define the information required by drivers and operators, and specify which information they should be permitted to update.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should investigate what information the driver or train operator would reasonably require and which information they should be permitted to update.",
+      "clarification_question": "What are the regulatory and safety requirements governing what data a train operator is permitted to modify while on duty?",
+      "candidate_id": "BASE-029"
+    },
+    {
+      "source_ref": "BRIEF-9",
+      "title": "Railway Operations Platform",
+      "statement": "Provide a web-based system for managing and overseeing railway operations that allows authorized users to understand what is currently happening across the railway network.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The railway organization requires a web-based system for managing and overseeing railway operations. The operations platform should allow authorized users to understand what is currently happening across the railway network.",
+      "clarification_question": null,
+      "candidate_id": "BASE-030"
+    },
+    {
+      "source_ref": "BRIEF-9",
+      "title": "Operations Platform Roles and Responsibilities",
+      "statement": "Identify appropriate user roles and responsibilities for the railway operations platform, supporting multiple access levels beyond a single administrator role.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "The users of this system should not simply be treated as a single Administrator role... You should identify appropriate user roles and responsibilities.",
+      "clarification_question": "What is the complete organizational hierarchy and required permission matrix for each operational department?",
+      "candidate_id": "BASE-031"
+    },
+    {
+      "source_ref": "BRIEF-10",
+      "title": "Disruption Handling and Communication",
+      "statement": "The system must provide an appropriate mechanism for handling disruptions and communicating relevant information to affected users.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The system should provide an appropriate mechanism for handling disruptions and communicating relevant information to affected users.",
+      "clarification_question": null,
+      "candidate_id": "BASE-032"
+    },
+    {
+      "source_ref": "BRIEF-10",
+      "title": "Disruption Information Propagation",
+      "statement": "Determine how disruption information propagates through the different applications.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should determine how disruption information propagates through the different applications.",
+      "clarification_question": "How should disruption information propagate through the different applications?",
+      "candidate_id": "BASE-033"
+    },
+    {
+      "source_ref": "BRIEF-11",
+      "title": "External Catering Platform Integration",
+      "statement": "SmartRail must integrate with the external catering platform.",
+      "classification": "PRODUCT_INTEGRATION",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "SmartRail must integrate with this external platform.",
+      "clarification_question": null,
+      "candidate_id": "BASE-034"
+    },
+    {
+      "source_ref": "BRIEF-11",
+      "title": "Catering Integration Data Provision",
+      "statement": "Provide railway information such as train services, routes, station information, arrival times, and service changes to the catering provider.",
+      "classification": "PRODUCT_DATA",
+      "source_strength": "ILLUSTRATIVE",
+      "evidence_excerpt": "The catering provider may require railway information such as: Train services. Train routes. Station information. Scheduled arrival times. Actual or estimated arrival times. Service changes.",
+      "clarification_question": null,
+      "candidate_id": "BASE-035"
+    },
+    {
+      "source_ref": "BRIEF-12",
+      "title": "Food Options Discovery",
+      "statement": "Passengers using SmartRail must be able to discover available food options associated with their journey.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Passengers using SmartRail should be able to discover available food options associated with their journey.",
+      "clarification_question": null,
+      "candidate_id": "BASE-036"
+    },
+    {
+      "source_ref": "BRIEF-12",
+      "title": "Food Ordering and Collection Arrangement",
+      "statement": "Passengers must be able to select food and arrange to receive or collect the order at an appropriate point during the journey.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "A passenger should be able to select food and arrange to receive or collect the order at an appropriate point during the journey.",
+      "clarification_question": null,
+      "candidate_id": "BASE-037"
+    },
+    {
+      "source_ref": "BRIEF-12",
+      "title": "Investigate Catering Ordering and Fulfillment Workflow",
+      "statement": "Investigate questions regarding the ordering and fulfillment workflow, including station support, order placement timing, modification rules, delay handling, missed collections, cancellations, payment processing ownership, menu ownership, availability changes, order association, and collection confirmation.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should investigate questions such as: Which stations support catering? When can an order be placed? How close to arrival can an order be modified? What happens if a train is delayed? What happens if the passenger misses the collection station? Can an order be cancelled? Who owns payment processing? Who owns the authoritative food menu? How are food availability changes communicated? How are orders associated with passengers and journeys? How is successful collection confirmed?",
+      "clarification_question": "What are the specific operational rules and ownership boundaries for the catering ordering and fulfillment workflow?",
+      "candidate_id": "BASE-038"
+    },
+    {
+      "source_ref": "BRIEF-13",
+      "title": "User Event Notifications",
+      "statement": "The system must provide capabilities to deliver information to different users when important events occur.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Different users may need to receive information when important events occur.",
+      "clarification_question": "What specific events trigger notifications, and through which channels must they be delivered?",
+      "candidate_id": "BASE-039"
+    },
+    {
+      "source_ref": "BRIEF-14",
+      "title": "Publicly Accessible Railway Information",
+      "statement": "The system must allow public access to certain railway information without authentication.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Some railway information may be publicly accessible.",
+      "clarification_question": null,
+      "candidate_id": "BASE-040"
+    },
+    {
+      "source_ref": "BRIEF-14",
+      "title": "Passenger Account Authentication",
+      "statement": "The system must support user accounts for passenger functionality.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Some passenger functionality may require an account.",
+      "clarification_question": null,
+      "candidate_id": "BASE-041"
+    },
+    {
+      "source_ref": "BRIEF-14",
+      "title": "Driver Application Authentication",
+      "statement": "Driver applications must require authentication for operational users.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Driver applications require authenticated operational users.",
+      "clarification_question": null,
+      "candidate_id": "BASE-042"
+    },
+    {
+      "source_ref": "BRIEF-14",
+      "title": "Railway Management Organizational Access",
+      "statement": "Railway management functionality must require organizational access.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Railway management functionality requires organizational access.",
+      "clarification_question": null,
+      "candidate_id": "BASE-043"
+    },
+    {
+      "source_ref": "BRIEF-14",
+      "title": "Role-Based Permissions",
+      "statement": "Different organizational roles must be supported with different permissions.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Different organizational roles may require different permissions.",
+      "clarification_question": null,
+      "candidate_id": "BASE-044"
+    },
+    {
+      "source_ref": "BRIEF-14",
+      "title": "Identity and Authorization Model Definition",
+      "statement": "Define an appropriate identity and authorization model covering the authentication and permission requirements.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should define an appropriate identity and authorization model.",
+      "clarification_question": "What are the specific identity provider integrations and compliance requirements for the authorization model?",
+      "candidate_id": "BASE-045"
+    },
+    {
+      "source_ref": "BRIEF-15",
+      "title": "Application Suite Identification",
+      "statement": "The solution must accommodate five distinct application types including Passenger Mobile, Driver / Operator, Station Terminal, Station Information Displays, and Railway Operations Web Application.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "ILLUSTRATIVE",
+      "evidence_excerpt": "These may include: 1. Passenger Mobile Application 2. Driver / Operator Application 3. Station Terminal Application 4. Station Information Displays 5. Railway Operations Web Application",
+      "clarification_question": "Are there any mandatory applications out of this list that must be delivered in the initial scope?",
+      "candidate_id": "BASE-046"
+    },
+    {
+      "source_ref": "BRIEF-15",
+      "title": "Design System and Language Strategy",
+      "statement": "Determine whether and how the multiple applications share a common design language.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should determine whether and how these applications share a common design language.",
+      "clarification_question": "What are the technical constraints or target platforms for establishing a shared design system?",
+      "candidate_id": "BASE-047"
+    },
+    {
+      "source_ref": "BRIEF-15",
+      "title": "Passenger Experience in Busy Stations",
+      "statement": "Design experiences that passengers can understand quickly while moving through a busy railway station.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Special attention should be paid to designing experiences that passengers can understand quickly while moving through a busy railway station.",
+      "clarification_question": "Are there specific accessibility or cognitive load guidelines that must be met for station environments?",
+      "candidate_id": "BASE-048"
+    },
+    {
+      "source_ref": "BRIEF-16",
+      "title": "Unreliable Network Environments",
+      "statement": "Determine how relevant applications behave under conditions of unreliable network connectivity.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should determine how relevant applications behave under these conditions.",
+      "clarification_question": "What specific behaviors or offline modes are required for applications during network outages?",
+      "candidate_id": "BASE-049"
+    },
+    {
+      "source_ref": "BRIEF-17",
+      "title": "Lifecycle Security Integration",
+      "statement": "Incorporate security throughout the development lifecycle rather than only after development completion.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Security should be incorporated throughout the development lifecycle.",
+      "clarification_question": null,
+      "candidate_id": "BASE-050"
+    },
+    {
+      "source_ref": "BRIEF-18",
+      "title": "Structured Quality Engineering Approach",
+      "statement": "Demonstrate a structured quality engineering approach for the project.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The project should demonstrate a structured quality engineering approach.",
+      "clarification_question": null,
+      "candidate_id": "BASE-051"
+    },
+    {
+      "source_ref": "BRIEF-18",
+      "title": "Test Selection and Justification",
+      "statement": "Decide which tests provide the most value and justify the selected approach.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "TO_BE_DEFINED",
+      "evidence_excerpt": "You should decide which tests provide the most value and justify the selected approach.",
+      "clarification_question": "What specific criteria or stakeholder requirements should be used to determine test value and justify the approach?",
+      "candidate_id": "BASE-052"
+    },
+    {
+      "source_ref": "BRIEF-19",
+      "title": "Platform Operation Capability",
+      "statement": "The railway organization must be capable of operating the platform in production.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "The railway organization must be capable of operating the platform in production.",
+      "clarification_question": null,
+      "candidate_id": "BASE-053"
+    },
+    {
+      "source_ref": "BRIEF-20",
+      "title": "Data Collection Identification and Classification",
+      "statement": "Identify what information the platform collects and classify the data appropriately.",
+      "classification": "PRODUCT_DATA",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "You must identify what information the platform collects and classify the data appropriately.",
+      "clarification_question": null,
+      "candidate_id": "BASE-054"
+    },
+    {
+      "source_ref": "BRIEF-20",
+      "title": "Data Privacy and Handling Documentation",
+      "statement": "Document important privacy and data-handling decisions.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Important privacy and data-handling decisions should be documented.",
+      "clarification_question": null,
+      "candidate_id": "BASE-055"
+    },
+    {
+      "source_ref": "BRIEF-21",
+      "title": "AI Usage Demonstration",
+      "statement": "Demonstrate where AI was used, how generated output was validated, and where your own judgment changed or rejected AI suggestions.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "You should demonstrate where AI was used, how generated output was validated, and where your own judgment changed or rejected AI suggestions.",
+      "clarification_question": null,
+      "candidate_id": "BASE-056"
+    },
+    {
+      "source_ref": "BRIEF-22",
+      "title": "Discover Missing Requirements and Gaps",
+      "statement": "Identify missing actors, business processes, failure scenarios, states, security, operational, accessibility requirements, integration cases, conflicts, ambiguities, and important assumptions.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "You should identify: - Missing actors. - Missing business processes. - Missing failure scenarios. - Missing states. - Missing security requirements. - Missing operational requirements. - Missing accessibility requirements. - Missing integration cases. - Conflicting requirements. - Ambiguous requirements. - Important assumptions.",
+      "clarification_question": "What formal criteria will be used to measure the completeness of the discovered requirements?",
+      "candidate_id": "BASE-057"
+    },
+    {
+      "source_ref": "BRIEF-22",
+      "title": "Simulate Stakeholder Discussions Using AI Agents",
+      "statement": "Use AI agents to simulate discussions with various railway roles such as passenger, driver, station manager, railway controller, customer-service representative, catering provider, security engineer, QA engineer, accessibility specialist, and product owner.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "ILLUSTRATIVE",
+      "evidence_excerpt": "You may use AI agents to simulate discussions with roles such as: - Passenger. - Driver. - Station manager. - Railway controller. - Customer-service representative. - Catering provider. - Security engineer. - QA engineer. - Accessibility specialist. - Product owner.",
+      "clarification_question": "Are specific AI agent frameworks or prompt logs required for submission?",
+      "candidate_id": "BASE-058"
+    },
+    {
+      "source_ref": "BRIEF-22",
+      "title": "Consolidate Discoveries into Refined Requirements",
+      "statement": "Consolidate the discoveries from the requirement discovery challenge into refined requirements.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "You should consolidate these discoveries into your own refined requirements.",
+      "clarification_question": null,
+      "candidate_id": "BASE-059"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Provide Requirements Documentation Artifacts",
+      "statement": "Provide refined requirements, identified assumptions, user personas or actors, user journeys, user stories or equivalent requirements, acceptance criteria, and identified edge cases.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Refined requirements. - Identified assumptions. - User personas or actors. - User journeys. - User stories or equivalent requirements. - Acceptance criteria. - Identified edge cases.",
+      "clarification_question": null,
+      "candidate_id": "BASE-060"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Provide Product and UX Artifacts",
+      "statement": "Provide user flows, wireframes, high-fidelity designs where appropriate, design-system definition, and accessibility considerations.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "User flows. - Wireframes. - High-fidelity designs where appropriate. - Design-system definition. - Accessibility considerations.",
+      "clarification_question": null,
+      "candidate_id": "BASE-061"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Provide Architecture Documentation Artifacts",
+      "statement": "Provide high-level solution architecture, application boundaries, major system components, data ownership, integration architecture, authentication and authorization approach, and important architecture decisions and trade-offs.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "High-level solution architecture. - Application boundaries. - Major system components. - Data ownership. - Integration architecture. - Authentication and authorization approach. - Important architecture decisions and trade-offs.",
+      "clarification_question": null,
+      "candidate_id": "BASE-062"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Implement a Working Backend",
+      "statement": "Implement a working backend demonstrating appropriate domain modeling, APIs, data persistence, validation, authorization, integration, error handling, and observability.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "A working backend demonstrating appropriate: - Domain modeling. - APIs. - Data persistence. - Validation. - Authorization. - Integration. - Error handling. - Observability.",
+      "clarification_question": null,
+      "candidate_id": "BASE-063"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Implement a Web Application",
+      "statement": "Implement a web-based operational experience demonstrating meaningful railway-management functionality.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "A web-based operational experience demonstrating meaningful railway-management functionality.",
+      "clarification_question": null,
+      "candidate_id": "BASE-064"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Implement a Passenger Mobile Application",
+      "statement": "Implement a mobile experience supporting important passenger journeys.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "A mobile experience supporting important passenger journeys.",
+      "clarification_question": null,
+      "candidate_id": "BASE-065"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Implement an Operational Mobile Application",
+      "statement": "Implement a mobile application or equivalent experience for train drivers or operational personnel.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "A mobile application or equivalent experience for train drivers or operational personnel.",
+      "clarification_question": null,
+      "candidate_id": "BASE-066"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Implement a Station Experience Prototype",
+      "statement": "Implement a functional prototype representing station passenger-information displays, interactive station terminals, or both.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "A functional prototype representing either or both: - Station passenger-information displays. - Interactive station terminals.",
+      "clarification_question": null,
+      "candidate_id": "BASE-067"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Implement External Catering Integration",
+      "statement": "Implement a working integration with a simulated external catering platform, which may be mocked, simulated, or implemented as a small independent application.",
+      "classification": "PRODUCT_INTEGRATION",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "A working integration with a simulated external catering platform. The external platform may be mocked, simulated, or implemented as a small independent application where appropriate.",
+      "clarification_question": null,
+      "candidate_id": "BASE-068"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Provide Quality Assurance Artifacts and Testing Evidence",
+      "statement": "Provide a test strategy covering the full spectrum of quality, functional test scenarios, automated tests for selected 5 end-to-end flows, identified defects, evidence of testing, and a quality assessment of the final product.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Test strategy covering full spectrum of quality - Functional test scenarios. - Automated tests - Automating selected 5 end to end flows as they feel like most critical - Identified defects. - Evidence of testing. - Quality assessment of the final product.",
+      "clarification_question": null,
+      "candidate_id": "BASE-069"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Provide Security Artifacts and Testing Evidence",
+      "statement": "Provide a basic threat model, important security decisions, identified risks, security controls implemented, and evidence of relevant security testing.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Basic threat model. - Important security decisions. - Identified risks. - Security controls implemented. - Evidence of relevant security testing.",
+      "clarification_question": null,
+      "candidate_id": "BASE-070"
+    },
+    {
+      "source_ref": "BRIEF-23",
+      "title": "Document AI Tool Usage and Workflows",
+      "statement": "Document which AI tools or agents were used, assigned responsibilities, important prompts or workflows, output validation methods, examples of incorrect or insufficient AI outputs, examples of human judgment improving results, and significantly modified AI-generated implementations with reasons.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Document: - Which AI tools or agents you used. - What responsibilities were assigned to them. - Important prompts or workflows. - How their output was validated. - Examples where AI output was incorrect or insufficient. - Examples where your own judgment improved the result. - Any AI-generated implementation you significantly modified and why.",
+      "clarification_question": null,
+      "candidate_id": "BASE-071"
+    },
+    {
+      "source_ref": "BRIEF-24",
+      "title": "Select and Justify Technology Stack",
+      "statement": "Select appropriate technologies for the proposed solution and explain why they are appropriate for the problem being solved.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "You may select technologies appropriate to your proposed solution unless additional constraints are provided by the assessors. Choosing a technology is not sufficient by itself. You should be able to explain why it is appropriate for the problem being solved.",
+      "clarification_question": null,
+      "candidate_id": "BASE-072"
+    },
+    {
+      "source_ref": "BRIEF-25",
+      "title": "Explore Broader Problem",
+      "statement": "The engineer must explore the broader railway problem space.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "1. Explore the broader problem.",
+      "clarification_question": null,
+      "candidate_id": "BASE-073"
+    },
+    {
+      "source_ref": "BRIEF-25",
+      "title": "Identify Important Capabilities",
+      "statement": "The engineer must identify the important capabilities of the system.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "2. Identify the important capabilities.",
+      "clarification_question": null,
+      "candidate_id": "BASE-074"
+    },
+    {
+      "source_ref": "BRIEF-25",
+      "title": "Define Achievable Assessment Scope",
+      "statement": "The engineer must define an achievable assessment scope.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "3. Define an achievable assessment scope.",
+      "clarification_question": null,
+      "candidate_id": "BASE-075"
+    },
+    {
+      "source_ref": "BRIEF-25",
+      "title": "Prioritize Requirements",
+      "statement": "The engineer must prioritize requirements.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "4. Prioritize requirements.",
+      "clarification_question": null,
+      "candidate_id": "BASE-076"
+    },
+    {
+      "source_ref": "BRIEF-25",
+      "title": "Identify MVP Scope",
+      "statement": "The engineer must identify what belongs in the MVP.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "5. Identify what belongs in your MVP.",
+      "clarification_question": null,
+      "candidate_id": "BASE-077"
+    },
+    {
+      "source_ref": "BRIEF-25",
+      "title": "Document Deferred Items",
+      "statement": "The engineer must clearly document what has been deferred.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "6. Clearly document what has been deferred.",
+      "clarification_question": null,
+      "candidate_id": "BASE-078"
+    },
+    {
+      "source_ref": "BRIEF-25",
+      "title": "Explain Prioritization Rationale",
+      "statement": "The engineer must explain why particular capabilities were prioritized.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "7. Explain why particular capabilities were prioritized.",
+      "clarification_question": null,
+      "candidate_id": "BASE-079"
+    },
+    {
+      "source_ref": "BRIEF-25",
+      "title": "Build Selected Scope to Quality",
+      "statement": "The engineer must build the selected scope to an appropriate level of quality.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "8. Build the selected scope to an appropriate level of quality.",
+      "clarification_question": null,
+      "candidate_id": "BASE-080"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Transform Incomplete Problem into Requirements",
+      "statement": "The engineer must demonstrate the ability to transform an incomplete problem into meaningful requirements.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Requirement Discovery | Ability to transform an incomplete problem into meaningful requirements",
+      "clarification_question": null,
+      "candidate_id": "BASE-081"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "AI-Assisted Engineering Usage",
+      "statement": "The engineer must effectively use, orchestrate, and validate AI assistants or agents.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "AI-Assisted Engineering | Effective use, orchestration, and validation of AI assistants or agents",
+      "clarification_question": null,
+      "candidate_id": "BASE-082"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Product Thinking Demonstration",
+      "statement": "The engineer must demonstrate an understanding of users, priorities, workflows, and business value.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Product Thinking | Understanding users, priorities, workflows, and business value",
+      "clarification_question": null,
+      "candidate_id": "BASE-083"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "UI/UX Implementation",
+      "statement": "The solution must incorporate usability, consistency, accessibility, and design-system thinking.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "UI/UX | Usability, consistency, accessibility, and design-system thinking",
+      "clarification_question": null,
+      "candidate_id": "BASE-084"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Architecture Boundaries and Decisions",
+      "statement": "The solution must establish appropriate boundaries, responsibility separation, and technical decisions.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Architecture | Appropriate boundaries, responsibility separation, and technical decisions",
+      "clarification_question": null,
+      "candidate_id": "BASE-085"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Backend Engineering Standards",
+      "statement": "The backend must ensure maintainability, correctness, APIs, data design, and business logic.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Backend Engineering | Maintainability, correctness, APIs, data design, and business logic",
+      "clarification_question": null,
+      "candidate_id": "BASE-086"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Frontend Engineering Standards",
+      "statement": "The frontend application must be usable, maintainable, and responsive.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Frontend Engineering | Usable, maintainable, responsive application development",
+      "clarification_question": null,
+      "candidate_id": "BASE-087"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Mobile Engineering Experience",
+      "statement": "The system must provide an appropriate mobile experience and consider platform-specific needs.",
+      "classification": "PRODUCT_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Mobile Engineering | Appropriate mobile experience and platform considerations",
+      "clarification_question": "What specific mobile platforms or devices must be targeted by the mobile experience?",
+      "candidate_id": "BASE-088"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Integration with Catering Platform",
+      "statement": "The system must communicate robustly with the external catering platform.",
+      "classification": "PRODUCT_INTEGRATION",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Integration | Robust communication with the external catering platform",
+      "clarification_question": "What are the exact technical protocols, APIs, and authentication mechanisms required for the external catering platform?",
+      "candidate_id": "BASE-089"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "QA and Testing Strategy",
+      "statement": "The engineer must implement a meaningful testing strategy and provide evidence of quality.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "QA | Meaningful testing strategy and evidence of quality",
+      "clarification_question": null,
+      "candidate_id": "BASE-090"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Secure-by-Design Engineering",
+      "statement": "The system must be built using secure-by-design engineering practices.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Security | Secure-by-design engineering practices",
+      "clarification_question": null,
+      "candidate_id": "BASE-091"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Operations and Observability",
+      "statement": "The engineering design must address observability, reliability, and production-readiness.",
+      "classification": "PRODUCT_NON_FUNCTIONAL",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Operations | Observability, reliability, and production-readiness thinking",
+      "clarification_question": null,
+      "candidate_id": "BASE-092"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Technical Judgment and Decision Justification",
+      "statement": "The engineer must make and justify technical decisions instead of blindly following AI suggestions.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Technical Judgment | Ability to make and justify decisions instead of blindly following AI suggestions",
+      "clarification_question": null,
+      "candidate_id": "BASE-093"
+    },
+    {
+      "source_ref": "BRIEF-26",
+      "title": "Communication of Requirements and Trade-offs",
+      "statement": "The engineer must be able to explain requirements, decisions, trade-offs, and outcomes.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Communication | Ability to explain requirements, decisions, trade-offs, and outcomes",
+      "clarification_question": null,
+      "candidate_id": "BASE-094"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Final Stakeholder Presentation Delivery",
+      "statement": "The engineer must present the solution to stakeholders from the railway organization as a narrative rather than isolated screens.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "At the end of the assessment, you should present the solution as if demonstrating it to stakeholders from the railway organization. The presentation should tell a story rather than simply demonstrate individual screens.",
+      "clarification_question": null,
+      "candidate_id": "BASE-095"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of Discovered Requirements",
+      "statement": "The final presentation must explain what requirements were discovered.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- What requirements you discovered.",
+      "clarification_question": null,
+      "candidate_id": "BASE-096"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of Assumptions",
+      "statement": "The final presentation must explain what assumptions were made.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- What assumptions you made.",
+      "clarification_question": null,
+      "candidate_id": "BASE-097"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of Intentional Exclusions",
+      "statement": "The final presentation must explain what was intentionally excluded.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- What you intentionally excluded.",
+      "clarification_question": null,
+      "candidate_id": "BASE-098"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of Scope Prioritization",
+      "statement": "The final presentation must explain how the scope was prioritized.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- How you prioritized the scope.",
+      "clarification_question": null,
+      "candidate_id": "BASE-099"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of Architecture Decisions",
+      "statement": "The final presentation must explain important architecture decisions.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- Important architecture decisions.",
+      "clarification_question": null,
+      "candidate_id": "BASE-100"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of UX Decisions",
+      "statement": "The final presentation must explain important UX decisions.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- Important UX decisions.",
+      "clarification_question": null,
+      "candidate_id": "BASE-101"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of Security Considerations",
+      "statement": "The final presentation must explain security considerations.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- Security considerations.",
+      "clarification_question": null,
+      "candidate_id": "BASE-102"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of QA Strategy",
+      "statement": "The final presentation must explain the QA strategy.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- QA strategy.",
+      "clarification_question": null,
+      "candidate_id": "BASE-103"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of AI Contribution",
+      "statement": "The final presentation must explain how AI contributed to the development process.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- How AI contributed to the development process.",
+      "clarification_question": null,
+      "candidate_id": "BASE-104"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of AI Challenge and Rejection Rationale",
+      "statement": "The final presentation must explain where AI-generated suggestions were challenged or rejected.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- Where AI-generated suggestions were challenged or rejected.",
+      "clarification_question": null,
+      "candidate_id": "BASE-105"
+    },
+    {
+      "source_ref": "BRIEF-27",
+      "title": "Presentation of Future System Improvements",
+      "statement": "The final presentation must explain what would be improved if the system were continued beyond the assessment.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "- What you would improve if the system were continued beyond the assessment.",
+      "clarification_question": null,
+      "candidate_id": "BASE-106"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Individual Ownership of Submitted Work",
+      "statement": "The submitted work must represent the candidate's own understanding and decision-making.",
+      "classification": "ENGINEERING_PROCESS",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "the submitted work must represent **your own understanding and decision-making**",
+      "clarification_question": null,
+      "candidate_id": "BASE-107"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Explain Generated Code",
+      "statement": "The engineer may be asked to explain generated code during the assessment or final review.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Explain generated code.",
+      "clarification_question": null,
+      "candidate_id": "BASE-108"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Modify an Existing Feature",
+      "statement": "The engineer may be asked to modify an existing feature during the assessment or final review.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Modify an existing feature.",
+      "clarification_question": null,
+      "candidate_id": "BASE-109"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Debug an Issue",
+      "statement": "The engineer may be asked to debug an issue during the assessment or final review.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Debug an issue.",
+      "clarification_question": null,
+      "candidate_id": "BASE-110"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Explain Architectural Decisions",
+      "statement": "The engineer may be asked to explain an architectural decision during the assessment or final review.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Explain an architectural decision.",
+      "clarification_question": null,
+      "candidate_id": "BASE-111"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Change a Requirement",
+      "statement": "The engineer may be asked to change a requirement during the assessment or final review.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Change a requirement.",
+      "clarification_question": null,
+      "candidate_id": "BASE-112"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Explain the Data Model",
+      "statement": "The engineer may be asked to explain their data model during the assessment or final review.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Explain your data model.",
+      "clarification_question": null,
+      "candidate_id": "BASE-113"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Demonstrate Integrations",
+      "statement": "The engineer may be asked to demonstrate how an integration works during the assessment or final review.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Demonstrate how an integration works.",
+      "clarification_question": null,
+      "candidate_id": "BASE-114"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Explain AI Recommendation Decisions",
+      "statement": "The engineer may be asked to explain why a particular AI recommendation was accepted or rejected.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Explain why a particular AI recommendation was accepted or rejected.",
+      "clarification_question": null,
+      "candidate_id": "BASE-115"
+    },
+    {
+      "source_ref": "BRIEF-28",
+      "title": "Capability to Describe Alternative Approaches",
+      "statement": "The engineer may be asked to describe alternative approaches they considered.",
+      "classification": "ASSESSMENT_DELIVERABLE",
+      "source_strength": "EXPLICIT",
+      "evidence_excerpt": "Describe alternative approaches you considered.",
+      "clarification_question": null,
+      "candidate_id": "BASE-116"
+    }
+  ]
+}
