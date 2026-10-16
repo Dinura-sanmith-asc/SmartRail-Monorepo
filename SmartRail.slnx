@@ -5,4 +5,8 @@
     <Project Path="src/SmartRail.Domain/SmartRail.Domain.csproj" />
     <Project Path="src/SmartRail.Infrastructure/SmartRail.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmartRail.IntegrationTests/SmartRail.IntegrationTests.csproj" />
+    <Project Path="tests/SmartRail.UnitTests/SmartRail.UnitTests.csproj" />
+  </Folder>
 </Solution>
