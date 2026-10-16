@@ -18,4 +18,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SmartRail.Domain\SmartRail.Domain.csproj" />
+    <ProjectReference Include="..\..\src\SmartRail.Application\SmartRail.Application.csproj" />
+  </ItemGroup>
+
 </Project>
