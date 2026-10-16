@@ -18,4 +18,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SmartRail.Api\SmartRail.Api.csproj" />
+    <ProjectReference Include="..\..\src\SmartRail.Infrastructure\SmartRail.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
