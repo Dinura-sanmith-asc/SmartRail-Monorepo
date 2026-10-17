@@ -16,6 +16,16 @@ The Flutter passenger-client specification owns loading, empty, error, retry and
 
 Cross-module integration and release verification owns the complete passenger search-to-live-status E2E Flow 1 with Journeys & Status (SR-013 and SR-007), plus the constitution-required five release flows. Feature 001 supplies the planned service search and detail contract only; its endpoint tests do not replace these release checks.
 
+### Follow-up artifacts to create when downstream work begins
+
+These are named future artifacts, not current Feature 001 deliverables or tasks:
+
+- **FA-01: Flutter Passenger Client SDD specification**: cover passenger loading, empty, error, retry and stale/unavailable states (SR-013, SR-109, SR-114; public reads also depend on SR-089). Create it when passenger-client SDD work begins.
+- **FA-02: Journey & Status cross-module integration SDD artifact**: specify the integration boundary and complete search-to-live-status E2E Flow 1 (SR-007, with the SR-013 search dependency). Create it when Journey & Status SDD work begins.
+- **FA-03: SmartRail release E2E verification plan/checklist**: identify and verify all five constitution-required release E2E workflows. Create it when release verification planning begins.
+
+These follow-up artifacts preserve downstream ownership; they do not expand Feature 001's Railway Network backend scope.
+
 ## Technical Context
 
 **Language/Version**: C# / ASP.NET Core .NET 10 (`net10.0`; current API OpenAPI package is 10.0.12)

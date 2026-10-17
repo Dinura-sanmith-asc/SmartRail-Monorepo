@@ -147,7 +147,7 @@ The following wording and acceptance checks are transcribed from the approved wo
 
 1. Complete Phase 1 before domain work: T001–T007 establish dependencies, local PostgreSQL, safe configuration, DbContext/DI and migration tooling. T008 confirms existing project boundaries.
 2. Complete Phase 2 domain model/rules: T009-T020. Core entity files can be developed concurrently after T008; T020 depends on T009 and T019; publication and date rules follow their entity contracts.
-3. Complete Phase 3 persistence: T021-T029 and T031/T033 can proceed by distinct files after their entity prerequisites. T028-T029 map audit entities from T019-T020. T030 depends on all feature entities and mappings T009-T029. T031/T033 then proceed as independent validation and fixture work; T032 and T034 depend on the migration/validation prerequisites. T035 verifies the generated schema against the isolated PostgreSQL database from T007.
+3. Complete Phase 3 persistence: T021-T029 and T031/T033 can proceed by distinct files after their entity prerequisites. T028-T029 map audit entities from T019-T020. T030 depends on all feature entities and mappings T009-T029. T031/T033 then proceed as independent validation and fixture work; T032 depends on T030-T031. T034 must wait until the initial database migration T030 is completed, as well as T026-T027 and T031-T033, before fixture loading is implemented or executed. T035 verifies the generated schema against the isolated PostgreSQL database from T007.
 4. Complete Phase 4 use cases: T036–T041 can proceed by separate use-case files after Phase 2; T042 depends on T021–T027 and T018; T043 depends on T041–T042; T044 depends on T031–T032; T045 depends on T017 and T026–T027.
 5. Complete Phase 5 API: T046–T054 depend on the relevant Phase 4 handlers. T047 and T048 can proceed in parallel before endpoint binding; T049–T054 integrate through `RailwayNetworkEndpoints.cs` and must be coordinated to avoid same-file conflicts.
 6. Complete Phase 6 verification: T055-T061 can proceed after their domain/application rules exist; T062-T065 require T007, PostgreSQL/migrations and Phase 3 persistence; T066-T069 require T007, Phase 5 endpoints and T033-T034 fixtures. Each integration-test class receives its own database from T007. Do not treat mocked persistence as evidence for database constraints.
@@ -167,10 +167,20 @@ Tasks touching the same file (notably `Program.cs`, `RailwayNetworkEndpoints.cs`
 
 - T001-T004 and T008 have no feature-code prerequisites. T005 depends on T001; T006 depends on T005; T007 depends on T002, T003 and T005 for test-host/database configuration.
 - T009-T016 and T019 depend on Phase 1 completion; T020 depends on T009 and T019. T017 depends on T009-T016; T018 depends on T013-T016.
-- T021 depends on T009; T022 on T010-T011; T023 on T012-T013; T024 on T014-T016. T025 depends on T021-T024; T026 on T017/T023/T025; T027 on T024; T028 on T019; T029 on T009/T019/T020/T028. T030 depends on T009-T029. T031 depends on T009/T021; T032 on T030-T031; T033 on T009-T020 and the source-field gate; T034 on T026-T027/T031-T033; T035 on T003-T007/T030.
+- T021 depends on T009; T022 on T010-T011; T023 on T012-T013; T024 on T014-T016. T025 depends on T021-T024; T026 on T017/T023/T025; T027 on T024; T028 on T019; T029 on T009/T019/T020/T028. T030 depends on T009-T029. T031 depends on T009/T021; T032 on T030-T031; T033 on T009-T020 and the source-field gate; T034 on T026-T027/T030-T033; T035 on T003-T007/T030.
 - T036–T037 depend on their corresponding domain entities; T038 on T036/T021; T039 on T037/T022; T040 on T037/T023; T041 on T018/T037; T042 on T018/T024–T027/T041; T043 on T041–T042; T044 on T031–T032/T036; T045 on T017/T023–T027 and the production-publication gate.
 - T046 depends on Phase 1 and the read handlers T038–T043; T047–T048 can proceed in parallel after their read handlers; T049–T054 depend on T046–T048 and must be integrated in the shared endpoint/Program files.
 - T055-T061 depend on corresponding domain/application tasks; T062-T065 depend on T007 and T030-T034; T066-T069 depend on T007, T046-T054 and T033-T034. T070-T078 depend on implementation and relevant test tasks T055-T069.
+
+## Deferred Follow-up Artifacts (Outside Feature 001)
+
+Create these artifacts when the corresponding downstream SDD or release work begins. They are explicit follow-up obligations, not Feature 001 implementation tasks:
+
+- **FA-01: Flutter Passenger Client SDD specification**: define passenger loading, empty, error, retry and stale/unavailable states for search, preserving SR-013, SR-109 and SR-114 (and the SR-089 public-read dependency).
+- **FA-02: Journey & Status cross-module integration SDD artifact**: define the search-to-live-status integration boundary and complete E2E Flow 1, preserving SR-007 and its SR-013 search dependency.
+- **FA-03: SmartRail release E2E verification plan/checklist**: define, automate where appropriate, and record all five constitution-required release E2E workflows.
+
+Feature 001 remains limited to its Railway Network backend scope; creating these artifacts does not add client UI or live journey/status implementation here.
 
 ## MVP Delivery Strategy
 
