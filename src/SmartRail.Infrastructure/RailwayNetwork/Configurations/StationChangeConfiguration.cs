@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartRail.Domain.RailwayNetwork.Entities;
@@ -22,7 +23,16 @@ public sealed class StationChangeConfiguration : IEntityTypeConfiguration<Statio
         var fieldsConverter = new ValueConverter<IReadOnlyList<string>, string[]>(
             fields => fields.ToArray(),
             fields => fields);
-        builder.Property(change => change.ChangedFieldNames).HasColumnName("changed_field_names").HasColumnType("text[]").HasConversion(fieldsConverter).IsRequired();
+        var fieldsComparer = new ValueComparer<IReadOnlyList<string>>(
+            (left, right) => left != null && right != null && left.SequenceEqual(right),
+            value => value.Aggregate(0, (hash, field) => HashCode.Combine(hash, field)),
+            value => (IReadOnlyList<string>)value.ToArray());
+        var fieldsProperty = builder.Property(change => change.ChangedFieldNames)
+            .HasColumnName("changed_field_names")
+            .HasColumnType("text[]")
+            .HasConversion(fieldsConverter)
+            .IsRequired();
+        fieldsProperty.Metadata.SetValueComparer(fieldsComparer);
         builder.Property(change => change.ChangedAt).HasColumnName("changed_at").HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(change => change.ChangedBy).HasColumnName("changed_by").IsRequired();
         builder.HasOne<StationImportRun>().WithMany().HasForeignKey(change => change.ImportRunId).OnDelete(DeleteBehavior.Restrict).HasConstraintName("fk_station_change_import_run");

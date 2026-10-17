@@ -57,6 +57,13 @@ public sealed class StationImportTests(PostgreSqlTestDatabaseFixture fixture) : 
         Assert.Equal("Colombo", station.VerifiedDetails["district"]);
         Assert.Equal(1, first.CreatedCount);
         Assert.Equal(1, repeat.UnchangedCount);
+        var update = await repository.ApplyAsync(Request([
+            new(Guid.NewGuid(), "TEST-IMPORT-UNIQUE", "Test station", true, new Dictionary<string, string> { ["district"] = "Galle" })
+        ], "import-update-details"));
+        await db.Entry(station).ReloadAsync();
+        Assert.Equal(1, update.UpdatedCount);
+        Assert.Equal("Galle", station.VerifiedDetails["district"]);
+        Assert.Equal(1, await db.StationChanges.CountAsync(item => item.ImportRunId == update.ImportRunId));
         Assert.Equal(2, await db.RouteStops.Join(db.Stations, stop => stop.StationId, station => station.StationId,
             (stop, station) => stop).CountAsync());
         Assert.Equal(1, await db.StationChanges.CountAsync(item => item.ImportRunId == first.ImportRunId));

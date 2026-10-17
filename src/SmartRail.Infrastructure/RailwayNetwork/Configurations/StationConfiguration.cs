@@ -34,11 +34,12 @@ public sealed class StationConfiguration : IEntityTypeConfiguration<Station>
             (left, right) => left != null && right != null && left.SequenceEqual(right),
             value => value.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.Key, item.Value)),
             value => (IReadOnlyDictionary<string, string>)value.ToDictionary(item => item.Key, item => item.Value, StringComparer.Ordinal));
-        builder.Property(station => station.VerifiedDetails)
+        var detailsProperty = builder.Property(station => station.VerifiedDetails)
             .HasColumnName("verified_details")
             .HasColumnType("jsonb")
             .HasConversion(converter)
             .HasDefaultValueSql("'{}'::jsonb")
             .IsRequired();
+        detailsProperty.Metadata.SetValueComparer(detailsComparer);
     }
 }
