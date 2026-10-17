@@ -27,13 +27,13 @@ This document records plan decisions and proposals. Source requirements and appr
 
 ### Represent published exact-date eligibility separately from operational journeys
 
-**Decision**: Add exact service operation-date evidence to a published schedule revision. Store ordered calls linked to route stops, with time offsets from the schedule's first-call departure. Store a complete source manifest for each operation date so an absent service row can mean “not operating” only when that date's publication is known complete. Do not generate recurrence, weekday, holiday, or advance calendars.
+**Decision**: Add exact service operation-date evidence to an immutable, versioned published schedule revision. Keep exactly one current published revision per service and preserve prior revisions as superseded history. Store ordered calls linked to route stops, with time offsets from the schedule's first-call departure. Use controlled, versioned timetable fixtures for local and integration environments. Each fixture publication carries explicit completeness for each covered operation date, including a complete date with zero services; a missing service row means “not operating” only for a date with a complete manifest. Do not generate recurrence, weekday, holiday, or advance calendars.
 
 **Rationale**: SR-013 requires date- and direction-valid search. A route alone cannot prove a service calls at a station. Exact published date rows meet the feature's clarified behavior; an explicit completeness marker distinguishes no match from missing/incomplete source data. Calling points are the minimal indexed source needed to find arbitrary station pairs and their order. This is a search eligibility projection; it has no operational journey ID, status, live position, ETA, platform, incident, driver assignment or lifecycle state. Journeys & Status may later create its own `Journey` for an eligible service-date and own actual stops/status.
 
 **Alternatives considered**: Route membership alone is incorrect where a service skips stations. Full recurring calendars implement deferred SR-005 behavior. A date-specific `Journey` owned by Railway Network would duplicate Journeys & Status. An origin/destination pair materialization avoids storing ordered calls but duplicates pair rows and requires regenerating them after schedule changes.
 
-**Approval required**: Confirm the authoritative schedule source and whether its approved publication format can provide complete exact-date coverage, ordered calls and the times needed at selected endpoints. Confirm who publishes/supersedes a schedule revision. Until that exists, do not treat an absent row as evidence that a service does not operate.
+**Approval required**: Confirm the authoritative railway timetable source and who is authorized to publish/supersede revisions. Until the source can prove complete exact-date coverage, do not treat an absent service row as evidence that a service does not operate. The one-current-revision and history-preservation model is fixed for this plan; the production publication authority remains to be named.
 
 ### Use the selected origin's departure date for overnight services
 
@@ -41,15 +41,15 @@ This document records plan decisions and proposals. Source requirements and appr
 
 **Rationale**: This is the user's approved SR-013 clarification. It allows a service that starts before midnight to be found for a downstream origin after midnight without assigning the destination arrival date as the travel date.
 
-**Approval required**: The recommended schedule zone is `Asia/Colombo`, consistent with the SmartRail context. The feature spec does not approve a zone or cross-zone behavior. Confirm the time-zone identifier before storing local times or serializing offset-bearing API timestamps. PostgreSQL `timestamp with time zone` stores instants in UTC and does not retain the original zone; keep the IANA zone as explicit configuration/reference data if the approved scope becomes multi-zone. See [PostgreSQL date/time types](https://www.postgresql.org/docs/current/datatype-datetime.html).
+**Decision**: Use `Asia/Colombo` as the local railway schedule zone for this feature. Preserve the distinction between local schedule dates/times and UTC audit instants; API scheduled instants carry the `+05:30` offset. No multi-zone behavior is introduced. PostgreSQL `timestamp with time zone` stores instants in UTC and does not retain the original zone. See [PostgreSQL date/time types](https://www.postgresql.org/docs/current/datatype-datetime.html).
 
 ### Use a controlled, audited station import instead of a public write endpoint
 
-**Decision**: A reviewed source-controlled import file is the production maintenance path. A station steward prepares it; an independently authorized Railway Network owner approves it; a restricted invocation of the import command validates and applies the batch transactionally. The import command is dispatched by the existing application host and is never an HTTP route. Seed local/test stations through the same validation logic. Upsert by canonical station code, preserve station IDs, reject duplicates and invalid references, and never delete on omission.
+**Decision**: A reviewed source-controlled import file is the production maintenance path. A station steward prepares it; an independently authorized Railway Network owner approves it; a restricted invocation of the import command validates and applies the batch transactionally. The import command is dispatched by the existing application host and is never an HTTP route. Seed local/test stations through the same validation logic. Upsert by the authoritative source identity (mapping to be confirmed), preserve station IDs, reject duplicate identities and invalid references, and never delete on omission.
 
 **Rationale**: This implements the approved clarification and SR-002 creation check without claiming a route or permission absent from the PDF. The PDF's four Railway Network endpoints are read-only. A repeatable import is reviewable, testable and compatible with the existing solution without another project or public management UI.
 
-**Proposed role and approval**: “Railway Reference Data Steward” prepares the change; “Railway Network Data Owner” approves production publication. The roles are proposals only: the current RBAC matrix has no station-maintenance action. The project decision owner must approve the responsible people/roles and workflow before production access. The importer records the reviewer, source revision/hash, execution time and station changes. Detailed field-level audit beyond import evidence may promote SR-012 (Should Have) and needs a separate scope decision.
+**Approval gate**: A production maintainer role and approval authority must be named because the current RBAC matrix has no station-maintenance action. The Railway Reference Data Steward / Railway Network Data Owner split is a proposal only. The importer records source revision/hash, submitter and approver identities, execution time, counts and minimal per-station action/changed-field evidence. Do not add field-level before/after history or general-purpose audit workflows; broader audit beyond SR-002 import/change evidence may promote SR-012 (Should Have) and needs a separate scope decision.
 
 **Alternatives considered**: A public station POST/PATCH route conflicts with the clarified scope. An authenticated staff API would add an operation and role to the approved contract inventory; consider it only through an explicit recorded API/RBAC change.
 
@@ -61,13 +61,13 @@ This document records plan decisions and proposals. Source requirements and appr
 
 **Approval required**: There is no approved timetable freshness age or source refresh SLA. Treat withdrawn/superseded publication as stale; do not expire data based on an invented duration. The owner must set freshness/retention behavior before an age-based stale decision is implemented.
 
-### Require a policy for repeat station visits before publishing affected schedules
+### Withhold ambiguous repeated-station publications
 
-**Decision proposal**: Until railway owners decide which visit a passenger means, reject or withhold routes/schedules whose station identity occurs more than once. Do not add a unique database constraint yet; first obtain the domain decision. If repeat visits are approved, define deterministic boarding/alighting semantics and test them before relaxing the import validation.
+**Decision**: Reject or withhold publication of an affected route/schedule if the same station ID occurs more than once and no approved calling-point occurrence rule resolves the passenger's boarding/alighting choice. Never silently select the first or last occurrence. Do not add a route-wide unique-station constraint; it would prohibit valid repeated calls and encode a broader rule than needed.
 
 **Rationale**: The same station ID can occur at multiple ordered calls, making the requested origin/destination ambiguous. Choosing the first call silently could return the wrong departure time.
 
-**Approval required**: Confirm whether repeat station IDs are allowed and, if so, how a query with multiple candidate calls selects an occurrence. This is an existing explicit specification ambiguity.
+**Approval gate**: Before enabling repeated station IDs in a published route, the railway owner must approve deterministic occurrence-selection semantics. Until then, validation withholds that publication; unrelated unambiguous routes remain publishable.
 
 ### Use the four public GET contracts and `WebApplicationFactory` integration tests
 
@@ -86,11 +86,12 @@ This document records plan decisions and proposals. Source requirements and appr
 | Authoritative timetable input and date coverage | Versioned source publishes complete exact operation-date manifests, eligible schedules, ordered calls and endpoint schedule times | Search implementation treats date-row absence as not operating |
 | Timetable publication/revision | One active published revision per service; supersede through a reviewed source revision; keep old records for audit | Migration or publication workflow is finalized |
 | Station maintenance role and human review | Railway Reference Data Steward prepares; Railway Network Data Owner separately approves; no public write API | Production import permission is granted |
-| Station public detail schema | `locationDescription` and `essentialServiceDetails` from verified source data | Public DTO/data fields are finalized |
-| Service time zone | `Asia/Colombo` for local schedule/date semantics and offset-bearing results | Local time/date storage and serialization are implemented |
-| Repeated station visits | Withhold affected publication until occurrence semantics are approved | Route uniqueness constraint/search behavior is chosen |
+| Station public detail schema | Expose stable station ID and name until the data owner verifies which location/service details are sourced and approved for public display | Any additional station field is added to public API or fixtures |
+| Service time zone | `Asia/Colombo` local schedule interpretation and `+05:30` offset for serialized scheduled instants | Configure local schedule parsing/serialization |
+| Repeated station visits | Withhold affected publication until deterministic occurrence semantics are approved; never silently choose | A repeated-station publication is enabled |
 | Stale schedule evidence | No age-based cutoff; explicit supersession/incomplete-manifest state only | Any age threshold or refresh expectation is implemented |
-| Station audit depth | Import run and per-station change summary as minimum; field-level history remains separate | Any broader SR-012 scope is committed |
+| Station audit depth | Import run and minimal per-station action/changed-field evidence only | Broader before/after history or audit functionality is proposed |
+| Production publication authority | Name timetable publisher and station-import approver; infer no role from current RBAC | Production write credentials are granted |
 
 ## Repository inspection
 

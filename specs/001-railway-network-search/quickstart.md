@@ -8,7 +8,7 @@
 - Docker Desktop with Compose.
 - PostgreSQL 18 Docker image (pinned in the future Compose file).
 - The EF Core 10/Npgsql 10 packages, EF tooling, and WebApplicationFactory test package added in the implementation phase.
-- A verified, approved local reference dataset with stations, ordered routes, service schedules, exact operation dates and complete date manifests.
+- The checked-in, deterministic, versioned timetable fixtures under `tests/SmartRail.IntegrationTests/Fixtures/RailwayNetwork/`, containing stations, ordered routes/calls, schedule revisions, exact operation dates and explicit complete/incomplete manifests.
 
 Do not put passwords or production credentials in committed configuration. Use .NET User Secrets for local API configuration and dedicated non-production database credentials in Compose. Production access and import authorization are separate and must be approved.
 
@@ -25,13 +25,13 @@ The database must be healthy before applying migrations. Use the same PostgreSQL
 
 ## Initialize controlled reference data
 
-Use the approved station source file and deterministic schedule fixtures. The future import command validates the full file, checks canonical duplicate station codes and references, and commits the batch with its audit record or rolls it back entirely.
+Use the approved station source file and deterministic timetable fixture version. The future import command validates the full station file, checks duplicate source identities and references, and commits the batch with minimal import/change evidence in one transaction or rolls it back entirely. Fixture publication includes complete dates with zero services and incomplete dates, so no-service and unavailable outcomes can be exercised separately.
 
 ```powershell
 dotnet run --project src/SmartRail.Api -- --import-stations path\to\stations.csv
 ```
 
-The command above is the planned invocation, not an existing executable option. No HTTP endpoint accepts station changes. A production import requires an approved data steward, independent owner approval and restricted database access.
+The command above is the planned invocation, not an existing executable option. No HTTP endpoint accepts station changes. A production import requires an approved maintainer and approval authority plus restricted database access; those roles remain an approval gate.
 
 ## Run API and tests
 
@@ -41,7 +41,7 @@ dotnet test tests/SmartRail.UnitTests
 dotnet test tests/SmartRail.IntegrationTests
 ```
 
-The unit suite checks ordering, exact-date eligibility, offset calculations and input rules. Integration tests start a real PostgreSQL database, apply the migration, load isolated deterministic fixtures, exercise the API through `WebApplicationFactory`, and discard the database after the run. They must not silently skip when the configured test database is unavailable.
+The unit suite checks ordering, exact-date eligibility, `Asia/Colombo` date/offset calculations and input rules. Integration tests start a real PostgreSQL database, apply the migration, load an isolated versioned fixture, exercise the API through `WebApplicationFactory`, and discard the database after the run. They must prove that a complete date with no service rows returns no results, while an incomplete or absent manifest returns unavailable; that a later-origin overnight service is found using its operation date from before the requested origin date; and that exactly one revision is current while prior revisions remain preserved. Tests must not silently skip when the configured database is unavailable.
 
 ## Smoke-test the approved read contracts
 

@@ -178,23 +178,22 @@ components:
     Station:
       type: object
       additionalProperties: false
-      required: [stationId, stationCode, name, locationDescription, essentialServiceDetails]
+      required: [stationId, name]
       properties:
         stationId:
           type: string
           format: uuid
-        stationCode:
-          type: string
-          description: Stable, unique railway station code.
         name:
           type: string
           minLength: 1
-        locationDescription:
-          type: [string, 'null']
-          description: Verified public location detail, when available.
-        essentialServiceDetails:
+        locationDetails:
           type: array
-          description: Verified public station-service details; exact content is approved with the source data owner.
+          description: Only location details present in and approved from the authoritative railway source; no invented fields.
+          items:
+            type: string
+        serviceDetails:
+          type: array
+          description: Only essential service details present in and approved from the authoritative railway source; no invented fields.
           items:
             type: string
     RouteStops:
@@ -216,7 +215,7 @@ components:
     RouteStop:
       type: object
       additionalProperties: false
-      required: [stopOrder, stationId, stationCode, stationName]
+      required: [stopOrder, stationId, stationName]
       properties:
         stopOrder:
           type: integer
@@ -224,12 +223,8 @@ components:
         stationId:
           type: string
           format: uuid
-        stationCode:
-          type: string
         stationName:
           type: string
-        locationDescription:
-          type: [string, 'null']
     ServiceSearchResponse:
       type: object
       additionalProperties: false
@@ -273,13 +268,11 @@ components:
     ScheduledCall:
       type: object
       additionalProperties: false
-      required: [stationId, stationCode, stationName, stopOrder, scheduledAt]
+      required: [stationId, stationName, stopOrder, scheduledAt]
       properties:
         stationId:
           type: string
           format: uuid
-        stationCode:
-          type: string
         stationName:
           type: string
         stopOrder:
