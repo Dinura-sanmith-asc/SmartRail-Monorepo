@@ -9,7 +9,7 @@ public sealed class ServiceScheduleRevision
     public Guid ServiceId { get; }
     public int Revision { get; }
     public TimeOnly FirstDepartureLocalTime { get; }
-    public string TimeZoneId => RailwayTimeZoneId;
+    public string TimeZoneId { get; private set; }
     public bool IsPublished { get; private set; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? PublishedAt { get; private set; }
@@ -37,6 +37,7 @@ public sealed class ServiceScheduleRevision
         ServiceId = serviceId;
         Revision = revision;
         FirstDepartureLocalTime = firstDepartureLocalTime;
+        TimeZoneId = RailwayTimeZoneId;
         CreatedAt = createdAt;
         IsPublished = isPublished;
         PublishedAt = publishedAt;

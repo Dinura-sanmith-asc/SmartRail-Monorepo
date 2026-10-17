@@ -9,6 +9,8 @@ public sealed class Station
     public string Name { get; private set; }
     public bool IsPublished { get; private set; }
     public IReadOnlyDictionary<string, string> VerifiedDetails => _verifiedDetails;
+    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset UpdatedAt { get; private set; }
     public int Version { get; private set; }
 
     internal string SourceStationKey { get; private set; }
@@ -19,7 +21,9 @@ public sealed class Station
         string name,
         bool isPublished = false,
         IReadOnlyDictionary<string, string>? verifiedDetails = null,
-        int version = 1)
+        int version = 1,
+        DateTimeOffset createdAt = default,
+        DateTimeOffset updatedAt = default)
     {
         if (stationId == Guid.Empty) throw new ArgumentException("Station ID must be a non-empty UUID.", nameof(stationId));
         if (string.IsNullOrWhiteSpace(sourceStationKey)) throw new ArgumentException("Source station key is required.", nameof(sourceStationKey));
@@ -30,6 +34,8 @@ public sealed class Station
         Name = RequireText(name, nameof(name));
         IsPublished = isPublished;
         Version = version;
+        CreatedAt = createdAt == default ? DateTimeOffset.UtcNow : createdAt;
+        UpdatedAt = updatedAt == default ? CreatedAt : updatedAt;
         _verifiedDetails = CopyAndValidateDetails(verifiedDetails);
     }
 
@@ -40,10 +46,11 @@ public sealed class Station
         _verifiedDetails.Clear();
         foreach (var item in CopyAndValidateDetails(verifiedDetails)) _verifiedDetails.Add(item.Key, item.Value);
         Version++;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void Publish() => IsPublished = true;
-    public void Unpublish() => IsPublished = false;
+    public void Publish() { IsPublished = true; Version++; UpdatedAt = DateTimeOffset.UtcNow; }
+    public void Unpublish() { IsPublished = false; Version++; UpdatedAt = DateTimeOffset.UtcNow; }
 
     private static string RequireText(string value, string parameterName) =>
         string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Value is required.", parameterName) : value.Trim();

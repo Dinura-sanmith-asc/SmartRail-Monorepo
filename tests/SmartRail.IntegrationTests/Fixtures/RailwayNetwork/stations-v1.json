@@ -1,0 +1,8 @@
+{
+  "sourceRevision": "fixture-stations-1",
+  "contentHash": "sha256:fixture-stations-1",
+  "stations": [
+    { "stationId": "10000000-0000-0000-0000-000000000001", "sourceStationKey": "SL-CMB-FORT", "name": "Colombo Fort", "isPublished": true, "verifiedDetails": {} },
+    { "stationId": "10000000-0000-0000-0000-000000000002", "sourceStationKey": "SL-GAL-FORT", "name": "Galle", "isPublished": true, "verifiedDetails": {} }
+  ]
+}
