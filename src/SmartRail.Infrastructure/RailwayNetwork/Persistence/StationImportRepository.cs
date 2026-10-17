@@ -5,14 +5,6 @@ using SmartRail.Infrastructure.RailwayNetwork;
 
 namespace SmartRail.Infrastructure.RailwayNetwork.Persistence;
 
-public sealed record StationImportRequest(
-    string SourceRevision,
-    string ContentHash,
-    string SubmittedBy,
-    string ApprovedBy,
-    DateTimeOffset StartedAt,
-    IReadOnlyCollection<StationImportRecord> Stations);
-
 public sealed class StationImportValidationException(IReadOnlyList<string> errors)
     : InvalidOperationException("Station import was rejected: " + string.Join("; ", errors))
 {
@@ -20,7 +12,7 @@ public sealed class StationImportValidationException(IReadOnlyList<string> error
 }
 
 /// <summary>Persists validated station imports and their minimal audit evidence atomically.</summary>
-public sealed class StationImportRepository(SmartRailDbContext dbContext)
+public sealed class StationImportRepository(SmartRailDbContext dbContext) : IStationImportRepository
 {
     public async Task<StationImportRun> ApplyAsync(StationImportRequest request, CancellationToken cancellationToken = default)
     {
