@@ -1,4 +1,9 @@
+using SmartRail.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// WebApplication.CreateBuilder loads appsettings, User Secrets in Development, and environment variables.
+builder.Services.AddSmartRailInfrastructure(builder.Configuration);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -34,6 +39,8 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast");
 
 app.Run();
+
+public partial class Program { }
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
