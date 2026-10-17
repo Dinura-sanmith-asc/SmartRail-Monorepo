@@ -8,6 +8,18 @@
 
 **Input**: User description: Define the authentication and authorization foundation for SmartRail passenger, driver, station-staff and railway-controller workflows.
 
+## Clarifications
+
+### Session 2026-10-17
+
+The first clarification answer controls the source of active roles. The union rule in the second answer applies to active roles resolved from SmartRail's internal mapping; JWT group claims do not establish active grants. The second answer is preserved verbatim as requested.
+
+- Q: Which model should determine a caller's active SmartRail roles, combine multiple roles and apply role revocation? -> A: Option B: Cognito authenticates the caller; SmartRail's controlled internal mapping keyed by verified Cognito subject is authoritative for active application roles. Multiple active roles combine only explicit RBAC grants; resource-scope and ownership checks always apply. Role revocation takes effect on the next authorization check against the active mapping. If the mapping cannot be verified, protected access is denied. JWT group claims are not trusted as active SmartRail grants.
+- Q: If a user belongs to more than one Cognito group, how should SmartRail combine the permissions granted by those roles? -> A: Allow the union of explicit grants in the approved RBAC matrix for all groups on the validated token; continue enforcing every applicable ownership and resource-scope check.
+- Q: What authoritative evidence should SmartRail use to check station, journey and passenger-order scope, and what should it do when that evidence is missing, stale or revoked? -> A: Use each owning module's current source: Identity & Permissions maintains station-staff station assignments; Driver Operations owns driver-to-journey assignments; Catering Adapter verifies passengers against its order-owner association; Incident Management provides the target incident/resource relationship. Missing, stale, revoked or unverifiable evidence grants no access.
+- Q: What should `GET /api/me` return when the caller has a valid Cognito identity, including when that identity has no recognized SmartRail role? -> A: Return only `{ subject, roles }`, where subject is the caller's Cognito subject and roles lists recognized SmartRail roles; return an empty roles list when none are recognized. Do not return resource scopes or personal profile fields.
+- Q: If a caller sends a malformed or expired bearer token to one of the four anonymous Railway Network GET endpoints, should SmartRail still serve the public response? -> A: Ignore malformed or expired optional bearer tokens on these four public reads and process the request anonymously; protected operations still reject invalid or expired tokens.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Access public railway information (Priority: P1)
@@ -38,8 +50,10 @@ A passenger or railway employee presents a valid Cognito-issued access token bef
 
 1. **Given** a protected operation and no token, **When** a caller requests it, **Then** the request is rejected before protected information or write behavior is exposed.
 2. **Given** a malformed, invalid or expired Cognito-issued token, **When** it is presented to a protected operation, **Then** the caller is not treated as authenticated and the operation is rejected.
-3. **Given** a valid Cognito-issued token, **When** its owner requests `GET /api/me`, **Then** the response describes only the authenticated caller and does not accept a caller-selected identity.
+3. **Given** a valid Cognito-issued token, **When** its owner requests `GET /api/me`, **Then** the response contains only that caller's Cognito subject and roles from the current SmartRail mapping, with an empty roles list if no active role is mapped; it does not accept a caller-selected identity or expose resource scopes or profile fields.
 4. **Given** a valid token with insufficient permission, **When** the caller requests a protected operation, **Then** access is denied and the operation has no protected side effect.
+5. **Given** a valid token whose group claim still names a role that has been revoked in SmartRail's mapping, **When** the caller makes the next protected request, **Then** authorization uses the current mapping and denies any action no longer granted.
+6. **Given** the active role mapping cannot be verified, **When** the caller requests a protected operation, **Then** SmartRail grants no protected access.
 
 ---
 
@@ -85,8 +99,8 @@ Users receive a clear denial or recoverable error when access fails. Credentials
 - A passenger's token identifies a caller, but order ownership cannot be matched reliably; do not return another person's protected order information.
 - The same user has a role that permits reading but not writing; a read grant must not imply a create, update, cancellation or publication grant.
 - An unauthorized write attempt must be denied before state changes; retries or client-side controls must not convert a denial into success.
-- A request to `GET /api/me` has no token, an invalid/expired token, or an authenticated identity without a resolvable SmartRail role; it must not disclose another identity or protected profile data.
-- An invalid optional token accompanies an otherwise anonymous Railway Network read; the public-read availability remains required, while whether malformed optional credentials are ignored or rejected is an unresolved contract detail.
+- A request to `GET /api/me` has no token or an invalid/expired token; it must not disclose identity data. A valid authenticated identity without a recognized SmartRail role receives its own subject and an empty role list, but no protected permission.
+- A malformed or expired optional bearer token accompanies an otherwise anonymous Railway Network read; the request is processed anonymously and only the public projection is returned.
 - A catering provider request is forged or malformed; Identity & Permissions does not process it, while the Catering Adapter must enforce its own authenticated provider boundary under SR-094.
 
 ## Requirements *(mandatory)*
@@ -104,17 +118,17 @@ The following wording and acceptance checks are transcribed from the approved Mo
 | SR-100 | Must Have | Sensitive personal information and credentials shall not be exposed in verbose API errors or unrestricted application logs. | Negative tests show tokens/redacted identifiers absent from API error responses. |
 | SR-114 | Must Have | The system shall provide meaningful loading, no-data, access-denied, error and retry states for primary passenger and operational workflows. | Each primary view has tested no-results, 403, 500 and no-network cases. |
 
-**Related downstream Must Have requirement**: SR-094 — “Catering integration shall authenticate provider/API requests and validate incoming payloads before accepting order-state changes.” Its approved acceptance check is “Forged or malformed provider update is rejected without persisting altered state.” The Catering Adapter owns that provider-to-SmartRail trust boundary; this feature defines no provider credential, webhook, or order-state workflow.
+**Related downstream Must Have requirement**: SR-094: "Catering integration shall authenticate provider/API requests and validate incoming payloads before accepting order-state changes." Its approved acceptance check is "Forged or malformed provider update is rejected without persisting altered state." The Catering Adapter owns that provider-to-SmartRail trust boundary; this feature defines no provider credential, webhook, or order-state workflow.
 
 ### Functional Requirements
 
-- **FR-001 (SR-089)**: SmartRail MUST classify railway information as public or protected and require authentication only for protected functions. The four existing Railway Network GET operations MUST remain anonymous public reads: `GET /api/stations`, `GET /api/routes/{id}/stops`, `GET /api/services?origin=&destination=&date=`, and `GET /api/services/{id}`. Their contracts and published-data projections remain owned by Feature 001.
+- **FR-001 (SR-089)**: SmartRail MUST classify railway information as public or protected and require authentication only for protected functions. The four existing Railway Network GET operations MUST remain anonymous public reads even when a malformed or expired optional bearer token is supplied; such a token MUST be ignored and the request processed anonymously: `GET /api/stations`, `GET /api/routes/{id}/stops`, `GET /api/services?origin=&destination=&date=`, and `GET /api/services/{id}`. Their contracts and published-data projections remain owned by Feature 001.
 - **FR-002 (SR-090)**: SmartRail MUST accept Cognito-issued JWTs as the authentication credential for protected passenger and railway-staff workflows and MUST reject missing, invalid and expired credentials before protected information or write actions are exposed.
-- **FR-003 (SR-090, SR-091)**: SmartRail MUST distinguish the approved application roles Public, Passenger, Driver, Station Staff and Controller. A public caller has no authenticated role. Authentication alone MUST NOT imply any protected permission.
-- **FR-004 (SR-091)**: SmartRail MUST enforce permissions on the server for every protected operation using the approved role-to-action grants and the applicable target station, journey or resource scope. A user interface MUST NOT be the authorization boundary.
-- **FR-005 (SR-091)**: SmartRail MUST deny access when the required role, ownership or resource-scope evidence is absent, invalid or does not match the target. A denial MUST NOT change protected state.
+- **FR-003 (SR-090, SR-091)**: SmartRail MUST distinguish the approved application roles Public, Passenger, Driver, Station Staff and Controller. For authenticated callers, SmartRail MUST resolve active roles from its controlled internal mapping keyed by the verified Cognito subject; Cognito group claims MUST NOT be trusted as active SmartRail grants. A public caller has no authenticated role. When the active mapping contains multiple SmartRail roles for a subject, SmartRail MUST combine only their explicit grants in the approved RBAC matrix; each grant remains subject to applicable ownership and resource-scope checks. Authentication alone MUST NOT imply any protected permission.
+- **FR-004 (SR-091)**: SmartRail MUST enforce permissions on the server for every protected operation using the approved role-to-action grants and current authoritative evidence for the target station, journey or resource scope. Identity & Permissions supplies station-staff station assignments; Driver Operations supplies driver-to-journey assignments; Incident Management supplies incident-to-resource relationships; and Catering Adapter verifies passenger order ownership. A user interface MUST NOT be the authorization boundary.
+- **FR-005 (SR-091)**: SmartRail MUST deny access when required role, ownership or resource-scope evidence is absent, stale, revoked, unverifiable or does not match the target. If the active role mapping or an authoritative scope source is unavailable or cannot be verified, SmartRail MUST grant no protected access. A denial MUST NOT change protected state.
 - **FR-006 (RBAC baseline)**: SmartRail MUST apply the approved RBAC matrix recorded below as the cross-module authorization baseline. Module specifications own their operation behavior; this feature MUST NOT add operations or broaden grants.
-- **FR-007 (API inventory)**: SmartRail MUST provide authenticated `GET /api/me` behavior for the caller represented by a valid token. The operation MUST NOT accept a user identifier that allows a caller to select another identity, and its response MUST exclude credentials and tokens. Exact response fields remain to be decided.
+- **FR-007 (API inventory)**: SmartRail MUST provide authenticated `GET /api/me` behavior for the caller represented by a valid token. The operation MUST NOT accept a user identifier that allows a caller to select another identity. It MUST return only the caller's Cognito subject and active SmartRail roles resolved from the internal mapping, excluding credentials, tokens, resource scopes and personal profile fields. A valid authenticated identity with no active role mapping receives an empty roles list; that identity receives no protected permissions. If the active mapping cannot be verified, the response MUST NOT assert active roles.
 - **FR-008 (SR-093)**: Driver and operational clients MUST use supported secure credential storage and controlled session expiration; access tokens MUST NOT be stored in plaintext application cache. Applicable clients MUST reflect expiry and require renewed authentication before protected work proceeds.
 - **FR-009 (SR-100)**: Authentication and authorization failures MUST NOT expose credentials, access tokens or unrestricted sensitive personal information through verbose API errors or unrestricted application logs. Error output MUST use redacted identifiers where identifiers are needed for diagnosis.
 - **FR-010 (SR-114)**: Applicable primary passenger and operational workflows MUST present meaningful access-denied, no-data, error and retry states. A retry MUST preserve the same authorization requirement and MUST NOT imply an unauthorized operation succeeded.
@@ -159,6 +173,7 @@ This feature defines authorization policy boundaries for those modules; it does 
 
 - **Authenticated principal**: The caller established by a valid Cognito-issued token and identified by a stable authority subject. It is distinct from credentials and from any client-supplied user identifier.
 - **SmartRail role**: A recognized application role (Passenger, Driver, Station Staff or Controller) used with an action grant. Public is an unauthenticated access class, not an authenticated role.
+- **Active role mapping**: The controlled SmartRail association between a verified Cognito subject and its currently active application roles. This mapping, not JWT group claims, is authoritative for authorization; revocation is observed on the next authorization check.
 - **Resource scope**: Evidence that a principal is associated with a target station, assigned journey, incident or owned passenger order where the approved matrix requires “scoped” or “own” access.
 - **Authorization decision**: The server's allow or deny result for a principal, action and target resource. A denied decision has no protected state change.
 
@@ -176,17 +191,15 @@ This feature defines authorization policy boundaries for those modules; it does 
 ## Assumptions
 
 - Cognito is the sole credential authority; SmartRail does not create or store user passwords.
-- Cognito-issued JWTs are the credential presented to protected SmartRail operations. The API verifies them before trusting identity or authorization claims.
+- Cognito-issued JWTs authenticate the caller. The API verifies signature, issuer, intended audience and expiry before using the verified Cognito subject to look up active SmartRail roles. The internal mapping is authoritative; JWT group claims and client-supplied role or scope values are not trusted as active SmartRail permissions. A current mapping is checked for each authorization decision, and inability to verify it grants no protected access.
 - The four Railway Network GET operations retain their already-approved anonymous access and response contracts.
 - The approved RBAC/API PDF is authoritative for action grants and the endpoint inventory. Feature-specific modules refine how those actions work without broadening grants.
-- The authenticated subject is the caller identity for `GET /api/me`; no arbitrary user lookup is implied by that endpoint.
-- Cognito user enrollment, password recovery, operational account provisioning, role assignment and scope-assignment procedures are not approved by the cited baseline and remain outside this feature until decided.
+- The authenticated subject is the caller identity for `GET /api/me`; no arbitrary user lookup is implied by that endpoint. The response includes only subject and recognized roles, not resource scopes or profile fields.
+- Active SmartRail role assignments are held in a controlled internal mapping keyed by verified Cognito subject. Assignment and revocation use a controlled non-public process; no public role-administration endpoint is approved. Cognito user enrollment, password recovery, operational account provisioning and scope-assignment procedures remain outside this feature unless separately approved.
 - Authorization is deny-by-default whenever required identity, role, ownership or resource-scope evidence cannot be established.
 
-## Dependencies and Open Business Decisions
+## Remaining Operational Decisions
 
-1. **Role source and lifecycle**: The approved baseline names roles but does not decide whether SmartRail roles come from Cognito groups, another trusted claim, or an internal mapping; how multiple roles combine; who assigns/revokes roles; or how quickly revocation takes effect.
-2. **Resource-scope authority**: The baseline requires station/journey/resource scoping but does not define who maintains station-staff assignments, how driver assignment validity is determined, how incident scope is inherited, or how passenger ownership is linked to provider order references. Owning module specifications must define authoritative evidence before implementing those checks.
-3. **`GET /api/me` and public-token edge behavior**: The endpoint inventory lists `GET /api/me` as authenticated but leaves its projection TBD. Exact fields, role/scope disclosure, behavior for a valid identity without a resolvable SmartRail role, and treatment of malformed/expired optional tokens on the four anonymous reads require contract clarification.
-
-These decisions do not authorize public account or administrative workflows. Resolve each in clarification/planning before dependent behavior is implemented; preserve the established anonymous Railway Network reads and current RBAC grants.
+- SmartRail's internal role mapping is authoritative, but the organization must approve which operators may assign or revoke mappings and what audit evidence the production procedure retains. This is an operational approval gate; it does not authorize a public role-administration API.
+- Identity & Permissions owns current station-staff scope records, but the authorized process for creating, reviewing and revoking those records must be defined before production use. No public station-scope administration endpoint is approved.
+- Token issuer, audience, signing-key and expiry settings must be configured for each environment. Cognito JWT revocation/expiry controls remain deployment decisions; SmartRail role revocation is enforced from the current internal mapping on the next authorization check. The API must verify signature, issuer, audience and expiry and must not trust JWT group claims or client-supplied role or scope values.

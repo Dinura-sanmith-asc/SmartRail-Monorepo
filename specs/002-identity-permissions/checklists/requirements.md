@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No unresolved decision is hidden; three open decisions are explicitly documented without blocking the defined baseline
+- [x] Unresolved production role/scope governance approvals are explicitly listed and do not alter the defined authorization behavior
 - [x] Requirements are testable and unambiguous within the approved RBAC boundary
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic
@@ -36,5 +36,6 @@
 
 - Reviewed against the approved requirements workbook, RBAC/API PDF, SmartRail constitution, handoff and Feature 001 OpenAPI contract.
 - SR-094 remains a downstream Catering Adapter obligation; its authenticated provider boundary is recorded as a dependency only.
-- Open decisions are listed in `spec.md` and must be settled before implementing dependent role mapping, scope checks or the `/api/me` response contract.
+- Production approval gates for maintaining the internal role mapping and station scopes are listed in `spec.md`; the authorization behavior and `/api/me` response contract are clarified.
+- The second clarification answer is preserved verbatim; its reference to token groups is explicitly subordinate to the first answer and does not authorize trusting JWT group claims.
 - This checklist records specification quality only; `[x]` does not indicate implementation completion.
