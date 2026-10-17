@@ -37,5 +37,5 @@
 - Reviewed against the approved requirements workbook, RBAC/API PDF, SmartRail constitution, handoff and Feature 001 OpenAPI contract.
 - SR-094 remains a downstream Catering Adapter obligation; its authenticated provider boundary is recorded as a dependency only.
 - Production approval gates for maintaining the internal role mapping and station scopes are listed in `spec.md`; the authorization behavior and `/api/me` response contract are clarified.
-- The second clarification answer is preserved verbatim; its reference to token groups is explicitly subordinate to the first answer and does not authorize trusting JWT group claims.
+- The second clarification answer is preserved verbatim; its token-group source wording is marked SUPERSEDED, while its explicit-grant union applies to roles from the internal mapping.
 - This checklist records specification quality only; `[x]` does not indicate implementation completion.

@@ -1,0 +1,102 @@
+openapi: 3.1.0
+info:
+  title: SmartRail Identity & Permissions API
+  version: 1.0.0
+  description: >-
+    Feature 002 contract for the already-approved authenticated self-identity
+    operation. No account or role-administration operations are defined here.
+servers:
+  - url: https://api.smartrail.example
+paths:
+  /api/me:
+    get:
+      operationId: getCurrentIdentity
+      summary: Get the authenticated caller's SmartRail identity projection
+      description: >-
+        Requires a valid Cognito access token. The subject is taken from its
+        verified sub claim. Active SmartRail roles are resolved from the current
+        internal PostgreSQL mapping; Cognito group claims do not grant roles.
+        A valid subject with no active role mapping receives an empty roles list.
+        No caller-selected subject, profile fields, scopes, or token are returned.
+      security:
+        - CognitoAccessToken: []
+      responses:
+        '200':
+          description: Current caller identity and recognized active roles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentIdentity'
+              examples:
+                mappedCaller:
+                  value:
+                    subject: 7f9f96c2-opaque-cognito-subject
+                    roles: [Passenger, "Station Staff"]
+                noActiveRole:
+                  value:
+                    subject: 7f9f96c2-opaque-cognito-subject
+                    roles: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/AuthorizationAuthorityUnavailable'
+components:
+  securitySchemes:
+    CognitoAccessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cognito access token only; issuer, signature, lifetime, token_use and client_id are validated.
+  schemas:
+    CurrentIdentity:
+      type: object
+      additionalProperties: false
+      required: [subject, roles]
+      properties:
+        subject:
+          type: string
+          minLength: 1
+          description: Opaque Cognito sub from the validated access token; format is not constrained to UUID.
+        roles:
+          type: array
+          uniqueItems: true
+          description: Recognized active SmartRail roles from the current internal mapping. Empty when verified mapping has no active roles.
+          items:
+            type: string
+            enum: [Passenger, Driver, "Station Staff", Controller]
+    ProblemDetails:
+      type: object
+      description: RFC 9457 Problem Details with the repository's safe code and trace identifier extensions.
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+          description: Generic, safe detail; must not contain token claims or authority internals.
+        instance:
+          type: string
+          format: uri-reference
+        code:
+          type: string
+        traceId:
+          type: string
+      additionalProperties: true
+  responses:
+    Unauthorized:
+      description: Missing or invalid access token; no validation detail is disclosed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    AuthorizationAuthorityUnavailable:
+      description: The current role mapping could not be verified; no role is asserted or granted.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+
