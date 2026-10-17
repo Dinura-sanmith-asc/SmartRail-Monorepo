@@ -6,9 +6,15 @@
 
 ## Summary
 
-Implement Railway Network as a feature inside the existing ASP.NET Core .NET 10 modular monolith. Public Minimal API endpoints read published stations, ordered routes, scheduled services and date-eligible service choices. Application use cases own the search and station-import workflows; Domain owns stable identity and eligibility rules; Infrastructure uses EF Core and PostgreSQL. Station maintenance uses a controlled, authorized, repeatable import. No public station write endpoint or UI is added.
+Implement Railway Network as a feature inside the existing ASP.NET Core .NET 10 modular monolith. Public Minimal API endpoints read published stations, ordered routes, scheduled services and date-eligible service choices. Application use cases own the search and station-import workflows; Domain owns stable identity and eligibility rules; Infrastructure uses EF Core and PostgreSQL. Station maintenance uses a controlled, authorized, repeatable import. Feature 001 adds no public station write endpoint or passenger UI.
 
 The minimum search model consists of immutable, versioned schedule revisions, ordered service calling points and exact published operation-date records. Controlled timetable fixtures carry an explicit source revision and a completeness manifest for every covered date, including dates with no operating services. Only one revision per service is current and published; older revisions remain preserved. The service date is interpreted at the selected origin in `Asia/Colombo`: a service that departs an earlier station before midnight may match a later-origin search on the following date. This remains planned schedule data; Journeys & Status owns dated operational journeys and live state.
+
+## Downstream client and release obligations
+
+The Flutter passenger-client specification owns loading, empty, error, retry and stale/unavailable presentation for railway search (SR-013, SR-109 and SR-114; anonymous public-read behavior also relies on SR-089). The client specification is a separate Spec Kit feature and is not created or implemented by Feature 001.
+
+Cross-module integration and release verification owns the complete passenger search-to-live-status E2E Flow 1 with Journeys & Status (SR-013 and SR-007), plus the constitution-required five release flows. Feature 001 supplies the planned service search and detail contract only; its endpoint tests do not replace these release checks.
 
 ## Technical Context
 
@@ -18,7 +24,7 @@ The minimum search model consists of immutable, versioned schedule revisions, or
 
 **Storage**: PostgreSQL 18 for local Docker and Amazon RDS for PostgreSQL 18 for demo, with exact engine patch selected for the target AWS region. Use EF Core migrations. RDS PostgreSQL 18 is listed in current AWS release information; verify the available patch and region at deployment.
 
-**Testing**: Existing xUnit 2.9.3 and Microsoft.NET.Test.Sdk 17.14.1 projects. Add WebApplicationFactory support and a disposable real-PostgreSQL test fixture; keep unit and integration tests in the existing projects.
+**Testing**: Existing xUnit 2.9.3 and Microsoft.NET.Test.Sdk 17.14.1 projects. Add WebApplicationFactory support and a real-PostgreSQL test fixture that creates one isolated database per integration-test class; keep unit and integration tests in the existing projects.
 
 **Target Platform**: One ASP.NET Core .NET 10 application on AWS Lambda behind API Gateway HTTP API; anonymous read endpoints for this feature. Local development uses Docker PostgreSQL.
 
@@ -40,7 +46,7 @@ The minimum search model consists of immutable, versioned schedule revisions, or
 - **Sources of truth and integrity**: Pass with design decisions recorded below. Schedule eligibility is separate from operational journey state; PostgreSQL constraints enforce relationships.
 - **Identity and safety**: Pass. The approved reads remain anonymous and return public projections. The import path is privileged and has no HTTP route. Its operator role must be approved before production use.
 - **Documented contracts**: Pass. The four approved endpoints are specified in `contracts/railway-network.openapi.yaml`; no unrelated endpoint is proposed.
-- **Evidence-based quality**: Pass. Unit, PostgreSQL, API and flow-1 verification are mapped to SR acceptance evidence.
+- **Evidence-based quality**: Pass. Feature 001 maps domain, PostgreSQL and API tests to the four SR acceptance checks. Passenger client states and cross-module Flow 1/five-flow release verification are explicitly assigned as downstream obligations below.
 - **Honest and observable operation**: Pass. Valid empty search, invalid input, missing eligibility publication and source outage have distinct outcomes. No freshness threshold is invented.
 - **Approved stack and deployment**: Pass. .NET 10, EF Core, PostgreSQL, RDS and Lambda are retained. No code, dependency, project reference or migration is changed here.
 
@@ -67,7 +73,7 @@ Register application and infrastructure services with focused extension methods 
 
 ### Station initialization and maintenance
 
-Use a version-controlled station import file and an explicit import command in the existing application entry point, dispatching to an Application use case. The command is never mapped to HTTP. A Railway Reference Data Steward (proposed role) prepares the change; a separately authorized Railway Network owner approves the production import. The deployed import identity receives write access only for the import operation. This is a proposal: neither role appears in the approved RBAC matrix, so role mapping and human approval authority require project-owner approval before production access is configured.
+Use a version-controlled station import file and an explicit import command in the existing application entry point, dispatching to an Application use case. The command is never mapped to HTTP. A Railway Reference Data Steward (proposed role) prepares the change; a separately authorized Railway Network owner approves the production import. The import command uses an Application-layer deny-by-default authorization abstraction; absent or unrecognized invocation identities are rejected before persistence. Unit tests use explicit authorized and unauthorized identities, and real-PostgreSQL tests prove unauthorized calls leave station and audit state unchanged. The production authorization adapter, maintainer role and independent approval authority remain disabled pending approval because neither role appears in the approved RBAC matrix.
 
 The importer validates the entire file before writing, normalizes the authoritative source identity for duplicate detection, rejects duplicate identities and missing required identity/name data, checks route/service references against the resulting station set, and applies the batch in one transaction. Upsert by the confirmed private source identity; preserve the stable `StationId`; update only explicitly supplied verified fields; never delete or withdraw a station on an omitted row. A rerun with the same source produces no additional changes. Record an import-run ID, source revision/hash, submitting and approving identities, time, counts and a minimal per-station action/changed-field summary. Do not add field-level history snapshots or general audit workflows; broader SR-012 audit capability is Should Have and requires a separate scope decision. Production approval authority remains a gate because its role is absent from the approved RBAC matrix.
 
@@ -100,7 +106,7 @@ Station maintenance uses the controlled import command and its separate authoriz
 
 ## Testing strategy and SR traceability
 
-Use deterministic station, route, schedule and date-manifest fixtures with a documented source revision. xUnit is already referenced; no tests currently exist. The integration test project currently lacks `Microsoft.AspNetCore.Mvc.Testing`, EF Core/Npgsql, or a PostgreSQL isolation fixture. Add compatible references in implementation only; use `WebApplicationFactory<Program>` and a disposable PostgreSQL database/container so provider queries, migrations, constraints and HTTP serialization are real. Do not substitute an in-memory provider for persistence acceptance.
+Use deterministic station, route, schedule and date-manifest fixtures with a documented source revision. xUnit is already referenced; no tests currently exist. The integration test project currently lacks `Microsoft.AspNetCore.Mvc.Testing`, EF Core/Npgsql or a PostgreSQL isolation fixture. Add compatible references in implementation only; use `WebApplicationFactory<Program>` and a dedicated PostgreSQL test host. Create a unique database per integration-test class, inject it into that class's DbContext and test host, drop it at teardown, and serialize methods within each class. Distinct classes may run concurrently because they do not share a database. Fail clearly when PostgreSQL is unavailable. Do not substitute an in-memory provider for persistence acceptance.
 
 | Requirement / acceptance evidence | Domain/Application | PostgreSQL/API or flow evidence |
 |---|---|---|
@@ -110,11 +116,11 @@ Use deterministic station, route, schedule and date-manifest fixtures with a doc
 | SR-013 — valid search results; invalid pairs and no-results provide useful feedback | Direction, skipped route station, exact date manifest, overnight departure at selected origin, same station, absent call, duplicate/ambiguous call, no-match vs unavailable | `GET /api/services` query/response and OpenAPI tests; anonymous read succeeds; malformed/missing/unknown inputs are 400, complete empty result is 200, incomplete data is 503 |
 | SR-089 / SR-114 support — permitted public reads and distinct error/empty states | No operational/private properties in read projections | Anonymous requests to all four routes; problem shape, no-result, 404 and 503 cases; test no station-management HTTP route exists |
 
-Additional PostgreSQL tests cover transaction rollback on invalid import, unique constraints, route-stop ordering, schedule-to-route consistency, date-manifest completeness, and an overnight date where origin departure is the following day after service start. API contract tests compare generated OpenAPI schemas/parameters/status responses to the checked-in YAML. E2E flow 1 verifies anonymous origin/destination/date search to planned route/service detail and the adjacent Journeys & Status projection; this feature alone does not implement live status. No UI code or full five-flow release test is part of Feature 001.
+Additional PostgreSQL tests cover transaction rollback on invalid import (including both audit tables), unauthorized import with no state change, unique constraints, route-stop ordering, schedule-to-route consistency, date-manifest completeness, and an overnight date where origin departure is the following day after service start. API contract tests compare generated OpenAPI schemas/parameters/status responses to the checked-in YAML. Passenger loading, empty, error, retry and stale states are owned by the Flutter passenger-client specification (SR-013/SR-109/SR-114; public reads also depend on SR-089). The complete anonymous search-to-live-status E2E Flow 1 and constitution-required five release flows are owned by cross-module integration and release verification with Journeys & Status (SR-013/SR-007). Feature 001 verifies its own API boundary and does not implement UI or live status.
 
 ## Local development and verification
 
-Add a pinned PostgreSQL 18 Docker Compose service with a named local volume, health check, non-production credentials and a separate test database/container. Add an ignored local secrets file or .NET User Secrets for connection strings; commit only safe example configuration. Configure `Asia/Colombo` as the feature's railway local-time basis. Keep production RDS credentials outside source control and restrict RDS to the Lambda/application and approved import identity.
+Add a pinned PostgreSQL 18 Docker Compose service with a named local volume, health check and non-production credentials. Run integration tests against a dedicated test-only PostgreSQL host; create a uniquely named database per integration-test class and drop it at teardown, separate from the developer database and RDS. Add an ignored local secrets file or .NET User Secrets for connection strings; commit only safe example configuration. Configure `Asia/Colombo` as the feature's railway local-time basis. Keep production RDS credentials outside source control and restrict RDS to the Lambda/application and approved import identity.
 
 Planned developer sequence after implementation artifacts exist:
 

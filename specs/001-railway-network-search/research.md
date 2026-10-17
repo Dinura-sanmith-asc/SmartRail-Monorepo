@@ -45,6 +45,8 @@ This document records plan decisions and proposals. Source requirements and appr
 
 ### Use a controlled, audited station import instead of a public write endpoint
 
+**Authorization boundary**: Keep authorization in the Application use case behind `IStationImportAuthorization`. The default implementation denies access; missing, unknown and unauthorized invocation identities cannot reach persistence. Use explicit test identities for allow/deny tests and verify unchanged PostgreSQL state on denial. Keep the production adapter and maintainer/approver role mapping disabled until the project owner approves the identities and authority. This boundary does not create an HTTP route or change the approved RBAC contract.
+
 **Decision**: A reviewed source-controlled import file is the production maintenance path. A station steward prepares it; an independently authorized Railway Network owner approves it; a restricted invocation of the import command validates and applies the batch transactionally. The import command is dispatched by the existing application host and is never an HTTP route. Seed local/test stations through the same validation logic. Upsert by the authoritative source identity (mapping to be confirmed), preserve station IDs, reject duplicate identities and invalid references, and never delete on omission.
 
 **Rationale**: This implements the approved clarification and SR-002 creation check without claiming a route or permission absent from the PDF. The PDF's four Railway Network endpoints are read-only. A repeatable import is reviewable, testable and compatible with the existing solution without another project or public management UI.
@@ -70,6 +72,8 @@ This document records plan decisions and proposals. Source requirements and appr
 **Approval gate**: Before enabling repeated station IDs in a published route, the railway owner must approve deterministic occurrence-selection semantics. Until then, validation withholds that publication; unrelated unambiguous routes remain publishable.
 
 ### Use the four public GET contracts and `WebApplicationFactory` integration tests
+
+**PostgreSQL test isolation**: Run against a dedicated test-only PostgreSQL host. The integration fixture creates a unique database per test class, injects it into that class's DbContext and WebApplicationFactory, and drops it at teardown. Methods in a class run serially; classes may run concurrently because each owns a separate database. Unavailable PostgreSQL is a test failure, never a skipped persistence suite.
 
 **Decision**: Preserve the four API paths in the PDF; document request, DTO, validation, status and error behavior in the OpenAPI contract. Use `application/problem+json` for invalid, missing-resource and unavailable cases. Add `Microsoft.AspNetCore.Mvc.Testing` for application-host integration tests and real PostgreSQL isolation tooling during implementation.
 

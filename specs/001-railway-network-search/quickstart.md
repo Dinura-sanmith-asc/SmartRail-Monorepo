@@ -21,7 +21,7 @@ docker compose up -d postgres
 dotnet ef database update --project src/SmartRail.Infrastructure --startup-project src/SmartRail.Api
 ```
 
-The database must be healthy before applying migrations. Use the same PostgreSQL major version in local and integration environments. Never point the local import or migration command at RDS.
+The database must be healthy before applying migrations. Use a dedicated test-only PostgreSQL host separate from the developer database and RDS. The integration-test fixture creates one uniquely named database per test class, configures that class's DbContext and `WebApplicationFactory` to use it, and drops it at teardown. Test methods within a class run serially; distinct classes may run concurrently because they never share a database. Fail clearly if the test host is unavailable. Never point local import, migration or test commands at RDS.
 
 ## Initialize controlled reference data
 
@@ -41,7 +41,7 @@ dotnet test tests/SmartRail.UnitTests
 dotnet test tests/SmartRail.IntegrationTests
 ```
 
-The unit suite checks ordering, exact-date eligibility, `Asia/Colombo` date/offset calculations and input rules. Integration tests start a real PostgreSQL database, apply the migration, load an isolated versioned fixture, exercise the API through `WebApplicationFactory`, and discard the database after the run. They must prove that a complete date with no service rows returns no results, while an incomplete or absent manifest returns unavailable; that a later-origin overnight service is found using its operation date from before the requested origin date; and that exactly one revision is current while prior revisions remain preserved. Tests must not silently skip when the configured database is unavailable.
+The unit suite checks ordering, exact-date eligibility, `Asia/Colombo` date/offset calculations and input rules. Integration tests use a dedicated real PostgreSQL test host and a unique database per test class, apply the migration, load a versioned fixture, exercise the API through `WebApplicationFactory`, and drop each database at fixture teardown. Test methods within a class are serialized; classes may run concurrently because they have separate databases. They must prove that a complete date with no service rows returns no results, while an incomplete or absent manifest returns unavailable; that a later-origin overnight service is found using its operation date from before the requested origin date; that audit rows persist and roll back with station changes; and that unauthorized import attempts leave database state unchanged. Tests must not silently skip when the configured database is unavailable.
 
 ## Smoke-test the approved read contracts
 
