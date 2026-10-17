@@ -1,5 +1,6 @@
 using System.Data.Common;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi;
 using SmartRail.Api.Contracts.RailwayNetwork;
 using SmartRail.Api.Errors;
 using SmartRail.Application.RailwayNetwork.Routes;
@@ -35,6 +36,28 @@ public static class RailwayNetworkEndpoints
             .WithName("SearchServices").WithTags("Railway Network")
             .WithSummary("Search published services by origin, destination and travel date")
             .WithDescription("Returns planned service choices only. Travel date is the scheduled departure date from the selected origin; incomplete date evidence is unavailable, not an empty result.")
+            .AddOpenApiOperationTransformer((operation, _, _) =>
+            {
+                operation.Parameters ??= [];
+                var parameters = operation.Parameters.ToArray();
+                operation.Parameters.Clear();
+                foreach (var parameter in parameters)
+                {
+                    operation.Parameters.Add(new OpenApiParameter
+                    {
+                        Name = parameter.Name,
+                        In = parameter.In,
+                        Description = parameter.Description,
+                        Required = true,
+                        Schema = new OpenApiSchema
+                        {
+                            Type = JsonSchemaType.String,
+                            Format = parameter.Name == "date" ? "date" : "uuid"
+                        }
+                    });
+                }
+                return Task.CompletedTask;
+            })
             .Produces<ServiceSearchResponse>(StatusCodes.Status200OK)
             .Produces<ProblemResponse>(StatusCodes.Status400BadRequest, contentType: "application/problem+json")
             .Produces<ProblemResponse>(StatusCodes.Status503ServiceUnavailable, contentType: "application/problem+json")
@@ -64,9 +87,12 @@ public static class RailwayNetworkEndpoints
             return Results.Ok(response);
         });
 
-    private static Task<IResult> GetRouteStopsAsync(Guid routeId, GetRouteStopsHandler handler, CancellationToken cancellationToken) =>
+    private static Task<IResult> GetRouteStopsAsync(string? id, GetRouteStopsHandler handler, CancellationToken cancellationToken) =>
         Safe(async () =>
         {
+            if (!Guid.TryParse(id, out var routeId))
+                return ProblemDetailsConfiguration.Create(StatusCodes.Status400BadRequest, "Invalid route identifier.", "invalid_route_id",
+                    new Dictionary<string, string[]> { ["id"] = ["Route ID must be a valid UUID."] });
             var result = await handler.HandleAsync(new GetRouteStopsQuery(routeId), cancellationToken);
             if (result.IsInvalid)
                 return ProblemDetailsConfiguration.Create(StatusCodes.Status400BadRequest, "Invalid route identifier.", "invalid_route_id",
@@ -78,15 +104,22 @@ public static class RailwayNetworkEndpoints
         });
 
     private static Task<IResult> SearchServicesAsync(
-        [FromQuery(Name = "origin")] Guid originId,
-        [FromQuery(Name = "destination")] Guid destinationId,
-        DateOnly date,
+        [FromQuery(Name = "origin")] string? origin,
+        [FromQuery(Name = "destination")] string? destination,
+        [FromQuery(Name = "date")] string? date,
         SearchServicesHandler handler,
         CancellationToken cancellationToken) =>
         Safe(async () =>
         {
+            var errors = new Dictionary<string, string[]>(StringComparer.Ordinal);
+            if (!Guid.TryParse(origin, out var originId)) errors["origin"] = ["Origin must be a valid station UUID."];
+            if (!Guid.TryParse(destination, out var destinationId)) errors["destination"] = ["Destination must be a valid station UUID."];
+            if (string.IsNullOrWhiteSpace(date)) errors["date"] = ["Travel date is required in yyyy-MM-dd format."];
+            if (errors.Count > 0)
+                return ProblemDetailsConfiguration.Create(StatusCodes.Status400BadRequest, "Search criteria are invalid.", "invalid_search_criteria", errors);
+
             var result = await handler.HandleAsync(new SearchServicesQuery(originId, destinationId,
-                date.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)), cancellationToken);
+                date), cancellationToken);
             if (result.Outcome == ServiceSearchOutcome.Invalid)
                 return ProblemDetailsConfiguration.Create(StatusCodes.Status400BadRequest, "Search criteria are invalid.", "invalid_search_criteria",
                     result.Errors.ToDictionary(item => item.Key, item => item.Value, StringComparer.Ordinal));
@@ -95,16 +128,19 @@ public static class RailwayNetworkEndpoints
                     "Railway service eligibility information is unavailable.", "service_eligibility_unavailable");
 
             var response = new ServiceSearchResponse(originId, destinationId,
-                date,
+                DateOnly.ParseExact(date!, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
                 result.Services.Select(service => new ServiceChoiceResponse(service.ServiceId, service.ServiceCode,
                     service.RouteId, service.RouteCode, service.ScheduleRevision,
                     ToResponse(service.Origin), ToResponse(service.Destination))).ToArray());
             return Results.Ok(response);
         });
 
-    private static Task<IResult> GetServiceAsync(Guid serviceId, GetServiceHandler handler, CancellationToken cancellationToken) =>
+    private static Task<IResult> GetServiceAsync(string? id, GetServiceHandler handler, CancellationToken cancellationToken) =>
         Safe(async () =>
         {
+            if (!Guid.TryParse(id, out var serviceId))
+                return ProblemDetailsConfiguration.Create(StatusCodes.Status400BadRequest, "Invalid service identifier.", "invalid_service_id",
+                    new Dictionary<string, string[]> { ["id"] = ["Service ID must be a valid UUID."] });
             var result = await handler.HandleAsync(new GetServiceQuery(serviceId), cancellationToken);
             if (result.IsInvalid)
                 return ProblemDetailsConfiguration.Create(StatusCodes.Status400BadRequest, "Invalid service identifier.", "invalid_service_id",

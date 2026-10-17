@@ -30,10 +30,15 @@ public sealed class SchedulePublicationRepository(SmartRailDbContext dbContext) 
             ?? throw new InvalidOperationException("The schedule revision does not belong to the train service.");
         if (candidate.IsCurrentPublished) throw new InvalidOperationException("The schedule revision is already current and published.");
         foreach (var current in revisions.Where(item => item.IsCurrentPublished)) current.Supersede(request.PublishedAt);
+        // Clear the partial unique index before making the replacement current; both writes remain atomic.
+        await dbContext.SaveChangesAsync(cancellationToken);
         candidate.Publish(request.PublishedAt);
         service.Publish();
         var routeStops = await dbContext.RouteStops.Where(stop => stop.RouteId == route.RouteId).ToListAsync(cancellationToken);
-        var calls = await dbContext.ServiceCallingPoints.ToListAsync(cancellationToken);
+        var revisionIds = revisions.Select(item => item.ScheduleId).ToArray();
+        var calls = await dbContext.ServiceCallingPoints
+            .Where(item => revisionIds.Contains(item.ScheduleId))
+            .ToListAsync(cancellationToken);
         var validation = SchedulePublicationValidator.Validate(service, route, routeStops, revisions, calls);
         if (!validation.IsValid) throw new SchedulePublicationRejectedException(validation.Errors);
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -75,11 +80,16 @@ public sealed class SchedulePublicationRepository(SmartRailDbContext dbContext) 
         if (candidate.IsCurrentPublished) throw new InvalidOperationException("The schedule revision is already current and published.");
 
         foreach (var current in revisions.Where(item => item.IsCurrentPublished)) current.Supersede(publishedAt);
+        // Clear the partial unique index before making the replacement current; both writes remain atomic.
+        await dbContext.SaveChangesAsync(cancellationToken);
         candidate.Publish(publishedAt);
         service.Publish();
 
         var routeStops = await dbContext.RouteStops.Where(stop => stop.RouteId == route.RouteId).ToListAsync(cancellationToken);
-        var calls = await dbContext.ServiceCallingPoints.ToListAsync(cancellationToken);
+        var revisionIds = revisions.Select(item => item.ScheduleId).ToArray();
+        var calls = await dbContext.ServiceCallingPoints
+            .Where(item => revisionIds.Contains(item.ScheduleId))
+            .ToListAsync(cancellationToken);
         var result = SchedulePublicationValidator.Validate(service, route, routeStops, revisions, calls);
         if (!result.IsValid) throw new SchedulePublicationRejectedException(result.Errors);
 

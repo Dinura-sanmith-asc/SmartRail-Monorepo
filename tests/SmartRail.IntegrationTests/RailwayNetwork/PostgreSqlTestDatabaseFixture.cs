@@ -1,7 +1,10 @@
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using Xunit;
 
@@ -64,11 +67,24 @@ public sealed class PostgreSqlTestDatabaseFixture : IAsyncLifetime
         }
 
         return new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment("Development");
+            builder.UseSetting(
+                $"ConnectionStrings:{SmartRail.Infrastructure.RailwayNetwork.SmartRailDbContext.ConnectionStringName}",
+                ConnectionString);
             builder.ConfigureAppConfiguration((_, configuration) =>
                 configuration.AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     [$"ConnectionStrings:{SmartRail.Infrastructure.RailwayNetwork.SmartRailDbContext.ConnectionStringName}"] = ConnectionString
-                })));
+                }));
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<DbContextOptions<SmartRail.Infrastructure.RailwayNetwork.SmartRailDbContext>>();
+                services.RemoveAll<SmartRail.Infrastructure.RailwayNetwork.SmartRailDbContext>();
+                services.AddDbContext<SmartRail.Infrastructure.RailwayNetwork.SmartRailDbContext>(options =>
+                    options.UseNpgsql(ConnectionString));
+            });
+        });
     }
 
     public async Task DisposeAsync()
