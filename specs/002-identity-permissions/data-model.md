@@ -12,6 +12,19 @@ The entities are added to the existing `SmartRailDbContext` and PostgreSQL 18 / 
 
 ## Entities
 
+### Canonical role representation
+
+Persist and evaluate only these internal role codes. The `/api/me` response serializes the corresponding external role labels as shown; this is a representation mapping only and does not change the approved RBAC matrix.
+
+| Internal role code | `/api/me` label |
+|---|---|
+| `Passenger` | `Passenger` |
+| `Driver` | `Driver` |
+| `StationStaff` | `Station Staff` |
+| `Controller` | `Controller` |
+
+`Public` is an anonymous access class, not an assigned role code or response label.
+
 ### RoleAssignment
 
 Represents one grant lifecycle for a Cognito subject and one recognized SmartRail role. Revocation closes that lifecycle; a later grant creates a new row so audit history remains append-only.
@@ -75,7 +88,27 @@ Represents the Identity-owned association between a subject with station-staff d
 - Reassignment after revocation creates a new lifecycle row.
 - Lookup must use current active state on each protected authorization decision; no cached scope grants.
 - This data establishes only station scope. It does not grant an action by itself; the approved RBAC matrix must also grant the action.
-- Production assignment/revocation authority and audit procedure remain gated; no public scope-management API is approved.
+- Every scope grant and revocation produces an append-only `StationScopeAssignmentAudit` event in the same transaction as the active-state change. Production assignment/revocation authority and audit retention/access procedure remain gated; no public scope-management API is approved.
+
+### StationScopeAssignmentAudit
+
+An append-only evidence row for each station-scope grant or revocation, transactionally coupled to the associated lifecycle row.
+
+| Property | Type | Required | Meaning / invariant |
+|---|---|---:|---|
+| `Id` | UUID | Yes | Stable primary key. |
+| `StationScopeAssignmentId` | UUID | Yes | Foreign key to the scope lifecycle row; restrict delete. |
+| `Action` | constrained text | Yes | `Granted` or `Revoked`. |
+| `ActorSubject` | text | Yes | Verified actor subject from the controlled process. |
+| `OccurredAtUtc` | timestamptz | Yes | UTC event instant. |
+| `EvidenceReference` | text | No | Optional controlled ticket/change reference; no secrets or unnecessary personal data. |
+
+**Invariants and verification**
+
+- Insert one `Granted` event with each new scope assignment; insert one `Revoked` event with each revocation. A re-grant creates a new assignment lifecycle and a new grant event; prior events are never rewritten.
+- Audit insert and assignment mutation commit or roll back together. Application behavior does not update or delete audit events.
+- PostgreSQL integration tests verify grant and revoke history, actor/action/time values, rollback of both the scope state and event on transaction failure, re-grant history, and rejection of audit mutation/deletion through the persistence path.
+- Index by `(StationScopeAssignmentId, OccurredAtUtc)` for history queries. Do not invent a retention period; production retention and access controls remain an approval gate.
 
 ## Relationships
 
@@ -84,6 +117,7 @@ Cognito (credential authority)
   └── verified subject (`sub`, opaque text)
        ├── 0..* RoleAssignment ── 1..* RoleAssignmentAudit
        └── 0..* StationScopeAssignment ── 1 Railway Network Station
+              └── 1..* StationScopeAssignmentAudit
 
 Driver Operations ── current driver-to-journey evidence (owner module)
 Incident Management ── incident-to-station/journey evidence (owner module)
@@ -96,7 +130,7 @@ The three future-module evidence sources are not foreign-keyed into Identity tab
 
 - Read current active role mapping from PostgreSQL for each protected authorization evaluation. Do not trust JWT group claims and do not cache results.
 - A role grant/revoke updates the role row and inserts its audit event in one transaction. Rollback leaves both assignment and audit unchanged.
-- Station scope grant/revoke is persisted with the same actor/time evidence and current-state constraints. Audit requirements for scope operations must follow the production approval before they are enabled; do not imply a retention period.
+- Station scope grant/revoke updates the scope row and inserts its audit event in one transaction. Rollback leaves both scope state and audit history unchanged.
 - Use restrictive foreign keys, required-field/check constraints, and partial unique indexes. PostgreSQL integration tests must exercise the actual migration and constraints.
 - For API identity projection, if mapping lookup succeeds with zero active roles, return an empty role list. If lookup is unavailable, do not report an empty list as verified state; return safe service-unavailable behavior.
 
@@ -105,6 +139,6 @@ The three future-module evidence sources are not foreign-keyed into Identity tab
 1. Production operators, bootstrap path, separation of duties, and approval process for role mapping changes.
 2. Production operators and review/revocation process for station scopes.
 3. Audit retention and access-control duration for role and scope evidence.
-4. Environment-specific Cognito issuer, allowed human client IDs, optional resource audience, and token expiry configuration.
+4. Environment-specific Cognito issuer, allowed human client IDs, optional resource audience, and token expiry configuration. If an expected audience is configured, tokens must contain and match it; if no audience is configured, reject tokens that carry `aud` until the expected value is configured.
 
 These gates do not prevent deterministic isolated test fixtures. They prevent enabling a production provisioning path without approval.

@@ -14,11 +14,15 @@ No boolean or missing-value fallback may turn an unavailable lookup into `Allowe
 
 ## Identity and role inputs
 
-1. API validates Cognito access token signature and key, issuer, lifetime, `token_use=access`, and allowlisted human `client_id`; validate resource audience when configured/present.
+1. API validates Cognito access token signature and key, issuer, lifetime, `token_use=access`, and allowlisted human `client_id`; apply the configured/missing/present audience rules below.
+   - When an expected API resource audience is configured, `aud` is required and must match; missing or mismatched `aud` is invalid.
+   - When no expected audience is configured, accept only a token with no `aud`; reject a token carrying an unconfigured `aud`. Never substitute `client_id` for `aud`.
 2. The validated `sub` is the only identity key and is treated as opaque text.
 3. Resolve active roles from Identity's PostgreSQL mapping at each protected authorization check. Do not cache roles or accept `cognito:groups`, client-supplied role values, or scope claims as grants.
 4. Combine only explicit grants for all currently active recognized roles in the approved matrix. Every “own” or “scoped” grant also requires its owner-module evidence.
 5. A valid principal with no active role mapping is authenticated but has no protected grant. `/api/me` returns an empty role array only after a successful mapping lookup. A failed mapping lookup is unavailable, not empty.
+
+The persisted role codes are `Passenger`, `Driver`, `StationStaff`, and `Controller`. `GET /api/me.roles` emits `Passenger`, `Driver`, `Station Staff`, and `Controller`, respectively. `Public` is not an assigned role and is not returned. This label mapping does not change any approved grant.
 
 ## Resource evidence ownership
 
@@ -37,6 +41,7 @@ Identity does not store driver assignments, incidents, or catering orders. Each 
 - Valid identity with verified but insufficient role/action/scope/ownership: `403`.
 - Current role map or required authority unavailable: `503`, with no protected effect.
 - `GET /api/me`: `200 { subject, roles }` for verified mapping, including `roles: []`; `401` for invalid/missing token; safe `503` if role mapping cannot be verified.
+- `GET /api/me.roles` uses the exact external labels `Passenger`, `Driver`, `Station Staff`, and `Controller`; persisted/internal policy codes use `Passenger`, `Driver`, `StationStaff`, and `Controller`.
 - Feature 001 public GET routes remain explicitly anonymous. Optional malformed/expired bearer credentials are ignored there; existing response contracts and public projections are unchanged.
 - Use generic RFC 9457 Problem Details. Never return raw tokens, claims, passwords, signing keys, SQL errors or sensitive resource-existence details.
 

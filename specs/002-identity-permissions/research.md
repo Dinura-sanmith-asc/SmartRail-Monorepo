@@ -15,11 +15,11 @@
 
 ### 2. Validate Cognito access tokens using Cognito-specific claims
 
-**Decision**: Use ASP.NET Core `JwtBearer` with HTTPS OIDC metadata/JWKS from a configured trusted Cognito User Pool issuer. Validate RSA signature and `kid`, exact issuer, lifetime/expiry, `token_use=access`, and `client_id` against configured human app clients. If Cognito resource binding produces an `aud` claim, validate it against the configured API audience; do not require an `aud` claim on access tokens when resource binding is not in use. Reject ID tokens and app clients not approved for human SmartRail use.
+**Decision**: Use ASP.NET Core `JwtBearer` with HTTPS OIDC metadata/JWKS from a configured trusted Cognito User Pool issuer. Validate RSA signature and `kid`, exact issuer, lifetime/expiry, `token_use=access`, and `client_id` against configured human app clients. If an expected API resource audience is configured, require an `aud` claim and require it to match that expected audience; missing or mismatched `aud` is rejected. If no expected audience is configured, accept only access tokens with no `aud`; reject a token that carries an unconfigured audience. Never treat `client_id` as a substitute for `aud`. Reject ID tokens and app clients not approved for human SmartRail use.
 
-**Rationale**: Cognito access tokens carry `client_id` and `token_use`; an access-token `aud` claim is present when resource binding is configured. Cognito documents `sub` as the stable user key and cautions against strict UUID-format validation. Access and ID tokens can have different signing keys. Signing keys are discovered and refreshed from JWKS rather than hard-coded. Microsoft's ASP.NET Core guidance supports `JwtBearer`, full signature/issuer/lifetime validation, metadata refresh and safe control of error-detail exposure.
+**Rationale**: Cognito access tokens carry `client_id` and `token_use`; an access-token `aud` claim is present when resource binding is configured. Explicit behavior for configured, absent and mismatched audience values prevents accepting a resource-bound token without validating its intended API. Cognito documents `sub` as the stable user key and cautions against strict UUID-format validation. Access and ID tokens can have different signing keys. Signing keys are discovered and refreshed from JWKS rather than hard-coded. Microsoft's ASP.NET Core guidance supports `JwtBearer`, full signature/issuer/lifetime validation, metadata refresh and safe control of error-detail exposure.
 
-**Alternatives considered**: Accept ID tokens or any Cognito-signed token (rejected; wrong use/client can cross a trust boundary); trust a configured `aud` alone for Cognito access tokens (rejected because access-token client identification uses `client_id` and `aud` is optional without resource binding); static key pinning (rejected because Cognito rotates keys).
+**Alternatives considered**: Accept ID tokens or any Cognito-signed token (rejected; wrong use/client can cross a trust boundary); treat `client_id` as the API resource audience (rejected because they identify different trust boundaries); ignore an `aud` claim when no expected audience is configured (rejected because an unvalidated resource-bound token must not be accepted); static key pinning (rejected because Cognito rotates keys).
 
 **References**:
 
@@ -38,7 +38,7 @@
 
 ### 4. Keep resource evidence in its owning module
 
-**Decision**: Persist station-staff station scopes in Identity & Permissions. Consume driver-to-journey evidence from Driver Operations, incident/resource relationships from Incident Management, and passenger/order ownership from Catering Adapter. Do not replicate those modules' operational or order records. Use framework-neutral Application ports; future owning modules implement their evidence queries through their own persistence rules. Missing, revoked, stale, or unverifiable evidence denies the grant; source outage returns unavailable without a write.
+**Decision**: Persist station-staff station scopes in Identity & Permissions, with an append-only actor/time/action audit event for every grant and revocation in the same transaction as the scope-state change. Verify persisted grant/revoke history, re-grant, actor/action/time values and atomic rollback using real PostgreSQL integration tests. Consume driver-to-journey evidence from Driver Operations, incident/resource relationships from Incident Management, and passenger/order ownership from Catering Adapter. Do not replicate those modules' operational or order records. Use framework-neutral Application ports; future owning modules implement their evidence queries through their own persistence rules. Missing, revoked, stale, or unverifiable evidence denies the grant; source outage returns unavailable without a write.
 
 **Rationale**: Preserves the approved clarification and constitution's module-owned data rules while providing a single server-side authorization decision boundary.
 
@@ -46,7 +46,7 @@
 
 ### 5. Expose only the inventoried self-identity operation
 
-**Decision**: Add an OpenAPI contract for the existing approved `GET /api/me` inventory entry. It requires a verified Cognito access token and returns `{ subject, roles }` from the internal mapping. A valid caller with no active role receives an empty `roles` array. No caller-selected subject, resource scopes, profile attributes, credentials or token are returned. No other Identity HTTP operation is introduced.
+**Decision**: Add an OpenAPI contract for the existing approved `GET /api/me` inventory entry. It requires a verified Cognito access token and returns `{ subject, roles }` from the internal mapping. Persisted role codes are `Passenger`, `Driver`, `StationStaff`, and `Controller`; response labels are `Passenger`, `Driver`, `Station Staff`, and `Controller`. A valid caller with no active role receives an empty `roles` array. No caller-selected subject, resource scopes, profile attributes, credentials or token are returned. No other Identity HTTP operation is introduced.
 
 **Rationale**: Implements the PDF's existing Identity endpoint inventory while honoring the clarified minimal caller-only response and avoiding unapproved account or role administration.
 
@@ -61,6 +61,12 @@
 **Decision**: Add Identity feature namespaces to the existing `SmartRail.Domain`, `SmartRail.Application`, `SmartRail.Infrastructure`, API, UnitTests and IntegrationTests projects. Add an additive migration to the existing shared `SmartRailDbContext` migration pipeline. Reuse built-in JwtBearer/authorization, OpenAPI, Problem Details and the existing per-class PostgreSQL integration fixture. Add only JwtBearer 10.0.12, aligned with existing .NET packages.
 
 **Rationale**: Matches actual repository references and the ratified modular-monolith/Clean Architecture decisions. No new context, deployable, database, framework layer, external authorization product or project is justified.
+
+### 8. Local-first implementation and user-operated AWS deployment
+
+**Decision**: Implement and verify Feature 002 and the complete SmartRail system locally before AWS deployment. Keep local settings/secrets separate from AWS values. Use deterministic isolated signing keys, metadata and identity fixtures for tests only; test authentication configuration must not create a production bypass. AWS resource creation, IAM, Cognito environment configuration, RDS, API Gateway, Lambda, SAM, and deployment commands are performed manually by the user with step-by-step guidance after local verification. No AWS resources are provisioned and no AWS deployment command is run during feature implementation.
+
+**Rationale**: This follows the user's explicit deployment workflow while preserving the approved AWS target architecture and keeping local verification reproducible.
 
 **Database references**:
 

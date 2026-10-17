@@ -31,6 +31,10 @@
 - [x] Feature preserves Feature 001's four anonymous Railway Network reads and existing Clean Architecture/module ownership
 - [x] Cross-module authorization responsibilities do not claim implementation ownership for Journeys, Incidents, Driver Operations or Catering
 - [x] No public identity-management or administrative endpoint is introduced
+- [x] Internal role codes and external `/api/me` labels are defined consistently, including the `StationStaff` / `Station Staff` representation mapping
+- [x] Station-scope grant/revocation audit history is transactionally defined and has PostgreSQL verification coverage
+- [x] Cognito access-token resource-audience behavior is explicit for configured, missing and mismatched `aud` claims
+- [x] Local-first verification and user-operated manual AWS deployment boundaries are documented without changing the target architecture
 
 ## Notes
 

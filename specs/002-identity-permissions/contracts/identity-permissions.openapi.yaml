@@ -17,6 +17,8 @@ paths:
         verified sub claim. Active SmartRail roles are resolved from the current
         internal PostgreSQL mapping; Cognito group claims do not grant roles.
         A valid subject with no active role mapping receives an empty roles list.
+        Persisted role codes are Passenger, Driver, StationStaff, and Controller;
+        response labels are Passenger, Driver, Station Staff, and Controller.
         No caller-selected subject, profile fields, scopes, or token are returned.
       security:
         - CognitoAccessToken: []
@@ -46,7 +48,12 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Cognito access token only; issuer, signature, lifetime, token_use and client_id are validated.
+      description: >-
+        Cognito access token only; issuer, signature, lifetime, token_use=access,
+        and allowlisted client_id are validated. If an expected API resource
+        audience is configured, aud must be present and match. If no expected
+        audience is configured, aud must be absent; tokens carrying an
+        unconfigured aud are rejected. client_id is never used as aud.
   schemas:
     CurrentIdentity:
       type: object
