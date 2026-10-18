@@ -63,17 +63,17 @@
 
 **Purpose**: Resolve current roles and module-owned scope evidence, evaluate authorization, expose the caller identity projection, and keep maintenance commands non-HTTP and deny-by-default.
 
-- [ ] T027 Define framework-neutral authorization inputs/outcomes and owner-module evidence ports for Driver Operations, Incident Management and Catering Adapter in `src/SmartRail.Application/Identity/Authorization/AuthorizationContracts.cs` (depends on T019, T026).
-- [ ] T028 Implement current active-role resolution by verified Cognito subject, including `Unavailable` versus verified-empty results, in `src/SmartRail.Application/Identity/Authorization/ResolveCurrentRolesHandler.cs` (depends on T019, T020, T027).
-- [ ] T029 Implement current station, assigned-journey, incident-resource and passenger-order evidence resolution through owner ports in `src/SmartRail.Application/Identity/Authorization/ResolveResourceScopeHandler.cs` (depends on T027, T028).
-- [ ] T030 Implement server-side permission decisions requiring explicit active-role grants plus every applicable current scope/ownership result in `src/SmartRail.Application/Identity/Authorization/AuthorizeOperationHandler.cs` (depends on T010, T028, T029).
-- [ ] T031 Implement `GET /api/me` query/handler returning only caller subject and active recognized internal role codes, with verified-empty distinct from unavailable, in `src/SmartRail.Application/Identity/Queries/GetCurrentIdentityHandler.cs` (depends on T028).
-- [ ] T032 Implement the non-HTTP grant-role command behind a deny-by-default maintenance-authority port in `src/SmartRail.Application/Identity/Maintenance/GrantRoleAssignmentHandler.cs` (depends on T019, T027).
-- [ ] T033 Implement the non-HTTP revoke-role command behind the same deny-by-default maintenance boundary in `src/SmartRail.Application/Identity/Maintenance/RevokeRoleAssignmentHandler.cs` (depends on T019, T027, T032).
-- [ ] T034 Implement the non-HTTP grant-station-scope command behind a deny-by-default maintenance-authority port in `src/SmartRail.Application/Identity/Maintenance/GrantStationScopeHandler.cs` (depends on T019, T027).
-- [ ] T035 Implement the non-HTTP revoke-station-scope command behind the deny-by-default maintenance boundary in `src/SmartRail.Application/Identity/Maintenance/RevokeStationScopeHandler.cs` (depends on T019, T027, T034).
-- [ ] T036 [P] [US3] Test role resolution, explicit-grant union, all scope-provider outcomes, ownership denial and unavailable-source fail-closed behavior in `tests/SmartRail.UnitTests/Identity/AuthorizationHandlerTests.cs` (depends on T028–T030).
-- [ ] T037 [P] [US3] Test role/scope maintenance commands reject by default and make no persistence calls when authority is absent or denied in `tests/SmartRail.UnitTests/Identity/IdentityMaintenanceAuthorizationTests.cs` (depends on T032–T035).
+- [X] T027 Define framework-neutral authorization inputs/outcomes and owner-module evidence ports for Driver Operations, Incident Management and Catering Adapter in `src/SmartRail.Application/Identity/Authorization/AuthorizationContracts.cs` (depends on T019, T026).
+- [X] T028 Implement current active-role resolution by verified Cognito subject, including `Unavailable` versus verified-empty results, in `src/SmartRail.Application/Identity/Authorization/ResolveCurrentRolesHandler.cs` (depends on T019, T020, T027).
+- [X] T029 Implement current station, assigned-journey, incident-resource and passenger-order evidence resolution through owner ports in `src/SmartRail.Application/Identity/Authorization/ResolveResourceScopeHandler.cs` (depends on T027, T028).
+- [X] T030 Implement server-side permission decisions requiring explicit active-role grants plus every applicable current scope/ownership result in `src/SmartRail.Application/Identity/Authorization/AuthorizeOperationHandler.cs` (depends on T010, T028, T029).
+- [X] T031 Implement `GET /api/me` query/handler returning only caller subject and active recognized internal role codes, with verified-empty distinct from unavailable, in `src/SmartRail.Application/Identity/Queries/GetCurrentIdentityHandler.cs` (depends on T028).
+- [X] T032 Implement the non-HTTP grant-role command behind a deny-by-default maintenance-authority port in `src/SmartRail.Application/Identity/Maintenance/GrantRoleAssignmentHandler.cs` (depends on T019, T027).
+- [X] T033 Implement the non-HTTP revoke-role command behind the same deny-by-default maintenance boundary in `src/SmartRail.Application/Identity/Maintenance/RevokeRoleAssignmentHandler.cs` (depends on T019, T027, T032).
+- [X] T034 Implement the non-HTTP grant-station-scope command behind a deny-by-default maintenance-authority port in `src/SmartRail.Application/Identity/Maintenance/GrantStationScopeHandler.cs` (depends on T019, T027).
+- [X] T035 Implement the non-HTTP revoke-station-scope command behind the deny-by-default maintenance boundary in `src/SmartRail.Application/Identity/Maintenance/RevokeStationScopeHandler.cs` (depends on T019, T027, T034).
+- [X] T036 [P] [US3] Test role resolution, explicit-grant union, all scope-provider outcomes, ownership denial and unavailable-source fail-closed behavior in `tests/SmartRail.UnitTests/Identity/AuthorizationHandlerTests.cs` (depends on T028–T030).
+- [X] T037 [P] [US3] Test role/scope maintenance commands reject by default and make no persistence calls when authority is absent or denied in `tests/SmartRail.UnitTests/Identity/IdentityMaintenanceAuthorizationTests.cs` (depends on T032–T035).
 
 **Phase verification gate**: Run focused Application tests; demonstrate no grant from token/group input, every module-owned scope check is required where applicable, and denied/unavailable maintenance commands have no write effect.
 
