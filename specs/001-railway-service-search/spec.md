@@ -15,6 +15,8 @@
 - Q: When a passenger changes any search criterion while results are displayed, what should happen to the previous results? → A: Clear the visible results as soon as a criterion changes, retain the edited criteria, and show results again only after the passenger submits a new search.
 - Q: When a service's destination is scheduled on a calendar day after its origin departure, how should the app display those planned times? → A: Show each call's scheduled date and time as supplied, with a clear "next day" cue when it differs from the selected origin travel date; do not convert it to the passenger's device time zone.
 - Q: If the service-detail information loads but the route-stop list fails (or the reverse), what should the passenger see? → A: Show the information that loaded, mark only the unavailable section, and let the passenger retry that section.
+- Q: If an approved public railway read returns 403, should the app offer Retry or only explain that access is unavailable and let the passenger go back? → A: Show a brief access-unavailable message, do not prompt sign-in or offer Retry, and provide Back to the previous screen.
+- Q: While a search or service-detail request is loading, should Back remain available and any response arriving after the passenger leaves be ignored for the screen they left? → A: Keep Back available; ignore late responses for the screen the passenger left.
 
 ## User Scenarios & Testing
 
@@ -87,6 +89,9 @@ same search and result set when the passenger navigates back.
 5. **Given** either service detail or route stops fails while the other read succeeds,
    **When** the detail view is shown, **Then** it presents the successful information and
    marks only the failed section unavailable with a retry for that section.
+6. **Given** service-detail or route-stop information is loading, **When** the passenger
+   chooses Back, **Then** navigation remains available and any response arriving after the
+   passenger has left the detail view does not change that departed view.
 
 **Resolved UX decision**: Use documented fields only. The detail view shows service and
 route identity, ordered stop names, and planned times available for the searched origin and
@@ -128,6 +133,12 @@ criteria, and available recovery action for each.
 5. **Given** a retry succeeds, **When** the new response is received, **Then** the loading
    and unavailable indicators are replaced by the corresponding results, empty state, or
    service detail.
+6. **Given** an approved public railway read returns 403, **When** the passenger sees the
+   access-denied state, **Then** the app explains that access is unavailable, does not
+   prompt sign-in or offer retry, and provides Back to the previous screen.
+7. **Given** a search is loading, **When** the passenger leaves the search/results view,
+   **Then** Back remains available and a late response does not replace or reopen the view
+   the passenger left.
 
 ## Requirements
 
@@ -204,7 +215,8 @@ the scheduled data itself is not represented as live information.
   empty result.
 - **FR-014**: For a 403 or other access-denied response, the app MUST show a clear access
   unavailable state for the affected information without prompting the passenger to sign in
-  for these approved public reads. Any independently loaded section MUST remain visible.
+  or offering retry for these approved public reads. It MUST provide a path Back to the
+  previous screen. Any independently loaded detail section MUST remain visible.
 - **FR-015**: A retry MUST repeat the failed read using the retained selection. When one of
   the independent service-detail or route-stop reads failed, the retry MUST target that read
   without discarding successfully loaded information. On success, the app MUST replace the
@@ -229,6 +241,9 @@ the scheduled data itself is not represented as live information.
 - **FR-021**: When a passenger edits origin, destination, or travel date after results are
   displayed, the app MUST clear those results immediately, retain the edited criteria, and
   require a new explicit search before displaying results for the changed criteria.
+- **FR-022**: While a search, service-detail, or route-stop read is pending, the app MUST
+  keep Back navigation available. A response arriving after the passenger has left the
+  corresponding view MUST NOT replace or reopen that view.
 
 ### Edge Cases
 
@@ -257,10 +272,14 @@ the scheduled data itself is not represented as live information.
   immediately so it cannot be mistaken for a response to the edited criteria.
 - A request is repeated while one is pending: prevent duplicate visible results or duplicate
   navigation.
+- The passenger leaves a search or detail view while a read is pending: keep Back available
+  and ignore the late response for the view the passenger left.
 - Device connectivity is lost during search or detail retrieval: show network unavailable,
   preserve criteria, and allow retry after connectivity returns.
 - A backend error contains technical details: show safe, passenger-appropriate text; do not
   expose stack traces or internal diagnostics.
+- An approved public read returns 403: explain that access is unavailable, do not prompt
+  sign-in or offer retry, and let the passenger return to the previous screen.
 - A scheduled timestamp includes an offset: display its local schedule date and clock time;
   identify a destination call on a later date as "next day" and do not convert it to device
   time or imply it is an observed time.
@@ -302,14 +321,14 @@ incident management. This feature does not implement backend data creation or ed
 - **SC-004**: In all successful service-detail cases, route stops appear in backend order,
   each displayed time retains its scheduled local date and clock time, later-day calls are
   identified as "next day", and every time is identified as planned schedule information.
-- **SC-007**: In every partial detail failure case, the successful section remains visible,
-  the failed section is identified accurately, and retrying it does not discard successful
-  information.
 - **SC-005**: Passengers can move from search to results to a service detail and back while
   retaining the same search criteria and result list in every acceptance run.
 - **SC-006**: Every interactive search/result/retry control has a meaningful accessible
   name, and loading, empty, unavailable, and result changes are available to assistive
   technology in the accessibility review.
+- **SC-007**: In every partial detail failure case, the successful section remains visible,
+  the failed section is identified accurately, and retrying it does not discard successful
+  information.
 
 ## Assumptions
 
