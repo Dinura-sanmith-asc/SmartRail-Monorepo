@@ -32,10 +32,15 @@
 - [x] No implementation details leak into the specification — the approved interaction boundary is stated as a product scope limit; detailed schemas remain for contracts/planning
 - [x] Requirement traceability identifies which acceptance evidence belongs to Feature 003 versus other modules and clients
 
+## Pre-planning Gates
+
+- [ ] Gate 1 — Journey identity: BLOCKED pending approval of the authoritative journey-instance ID issuer/initialization process and passenger-safe disambiguation for a collision on the approved occurrence key
+- [ ] Gate 2 — API contracts: BLOCKED pending approved schemas for journey identity/revision, ordered route diversions, Controller audit/correction evidence, optional Driver-observation ID linkage, and consistent dependent reads; no new operation is proposed
+
 ## Notes
 
 - Approved clarification directions are recorded in `spec.md`: allow multiple journey instances per service/date; require explicit transitions and auditable corrections; retain the current operation boundary without adding routes.
 - The approved lifecycle now specifies transition paths, cancellation/termination/completion meanings, audited terminal corrections, and stale-revision rejection.
-- Before planning, define how same-date distinct departures that share an indistinguishable scheduled occurrence are represented. Approve any required schema/semantic changes to the existing operations for route-diversion revisions and observation-ID evidence. Do not add operations or claim complete Must Have coverage before the contract gaps are resolved.
+- Gate findings and explicitly unapproved minimal proposals are recorded in `spec.md` under Pre-planning Readiness Review. Do not treat proposals as approved behavior or claim complete Must Have coverage before both gates pass.
 - Client-owned and other-module-owned acceptance checks remain open until their owning specifications and test evidence exist.
 - Approved source documents are read-only; this feature specification does not amend them.

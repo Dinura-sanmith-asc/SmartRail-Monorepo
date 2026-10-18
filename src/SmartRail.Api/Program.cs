@@ -30,6 +30,19 @@ builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SmartRailAu
 builder.Services.AddSmartRailInfrastructure(builder.Configuration);
 builder.Services.AddSmartRailProblemDetails();
 
+const string ReactDevCors = "ReactDevelopment";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(ReactDevCors, policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>
@@ -89,11 +102,20 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+
 app.UseHttpsRedirection();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(ReactDevCors);
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapRailwayNetworkEndpoints();
 app.MapIdentityEndpoints();
+
 
 app.Run();
 

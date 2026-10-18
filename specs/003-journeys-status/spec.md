@@ -209,6 +209,48 @@ The approved RBAC/API baseline permits Journeys & Status reads for journey detai
    **Follow-up SR-022 clarification (approved)**: A route diversion is a Controller-published change to the dated journey's ordered calling points; it does not change the reusable Feature 001 route/schedule. Journey detail, update history, and station-departure reads must identify the same new journey revision and preserve the prior revision. The existing operation inventory remains fixed. Formal approval of existing operation schemas/semantics is required if they cannot represent the diversion; no route/payload behavior is presumed before that approval.
    **Follow-up Driver-observation clarification (approved)**: The Controller may read an observation through the existing authorized read and reference its stable observation ID in the existing official journey-update evidence. Driver Operations retains ownership; only a separate authorized Controller publication changes official status. If existing schemas cannot express the reference, obtain approval to extend an existing operation schema before implementation. Do not add a review mutation or copy observation ownership into Journeys & Status.
 
+## Pre-planning Readiness Review
+
+This review compares the approved sources available on 2026-10-18. Proposed identifier or schema additions below are **not approved** and do not change the MoSCoW baseline, RBAC grants, or API operation inventory.
+
+### Gate 1 — Journey Identity: BLOCKED
+
+The approved composite rule remains `scheduled service + published schedule revision + operation date + first-calling-point scheduled departure occurrence`. Feature 001 stores a schedule revision and planned call times; its `ServiceChoice` response exposes `serviceId`, `scheduleRevision`, selected origin/destination calls and scheduled times. It does not expose a physical journey-instance identifier. The approved sources do not constrain two separate operational instances from referring to the same planned occurrence. Therefore, distinct real departures can collide on the approved composite (for example, two operational instances of one scheduled departure); the composite identifies the planned occurrence, not necessarily the realized instance.
+
+**Minimal proposed resolution — requires business approval:** retain the approved composite as schedule linkage and search context, and add a distinct opaque `journeyInstanceId` issued by an authoritative journey-instance source. Do not derive it from the composite or generate replacement evidence in Journeys & Status. The project decision owner must approve which source/process issues this ID, including the controlled local/manual initialization case when no feed supplies one. This does not add a public operation or RBAC grant.
+
+Duplicate and selection behavior proposed for that decision:
+
+- Same `journeyInstanceId` with the same service/revision/date/occurrence is an idempotent repeat; do not create another journey.
+- Same `journeyInstanceId` with conflicting schedule linkage is rejected as a source conflict.
+- Different authoritative instance IDs with the same approved composite remain distinct journeys; never merge them.
+- Missing or repeated/unverifiable instance evidence is rejected/quarantined for resolution; never invent an ID or silently choose one.
+- The existing station-departures read must return each `journeyId` with sufficient published service, revision, date, occurrence and passenger-safe departure description to select the intended instance. The selected identity opens the existing journey-detail read. Feature 001's service-search contract remains unchanged; the join from a searched service choice to one or more dated journey choices must be specified in the Journeys & Status read schemas.
+
+The approved operation inventory has no journey-creation operation. The authoritative initialization/issuance process and a passenger-usable distinction for colliding planned occurrences therefore require explicit business approval before Gate 1 can pass.
+
+### Gate 2 — Approved API Contracts: BLOCKED
+
+The approved RBAC/API PDF specifies permissions and these Journeys & Status operations only: `GET /api/journeys/{id}`, `GET /api/journeys/{id}/updates`, `GET /api/stations/{id}/departures`, `PATCH /api/operations/journeys/{id}/status`, and `PATCH /api/operations/journeys/{id}/stops/{stopId}`. It provides no request/response schemas, revision model, or error contract for them. Feature 001's OpenAPI describes reusable scheduled services, not dated journeys, and has no `journeyId` or journey-instance identifier in `ServiceChoice`. Feature 002 defines the Controller grants and authorization boundaries but no Journeys & Status payloads. Thus the approved sources do not establish that the operations can currently express the needed behavior.
+
+Specific gaps against the approved requirements:
+
+- **SR-007**: detail and departure responses are not specified to connect a unique realized journey to its service, schedule revision, operation date and occurrence, or to distinguish two instances sharing one planned occurrence.
+- **SR-022**: no write schema represents a diversion's changed, ordered journey calling points, and no read schema returns that revised order while preserving the reusable schedule.
+- **SR-040**: official update request, Controller actor/time audit evidence, correction linkage, and stale/concurrent update behavior are absent from the contract schemas.
+- **SR-048**: the contracts do not define a shared journey revision/source across journey detail, update history, and station departures.
+- **SR-069**: Driver Operations has an observation submission and Controller read operation in the inventory, but no schemas are defined; there is no field linking an observation ID to the Controller's separate official publication.
+
+**Minimal proposed schema changes — not approved:** keep every listed operation and RBAC grant unchanged. Extend only their schemas/semantics if the contract owner approves:
+
+1. Define a shared journey identity/snapshot with `journeyId`, `serviceId`, schedule revision, operation date, approved occurrence key, current `journeyRevision`, published status, and ordered realized calling points. Station departure results expose the same identity and revision with a passenger-safe departure description. Journey detail and departure reads must return the same current revision.
+2. Define update history events with immutable update ID, journey revision/previous revision, verified Controller subject, publication time, source, affected changes, and optional `correctionOfUpdateId`. A route diversion carries a complete ordered replacement calling-point set tied to that single revision; it changes only the dated journey, not Feature 001 schedule data.
+3. Extend the existing Controller status publication body with `expectedJourneyRevision`, optional route-diversion calling points, optional `driverObservationId`, and optional correction reference. Extend the existing stop-update body with `expectedJourneyRevision` for platform/timing changes. Stale revisions return a contract-defined conflict (proposed HTTP 409) and do not partially publish. A correction appends a linked event and retains prior evidence.
+4. The optional observation reference is an opaque stable ID only. Driver Operations remains the source of the observation; the Controller's publication remains authoritative. The module owners must approve how the reference is verified through the existing Controller read boundary. No review/approval endpoint is added.
+5. Every dependent read exposes the same committed `journeyRevision` and its update time/source. Publish a route diversion and its revision atomically; do not expose mixed old/new calling-point orders.
+
+The contract owner must explicitly approve these schema changes (or provide sufficient existing schemas) before the proposed behavior is treated as implementable. This review does not approve them or add any operation.
+
 ## Assumptions
 
 - The approved MoSCoW workbook controls requirement IDs, exact wording, priority, and acceptance checks; the RBAC/API PDF controls existing grants and operation inventory.
