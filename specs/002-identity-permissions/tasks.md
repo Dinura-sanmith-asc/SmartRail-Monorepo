@@ -114,14 +114,14 @@
 
 **Purpose**: Complete end-to-end local verification and evidence before any separately guided manual AWS work.
 
-- [ ] T057 Restore and build the complete solution with `dotnet restore SmartRail.slnx` and `dotnet build SmartRail.slnx`; record results in `specs/002-identity-permissions/quickstart.md` (depends on T001–T056).
-- [ ] T058 Run `dotnet test SmartRail.slnx` against the isolated PostgreSQL test service; record passed, failed and skipped counts in `specs/002-identity-permissions/quickstart.md` (depends on T057).
-- [ ] T059 Apply the Identity migration only to the explicitly verified local development database using the connection settings documented in `specs/002-identity-permissions/quickstart.md`; verify `__EFMigrationsHistory` and never target RDS or another remote database (depends on T022, T058).
-- [ ] T060 Run local HTTP smoke checks for `/api/me`, all four anonymous Feature 001 GET routes, invalid/expired token behavior, role labels, and 401/403/503 outcomes with deterministic local fixtures in `tests/SmartRail.IntegrationTests/Identity/IdentityLocalSmokeTests.cs` (depends on T047–T059).
-- [ ] T061 Record results from T055 and the existing Feature 001 OpenAPI regression test in `specs/002-identity-permissions/quickstart.md`; confirm no extra routes, live-status behavior, or unrelated module implementation (depends on T055, T060).
-- [ ] T062 Update `specs/002-identity-permissions/checklists/requirements.md` with Feature 002 evidence for SR-089, SR-090, SR-091, SR-100 and the API portion of SR-114; update the downstream tracking section below with links to the owning Flutter/React feature specifications and their implementation/test evidence when available; keep SR-093 and the client portion of SR-114 explicitly open for overall MVP acceptance until that evidence exists (depends on T048–T061).
-- [ ] T063 Review `specs/002-identity-permissions/quickstart.md` and `specs/002-identity-permissions/plan.md` to confirm local configuration is separate from AWS settings, production role/scope writes remain disabled pending approval, and AWS setup is manual after complete local system verification (depends on T057–T062).
-- [ ] T064 Run `git diff --check` and review the final diff for Feature 002 scope, unchanged Feature 001 routes/contracts, no new projects, no production fixture bypass, and no AWS provisioning/deployment operations; record final local readiness evidence in `specs/002-identity-permissions/quickstart.md` (depends on T057–T063).
+- [X] T057 Restore and build the complete solution with `dotnet restore SmartRail.slnx` and `dotnet build SmartRail.slnx`; record results in `specs/002-identity-permissions/quickstart.md` (depends on T001–T056).
+- [X] T058 Run `dotnet test SmartRail.slnx` against the isolated PostgreSQL test service; record passed, failed and skipped counts in `specs/002-identity-permissions/quickstart.md` (depends on T057).
+- [X] T059 Apply the Identity migration only to the explicitly verified local development database using the connection settings documented in `specs/002-identity-permissions/quickstart.md`; verify `__EFMigrationsHistory` and never target RDS or another remote database (depends on T022, T058).
+- [X] T060 Run local HTTP smoke checks for `/api/me`, all four anonymous Feature 001 GET routes, invalid/expired token behavior, role labels, and 401/403/503 outcomes with deterministic local fixtures in `tests/SmartRail.IntegrationTests/Identity/IdentityLocalSmokeTests.cs` (depends on T047–T059).
+- [X] T061 Record results from T055 and the existing Feature 001 OpenAPI regression test in `specs/002-identity-permissions/quickstart.md`; confirm no extra routes, live-status behavior, or unrelated module implementation (depends on T055, T060).
+- [X] T062 Update `specs/002-identity-permissions/checklists/requirements.md` with Feature 002 evidence for SR-089, SR-090, SR-091, SR-100 and the API portion of SR-114; update the downstream tracking section below with links to the owning Flutter/React feature specifications and their implementation/test evidence when available; keep SR-093 and the client portion of SR-114 explicitly open for overall MVP acceptance until that evidence exists (depends on T048–T061).
+- [X] T063 Review `specs/002-identity-permissions/quickstart.md` and `specs/002-identity-permissions/plan.md` to confirm local configuration is separate from AWS settings, production role/scope writes remain disabled pending approval, and AWS setup is manual after complete local system verification (depends on T057–T062).
+- [X] T064 Run `git diff --check` and review the final diff for Feature 002 scope, unchanged Feature 001 routes/contracts, no new projects, no production fixture bypass, and no AWS provisioning/deployment operations; record final local readiness evidence in `specs/002-identity-permissions/quickstart.md` (depends on T057–T063).
 
 **Phase verification gate**: Feature 002 is locally ready only when the complete solution build/tests, real PostgreSQL migration and persistence checks, API smoke tests, requirement evidence, and scope review all pass. AWS resource setup and deployment are not part of this feature implementation; the user will perform them manually with step-by-step guidance after local verification.
 
@@ -178,6 +178,8 @@ Parallelizable tasks are marked `[P]` only when they edit different files and ha
 ## Downstream Client Tracking — Open for Overall MVP Acceptance
 
 These approved Must Have obligations belong to the client feature specifications and are not implemented by Feature 002. T062 records Feature 002's API-side evidence but MUST NOT mark either requirement complete for overall MVP acceptance until the owning client specifications provide implementation and automated-test evidence.
+
+At the 2026-10-18 Phase 7 checkpoint, the owning Flutter/React specifications and client implementation/test evidence were not present in this repository. Add direct specification and evidence links here when those artifacts are created; until then both rows remain open.
 
 | Requirement | Owning client work | Required downstream acceptance evidence | Overall MVP status |
 |---|---|---|---|

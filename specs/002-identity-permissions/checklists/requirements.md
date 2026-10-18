@@ -42,4 +42,19 @@
 - SR-094 remains a downstream Catering Adapter obligation; its authenticated provider boundary is recorded as a dependency only.
 - Production approval gates for maintaining the internal role mapping and station scopes are listed in `spec.md`; the authorization behavior and `/api/me` response contract are clarified.
 - The second clarification answer is preserved verbatim; its token-group source wording is marked SUPERSEDED, while its explicit-grant union applies to roles from the internal mapping.
-- This checklist records specification quality only; `[x]` does not indicate implementation completion.
+- The specification-quality checks above remain distinct from the implementation evidence recorded below.
+
+## Implementation Verification Evidence — Phase 7 (2026-10-18)
+
+Feature 002 backend evidence was verified by the complete local solution suite (72 unit tests and 34 integration tests, 0 failures, 0 skipped) and a dedicated local HTTP smoke test (1 passed). PostgreSQL persistence and API tests used isolated databases on the dedicated test service; the development Identity migration was applied only to local `smartrail_dev` on port 5432.
+
+| Requirement | Feature 002 evidence | Feature/backend status | Overall MVP status |
+|---|---|---|---|
+| SR-089 | `PublicRailwayReadRegressionTests` and `IdentityLocalSmokeTests`: each of the four Feature 001 GET operations returns fixture public data without a token, malformed token or expired optional token. OpenAPI regression confirms the four route contracts remain present. | Verified for the backend public-read boundary. | Release E2E and cross-module acceptance remain outside this feature. |
+| SR-090 | `CognitoJwtValidationTests`, `CurrentIdentityEndpointTests`, `IdentityLocalSmokeTests`: real RSA/JWKS signature, trusted issuer, expiry, `token_use`, allowed client, audience rules, invalid-token 401, mapped/empty identity 200 and unavailable mapping 503. | Verified for Feature 002 authentication and `/api/me`. | Feature 002 backend evidence recorded. |
+| SR-091 | `AuthorizationEndpointTests`, `AuthorizationMatrixTests`, `AuthorizationRevocationIntegrationTests`: exact role/action matrix, multi-role union, station/journey/incident/order evidence, 403 denial, 503 unavailable evidence, no denied write effect, and role/scope revocation observed on the next request against PostgreSQL. | Verified for the Identity authorization boundary using isolated module-provider evidence fixtures. | Cross-module acceptance remains dependent on owner-module implementations and release E2E evidence. |
+| SR-100 | `AuthenticationPrivacyTests`: Problem Details and captured application logs exclude raw bearer tokens, password-like values, private claims and signing-key identifiers; responses avoid provider/connection details. | Verified for Feature 002 API errors/logging. | Feature 002 backend evidence recorded. |
+| SR-093 | JWT expiry is enforced by the API; Feature 002 does not persist access tokens. | Backend behavior verified. | **Open** until Flutter Driver and applicable operational clients demonstrate secure credential storage, no plaintext token cache and controlled session expiry with implementation and automated tests. |
+| SR-114 | API returns safe 401/403/503 outcomes; authorization is checked server-side for protected work. | API portion verified. | **Open** until applicable Flutter passenger/driver and React operational primary workflows test loading, no-data, 403, 500, retry and no-network states. |
+
+The repository did not contain the owning Flutter/React feature specifications or their implementation/test evidence at this checkpoint. Their links and evidence must be added when those specifications exist. Feature 002 backend tests do not close SR-093, the client portion of SR-114, or overall MVP acceptance.
