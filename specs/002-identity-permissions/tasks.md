@@ -51,7 +51,7 @@
 - [ ] T019 Define Application-owned role and station-scope persistence ports consumed by Infrastructure in `src/SmartRail.Application/Identity/Persistence/IdentityPersistenceContracts.cs` (depends on T006–T009).
 - [ ] T020 Implement current active role lookup and transactional grant/revoke plus role-audit writes in `src/SmartRail.Infrastructure/Identity/Persistence/RoleAssignmentRepository.cs` (depends on T018, T019).
 - [ ] T021 Implement current station-scope lookup and transactional scope grant/revoke plus scope-audit writes in `src/SmartRail.Infrastructure/Identity/Persistence/StationScopeRepository.cs` (depends on T018, T019).
-- [ ] T022 Create additive `IdentityPermissions` migration and update the shared snapshot at `src/SmartRail.Infrastructure/Migrations/20261018000000_IdentityPermissions.cs`, `src/SmartRail.Infrastructure/Migrations/20261018000000_IdentityPermissions.Designer.cs`, and `src/SmartRail.Infrastructure/Migrations/SmartRailDbContextModelSnapshot.cs`; retain the Feature 001 migration unchanged (depends on T014–T021).
+- [ ] T022 Create the additive EF Core migration named `IdentityPermissions` using an EF Core-generated migration ID (for example, `dotnet ef migrations add IdentityPermissions`); place the generated migration and designer files in the existing `src/SmartRail.Infrastructure/Migrations/` directory and update the shared `SmartRailDbContextModelSnapshot.cs` there; retain the Feature 001 migration unchanged (depends on T014–T021).
 - [ ] T023 [P] [US3] Test the additive migration, columns, checks, foreign keys, active-row uniqueness and indexes using the real isolated PostgreSQL fixture in `tests/SmartRail.IntegrationTests/Identity/IdentityMigrationAndConstraintTests.cs` (depends on T022).
 - [ ] T024 [P] [US3] Test role grant/revoke/re-grant audit history, verified actor/action/time, atomic rollback and append-only behavior in `tests/SmartRail.IntegrationTests/Identity/RoleAssignmentAuditTests.cs` (depends on T020, T022).
 - [ ] T025 [P] [US3] Test station-scope grant/revoke/re-grant audit history, actor/action/time, transaction rollback and append-only behavior in `tests/SmartRail.IntegrationTests/Identity/StationScopeAuditTests.cs` (depends on T021, T022).
@@ -119,7 +119,7 @@
 - [ ] T059 Apply the Identity migration only to the explicitly verified local development database using the connection settings documented in `specs/002-identity-permissions/quickstart.md`; verify `__EFMigrationsHistory` and never target RDS or another remote database (depends on T022, T058).
 - [ ] T060 Run local HTTP smoke checks for `/api/me`, all four anonymous Feature 001 GET routes, invalid/expired token behavior, role labels, and 401/403/503 outcomes with deterministic local fixtures in `tests/SmartRail.IntegrationTests/Identity/IdentityLocalSmokeTests.cs` (depends on T047–T059).
 - [ ] T061 Record results from T055 and the existing Feature 001 OpenAPI regression test in `specs/002-identity-permissions/quickstart.md`; confirm no extra routes, live-status behavior, or unrelated module implementation (depends on T055, T060).
-- [ ] T062 Update `specs/002-identity-permissions/checklists/requirements.md` with evidence links for SR-089, SR-090, SR-091, SR-100 and the API portion of SR-114; retain SR-093 secure-storage and SR-114 client loading/error/retry obligations as Flutter/React follow-up work owned by their client specifications (depends on T048–T061).
+- [ ] T062 Update `specs/002-identity-permissions/checklists/requirements.md` with Feature 002 evidence for SR-089, SR-090, SR-091, SR-100 and the API portion of SR-114; update the downstream tracking section below with links to the owning Flutter/React feature specifications and their implementation/test evidence when available; keep SR-093 and the client portion of SR-114 explicitly open for overall MVP acceptance until that evidence exists (depends on T048–T061).
 - [ ] T063 Review `specs/002-identity-permissions/quickstart.md` and `specs/002-identity-permissions/plan.md` to confirm local configuration is separate from AWS settings, production role/scope writes remain disabled pending approval, and AWS setup is manual after complete local system verification (depends on T057–T062).
 - [ ] T064 Run `git diff --check` and review the final diff for Feature 002 scope, unchanged Feature 001 routes/contracts, no new projects, no production fixture bypass, and no AWS provisioning/deployment operations; record final local readiness evidence in `specs/002-identity-permissions/quickstart.md` (depends on T057–T063).
 
@@ -156,7 +156,7 @@ Parallelizable tasks are marked `[P]` only when they edit different files and ha
 - Phase 2: T006 and T008 after T005; T011–T013 after their model/catalog dependencies.
 - Phase 3: T014–T017 mappings can proceed independently; T023–T026 test files can proceed after the migration and repositories exist.
 - Phase 4: T036 and T037 are independent test files once their handlers exist.
-- Phase 6: T048–T056 use separate test files and isolated fixtures after T047; run database tests with the existing per-class isolation strategy.
+- Phase 6: T048–T052 and T054–T056 use separate test files and may proceed after T047 and their other listed prerequisites, using isolated fixtures and the existing per-class database isolation strategy. T053 also uses a separate file, but depends on T050; it must not start until T050 is complete and may then proceed alongside other ready tasks.
 
 ## User Story Coverage and Independent Test Criteria
 
@@ -174,6 +174,17 @@ Parallelizable tasks are marked `[P]` only when they edit different files and ha
 | SR-093 | T062 preserves secure token-storage and session-expiry acceptance for downstream Flutter/React client specifications; client implementation is not claimed here. |
 | SR-100 | T044, T052, T062 verify safe API errors/logs and trace evidence. |
 | SR-114 | T044, T049, T052, T062 verify API failure outcomes and retain loading/no-data/error/retry client obligations for downstream Flutter/React specifications. |
+
+## Downstream Client Tracking — Open for Overall MVP Acceptance
+
+These approved Must Have obligations belong to the client feature specifications and are not implemented by Feature 002. T062 records Feature 002's API-side evidence but MUST NOT mark either requirement complete for overall MVP acceptance until the owning client specifications provide implementation and automated-test evidence.
+
+| Requirement | Owning client work | Required downstream acceptance evidence | Overall MVP status |
+|---|---|---|---|
+| SR-093 | Flutter Driver client and applicable operational clients (including the React operational client) | Client-specific implementation tasks and automated tests demonstrate supported secure credential storage, no plaintext access tokens in application cache, and controlled session expiry that requires re-authentication before protected work continues. | Open until client evidence exists. |
+| SR-114 | Applicable Flutter passenger and driver workflows and React operational workflows | Client-specific implementation tasks and automated tests cover loading, no-data/no-results, 403 access denial, 500 error, retry, and no-network states for each applicable primary workflow; retry preserves authorization and does not imply a denied operation succeeded. | Open until client evidence exists. |
+
+The owning Flutter/React feature specifications MUST identify the affected primary views, link SR-093/SR-114, include their own implementation tasks and automated tests, and record passing acceptance evidence. Feature 002 does not add client functionality or claim these client obligations complete.
 
 ## Implementation Strategy
 
