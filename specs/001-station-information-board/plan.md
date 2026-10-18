@@ -126,7 +126,7 @@ e2e/
 
 ## Risks and Open Dependencies
 
-- **High — future contracts absent**: no departure response schema, operational field meanings, refresh delivery, revision order, timestamp semantics, cache validity or error conventions. Do not claim live completion or invent a contract. Backend owner must publish/approve and verify these before Phase 4.
+- **High — future contracts absent**: no departure response schema, operational field meanings, refresh delivery, revision order, timestamp semantics, cache validity or error conventions. Do not claim live completion or invent a contract. Backend owner must publish/approve and verify these before the plan's Implementation Phase 4 (Live departure adapter); this gate blocks live integration only, while fixture-backed React development and verification in Phases 1 to 3 proceed independently.
 - **High — station date/time semantics**: “upcoming” eligibility, service date, timezone and cross-midnight ordering are not specified by the current Railway Network contract. The backend must define them for departure response; frontend must not derive them from reusable schedule search.
 - **Medium — offline continuity**: active-session memory can display the last successful information after a disconnect; a fresh start while offline shows unavailable. Durable offline storage would require approved cache integrity/expiry policy and is not included by this plan.
 - **Medium — test dependencies absent**: `package.json` has no Vitest, Testing Library or Playwright dependencies/scripts. Their addition belongs in implementation tasks; this planning change does not install them.
