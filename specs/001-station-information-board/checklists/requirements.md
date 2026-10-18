@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No `[NEEDS CLARIFICATION: ...]` markers remain; the three open decisions are separately enumerated under “Clarifications requiring approval” (Q1–Q3).
+- [x] No `[NEEDS CLARIFICATION: ...]` markers remain; product decisions Q1, Q2 and the behavioral portion of Q3 are recorded in the spec's Clarifications session.
 - [x] Requirements are testable and unambiguous within the documented assumptions and dependency boundaries
 - [x] Success criteria are measurable and technology-agnostic; numeric timing outcomes are withheld where no approved threshold exists
 - [x] All acceptance scenarios are defined for the six user stories
@@ -30,6 +30,6 @@
 
 ## Notes
 
-- Q1–Q3 need product/backend-owner resolution before the affected behaviors can be finalized for planning.
-- No plan or task breakdown has been created. Review unresolved decisions with `$speckit-clarify` before `$speckit-plan`.
+- Product decisions Q1, Q2 and the behavioral portion of Q3 are resolved. Backend contract details listed in the spec remain dependencies and must be verified before live-integration acceptance; they are not treated as approved contracts.
+- No plan or task breakdown has been created. Review the recorded backend dependencies with the Journeys & Status backend owner before `$speckit-plan` finalizes live-integration tasks.
 

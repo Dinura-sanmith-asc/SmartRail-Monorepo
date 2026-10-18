@@ -4,9 +4,17 @@
 
 **Created**: 2026-10-18
 
-**Status**: Draft — pending clarification of three display decisions
+**Status**: Draft — product clarifications resolved; backend contract dependencies remain
 
 **Input**: User description: "$speckit-specify — SmartRail Station Information & Departure Board"
+
+## Clarifications
+
+### Session 2026-10-18
+
+- Q: How is a deployed Station Display associated with its station? → A: Each display uses a deployment-provided stable station identifier validated against public, published Railway Network station information; there is no passenger-facing selector or station-management UI.
+- Q: Which display profiles are approved prototype targets? → A: Landscape 1920 × 1080 and 1366 × 768; no viewing-distance, hardware-certification or additional-resolution claim is approved.
+- Q: What automatic refresh and freshness behavior is approved? → A: While connected, the display automatically obtains updated authoritative railway information without passenger interaction. During connectivity failure, cached information is identified as cached or possibly outdated. After reconnection, the display revalidates against authoritative information before removing the stale indication. Numeric intervals and backend-dependent contract semantics remain unresolved.
 
 ## User Scenarios & Testing
 
@@ -20,10 +28,10 @@ A passenger looking at a station display needs to identify upcoming trains servi
 
 **Acceptance Scenarios**:
 
-1. **Given** a station has been selected or configured and authoritative departure data is available, **When** the display opens, **Then** it identifies the station and shows that station's appropriate upcoming departures with their published scheduled times.
+1. **Given** a deployment-provided stable station identifier matches a public, published station and authoritative departure data is available, **When** the display opens, **Then** it identifies that station and shows its appropriate upcoming departures with their published scheduled times.
 2. **Given** departure data contains services for other stations, **When** the board presents the selected station's departures, **Then** it does not show departures belonging only to another station.
 3. **Given** no appropriate upcoming departures are returned, **When** the board presents the result, **Then** it shows a clear empty state and does not imply that scheduled service search results are confirmed station departures.
-4. **Given** no station has been selected or configured, **When** the display starts, **Then** it does not present another station's information as though it belongs to this display and exposes a clear unavailable/configuration state. The method of selecting or configuring the station requires clarification (Q1).
+4. **Given** the deployment-provided station identifier is missing, invalid, unavailable or unpublished, **When** the display starts, **Then** it does not present another station's information and exposes a clear configuration or unavailable state without offering a passenger selector or station-management UI.
 
 ### User Story 2 - Understand published operational changes (Priority: P1)
 
@@ -53,7 +61,7 @@ A passenger needs the connected board to reflect newly available authoritative d
 
 1. **Given** the display is connected and a new authorized departure update becomes available, **When** the update is made available to the display, **Then** the board reflects the updated departure and its provided updated time without manual reload.
 2. **Given** the update service is unavailable, **When** the display cannot obtain a newer revision, **Then** it does not claim that the visible information is current and communicates the applicable unavailable or stale state.
-3. **Given** update frequency or delivery behavior has not been defined by an approved contract, **When** specifying the feature, **Then** no numeric refresh interval or timing guarantee is assumed (Q3).
+3. **Given** the display is connected and the backend makes a newer authoritative revision available, **When** the display's automatic update process obtains it, **Then** the board presents the updated information without passenger interaction; no numeric interval or timing guarantee is implied.
 
 ### User Story 4 - Recognize disconnected or stale information (Priority: P1)
 
@@ -76,11 +84,11 @@ A passenger viewing the board from the intended station display environment need
 
 **Why this priority**: Passengers must be able to scan departures and understand status from the display locations approved for deployment.
 
-**Independent Test**: Review the board at each approved screen profile and assess required information hierarchy, legibility, contrast and status interpretation. The approved profiles require clarification (Q2).
+**Independent Test**: Review the board at each approved landscape profile—1920 × 1080 and 1366 × 768—and assess required information hierarchy, legibility, contrast and status interpretation.
 
 **Acceptance Scenarios**:
 
-1. **Given** an approved display profile, **When** the board presents a populated departure list, **Then** station identity, scheduled time, service identity and available operational status are distinguishable and readable at that profile.
+1. **Given** either approved landscape display profile (1920 × 1080 or 1366 × 768), **When** the board presents a populated departure list, **Then** station identity, scheduled time, service identity and available operational status are distinguishable and readable at that profile.
 2. **Given** a status is indicated with color, **When** a passenger cannot distinguish that color, **Then** the same status remains understandable from text or a symbol.
 3. **Given** disruption information is presented, **When** a passenger scans the display, **Then** the disruption is visually distinguishable from planned schedule information and is not conveyed by color alone.
 
@@ -100,13 +108,14 @@ A passenger needs a public information screen that presents railway information 
 
 ### Edge Cases
 
-- The station cannot be identified, is unpublished, or has no available departure data.
+- The deployment-provided station identifier is missing, malformed, unknown, unavailable or refers to an unpublished station; the display must not fall back to another station.
+- The station is valid and published but has no available departure data or no upcoming departures.
 - A valid station has no upcoming departures, or returned departures contain missing optional operational values.
 - Scheduled data is available while journey status, platform or delay data is unavailable; each value retains its own meaning and availability.
-- The update source returns an error, an older revision, duplicate information or a response with no usable update timestamp; display freshness behavior depends on the verified contract (Q3).
+- The update source returns an error, an older or duplicate revision, a missing revision, or no usable source/update timestamp; handling and ordering depend on the verified backend contract and must not be guessed.
 - The display disconnects before first load, disconnects while showing data, or reconnects while newer updates are being published.
 - A cancellation, platform change or delay affects a departure while older cached data remains visible.
-- Text scaling or the target screen profile causes content to exceed the available presentation area; the response must preserve essential information and avoid silently hiding disruption state. Exact profiles require clarification (Q2).
+- At either approved profile, content pressure must not silently hide station identity or important disruption information; other physical viewing-distance and hardware assumptions are not approved.
 
 ## Requirements
 
@@ -139,15 +148,15 @@ SR-001 to SR-004 provide shared context and reference identity; they do not auth
 
 ### Functional Requirements
 
-- **FR-001**: The display MUST present the identity of exactly one station context at a time and show departures only for that context. How that station context is selected or configured is unresolved in Q1.
+- **FR-001**: Each display MUST use a deployment-provided stable station identifier from the authoritative Railway Network service. The display MUST validate that identifier against public, published station information and present information for exactly that station only. If the identifier is missing, invalid, unavailable or unpublished, it MUST show a configuration or unavailable state and MUST NOT fall back to another station. There MUST be no passenger-facing station selector or station-management UI.
 - **FR-002**: The display MUST show upcoming station departures from the authoritative station-departure source. It MUST NOT substitute service-search results or treat a reusable scheduled service as a confirmed dated departure.
 - **FR-003**: For each departure, the display MUST distinguish published scheduled time from available current operational status. It MUST preserve any source-provided meaning and update time.
 - **FR-004**: The display MUST present authorized platform changes, delays and cancellations for the affected departure. Missing or unsupported operational information MUST be labeled unknown or unavailable rather than inferred.
-- **FR-005**: When newer authorized departure information becomes available while connected, the display MUST update without manual passenger action. The mechanism and timing remain subject to verified backend contract behavior; no refresh interval or timing threshold is set here.
+- **FR-005**: While connected, the display MUST automatically obtain updated authoritative railway information without passenger interaction. The change-notification or polling mechanism and timing remain subject to verified backend contract behavior; no refresh interval or timing threshold is set here.
 - **FR-006**: When central connectivity is unavailable, the display MUST show available previously obtained information only with a clear cached, stale or possibly-outdated indication and last-update time when available. If no usable prior information exists, it MUST show an unavailable state.
-- **FR-007**: After connectivity returns, the display MUST obtain current authoritative information before representing the board as current or removing its stale indication.
+- **FR-007**: After connectivity returns, the display MUST successfully revalidate against authoritative information before representing the board as current or removing its stale indication.
 - **FR-008**: The display MUST provide distinguishable loading, no-departures, unavailable, error, disconnected/stale and recovered states. State messaging MUST not imply a successful live update when one has not occurred.
-- **FR-009**: The presentation MUST clearly identify the station and organize departure information for scanning at approved display profiles. Supported screen dimensions and viewing profiles require approval in Q2.
+- **FR-009**: The presentation MUST clearly identify the station and organize departure information for scanning at the two approved landscape prototype profiles: 1920 × 1080 and 1366 × 768. It MUST preserve station identity, scheduled departure time, service identity and available operational status at both profiles, without silently hiding important disruption information at the smaller profile. No physical viewing distance, hardware certification or additional resolution is approved.
 - **FR-010**: Status and disruption meaning MUST be available through text or symbols as well as color, and essential disruption information MUST remain distinguishable from planned schedule information.
 - **FR-011**: The display MUST remain a passive passenger-information experience. It MUST NOT expose station management, controller, privileged data-editing or interactive Station Terminal workflows.
 - **FR-012**: The display MUST support WCAG 2.2 AA for applicable information and interactions. Detailed layout and display resolution decisions belong in this feature's approved design/plan, within that conformance requirement.
@@ -166,18 +175,20 @@ SR-001 to SR-004 provide shared context and reference identity; they do not auth
 - **SC-001**: In verification scenarios covering all five display-specific Must Have requirements, each approved acceptance check is demonstrated with recorded evidence.
 - **SC-002**: In a station-data fixture containing departures for multiple stations, 100% of displayed departures belong to the configured station and no service-search-only result is represented as a station departure.
 - **SC-003**: In every verification case with a published cancellation, delay or platform change, the affected departure shows the authorized value and its provided updated time; missing values are never fabricated.
-- **SC-004**: In every connected update scenario, an authorized change becomes visible without manual passenger action; no numeric latency or refresh interval is asserted until approved contract behavior defines it.
+- **SC-004**: In every connected update scenario, the display automatically obtains and presents updated authoritative information without manual passenger action; no numeric latency or refresh interval is asserted until approved contract behavior defines it.
 - **SC-005**: In every disconnection scenario, the board visibly indicates cached/possibly outdated data or service unavailability; it removes the warning only after authoritative information is obtained following reconnection.
-- **SC-006**: At every approved display profile, reviewers can identify station, departure scheduled times and available operational status, and can understand status without relying on color alone.
+- **SC-006**: At both approved landscape profiles (1920 × 1080 and 1366 × 768), reviewers can identify station, scheduled departure time, service identity and available operational status; important disruption information is not silently hidden at 1366 × 768, and status is understandable without relying on color alone.
 - **SC-007**: Review confirms that the passenger-facing display exposes no privileged railway management actions or interactive terminal workflow.
 
 ## Assumptions
 
-- The experience is one passive, public station display prototype, not an interactive kiosk, operations dashboard or passenger application.
+- The experience is one passive, public station display prototype associated with exactly one station through a deployment-provided stable station identifier, not an interactive kiosk, operations dashboard or passenger application.
 - A station departure feed is the source for confirmed station departures. The currently implemented Railway Network endpoints provide stations, routes and planned services only; they are insufficient to substitute for the future departure feed.
 - Journeys & Status endpoints listed below are dependencies whose implementation and contracts require verification. The specification describes required user-visible behavior without assuming their response schemas or delivery mechanism.
 - The display may retain previously obtained information for presentation during connection loss only if it clearly communicates that the information may be outdated. Cache policy and validity are not set here.
-- No numeric refresh interval, freshness duration, retry schedule, operational threshold or screen resolution is assumed.
+- Approved prototype targets are landscape 1920 × 1080 and 1366 × 768 only. No viewing distance, hardware certification or additional resolution is assumed.
+- No numeric refresh interval, freshness duration, cache expiry, retry schedule, operational threshold, revision/order rule or timestamp meaning is assumed.
+- Isolated, clearly identified contract fixtures MAY support frontend UI development before live integration is available. Fixtures MUST NOT be presented as live data; final live-integration acceptance depends on verified backend behavior.
 - Requirement inventory entries reproduce workbook wording and acceptance checks; the workbook remains the governing source.
 
 ## Dependencies and Clarifications
@@ -199,11 +210,18 @@ The following Journeys & Status endpoints are expected future dependencies and M
 
 Before implementation, confirm response schemas, date/time and timezone semantics, ordering and meaning of “upcoming,” update revision/source/time fields, unavailable-value representation, authorization/public projection, error behavior, and how a connected display learns of a newer revision. The display MUST NOT infer those contract details from the Railway Network API.
 
-### Clarifications requiring approval
+### Outstanding backend contract dependencies
 
-1. **Q1 — Station association**: Should the station for a deployed screen be selected through an administrator-controlled setup flow, a deployment-provided station identity, or another approved mechanism? The passenger-facing board must remain passive; no management interface is implied by this question.
-2. **Q2 — Approved display profiles**: Which screen dimensions, orientation(s), viewing distance assumptions and text-size constraints define supported station display environments? No resolution is established by current approved sources.
-3. **Q3 — Update and freshness contract**: Which approved backend contract behavior provides change detection, update timestamps/revisions and the meaning of upcoming departures, and what product owner approved freshness expectations apply? Until answered, the specification sets no polling interval, staleness duration or numeric update guarantee.
+Product decisions Q1 and Q2 and the behavioral portion of Q3 have been resolved in the Clarifications session above. The following remain backend-contract dependencies and are not approved implementation assumptions:
+
+- Exact automatic refresh/polling interval and change-notification or polling mechanism.
+- Backend revision and ordering semantics, including older, duplicate or missing revisions.
+- Authoritative source/update timestamp semantics.
+- Cache expiry and numeric freshness thresholds.
+- Final station departure response schema and meaning of “upcoming.”
+- Error behavior and unavailable-value representation for station departure and journey data.
+
+These questions require verification and agreement with the Journeys & Status backend owner before live integration acceptance. No specification statement here declares an endpoint, field or behavior implemented.
 
 ## Out of Scope
 
