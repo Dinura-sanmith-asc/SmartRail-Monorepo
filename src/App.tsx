@@ -1,10 +1,54 @@
+import { useEffect, useState } from 'react'
+import { readStationDisplayConfig, type ConfigErrorReason } from './app/config'
+import { findPublishedStation } from './features/station-display/api/station-reference-client'
+import { StationHeader, type StationHeaderState } from './features/station-display/components/station-header'
+import { createHttpClient } from './shared/api/http-client'
+
+const stationDisplayConfig = readStationDisplayConfig()
+
+function configurationMessage(reason: ConfigErrorReason): string {
+  switch (reason) {
+    case 'missing-station-id':
+      return 'Display station configuration is missing.'
+    case 'invalid-station-id':
+      return 'Display station configuration is invalid.'
+    case 'missing-api-base-url':
+    case 'invalid-api-base-url':
+      return 'Station information is unavailable because API configuration is invalid.'
+  }
+}
+
 function App() {
+  const [state, setState] = useState<StationHeaderState>(() =>
+    stationDisplayConfig.kind === 'valid'
+      ? { kind: 'loading' }
+      : { kind: 'unavailable', message: configurationMessage(stationDisplayConfig.reason) },
+  )
+
+  useEffect(() => {
+    if (stationDisplayConfig.kind === 'invalid') return
+
+    let active = true
+    const client = createHttpClient({ baseUrl: stationDisplayConfig.config.apiBaseUrl })
+    void findPublishedStation(stationDisplayConfig.config.stationId, client).then((lookup) => {
+      if (!active) return
+      if (lookup.kind === 'found') {
+        setState({ kind: 'ready', station: lookup.station })
+      } else if (lookup.kind === 'unpublished') {
+        setState({ kind: 'unavailable', message: 'The configured station is not published.' })
+      } else {
+        setState({ kind: 'unavailable', message: 'Station information is unavailable.' })
+      }
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-white">SmartRail</h1>
-        <p className="mt-3 text-lg text-sky-400">Station Display Application</p>
-      </div>
+    <main className="flex min-h-screen flex-col bg-slate-950">
+      <StationHeader state={state} />
     </main>
   )
 }

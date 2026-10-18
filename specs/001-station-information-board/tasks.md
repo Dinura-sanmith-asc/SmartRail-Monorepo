@@ -46,15 +46,15 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 ### Tests for User Story 1
 
-- [ ] T011 [P] [US1] Add configuration validation tests in `src/app/config.test.ts` for missing API base URL, missing station ID, malformed/non-UUID station ID and valid public configuration (SR-002; spec US1 scenarios 1 and 4).
-- [ ] T012 [P] [US1] Add station reference client tests in `src/features/station-display/api/station-reference-client.test.ts` for published list match, no match, API failure and no arbitrary fallback (SR-002; spec US1 scenario 4).
-- [ ] T013 [US1] Add station header rendering tests in `src/features/station-display/components/station-header.test.tsx` for authoritative station name and configuration/unavailable states (SR-054, SR-061; spec US1 scenario 1).
+- [X] T011 [P] [US1] Add configuration validation tests in `src/app/config.test.ts` for missing API base URL, missing station ID, malformed/non-UUID station ID and valid public configuration (SR-002; spec US1 scenarios 1 and 4).
+- [X] T012 [P] [US1] Add station reference client tests in `src/features/station-display/api/station-reference-client.test.ts` for published list match, no match, API failure and no arbitrary fallback (SR-002; spec US1 scenario 4).
+- [X] T013 [US1] Add station header rendering tests in `src/features/station-display/components/station-header.test.tsx` for authoritative station name and configuration/unavailable states (SR-054, SR-061; spec US1 scenario 1).
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Implement public Vite configuration reading and UUID validation in `src/app/config.ts`; document build-time/public semantics and example variable names without storing secrets (after T011; spec FR-001; Q1).
-- [ ] T015 [US1] Implement the published station lookup and exact stable-ID match in `src/features/station-display/api/station-reference-client.ts` using only the checked-in `GET /api/stations` contract (SR-002; spec US1 scenarios 1 and 4).
-- [ ] T016 [US1] Implement the station identity header and invalid/unavailable station state in `src/features/station-display/components/station-header.tsx` and compose startup in the existing `src/App.tsx`; never show a selector or fallback station (after T013 through T015; SR-002, SR-061; spec FR-001/FR-008).
+- [X] T014 [US1] Implement public Vite configuration reading and UUID validation in `src/app/config.ts`; document build-time/public semantics and example variable names without storing secrets (after T011; spec FR-001; Q1).
+- [X] T015 [US1] Implement the published station lookup and exact stable-ID match in `src/features/station-display/api/station-reference-client.ts` using only the checked-in `GET /api/stations` contract (SR-002; spec US1 scenarios 1 and 4).
+- [X] T016 [US1] Implement the station identity header and invalid/unavailable station state in `src/features/station-display/components/station-header.tsx` and compose startup in the existing `src/App.tsx`; never show a selector or fallback station (after T013 through T015; SR-002, SR-061; spec FR-001/FR-008).
 
 **Checkpoint**: US1 is independently testable with the public station contract or deterministic station fixtures.
 
