@@ -26,8 +26,8 @@ unexecuted integration run `PASS`.
 | Criterion | Verification tasks | Expected evidence | Status | Evidence / reason |
 |---|---|---|---|---|
 | SC-001 | T033, T054 | Result/card assertions against supplied search values; emulator integration comparison with backend response. | NOT RUN | |
-| SC-002 | T026 | Validation tests prove incomplete or same-station criteria do not submit and show actionable feedback. | NOT RUN | |
-| SC-003 | T042, T047 | Error mapping and recovery tests distinguish 200-empty, 400, 403, 404, 500/default, 503, and no network. | NOT RUN | |
+| SC-002 | T022, T026 | Fake/spy repository search-counter assertions show exactly zero `repository.search` calls separately for missing origin, missing destination, missing travel date, and identical origin/destination; validation is actionable. | NOT RUN | |
+| SC-003 | T033, T042, T047 | HTTP 200 with an empty `services` collection shows no results and is not confused with validation, backend, or network failures; error mapping/recovery tests cover 400, 403, 404, 500/default, 503, and no network. | NOT RUN | |
 | SC-004 | T033, T040, T054 | Result and detail tests verify backend stop order, supplied local date/time, next-day cue, and planned labels. | NOT RUN | |
 | SC-005 | T041, T054 | Navigation tests and emulator flow show exact criteria/results restored after Back. | NOT RUN | |
 | SC-006 | T049, T050 | Accessibility semantics, focus, announcements, text scaling, and control operation review. | NOT RUN | |
