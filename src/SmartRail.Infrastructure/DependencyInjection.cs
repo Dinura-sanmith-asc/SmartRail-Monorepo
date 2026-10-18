@@ -7,6 +7,8 @@ using SmartRail.Application.RailwayNetwork.Services;
 using SmartRail.Application.RailwayNetwork.Stations;
 using SmartRail.Infrastructure.RailwayNetwork;
 using SmartRail.Infrastructure.RailwayNetwork.Persistence;
+using SmartRail.Application.Identity.Persistence;
+using SmartRail.Infrastructure.Identity.Persistence;
 
 namespace SmartRail.Infrastructure;
 
@@ -25,6 +27,8 @@ public static class DependencyInjection
         }
 
         services.AddDbContext<SmartRailDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddScoped<IRoleAssignmentRepository, RoleAssignmentRepository>();
+        services.AddScoped<IStationScopeRepository, StationScopeRepository>();
         services.AddScoped<IStationRepository, StationReadRepository>();
         services.AddScoped<IRouteReadRepository, RouteReadRepository>();
         services.AddScoped<IServiceReadRepository, ServiceReadRepository>();

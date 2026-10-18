@@ -22,6 +22,211 @@ namespace SmartRail.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("SmartRail.Domain.Identity.Entities.RoleAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CognitoSubject")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("cognito_subject");
+
+                    b.Property<DateTimeOffset>("GrantedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("granted_at_utc");
+
+                    b.Property<string>("GrantedBySubject")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("granted_by_subject");
+
+                    b.Property<DateTimeOffset?>("RevokedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at_utc");
+
+                    b.Property<string>("RevokedBySubject")
+                        .HasColumnType("text")
+                        .HasColumnName("revoked_by_subject");
+
+                    b.Property<string>("RoleCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("role_code");
+
+                    b.HasKey("Id")
+                        .HasName("pk_identity_role_assignment");
+
+                    b.HasIndex("CognitoSubject")
+                        .HasDatabaseName("ix_identity_role_assignment_active_subject")
+                        .HasFilter("revoked_at_utc IS NULL AND revoked_by_subject IS NULL");
+
+                    b.HasIndex("CognitoSubject", "RoleCode")
+                        .IsUnique()
+                        .HasDatabaseName("ux_identity_role_assignment_active_subject_role")
+                        .HasFilter("revoked_at_utc IS NULL AND revoked_by_subject IS NULL");
+
+                    b.ToTable("identity_role_assignment", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_identity_role_assignment_granted_by", "length(btrim(granted_by_subject)) > 0");
+
+                            t.HasCheckConstraint("ck_identity_role_assignment_revocation_after_grant", "revoked_at_utc IS NULL OR revoked_at_utc >= granted_at_utc");
+
+                            t.HasCheckConstraint("ck_identity_role_assignment_revocation_pair", "(revoked_at_utc IS NULL AND revoked_by_subject IS NULL) OR (revoked_at_utc IS NOT NULL AND length(btrim(revoked_by_subject)) > 0)");
+
+                            t.HasCheckConstraint("ck_identity_role_assignment_role", "role_code IN ('Passenger', 'Driver', 'StationStaff', 'Controller')");
+
+                            t.HasCheckConstraint("ck_identity_role_assignment_subject", "length(btrim(cognito_subject)) > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Identity.Entities.RoleAssignmentAudit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("action");
+
+                    b.Property<string>("ActorSubject")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("actor_subject");
+
+                    b.Property<string>("EvidenceReference")
+                        .HasColumnType("text")
+                        .HasColumnName("evidence_reference");
+
+                    b.Property<DateTimeOffset>("OccurredAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at_utc");
+
+                    b.Property<Guid>("RoleAssignmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("role_assignment_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_identity_role_assignment_audit");
+
+                    b.HasIndex("RoleAssignmentId", "OccurredAtUtc")
+                        .HasDatabaseName("ix_identity_role_assignment_audit_history");
+
+                    b.ToTable("identity_role_assignment_audit", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_identity_role_assignment_audit_action", "action IN ('Granted', 'Revoked')");
+
+                            t.HasCheckConstraint("ck_identity_role_assignment_audit_actor", "length(btrim(actor_subject)) > 0");
+
+                            t.HasCheckConstraint("ck_identity_role_assignment_audit_evidence", "evidence_reference IS NULL OR length(btrim(evidence_reference)) > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Identity.Entities.StationScopeAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CognitoSubject")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("cognito_subject");
+
+                    b.Property<DateTimeOffset>("GrantedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("granted_at_utc");
+
+                    b.Property<string>("GrantedBySubject")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("granted_by_subject");
+
+                    b.Property<DateTimeOffset?>("RevokedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at_utc");
+
+                    b.Property<string>("RevokedBySubject")
+                        .HasColumnType("text")
+                        .HasColumnName("revoked_by_subject");
+
+                    b.Property<Guid>("StationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("station_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_identity_station_scope_assignment");
+
+                    b.HasIndex("CognitoSubject")
+                        .HasDatabaseName("ix_identity_station_scope_active_subject")
+                        .HasFilter("revoked_at_utc IS NULL AND revoked_by_subject IS NULL");
+
+                    b.HasIndex("StationId");
+
+                    b.HasIndex("CognitoSubject", "StationId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_identity_station_scope_active_subject_station")
+                        .HasFilter("revoked_at_utc IS NULL AND revoked_by_subject IS NULL");
+
+                    b.ToTable("identity_station_scope_assignment", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_identity_station_scope_granted_by", "length(btrim(granted_by_subject)) > 0");
+
+                            t.HasCheckConstraint("ck_identity_station_scope_revocation_after_grant", "revoked_at_utc IS NULL OR revoked_at_utc >= granted_at_utc");
+
+                            t.HasCheckConstraint("ck_identity_station_scope_revocation_pair", "(revoked_at_utc IS NULL AND revoked_by_subject IS NULL) OR (revoked_at_utc IS NOT NULL AND length(btrim(revoked_by_subject)) > 0)");
+
+                            t.HasCheckConstraint("ck_identity_station_scope_subject", "length(btrim(cognito_subject)) > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Identity.Entities.StationScopeAssignmentAudit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("action");
+
+                    b.Property<string>("ActorSubject")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("actor_subject");
+
+                    b.Property<string>("EvidenceReference")
+                        .HasColumnType("text")
+                        .HasColumnName("evidence_reference");
+
+                    b.Property<DateTimeOffset>("OccurredAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at_utc");
+
+                    b.Property<Guid>("StationScopeAssignmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("station_scope_assignment_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_identity_station_scope_assignment_audit");
+
+                    b.HasIndex("StationScopeAssignmentId", "OccurredAtUtc")
+                        .HasDatabaseName("ix_identity_station_scope_audit_history");
+
+                    b.ToTable("identity_station_scope_assignment_audit", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_identity_station_scope_audit_action", "action IN ('Granted', 'Revoked')");
+
+                            t.HasCheckConstraint("ck_identity_station_scope_audit_actor", "length(btrim(actor_subject)) > 0");
+
+                            t.HasCheckConstraint("ck_identity_station_scope_audit_evidence", "evidence_reference IS NULL OR length(btrim(evidence_reference)) > 0");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.Route", b =>
                 {
                     b.Property<Guid>("RouteId")
@@ -454,6 +659,36 @@ namespace SmartRail.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("ck_train_service_version_positive", "version > 0");
                         });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Identity.Entities.RoleAssignmentAudit", b =>
+                {
+                    b.HasOne("SmartRail.Domain.Identity.Entities.RoleAssignment", null)
+                        .WithMany()
+                        .HasForeignKey("RoleAssignmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_identity_role_assignment_audit_assignment");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Identity.Entities.StationScopeAssignment", b =>
+                {
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.Station", null)
+                        .WithMany()
+                        .HasForeignKey("StationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_identity_station_scope_station");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Identity.Entities.StationScopeAssignmentAudit", b =>
+                {
+                    b.HasOne("SmartRail.Domain.Identity.Entities.StationScopeAssignment", null)
+                        .WithMany()
+                        .HasForeignKey("StationScopeAssignmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_identity_station_scope_audit_assignment");
                 });
 
             modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.RouteStop", b =>

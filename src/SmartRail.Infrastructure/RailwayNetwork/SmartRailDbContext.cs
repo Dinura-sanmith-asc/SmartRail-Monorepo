@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartRail.Domain.RailwayNetwork.Entities;
 using SmartRail.Infrastructure.RailwayNetwork.Configurations;
+using SmartRail.Domain.Identity.Entities;
 
 namespace SmartRail.Infrastructure.RailwayNetwork;
 
@@ -18,10 +19,37 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<ServiceOperationDate> ServiceOperationDates => Set<ServiceOperationDate>();
     public DbSet<StationImportRun> StationImportRuns => Set<StationImportRun>();
     public DbSet<StationChange> StationChanges => Set<StationChange>();
+    public DbSet<RoleAssignment> RoleAssignments => Set<RoleAssignment>();
+    public DbSet<RoleAssignmentAudit> RoleAssignmentAudits => Set<RoleAssignmentAudit>();
+    public DbSet<StationScopeAssignment> StationScopeAssignments => Set<StationScopeAssignment>();
+    public DbSet<StationScopeAssignmentAudit> StationScopeAssignmentAudits => Set<StationScopeAssignmentAudit>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(SmartRailDbContext).Assembly);
         RailwayNetworkIndexes.Configure(modelBuilder);
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        RejectAuditMutation();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        RejectAuditMutation();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    private void RejectAuditMutation()
+    {
+        var mutation = ChangeTracker.Entries()
+            .Where(entry => entry.Entity is RoleAssignmentAudit or StationScopeAssignmentAudit)
+            .FirstOrDefault(entry => entry.State is EntityState.Modified or EntityState.Deleted);
+        if (mutation is not null)
+        {
+            throw new InvalidOperationException("Identity audit events are append-only and cannot be updated or deleted.");
+        }
     }
 }
