@@ -34,6 +34,7 @@ public static class CognitoJwtBearerExtensions
                     ValidAlgorithms = [SecurityAlgorithms.RsaSha256],
                     ValidateLifetime = true,
                     RequireExpirationTime = true,
+                    ClockSkew = TimeSpan.Zero,
                     ValidateAudience = false,
                     RequireAudience = false,
                     NameClaimType = "sub",

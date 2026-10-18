@@ -69,13 +69,17 @@ public sealed class PostgreSqlTestDatabaseFixture : IAsyncLifetime
         return new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Development");
+            builder.UseSetting("Authentication:Cognito:Issuer", "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_test");
+            builder.UseSetting("Authentication:Cognito:AllowedClientIds:0", "smartrail-integration-test-client");
             builder.UseSetting(
                 $"ConnectionStrings:{SmartRail.Infrastructure.RailwayNetwork.SmartRailDbContext.ConnectionStringName}",
                 ConnectionString);
             builder.ConfigureAppConfiguration((_, configuration) =>
                 configuration.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    [$"ConnectionStrings:{SmartRail.Infrastructure.RailwayNetwork.SmartRailDbContext.ConnectionStringName}"] = ConnectionString
+                    [$"ConnectionStrings:{SmartRail.Infrastructure.RailwayNetwork.SmartRailDbContext.ConnectionStringName}"] = ConnectionString,
+                    ["Authentication:Cognito:Issuer"] = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_test",
+                    ["Authentication:Cognito:AllowedClientIds:0"] = "smartrail-integration-test-client"
                 }));
             builder.ConfigureServices(services =>
             {
