@@ -16,10 +16,10 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 **Purpose**: Add the approved test toolchain without changing existing React/Vite/Tailwind versions.
 
-- [ ] T001 Verify the installed React/Vite/TypeScript baseline from `package.json`, `package-lock.json` and `tsconfig.app.json`; retain those versions, add Vitest 5, jsdom, React Testing Library, `@testing-library/dom`, user-event, jest-dom, Playwright Test and axe Playwright integration as development dependencies, add `test:unit`, fixture-only `test:e2e`, and opt-in backend-gated `test:e2e:live` scripts in `package.json`, and update `package-lock.json`; live specs must not run in the default fixture suite.
-- [ ] T002 [P] Configure Vitest to reuse Vite plugins and use jsdom in `vite.config.ts` (after T001).
-- [ ] T003 Create `src/test/setup.ts` to load jest-dom matchers and perform per-test DOM cleanup; reference it from `vite.config.ts` (after T002).
-- [ ] T004 [P] Configure Playwright webServer, test directory and deterministic browser settings in `playwright.config.ts`; use root `e2e/` per the plan (after T001).
+- [X] T001 Verify the installed React/Vite/TypeScript baseline from `package.json`, `package-lock.json` and `tsconfig.app.json`; retain those versions, add Vitest 5, jsdom, React Testing Library, `@testing-library/dom`, user-event, jest-dom, Playwright Test and axe Playwright integration as development dependencies, add `test:unit`, fixture-only `test:e2e`, and opt-in backend-gated `test:e2e:live` scripts in `package.json`, and update `package-lock.json`; live specs must not run in the default fixture suite.
+- [X] T002 [P] Configure Vitest to reuse Vite plugins and use jsdom in `vite.config.ts` (after T001).
+- [X] T003 Create `src/test/setup.ts` to load jest-dom matchers and perform per-test DOM cleanup; reference it from `vite.config.ts` (after T002).
+- [X] T004 [P] Configure Playwright webServer, test directory and deterministic browser settings in `playwright.config.ts`; use root `e2e/` per the plan (after T001).
 
 ---
 
