@@ -42,16 +42,18 @@ client behavior only and does not add a response or server authorization rule to
 The `Problem` schema requires `type`, `title`, and integer `status`; `detail`, `instance`,
 `code`, `errors`, and `traceId` are optional. Parse required fields as protocol input, but
 do not require optional members. A malformed/non-Problem error body falls back to status
-classification and generic passenger text. HTTP 400 uses criteria correction only for the
-service-search operation. On the two detail operations, 400 represents a malformed path
-identifier, so report the affected section as unavailable and provide Back rather than
-asking the passenger to edit an internal identifier.
+classification and generic passenger text. HTTP 400 handling is operation-specific: the
+service-search operation preserves entered criteria and offers correction; the service-detail
+and route-stop operations classify a malformed path identifier as invalid/unavailable for
+that section, preserve successful sibling/result information, provide Back, and do not retry
+the unchanged identifier. These mappings describe client behavior for existing responses.
 
 | Status/result | Classification | Retry policy | View behavior |
 |---|---|---|---|
 | 200 non-empty | success | None | Present only response fields. |
 | 200 empty collection | empty success | Edit criteria / Back | Distinct from all failures. |
-| 400 | validation/request input | Correct input; retry after edit | Preserve choices/date; no empty-result message. |
+| 400 — service search | criteria validation/request input | Correct search criteria, then submit again | Preserve choices/date; show useful field feedback only when identified, otherwise general correction text; do not show empty results. |
+| 400 — service detail or route stops | malformed path identifier | No retry of unchanged identifier; Back | Mark only the affected section invalid/unavailable; retain successful sibling/result information. |
 | 403 | access denied | No Retry, no login | Access unavailable + Back. |
 | 404 | missing published resource | No blind retry | Mark affected detail section unavailable; keep successful sibling and result summary. |
 | 500/default unexpected | server error | Retry failed read | Safe unavailable state; never expose internal details. |

@@ -73,7 +73,15 @@ are external configuration inputs, not new API semantics.
 
 Replace the generated counter app at `lib/main.dart` only during implementation. It will
 initialize a single `ProviderScope`, build `MaterialApp.router`, and compose an environment
-configuration, one closable HTTP client, API data source, repository, and providers. Read
+configuration, one closable HTTP client, API data source, repository, and providers. The
+app-scoped `railwayApiClientProvider` owns the shared `http.Client`, creates it once for the
+application scope, and registers `Client.close()` with `ref.onDispose`. It is injected into
+the API data source and closed when the owning `ProviderContainer`/`ProviderScope` is disposed;
+widgets and individual screen controllers do not close the shared client. Screen/session
+notifiers own request generations and invalidate them in their disposal callback. A late
+completion must be ignored after generation change, route departure, or notifier disposal,
+whether or not the transport supports aborting the request. Tests verify client closure and
+late-completion suppression on provider disposal. Read
 `SMART_RAIL_API_BASE_URL` from a compile-time define per environment; reject a missing or
 malformed value in a visible development configuration error instead of silently using a
 production host. Keep secrets out of this public-read configuration. Android release builds
@@ -95,6 +103,7 @@ lib/
   app/
     app.dart
     app_config.dart
+    providers.dart   # app-scoped shared API client owner
     router.dart
     theme/
   core/
@@ -138,7 +147,9 @@ Use three routes: `/railway/search`, `/railway/results`, and
 loading result state, then push Results for either a non-empty or empty 200 response.
 Selecting a result pushes Details with its result summary and IDs. Back pops to the exact
 previous state. Search criteria and successful results belong to the retained search flow,
-not transient widget fields that disappear when a route is pushed.
+not transient widget fields that disappear when a route is pushed. The Phase 1 app shell
+must compile: all three route target placeholder screens are created before `router.dart`
+imports/registers them, and `main.dart` then composes that router.
 
 Search load has its own loading, ready, empty-stations, and unavailable/retry states. Form
 state holds optional origin, destination, and a calendar-only travel date; same-station and
@@ -152,9 +163,9 @@ Represent screen states explicitly rather than deriving errors from empty collec
 | Area | States and transitions |
 |---|---|
 | Stations | initial → loading → ready/empty/unavailable; retry reloads station list. |
-| Search | editing/invalid → loading → results or empty; 400 → correctable validation; 403 → access unavailable + Back only; 5xx/network/timeout → unavailable + retry. Duplicate submit is disabled or ignored. Search does not add a 404-specific state because its operation does not document 404. |
+| Search | editing/invalid → loading → results or empty; service-search 400 → criteria correction; 403 → access unavailable + Back only; 5xx/network/timeout → unavailable + retry. Duplicate submit is disabled or ignored. Search does not add a 404-specific state because its operation does not document 404. |
 | Results | loading → populated/empty; criteria change clears results; retry repeats the same criteria; a late result after leaving/editing is discarded. |
-| Details | service detail and route stops load independently; either can be data, empty stops, access-denied, not-found, or unavailable. One retry touches only that read. Preserve successful or retained result-summary sections. |
+| Details | service detail and route stops load independently; either can be data, empty stops, access-denied, not-found, or unavailable. A 400 for either detail operation identifies its affected section as invalid/unavailable, preserves successful sibling and result-summary information, provides Back, and does not retry the unchanged malformed ID. One retry for retryable failures touches only that read. Preserve successful or retained result-summary sections. |
 | Previously loaded data | If shown after a failed refresh, mark not refreshed and show client retrieval time when available; never claim source update time or live freshness. |
 
 For each new operation, assign an incrementing request generation and accept a completion
@@ -173,12 +184,11 @@ parsing tolerates absent optional `detail`, `code`, `errors`, `instance`, or `tr
 safe known field errors for 400, generic passenger language otherwise, and never display
 stack traces or diagnostics. Do not assume every response body is JSON.
 
-For 400 responses, FR-011's criteria retention/correction behavior applies to search input
-validation. The OpenAPI also declares 400 for the detail operations when a path ID is
-malformed; there, no passenger search criterion is correctable. Treat that as an invalid
-request for the affected detail section, preserve its sibling/result summary, and let the
-passenger go Back (do not retry an unchanged malformed ID). This is a contract-derived
-client treatment, not a change to FR-011 or the API. The per-operation field and status matrix lives in
+For 400 responses, apply FR-011 by operation: the service-search operation retains criteria
+and allows the passenger to correct them; the service-detail and route-stop operations
+identify only the affected section as invalid/unavailable, preserve successful sibling and
+result-summary information, keep Back available, and do not retry an unchanged malformed
+path ID. This does not change the API contract. The per-operation field and status matrix lives in
 [contracts/railway-network-client.md](contracts/railway-network-client.md). Important
 behavior: 200 with empty services is a valid empty result; 400 retains criteria; the
 clarified public 403 state has Back but no login/retry; detail-operation 400/404 mark only
@@ -220,9 +230,9 @@ future validation commands and setup.
 | Dart unit/model | Required/optional DTO fields, UUID/date mapping, malformed JSON, offset-preserving planned-time display, safe Problem mapping | FR-004, FR-006, FR-009, FR-011–016, FR-020; SR-002/003/004/013/114 |
 | HTTP client/repository | Exact four GET paths/query values, anonymous headers, 200 populated/empty, 400, 403, 404, 500/default, 503, invalid body, timeout/network errors | FR-001, FR-005, FR-008, FR-011–016, FR-020; SR-013/089/114 |
 | Riverpod/application | All state transitions, duplicate submit, edit clearing, old request suppression, independent detail failures and per-section retry, last-retrieved metadata | US1–US3; FR-005, FR-007, FR-010–017, FR-021–022; SR-109/114 |
-| Widget | Initial/loading/success/empty/error flows, station/date selection, useful validation, honest planned labels, accessible announcements and text scaling | FR-002–019; SR-002/004/013/103/104/109/114 |
-| Navigation | Search → Results → Details → Back restores criteria/results; Back during each read; late completion does not reopen/alter departed route | FR-017, FR-021–022; all five clarifications |
-| Integration | Anonymous app against approved backend/base URL; seeded search then detail/stops; no invented fields or auth; verify environment reachability | SR-002/003/004/013/089; US1/US2 |
+| Widget | Initial/loading/success/empty/error flows, station/date selection, useful validation, honest planned labels, accessible announcements and text scaling | FR-002–019; SR-002/004/013/103/104/109/114; SC-001–SC-004, SC-006–SC-007 |
+| Navigation | Search → Results → Details → Back restores criteria/results; Back during each read; late completion does not reopen/alter departed route; verify provider disposal | FR-017, FR-021–022; SC-005; all five clarifications |
+| Integration | Primary acceptance runs on Android emulator against approved backend/base URL and seeded data; physical-device smoke is supplementary; no invented fields or auth; record prerequisite status | SR-002/003/004/013/089; US1/US2; SC-001, SC-004–SC-005 |
 | Accessibility acceptance | Semantics names/focus/announcements, increased text scale, contrast, touch-operability review; retain Should Have evidence tier | FR-018–019; SR-103/104 |
 
 All five clarification answers must be explicit test cases: criterion edits clear results;
@@ -239,7 +249,8 @@ state tests must cover all relevant documented response classes and network loss
 | OpenAPI operation response lists omit 403 although SR-114 and the approved spec require access-denied handling. | A test environment may not produce this state through the current public operations. | Keep the specified conditional client behavior; exercise through a controlled gateway/test response if available; do not alter the API contract. |
 | No response-time SLO is approved. | Timeout choice is provisional and slow backend requests may be classified unavailable. | Start with a configurable 10-second bounded timeout; validate on backend/device and tune without changing passenger semantics. |
 | Android release manifest currently has no Internet permission; local backend may be cleartext-only. | Release calls will fail without permission; broad HTTP allowances weaken transport security. | Add Internet permission during implementation. Prefer HTTPS; confine any required local cleartext allowance to debug configuration. |
-| FR-011 states 400 correction broadly, while detail-operation 400 means malformed path ID. | An unchanged path cannot be corrected by the passenger. | This plan maps search 400 to criteria correction and detail 400 to an affected-section invalid/unavailable state with Back. Keep this contract-derived interpretation visible during plan review. |
+| The integration host or deterministic published seed data may be unavailable. | Real-backend acceptance cannot be executed yet. | Record `BLOCKED` with the missing prerequisite; never treat unexecuted integration as `PASS`. Complete independent local verification and matrix reporting. |
+| A physical device/network may be unavailable. | Supplementary physical-device smoke cannot be run. | Record `BLOCKED` or `NOT RUN`; this does not block the primary Android emulator integration acceptance path. |
 
 ## Implementation Sequence (planning only)
 
@@ -257,7 +268,8 @@ state tests must cover all relevant documented response classes and network loss
    section retry, Back during loading and response-generation guards.
 7. Automated tests: unit/API/state/widget/navigation/accessibility suite mapped above.
 8. Real backend integration: configure environment endpoint and seeded data; verify public
-   anonymous reads on emulator and reachable device.
+   anonymous reads on an Android emulator as the primary integration acceptance path. A
+   physical-device smoke run is supplementary unless an approved requirement changes this.
 9. Final acceptance verification: review all Must Have flow evidence and Should Have
    stretch status against spec/checklist before implementation completion.
 

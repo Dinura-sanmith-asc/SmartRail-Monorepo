@@ -12,9 +12,26 @@ installed and no validation commands were run during plan generation.
 - For real integration: a reachable SmartRail API base URL using the approved Railway
   Network contract and seeded published stations/services. Search and details must work
   anonymously.
-- Android emulator can reach a host-local backend at `10.0.2.2:<port>`; a physical device
-  needs a reachable network address. The URL is environment configuration, not a source
-  literal. Use HTTPS for shared/demo backends.
+- The primary integration acceptance path is an Android emulator with the real seeded
+  backend. It can reach a host-local backend at `10.0.2.2:<port>`. Physical-device smoke is
+  supplementary unless an approved requirement says otherwise. Its URL must be reachable
+  from that device. The URL is environment configuration, not a source literal. Use HTTPS
+  for shared/demo backends.
+
+## Verification Statuses
+
+Record each matrix entry in
+[`verification-matrix.md`](verification-matrix.md) as one of:
+
+- `PASS`: executed and all assertions passed, with command/review method and result recorded.
+- `FAIL`: executed and an assertion failed, with failure evidence recorded.
+- `BLOCKED`: not executable because a named external prerequisite or approval is missing.
+- `NOT RUN`: not attempted or supplementary and intentionally not run.
+
+`BLOCKED` and `NOT RUN` are not passes and never count as acceptance evidence. A missing
+backend URL, seed, or emulator may block integration execution, but must not prevent recording
+the matrix, running local tests/analyzer, or completing requirement traceability. Do not
+substitute mocked responses for real-backend evidence.
 
 ## Local Build and Deterministic Validation
 
@@ -48,13 +65,13 @@ responses and require no live service. The test suite should cover:
 7. Accessible names, status announcements, focus order and increased text scale remain
    operable. Report SR-103/SR-104 outcomes at their approved Should Have/stretch tier.
 
-Run device-backed integration tests separately on an available emulator/device:
+Run primary device-backed integration tests on an available Android emulator:
 
 ```powershell
 flutter test integration_test/railway_search -d <device-id>
 ```
 
-Expected: the selected device launches the app, exercises the public flow, and reports the
+Expected: the emulator launches the app, exercises the public flow, and reports the
 specific acceptance assertion that failed. The integration target must use the explicitly
 configured environment and seeded data; it must not silently fall back to mocks.
 
@@ -79,7 +96,7 @@ an explicit debug-only allowance; do not relax release network security. Android
 manifest needs Internet permission. A physical-device run must use a host/API URL reachable
 from that device and permitted by its firewall/TLS configuration.
 
-Acceptance walk-through:
+Acceptance walk-through on the Android emulator with real seeded backend data:
 
 1. Open the app without signing in and wait for published stations.
 2. Choose different origin and destination stations and a travel date; submit once.
@@ -92,6 +109,11 @@ Acceptance walk-through:
    the departed screen.
 7. Confirm every displayed time is scheduled/planned; later-day calls retain their supplied
    local date and clock time and show “next day”.
+
+A physical-device smoke flow may be recorded as supplementary evidence when a reachable
+device/backend combination is available. It does not gate the primary integration path unless
+an approved requirement establishes that gate. Record any unavailable integration run as
+`BLOCKED` or `NOT RUN` in the matrix; never mark it `PASS` without execution.
 
 ## Contract and Model References
 

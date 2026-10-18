@@ -28,9 +28,9 @@ configuration, feature structure, and Android network access.
 - [ ] T003 [P] Write environment configuration tests in `test/app/app_config_test.dart` for a valid configured API base URL, missing value, malformed URL, and rejection of a production localhost default. Trace: US1/US2/US3; FR-001, FR-020; SR-089.
 - [ ] T004 Implement validated compile-time `SMART_RAIL_API_BASE_URL` configuration in `lib/app/app_config.dart`; keep environment values out of source constants and secrets out of this public-read config. Depends on T003. Trace: US1/US2/US3; FR-001, FR-020; SR-089.
 - [ ] T005 [P] Establish shared app theme and reusable loading, empty, validation, unavailable, and access-denied presentation primitives in `lib/app/theme/app_theme.dart` and `lib/core/widgets/async_feedback.dart`. Trace: US1/US2/US3; FR-010–019; SR-103, SR-104, SR-109, SR-114.
-- [ ] T006 Configure declarative Search, Results, and Details routes and the app composition shell in `lib/app/router.dart` and `lib/app/app.dart`; keep a push/pop stack and add no authentication redirect. Depends on T001, T004, T005. Trace: US1/US2/US3; FR-001, FR-017, FR-022; SR-089, SR-114.
+- [ ] T006 Configure declarative Search, Results, and Details routes and the app composition shell in `lib/app/router.dart` and `lib/app/app.dart`; keep a push/pop stack and add no authentication redirect. Depends on T001, T004, T005, T008. Trace: US1/US2/US3; FR-001, FR-017, FR-022; SR-089, SR-114.
 - [ ] T007 Replace the generated counter startup with `ProviderScope` and `MaterialApp.router` in `lib/main.dart`; preserve the project entry point and initialize only configured dependencies. Depends on T006. Trace: US1/US2/US3; FR-001, FR-020; SR-089.
-- [ ] T008 Establish the feature-first source boundary and initial Search route placeholder in `lib/features/railway_search/presentation/railway_search_screen.dart`; follow the `lib/features/railway_search/{presentation,application,domain,data}` structure in `plan.md`. Depends on T006. Trace: US1; FR-001, FR-002; SR-013.
+- [ ] T008 Establish the feature-first source boundary and compile-safe Search, Results, and Details route placeholder screens in `lib/features/railway_search/presentation/railway_search_screen.dart`, `lib/features/railway_search/presentation/search_results_screen.dart`, and `lib/features/railway_search/presentation/service_detail_screen.dart`; each placeholder must be constructible by the router. Follow the `lib/features/railway_search/{presentation,application,domain,data}` structure in `plan.md`. Depends on T001. Trace: US1/US2; FR-001, FR-008, FR-017; SR-003, SR-013.
 - [ ] T009 [P] Add Android Internet permission to `android/app/src/main/AndroidManifest.xml` and verify release configuration does not enable broad cleartext traffic; any required local HTTP exception must be debug-only. Trace: US1/US2/US3; FR-001, FR-020; SR-089, SR-114.
 
 **Checkpoint**: App shell, route placeholders, validated URL configuration, resolved approved
@@ -47,8 +47,8 @@ contract/error tests. Use only `docs/contracts/railway-network.openapi.yaml`.
 - [ ] T011 Implement strict DTO parsing for `StationList`, `Station`, `RouteStops`, `RouteStop`, `ServiceSearchResponse`, `ServiceChoice`, `ScheduledCall`, and `ServiceDetail` in `lib/features/railway_search/data/railway_api_dtos.dart`, matching required/optional OpenAPI fields exactly. Depends on T010. Trace: US1/US2; FR-002, FR-004, FR-006, FR-008, FR-020; SR-002, SR-003, SR-004, SR-013.
 - [ ] T012 [P] Write RFC 9457 parsing and error-classification tests in `test/core/network/problem_details_parser_test.dart` for required `type/title/status`, optional `detail/instance/code/errors/traceId`, malformed bodies, and safe fallbacks. Trace: US1/US2/US3; FR-011–016, FR-020; SR-114.
 - [ ] T013 Implement typed API failures and safe Problem Details parsing in `lib/core/network/api_failure.dart` and `lib/core/network/problem_details_parser.dart`; never expose stack traces, internal details, or trace IDs to passengers. Depends on T012. Trace: US1/US2/US3; FR-011–016, FR-020; SR-114.
-- [ ] T014 [P] Write MockClient request/response tests in `test/features/railway_search/data/railway_network_api_test.dart` for exact URI paths, query names, full-date formatting, anonymous headers, status codes, and response content types. Trace: US1/US2/US3; FR-001, FR-004, FR-005, FR-008, FR-020; SR-013, SR-089, SR-114.
-- [ ] T015 Implement one injectable bounded-timeout HTTP transport with UTF-8 decoding and supported abortable requests in `lib/core/network/http_api_client.dart`; keep request generation checks as the late-response correctness guard. Depends on T002, T013. Trace: US1/US2/US3; FR-010, FR-013–016, FR-022; SR-109, SR-114.
+- [ ] T014 [P] Write MockClient request/response tests in `test/features/railway_search/data/railway_network_api_test.dart` for exact URI paths, query names, full-date formatting, anonymous headers, status codes, and response content types; also write shared-client lifecycle tests in `test/core/network/http_api_client_lifecycle_test.dart` proving app-scope ownership and exactly-once close on provider-container disposal. Trace: US1/US2/US3; FR-001, FR-004, FR-005, FR-008, FR-020, FR-022; SR-013, SR-089, SR-109, SR-114.
+- [ ] T015 Implement one injectable bounded-timeout HTTP transport in `lib/core/network/http_api_client.dart` and an app-scoped `railwayApiClientProvider` in `lib/app/providers.dart`; the provider owns the shared `http.Client`, registers `Client.close()` with `ref.onDispose`, and is the only owner that closes it. Keep request-generation/disposal checks as the late-response correctness guard. Depends on T002, T013, T014. Trace: US1/US2/US3; FR-010, FR-013–016, FR-022; SR-109, SR-114.
 - [ ] T016 Implement only `GET /api/stations`, `GET /api/routes/{id}/stops`, `GET /api/services?origin=&destination=&date=`, and `GET /api/services/{id}` in `lib/features/railway_search/data/railway_network_api.dart`; do not add headers requiring login or any other route. Depends on T011, T014, T015. Trace: US1/US2/US3; FR-001, FR-002, FR-005, FR-008, FR-020; SR-002, SR-003, SR-004, SR-013, SR-089.
 - [ ] T017 Define immutable domain models and validation constraints in `lib/features/railway_search/domain/railway_models.dart`: `Station.name` has `minLength: 1`; `TravelDate` is calendar-only `YYYY-MM-DD`; `SearchCriteria` is submittable only when origin, destination, and date exist and station IDs differ; `RouteStop.stopOrder`, `ServiceChoice.scheduleRevision`, and `ServiceDetail.schedule.revision` are integers with `minimum: 1`. Depends on T011. Trace: US1/US2; FR-002–009; SR-002, SR-003, SR-004, SR-013.
 - [ ] T018 [P] Write literal scheduled-time parsing/display tests in `test/features/railway_search/domain/scheduled_timestamp_test.dart` proving the raw offset-bearing timestamp, local date, and clock are preserved without device-timezone conversion. Trace: US1/US2; FR-006, FR-009; SR-004, SR-013.
@@ -89,12 +89,12 @@ backend, or a distinct successful empty state.
 displayed values/order match the response; edits clear results and late/duplicate responses
 cannot display stale results.
 
-- [ ] T028 [US1] Write result/search transition and Results screen tests in `test/features/railway_search/application/search_results_notifier_test.dart` and `test/features/railway_search/presentation/search_results_screen_test.dart` for submit, loading, success, empty, 400, 403, 503, duplicate submit, criteria edit clearing, out-of-order responses, displayed values/order, and retry. Depends on T023. Trace: US1/US3; FR-005–007, FR-010–016, FR-021–022; SR-013, SR-089, SR-109, SR-114.
+- [ ] T028 [US1] Write result/search transition and Results screen/card tests in `test/features/railway_search/application/search_results_notifier_test.dart`, `test/features/railway_search/presentation/search_results_screen_test.dart`, and `test/features/railway_search/presentation/service_result_card_test.dart` for submit, loading, success, empty, 400, 403, 503, duplicate submit, criteria edit clearing, out-of-order responses, displayed values/order, and retry. Card tests must verify the supplied planned date and time, the later-day/“next day” label, and preservation of the supplied local clock without device-timezone conversion. Depends on T023. Trace: US1/US3; FR-005–007, FR-009–016, FR-021–022; SR-004, SR-013, SR-089, SR-109, SR-114; SC-001, SC-003, SC-004.
 - [ ] T029 [US1] Implement submission/result state in `lib/features/railway_search/application/search_results_notifier.dart`; send only origin ID, destination ID, and selected origin travel date, and accept a response only for its matching criteria generation. Depends on T020, T023, T028. Trace: US1; FR-004–007, FR-010–011, FR-021–022; SR-013, SR-114.
 - [ ] T030 [P] [US1] Implement service result cards in `lib/features/railway_search/presentation/service_result_card.dart`, presenting returned service/route identifiers and planned origin/destination calls without sorting or recalculation. Depends on T017, T019. Trace: US1; FR-006, FR-009, FR-018–019; SR-004, SR-013, SR-103, SR-104.
 - [ ] T031 [US1] Implement the Results screen in `lib/features/railway_search/presentation/search_results_screen.dart` with loading, populated, and 200-empty states, retained criteria, retry, and change-criteria navigation. Depends on T029, T030. Trace: US1/US3; FR-006–007, FR-010–016, FR-017; SR-004, SR-013, SR-114.
 - [ ] T032 [US1] Integrate Search submission with Results navigation in `lib/features/railway_search/presentation/railway_search_screen.dart`; clear the previous result snapshot immediately on any criterion edit and require an explicit resubmission. Depends on T029, T031. Trace: US1; FR-005–007, FR-017, FR-021; SR-013.
-- [ ] T033 [US1] Run the prewritten Results widget suite in `test/features/railway_search/presentation/search_results_screen_test.dart` and fix failures in `lib/features/railway_search/presentation/search_results_screen.dart`; confirm 200-empty is distinct from failures. Depends on T031. Trace: US1/US3; FR-006–007, FR-010–016; SR-004, SR-013, SR-114.
+- [ ] T033 [US1] Run the prewritten Results widget and result-card suites in `test/features/railway_search/presentation/search_results_screen_test.dart` and `test/features/railway_search/presentation/service_result_card_test.dart`; fix failures in `lib/features/railway_search/presentation/search_results_screen.dart` and `lib/features/railway_search/presentation/service_result_card.dart`. Confirm 200-empty is distinct from failures and planned date/time plus later-day labels preserve backend values without device-timezone conversion. Depends on T031. Trace: US1/US3; FR-006–007, FR-009–016; SR-004, SR-013, SR-114; SC-001, SC-003, SC-004.
 - [ ] T034 [US1] Run the prewritten criteria-edit and duplicate/late-response suite in `test/features/railway_search/application/search_results_notifier_test.dart`; assert previous results clear immediately and abandoned responses cannot reopen Results. Depends on T029, T032. Trace: US1; FR-017, FR-021–022; SR-013, SR-114.
 
 **Checkpoint**: Search results are independently reviewable with deterministic responses.
@@ -130,14 +130,14 @@ stale/previously loaded data is not presented as newly refreshed or live.
 verify it is distinct from empty success and only appropriate recovery actions are offered.
 
 - [ ] T042 [US3] Write end-to-end error mapping tests in `test/core/network/api_failure_mapping_test.dart` covering search 400, detail path-ID 400, conditional 403, detail 404, 500/default, 503, malformed body, timeout, and network loss. Trace: US1/US2/US3; FR-011–016, FR-020; SR-089, SR-114.
-- [ ] T043 [US3] Write recovery-state, recovery-widget, and pending-navigation tests in `test/features/railway_search/application/recovery_state_test.dart`, `test/features/railway_search/presentation/recovery_feedback_test.dart`, and `test/features/railway_search/presentation/pending_navigation_test.dart` for criteria retention, explicit retries, retained sibling detail data, local last-retrieved time, not-refreshed indicators, Back during loading, and late-response suppression. Depends on T029, T036. Trace: US1/US2/US3; FR-011–017, FR-022; SR-109, SR-114.
+- [ ] T043 [US3] Write recovery-state, recovery-widget, pending-navigation, and provider-disposal tests in `test/features/railway_search/application/recovery_state_test.dart`, `test/features/railway_search/presentation/recovery_feedback_test.dart`, `test/features/railway_search/presentation/pending_navigation_test.dart`, and `test/features/railway_search/application/provider_disposal_test.dart` for criteria retention, explicit retries, retained sibling detail data, local last-retrieved time, not-refreshed indicators, Back during loading, late-response suppression, and ignoring completions after notifier disposal. Depends on T029, T036. Trace: US1/US2/US3; FR-011–017, FR-022; SR-109, SR-114.
 - [ ] T044 [US3] Implement status-to-passenger-message mapping in `lib/features/railway_search/application/recovery_message_mapper.dart`; search 400 remains correctable, detail 400/404 affects only its section, 403 is Back-only without login/retry, and 500/503/network failures can retry the failed read. Depends on T013, T042. Trace: US1/US2/US3; FR-011–015; SR-089, SR-114.
 - [ ] T045 [US3] Implement retained-data freshness metadata in `lib/features/railway_search/application/retrieval_metadata.dart`; label retained data “not refreshed” and use client retrieval time only, never a source update time. Depends on T043. Trace: US1/US2/US3; FR-016; SR-109.
 - [ ] T046 [US3] Implement retry/back and accessible unavailable/validation messaging in `lib/core/widgets/async_feedback.dart` and `lib/features/railway_search/presentation/retry_section.dart`; expose no retry or login action on 403. Depends on T044, T045. Trace: US1/US2/US3; FR-010–019; SR-089, SR-103, SR-109, SR-114.
 - [ ] T047 [US3] Run recovery widget tests in `test/features/railway_search/presentation/recovery_feedback_test.dart` and fix failures in `lib/features/railway_search/presentation/retry_section.dart` and `lib/core/widgets/async_feedback.dart` for 400, 403, 404, 500, 503, no-network, safe text, and retry/back affordances. Depends on T046. Trace: US1/US2/US3; FR-007, FR-011–016; SR-089, SR-114.
-- [ ] T048 [US3] Run pending-navigation tests in `test/features/railway_search/presentation/pending_navigation_test.dart` proving Back remains available during search/detail loading and late completions neither mutate nor reopen departed routes. Depends on T029, T036. Trace: US1/US2/US3; FR-017, FR-022; SR-013, SR-114.
+- [ ] T048 [US3] Run pending-navigation and provider-disposal tests in `test/features/railway_search/presentation/pending_navigation_test.dart` and `test/features/railway_search/application/provider_disposal_test.dart`, proving Back remains available during search/detail loading, late completions neither mutate nor reopen departed routes, and disposed notifiers ignore completions. Shared-client close-once behavior is verified by T014. Depends on T029, T036, T043. Trace: US1/US2/US3; FR-017, FR-022; SR-013, SR-109, SR-114.
 - [ ] T049 [P] [US1] Write semantics/accessibility tests in `test/features/railway_search/presentation/search_accessibility_test.dart` for accessible names, selected/disabled state, focus order, and loading/result/error announcements. Trace: US1/US2/US3; FR-018–019; SR-103 (Should Have), SR-104 (Should Have).
-- [ ] T050 [US1] Improve reusable controls for text scaling, legibility, non-color status cues, and operable touch targets in `lib/core/widgets/async_feedback.dart` and `lib/features/railway_search/presentation/`; do not elevate SR-103/SR-104 from Should Have. Depends on T049. Trace: US1/US2/US3; FR-018–019; SR-103 (Should Have), SR-104 (Should Have).
+- [ ] T050 [US1] Improve reusable controls for text scaling, legibility, non-color status cues, and operable touch targets in `lib/core/widgets/async_feedback.dart`, `lib/features/railway_search/presentation/station_picker.dart`, `lib/features/railway_search/presentation/railway_search_screen.dart`, `lib/features/railway_search/presentation/search_results_screen.dart`, `lib/features/railway_search/presentation/service_result_card.dart`, `lib/features/railway_search/presentation/service_detail_summary.dart`, `lib/features/railway_search/presentation/route_stops_list.dart`, `lib/features/railway_search/presentation/service_detail_screen.dart`, and `lib/features/railway_search/presentation/retry_section.dart`; do not elevate SR-103/SR-104 from Should Have. Depends on T049. Trace: US1/US2/US3; FR-018–019; SR-103 (Should Have), SR-104 (Should Have); SC-006.
 
 **Checkpoint**: Search and detail failure behavior is distinct, tested, and reviewable.
 
@@ -151,8 +151,8 @@ responses do not count as integration evidence.
 - [ ] T051 Create device-backed integration test setup in `integration_test/railway_search/integration_test_config.dart` that requires explicit `SMART_RAIL_API_BASE_URL`, fails fast if absent, and never silently substitutes mock data. Trace: US1/US2; FR-001, FR-020; SR-013, SR-089.
 - [ ] T052 [P] [US1] Add anonymous station selection and service-search integration coverage in `integration_test/railway_search/anonymous_service_search_test.dart`; compare displayed IDs, criteria, and planned calls with the actual API response. Depends on T051. Trace: US1; FR-001–007, FR-020–021; SR-002, SR-004, SR-013, SR-089.
 - [ ] T053 [P] [US2] Add real service-detail and route-stop integration coverage in `integration_test/railway_search/service_detail_test.dart`; compare service/route fields, stop order, schedule values, and independent section outcomes with actual responses. Depends on T051. Trace: US2; FR-008–009, FR-012–017, FR-020, FR-022; SR-003, SR-004.
-- [ ] T054 [US1] Run the real-backend integration tests on an available Android emulator and record the environment identifier, seeded data references, command, and pass/fail evidence in `specs/001-railway-service-search/verification-matrix.md`; use a host-reachable URL (`10.0.2.2` for a host-local Android emulator where applicable). Depends on T052, T053 and backend URL/seed availability. Trace: US1/US2; FR-001–009, FR-020; SR-002, SR-003, SR-004, SR-013, SR-089.
-- [ ] T055 [US2] Run the anonymous search/detail smoke flow on a reachable physical device and record device/network result in `specs/001-railway-service-search/verification-matrix.md`; do not reuse emulator localhost. Depends on T054 and device-reachable backend URL. Trace: US1/US2; FR-001–009, FR-020; SR-002, SR-003, SR-004, SR-013, SR-089.
+- [ ] T054 [US1] Run the real-backend integration tests on an Android emulator against a reachable backend with seeded published data; record the environment identifier, seed references, command, and evidence in `specs/001-railway-service-search/verification-matrix.md`. If the backend URL or seed is unavailable, record `BLOCKED` and the missing prerequisite; do not report the unexecuted run as `PASS`. Use a host-reachable URL (`10.0.2.2` for a host-local Android emulator where applicable). Depends on T052, T053. Trace: US1/US2; FR-001–009, FR-020; SR-002, SR-003, SR-004, SR-013, SR-089; SC-001, SC-004, SC-005.
+- [ ] T055 [US2] (Supplementary, non-gating) Run the anonymous search/detail smoke flow on a reachable physical device when available and record device/network evidence or `BLOCKED`/`NOT RUN` in `specs/001-railway-service-search/verification-matrix.md`; do not reuse emulator localhost. This task is not a dependency of primary integration acceptance unless an approved requirement establishes physical-device testing. Depends on T052, T053. Trace: US1/US2; FR-001–009, FR-020; SR-002, SR-003, SR-004, SR-013, SR-089.
 
 **Checkpoint**: Mocked contract tests remain separate from recorded real-service evidence.
 
@@ -166,10 +166,10 @@ traceability, and all five clarification decisions. Do not invent latency or rel
 - [ ] T056 Re-run `flutter pub get` and verify the committed `pubspec.lock` resolves the package constraints in `pubspec.yaml` without introducing unapproved dependencies. Depends on T001. Trace: US1/US2/US3; FR-001, FR-020; SR-089, SR-114.
 - [ ] T057 Run `flutter analyze` and record the result in `specs/001-railway-service-search/verification-matrix.md`; resolve feature warnings/errors before acceptance. Depends on T001–T050. Trace: US1/US2/US3; FR-001–022; SR-002, SR-003, SR-004, SR-013, SR-089, SR-103, SR-104, SR-109, SR-114.
 - [ ] T058 Run all unit, API-client, state, widget, navigation, and accessibility tests with `flutter test` and record pass/fail evidence in `specs/001-railway-service-search/verification-matrix.md`. Depends on T010–T050. Trace: US1/US2/US3; FR-001–022; SR-002, SR-003, SR-004, SR-013, SR-089, SR-103, SR-104, SR-109, SR-114.
-- [ ] T059 Run device-backed acceptance smoke tests with `flutter test integration_test/railway_search -d <device-id>` and the explicit backend URL; record results in `specs/001-railway-service-search/verification-matrix.md`. Depends on T054, T055. Trace: US1/US2; FR-001–009, FR-017, FR-020, FR-022; SR-002, SR-003, SR-004, SR-013, SR-089.
+- [ ] T059 Run primary device-backed acceptance smoke tests with `flutter test integration_test/railway_search -d <android-emulator-id>` and the explicit seeded backend URL; record results in `specs/001-railway-service-search/verification-matrix.md`. If prerequisites are absent, record `BLOCKED` or `NOT RUN`, never `PASS`. Depends on T054. Trace: US1/US2; FR-001–009, FR-017, FR-020, FR-022; SR-002, SR-003, SR-004, SR-013, SR-089; SC-001, SC-004, SC-005.
 - [ ] T060 Verify the five clarifications (edit clears results; scheduled date/time and next-day cue; partial detail recovery; 403 Back only; Back during loading/late suppression) against automated evidence and record each result in `specs/001-railway-service-search/verification-matrix.md`. Depends on T028, T034, T040–T050, T058. Trace: US1/US2/US3; FR-009, FR-014–017, FR-021–022; SR-013, SR-089, SR-109, SR-114.
-- [ ] T061 Complete requirement-to-test traceability for all FR-001–FR-022 and applicable SR-002/003/004/013/089/109/114 plus SR-103/104 stretch status in `specs/001-railway-service-search/verification-matrix.md`; mark evidence status honestly and list any uncovered criterion. Depends on T057–T060. Trace: US1/US2/US3; FR-001–022; SR-002, SR-003, SR-004, SR-013, SR-089, SR-103, SR-104, SR-109, SR-114.
-- [ ] T062 Record remaining environment, approval, or contract blockers and final quickstart commands in `specs/001-railway-service-search/quickstart.md`; do not mark blocked integration evidence as passed. Depends on T054–T061. Trace: US1/US2/US3; FR-001–022; SR-002, SR-003, SR-004, SR-013, SR-089, SR-103, SR-104, SR-109, SR-114.
+- [ ] T061 Complete requirement-to-test traceability for all FR-001–FR-022, applicable SR-002/003/004/013/089/109/114, and SR-103/104 stretch status in `specs/001-railway-service-search/verification-matrix.md`; mark each result `PASS`, `FAIL`, `BLOCKED`, or `NOT RUN` with evidence or a reason. Include explicit SC mapping: SC-001 → T033/T054; SC-002 → T026; SC-003 → T042/T047; SC-004 → T033/T040/T054; SC-005 → T041/T054; SC-006 → T049/T050; SC-007 → T040/T047. Recording traceability does not require external integration prerequisites. Depends on T057, T058, T060. Trace: US1/US2/US3; FR-001–022; SR-002, SR-003, SR-004, SR-013, SR-089, SR-103, SR-104, SR-109, SR-114; SC-001–SC-007.
+- [ ] T062 Record remaining environment, approval, or contract blockers and final quickstart commands in `specs/001-railway-service-search/quickstart.md`; do not mark blocked or unexecuted integration evidence as passed. This reporting can be completed when T054/T059 are `BLOCKED` or `NOT RUN`. Depends on T057, T058, T061. Trace: US1/US2/US3; FR-001–022; SR-002, SR-003, SR-004, SR-013, SR-089, SR-103, SR-104, SR-109, SR-114.
 
 **Checkpoint**: Acceptance evidence and any remaining gates are explicit; no task is complete
 until its evidence is reviewed.
@@ -180,8 +180,9 @@ until its evidence is reviewed.
 
 ### Phase Dependencies
 
-- **Phase 1 — Foundation**: Begins immediately. T001 → T002; T003 → T004; T004/T005 →
-  T006 → T007/T008. T009 only depends on T002.
+- **Phase 1 — Foundation**: Begins immediately. T001 → T002; T003 → T004; T008 creates all
+  route placeholders before T006 imports/registers them; T004/T005/T008 → T006 → T007. T009
+  only depends on T002. The Phase 1 checkpoint is a compiling app shell.
 - **Phase 2 — API and Models**: Depends on T001–T002. Tests precede their implementation;
   T011/T013/T019 feed the transport, endpoint, and repository tasks T015–T021.
 - **Phase 3 — Station Selection**: Depends on shared app/domain/repository foundation
@@ -191,10 +192,12 @@ until its evidence is reviewed.
   Back restoration integrates the completed Results route.
 - **Phase 6 — Recovery/Quality**: Depends on the search and detail states; its tests exercise
   US1, US2, and US3 with injected outcomes.
-- **Phase 7 — Real Integration**: Depends on completed app/API/features and an available
-  seeded backend. Backend URL/data/device are external prerequisites.
-- **Phase 8 — Final Verification**: Depends on implemented phases; preserve separate mock
-  test and real-backend evidence.
+- **Phase 7 — Real Integration**: Emulator/backend integration is the primary path and
+  depends on completed app/API/features plus a reachable seeded backend. Missing prerequisites
+  are recorded as `BLOCKED`/`NOT RUN`; physical-device smoke is supplementary.
+- **Phase 8 — Final Verification**: Local verification, traceability, and blocker reporting
+  can complete independently of external integration execution; preserve separate mock-test
+  and real-backend evidence.
 
 ### User Story Dependencies
 
@@ -210,14 +213,16 @@ until its evidence is reviewed.
 ### Explicit Task Dependencies
 
 - T001 → T002 → T015–T016 → T021.
-- T003 → T004 → T006 → T007/T008.
-- T010 → T011; T012 → T013 → T015; T014 → T016; T018 → T019.
+- T003 → T004; T008 → T006 → T007.
+- T010 → T011; T012 → T013 → T015; T014 → T015/T016; T018 → T019. T015 closes its
+  app-scoped client on provider-container disposal; T048 verifies notifier disposal behavior.
 - T017/T019 → T020 → T021 → T022 → T023 → T025 → T026/T027.
 - T028 → T029 → T031 → T032 → T033/T034.
 - T035 → T036 → T039 → T040/T041.
 - T042/T043 → T044/T045 → T046 → T047; T048 depends on T029/T036; T049 → T050.
-- T051 → T052/T053 → T054 → T055 (device run requires its own reachable URL).
-- T057/T058/T059 → T060 → T061 → T062; the task dependencies are also listed on each
+- T051 → T052/T053 → T054 → T059. T055 is supplementary and independent of the primary path.
+- T057/T058/T060 → T061 → T062; T061/T062 remain possible when T054/T059 are blocked or not
+  run, and record those statuses without implying a pass. The task dependencies are also listed on each
   final-verification task.
 
 ### Genuine Parallel Opportunities
@@ -234,7 +239,8 @@ until its evidence is reviewed.
 - In Phase 5, T037 (service summary) and T038 (route stop list) can proceed in parallel after
   their shared models exist; T039 composes them afterward.
 - Integration tests T052 and T053 use separate files and can be prepared in parallel after
-  T051; real execution T054 requires both.
+  T051; real emulator execution T054 requires both. T055 may be run independently as a
+  supplementary physical-device smoke when its URL is reachable.
 
 ## Parallel Example: Independent Detail Presenters
 

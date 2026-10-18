@@ -92,6 +92,10 @@ same search and result set when the passenger navigates back.
 6. **Given** service-detail or route-stop information is loading, **When** the passenger
    chooses Back, **Then** navigation remains available and any response arriving after the
    passenger has left the detail view does not change that departed view.
+7. **Given** a service-detail or route-stop request returns 400 for its path identifier,
+   **When** the detail view handles the response, **Then** only the affected section is
+   identified as unavailable, successful sibling information remains visible, Back remains
+   available, and the app does not retry the unchanged malformed identifier.
 
 **Resolved UX decision**: Use documented fields only. The detail view shows service and
 route identity, ordered stop names, and planned times available for the searched origin and
@@ -121,9 +125,12 @@ criteria, and available recovery action for each.
 1. **Given** a search request is being processed, **When** the response is pending,
    **Then** a loading state is visible and duplicate submission is prevented or safely
    ignored.
-2. **Given** the backend returns a documented validation error, **When** the search fails,
+2. **Given** the service-search operation returns a documented 400 validation error,
+   **When** the search fails,
    **Then** the app explains that the criteria need attention, preserves the passenger's
-   selections, and allows correction without showing an empty-results state.
+   selections, and allows correction without showing an empty-results state. Specific field
+   feedback is used only when the response identifies that field; otherwise the message is
+   general.
 3. **Given** railway information is unavailable or the network request fails,
    **When** no current response can be loaded, **Then** the app identifies the information
    as unavailable, preserves the search criteria, and offers a retry action.
@@ -201,9 +208,14 @@ the scheduled data itself is not represented as live information.
   time.
 - **FR-010**: The app MUST provide clear loading feedback while station, search, route-stop,
   or service-detail information is being retrieved.
-- **FR-011**: For a documented 400 response, the app MUST retain entered criteria, show a
-  useful validation message, and allow correction. It MUST use specific field feedback only
-  when the response identifies that field; otherwise it MUST use a general criteria message.
+- **FR-011**: For a documented 400 response from the service-search operation, the app MUST
+  retain entered criteria, show a useful validation message, and allow the passenger to
+  correct the search criteria. It MUST use specific field feedback only when the response
+  identifies that field; otherwise it MUST use a general criteria message. For a documented
+  400 response from a service-detail or route-stop operation, the app MUST identify only the
+  affected section as unavailable, preserve any successful sibling information, keep Back
+  available, and MUST NOT retry the unchanged malformed path identifier. These behaviors
+  interpret the existing operation-specific contract responses and do not add API semantics.
 - **FR-012**: For a documented 404 response when a selected service or route is unavailable,
   the app MUST explain that the affected information could not be found, preserve any
   separately loaded service or route information, and provide a path back to results or
