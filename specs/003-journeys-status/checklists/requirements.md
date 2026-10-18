@@ -15,7 +15,7 @@
 
 - [x] No [TBD] markers remain
 - [x] No [NEEDS CLARIFICATION] markers remain — the three requested direction decisions are recorded in the spec
-- [ ] Requirements are fully testable and unambiguous — exact transition edges/termination and same-date instance evidence remain open; SR-022 route-change publication and Driver-observation linkage are known contract gaps
+- [ ] Requirements are fully testable and unambiguous — the discriminator for distinct same-date departures with identical schedule occurrences remains open; existing API schemas still need approval to carry route-diversion revisions and optional Driver-observation evidence references
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
@@ -26,7 +26,7 @@
 
 ## Feature Readiness
 
-- [ ] All functional requirements have complete acceptance criteria — SR-022 route-change publication semantics remain uncovered by the approved operation contract
+- [ ] All functional requirements have complete acceptance criteria — contract-schema approval is still required if existing operations cannot represent route diversions or observation-ID evidence, and the identical-occurrence collision case remains unresolved
 - [x] User scenarios cover primary flows
 - [x] Feature outcomes are measurable in the Success Criteria
 - [x] No implementation details leak into the specification — the approved interaction boundary is stated as a product scope limit; detailed schemas remain for contracts/planning
@@ -35,6 +35,7 @@
 ## Notes
 
 - Approved clarification directions are recorded in `spec.md`: allow multiple journey instances per service/date; require explicit transitions and auditable corrections; retain the current operation boundary without adding routes.
-- Before planning, resolve the exact status transition/termination/reopening rules and define the authoritative identity evidence for same-date instances. Clarify SR-022 route-change and Driver-observation linkage outside this feature's existing operation boundary before claiming complete Must Have coverage.
+- The approved lifecycle now specifies transition paths, cancellation/termination/completion meanings, audited terminal corrections, and stale-revision rejection.
+- Before planning, define how same-date distinct departures that share an indistinguishable scheduled occurrence are represented. Approve any required schema/semantic changes to the existing operations for route-diversion revisions and observation-ID evidence. Do not add operations or claim complete Must Have coverage before the contract gaps are resolved.
 - Client-owned and other-module-owned acceptance checks remain open until their owning specifications and test evidence exist.
 - Approved source documents are read-only; this feature specification does not amend them.
