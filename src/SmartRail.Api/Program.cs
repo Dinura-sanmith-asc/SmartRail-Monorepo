@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using SmartRail.Api.Authentication;
 using SmartRail.Api.Endpoints;
 using SmartRail.Api.Errors;
 using SmartRail.Infrastructure;
@@ -5,6 +7,12 @@ using SmartRail.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 // WebApplication.CreateBuilder loads appsettings, User Secrets in Development, and environment variables.
+builder.Services.AddSingleton<IValidateOptions<CognitoJwtOptions>, CognitoJwtOptionsValidator>();
+builder.Services
+    .AddOptions<CognitoJwtOptions>()
+    .Bind(builder.Configuration.GetSection(CognitoJwtOptions.SectionName))
+    .ValidateOnStart();
+
 builder.Services.AddSmartRailInfrastructure(builder.Configuration);
 builder.Services.AddSmartRailProblemDetails();
 

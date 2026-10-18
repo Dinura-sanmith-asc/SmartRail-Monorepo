@@ -16,10 +16,10 @@
 
 **Purpose**: Prepare Cognito configuration and API package foundations in the existing solution.
 
-- [ ] T001 [P] Add `Microsoft.AspNetCore.Authentication.JwtBearer` 10.0.12 to `src/SmartRail.Api/SmartRail.Api.csproj`.
-- [ ] T002 [P] Define strongly typed Cognito issuer, allowed human `client_id` values, optional expected API audience and validation settings in `src/SmartRail.Api/Authentication/CognitoJwtOptions.cs`.
-- [ ] T003 Bind and validate Cognito settings at startup, requiring trusted issuer and allowed client IDs while enforcing the configured/missing/present `aud` policy, in `src/SmartRail.Api/Authentication/CognitoJwtOptionsValidator.cs` (depends on T002).
-- [ ] T004 Add secret-free local configuration examples and document .NET User Secrets/environment-variable overrides in `src/SmartRail.Api/appsettings.Development.example.json` (depends on T002, T003).
+- [X] T001 [P] Add `Microsoft.AspNetCore.Authentication.JwtBearer` 10.0.12 to `src/SmartRail.Api/SmartRail.Api.csproj`.
+- [X] T002 [P] Define strongly typed Cognito issuer, allowed human `client_id` values, optional expected API audience and validation settings in `src/SmartRail.Api/Authentication/CognitoJwtOptions.cs`.
+- [X] T003 Bind and validate Cognito settings at startup, requiring trusted issuer and allowed client IDs while enforcing the configured/missing/present `aud` policy, in `src/SmartRail.Api/Authentication/CognitoJwtOptionsValidator.cs` (depends on T002).
+- [X] T004 Add a secret-free local configuration example in `src/SmartRail.Api/appsettings.Development.example.json` and document .NET User Secrets/environment-variable overrides in `src/SmartRail.Api/Authentication/README.md` (depends on T002, T003).
 
 **Phase verification gate**: Restore and build `SmartRail.slnx`; confirm no credentials or AWS values are committed, required local Cognito settings fail clearly when missing, and no new project or AWS resource is introduced.
 
