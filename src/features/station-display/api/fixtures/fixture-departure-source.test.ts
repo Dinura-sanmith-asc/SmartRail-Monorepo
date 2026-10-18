@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
-import { stationDisplayFixtures } from './station-display.fixture'
+import { DEMO_STATION_IDS, stationDisplayFixtures } from './station-display.fixture'
 import { createFixtureDepartureSource } from './fixture-departure-source'
 
 describe('fixture departure source', () => {
   it('returns an explicitly non-live initial snapshot', async () => {
     const source = createFixtureDepartureSource(stationDisplayFixtures)
 
-    const snapshot = await source.getInitialSnapshot('demo-central')
+    const snapshot = await source.getInitialSnapshot(DEMO_STATION_IDS.central)
 
     expect(snapshot.origin).toBe('fixture')
-    expect(snapshot.station.stationId).toBe('demo-central')
+    expect(snapshot.station.stationId).toBe(DEMO_STATION_IDS.central)
     expect(snapshot.departures.length).toBeGreaterThan(0)
   })
 
@@ -17,7 +17,7 @@ describe('fixture departure source', () => {
     const source = createFixtureDepartureSource(stationDisplayFixtures)
     const listener = vi.fn()
     const unsubscribe = source.subscribe(listener)
-    const nextSnapshot = await source.revalidate('demo-central')
+    const nextSnapshot = await source.revalidate(DEMO_STATION_IDS.central)
 
     source.publish(nextSnapshot)
 
@@ -31,7 +31,7 @@ describe('fixture departure source', () => {
   it('returns an empty departure set for a fixture station with no departures', async () => {
     const source = createFixtureDepartureSource(stationDisplayFixtures)
 
-    await expect(source.getInitialSnapshot('demo-quiet')).resolves.toMatchObject({
+    await expect(source.getInitialSnapshot(DEMO_STATION_IDS.quiet)).resolves.toMatchObject({
       origin: 'fixture',
       departures: [],
     })

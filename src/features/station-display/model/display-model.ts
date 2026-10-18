@@ -20,6 +20,10 @@ export interface OperationalInformation {
   platform: PublishedValue<string>
   delay: PublishedValue<string>
   cancellation: PublishedValue<boolean>
+  updateTime?: {
+    displayValue: string
+    meaning: 'fixture-defined' | 'authoritative-verified' | 'unverified'
+  }
 }
 
 export interface StationDeparture {

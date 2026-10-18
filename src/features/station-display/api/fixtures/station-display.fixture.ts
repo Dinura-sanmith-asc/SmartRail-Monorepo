@@ -1,9 +1,15 @@
 import type { StationContext, StationDepartureSnapshot } from '../../model/display-model'
 
 /** Synthetic examples for development and tests only. They are not railway information. */
+export const DEMO_STATION_IDS = {
+  central: '00000000-0000-4000-8000-000000000101',
+  quiet: '00000000-0000-4000-8000-000000000102',
+  harbor: '00000000-0000-4000-8000-000000000103',
+} as const
+
 export const stationDisplayFixtures: readonly StationDepartureSnapshot[] = [
   {
-    station: { stationId: 'demo-central', name: 'DEMO Central Station' },
+    station: { stationId: DEMO_STATION_IDS.central, name: 'DEMO Central Station' },
     origin: 'fixture',
     departures: [
       {
@@ -33,12 +39,12 @@ export const stationDisplayFixtures: readonly StationDepartureSnapshot[] = [
     ],
   },
   {
-    station: { stationId: 'demo-quiet', name: 'DEMO Quiet Station' },
+    station: { stationId: DEMO_STATION_IDS.quiet, name: 'DEMO Quiet Station' },
     origin: 'fixture',
     departures: [],
   },
   {
-    station: { stationId: 'demo-harbor', name: 'DEMO Harbor Station' },
+    station: { stationId: DEMO_STATION_IDS.harbor, name: 'DEMO Harbor Station' },
     origin: 'fixture',
     departures: [
       {

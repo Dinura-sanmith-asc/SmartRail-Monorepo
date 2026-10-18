@@ -68,16 +68,16 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 ### Tests for User Story 2
 
-- [ ] T017 [P] [US2] Add departure row tests in `src/features/station-display/components/departure-row.test.tsx` for scheduled-time labeling, service identity, absent values and text/symbol status alongside color (after T016; SR-054, SR-035; spec US2 scenarios 1 and 5).
-- [ ] T018 [P] [US2] Add board and app composition tests in `src/features/station-display/components/departure-board.test.tsx` and `src/App.test.tsx` for configured-station isolation, source order, empty state, no service-search substitution, operational changes on the correct departure, and a persistent visible fixture/demo label whenever fixture data is rendered (after T016; SR-054, SR-056, SR-061, SR-003, SR-004; spec US1 scenarios 2/3).
-- [ ] T019 [US2] Add operational update tests in `src/features/station-display/components/operational-change.test.tsx` for platform change, delay, cancellation prominence, planned scheduled-time meaning, source-provided update time and unknown values that are never inferred (after T016; SR-056, SR-010, SR-035; spec US2 scenarios 2 through 5).
+- [X] T017 [P] [US2] Add departure row tests in `src/features/station-display/components/departure-row.test.tsx` for scheduled-time labeling, service identity, absent values and text/symbol status alongside color (after T016; SR-054, SR-035; spec US2 scenarios 1 and 5).
+- [X] T018 [P] [US2] Add board and app composition tests in `src/features/station-display/components/departure-board.test.tsx` and `src/App.test.tsx` for configured-station isolation, source order, empty state, no service-search substitution, operational changes on the correct departure, and a persistent visible fixture/demo label whenever fixture data is rendered (after T016; SR-054, SR-056, SR-061, SR-003, SR-004; spec US1 scenarios 2/3).
+- [X] T019 [US2] Add operational update tests in `src/features/station-display/components/operational-change.test.tsx` for platform change, delay, cancellation prominence, planned scheduled-time meaning, source-provided update time and unknown values that are never inferred (after T016; SR-056, SR-010, SR-035; spec US2 scenarios 2 through 5).
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Implement operational status/change presentation in `src/features/station-display/components/operational-change.tsx` for source-provided platform, delay and cancellation values; expose update time only when supplied with verified meaning and never derive values (after T019; SR-056, SR-010, SR-035; spec FR-003/FR-004).
-- [ ] T021 [US2] Implement `src/features/station-display/components/departure-row.tsx` and compose `OperationalChange` into each affected row so scheduled values retain planned meaning and operational values/unknowns are clearly labeled (after T017 and T020; SR-054, SR-056, SR-035; spec FR-002 through FR-004).
-- [ ] T022 [US2] Implement `src/features/station-display/components/departure-board.tsx` using only rows associated with the configured station and source-provided order; provide a no-departures state (after T018 and T021; SR-054; spec US1 scenarios 1 through 3).
-- [ ] T023 [US2] Wire the T010 non-live fixture source into `src/App.tsx` for isolated UI development, after station identity (T016) and board composition (T022) are available; always show a persistent visible fixture/demo label whenever fixture data renders (T018 verifies the label; SR-054, SR-061).
+- [X] T020 [US2] Implement operational status/change presentation in `src/features/station-display/components/operational-change.tsx` for source-provided platform, delay and cancellation values; expose update time only when supplied with verified meaning and never derive values (after T019; SR-056, SR-010, SR-035; spec FR-003/FR-004).
+- [X] T021 [US2] Implement `src/features/station-display/components/departure-row.tsx` and compose `OperationalChange` into each affected row so scheduled values retain planned meaning and operational values/unknowns are clearly labeled (after T017 and T020; SR-054, SR-056, SR-035; spec FR-002 through FR-004).
+- [X] T022 [US2] Implement `src/features/station-display/components/departure-board.tsx` using only rows associated with the configured station and source-provided order; provide a no-departures state (after T018 and T021; SR-054; spec US1 scenarios 1 through 3).
+- [X] T023 [US2] Wire the T010 non-live fixture source into `src/App.tsx` for isolated UI development, after station identity (T016) and board composition (T022) are available; always show a persistent visible fixture/demo label whenever fixture data renders (T018 verifies the label; SR-054, SR-061).
 
 ### Backend contract gate for User Story 2 — BLOCKED
 
