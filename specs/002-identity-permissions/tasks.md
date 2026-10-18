@@ -27,15 +27,15 @@
 
 **Purpose**: Define internal role codes, assignment/audit invariants and the approved explicit-grant evaluator.
 
-- [ ] T005 [US3] Define the canonical role-code enum `Passenger`, `Driver`, `StationStaff`, and `Controller` (with no `Public` assignment) in `src/SmartRail.Domain/Identity/RoleCode.cs` (depends on T001–T004).
-- [ ] T006 [P] [US3] Implement role grant/revocation lifecycle invariants and opaque Cognito-subject handling in `src/SmartRail.Domain/Identity/Entities/RoleAssignment.cs` (depends on T005).
-- [ ] T007 [US3] Implement append-only role grant/revocation audit evidence with actor, action, UTC time and optional controlled evidence reference in `src/SmartRail.Domain/Identity/Entities/RoleAssignmentAudit.cs` (depends on T006).
-- [ ] T008 [P] [US3] Implement station-scope grant/revocation lifecycle invariants referencing the existing Railway Network station identity in `src/SmartRail.Domain/Identity/Entities/StationScopeAssignment.cs` (depends on T005).
-- [ ] T009 [US3] Implement append-only station-scope grant/revocation audit evidence in `src/SmartRail.Domain/Identity/Entities/StationScopeAssignmentAudit.cs` (depends on T008).
-- [ ] T010 [US3] Encode only the approved role/action grants and explicit multi-role grant union in `src/SmartRail.Domain/Identity/RolePermissionCatalog.cs` without broadening or changing the matrix in `specs/002-identity-permissions/spec.md` (depends on T005).
-- [ ] T011 [P] [US3] Test role assignment invariants, active/revoked transitions, re-grant lifecycle, and audit event rules in `tests/SmartRail.UnitTests/Identity/RoleAssignmentTests.cs` (depends on T006, T007).
-- [ ] T012 [P] [US3] Test station-scope lifecycle, station identity, audit event rules and revocation in `tests/SmartRail.UnitTests/Identity/StationScopeAssignmentTests.cs` (depends on T008, T009).
-- [ ] T013 [P] [US3] Test exact approved matrix grants, multiple-role explicit-grant union, unknown codes and no-grant defaults in `tests/SmartRail.UnitTests/Identity/RolePermissionCatalogTests.cs` (depends on T010).
+- [X] T005 [US3] Define the canonical role-code enum `Passenger`, `Driver`, `StationStaff`, and `Controller` (with no `Public` assignment) in `src/SmartRail.Domain/Identity/RoleCode.cs` (depends on T001–T004).
+- [X] T006 [P] [US3] Implement role grant/revocation lifecycle invariants and opaque Cognito-subject handling in `src/SmartRail.Domain/Identity/Entities/RoleAssignment.cs` (depends on T005).
+- [X] T007 [US3] Implement append-only role grant/revocation audit evidence with actor, action, UTC time and optional controlled evidence reference in `src/SmartRail.Domain/Identity/Entities/RoleAssignmentAudit.cs` (depends on T006).
+- [X] T008 [P] [US3] Implement station-scope grant/revocation lifecycle invariants referencing the existing Railway Network station identity in `src/SmartRail.Domain/Identity/Entities/StationScopeAssignment.cs` (depends on T005).
+- [X] T009 [US3] Implement append-only station-scope grant/revocation audit evidence in `src/SmartRail.Domain/Identity/Entities/StationScopeAssignmentAudit.cs` (depends on T008).
+- [X] T010 [US3] Encode only the approved role/action grants and explicit multi-role grant union in `src/SmartRail.Domain/Identity/RolePermissionCatalog.cs` without broadening or changing the matrix in `specs/002-identity-permissions/spec.md` (depends on T005).
+- [X] T011 [P] [US3] Test role assignment invariants, active/revoked transitions, re-grant lifecycle, and audit event rules in `tests/SmartRail.UnitTests/Identity/RoleAssignmentTests.cs` (depends on T006, T007).
+- [X] T012 [P] [US3] Test station-scope lifecycle, station identity, audit event rules and revocation in `tests/SmartRail.UnitTests/Identity/StationScopeAssignmentTests.cs` (depends on T008, T009).
+- [X] T013 [P] [US3] Test exact approved matrix grants, multiple-role explicit-grant union, unknown codes and no-grant defaults in `tests/SmartRail.UnitTests/Identity/RolePermissionCatalogTests.cs` (depends on T010).
 
 **Phase verification gate**: Run the focused Domain unit tests; verify role codes match the data model, public is not an assigned role, and domain projects have no EF Core, API, Cognito SDK or AWS dependencies.
 
