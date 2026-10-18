@@ -9,6 +9,11 @@ using SmartRail.Infrastructure.RailwayNetwork;
 using SmartRail.Infrastructure.RailwayNetwork.Persistence;
 using SmartRail.Application.Identity.Persistence;
 using SmartRail.Infrastructure.Identity.Persistence;
+using SmartRail.Application.Identity.Authorization;
+using SmartRail.Application.Identity.Maintenance;
+using SmartRail.Application.Identity.Queries;
+using SmartRail.Infrastructure.Identity;
+using SmartRail.Infrastructure.Identity.Maintenance;
 
 namespace SmartRail.Infrastructure;
 
@@ -29,6 +34,18 @@ public static class DependencyInjection
         services.AddDbContext<SmartRailDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<IRoleAssignmentRepository, RoleAssignmentRepository>();
         services.AddScoped<IStationScopeRepository, StationScopeRepository>();
+        services.TryAddScoped<IDriverJourneyAssignmentEvidence, UnavailableOwnerEvidence>();
+        services.TryAddScoped<IIncidentResourceEvidence, UnavailableOwnerEvidence>();
+        services.TryAddScoped<IPassengerOrderOwnershipEvidence, UnavailableOwnerEvidence>();
+        services.TryAddSingleton<IIdentityMaintenanceAuthority, DenyAllIdentityMaintenanceAuthority>();
+        services.AddScoped<ResolveCurrentRolesHandler>();
+        services.AddScoped<ResolveResourceScopeHandler>();
+        services.AddScoped<AuthorizeOperationHandler>();
+        services.AddScoped<GetCurrentIdentityHandler>();
+        services.AddScoped<GrantRoleAssignmentHandler>();
+        services.AddScoped<RevokeRoleAssignmentHandler>();
+        services.AddScoped<GrantStationScopeHandler>();
+        services.AddScoped<RevokeStationScopeHandler>();
         services.AddScoped<IStationRepository, StationReadRepository>();
         services.AddScoped<IRouteReadRepository, RouteReadRepository>();
         services.AddScoped<IServiceReadRepository, ServiceReadRepository>();

@@ -2,7 +2,7 @@ namespace SmartRail.Api.Authentication;
 
 /// <summary>
 /// Configuration required to validate SmartRail human Cognito access tokens.
-/// Token validation is configured by a later implementation phase.
+/// Used by the configured Cognito bearer-token validator.
 /// </summary>
 public sealed class CognitoJwtOptions
 {

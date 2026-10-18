@@ -62,10 +62,3 @@ public interface IIdentityMaintenanceAuthority
 {
     Task<MaintenanceAuthorityDecision> AuthorizeAsync(string verifiedActorSubject, MaintenanceAction action, CancellationToken cancellationToken = default);
 }
-
-/// <summary>Safe default until an approved production maintenance authority is explicitly wired.</summary>
-public sealed class DenyAllIdentityMaintenanceAuthority : IIdentityMaintenanceAuthority
-{
-    public Task<MaintenanceAuthorityDecision> AuthorizeAsync(string verifiedActorSubject, MaintenanceAction action, CancellationToken cancellationToken = default) =>
-        Task.FromResult(new MaintenanceAuthorityDecision(MaintenanceAuthorityOutcome.Denied));
-}

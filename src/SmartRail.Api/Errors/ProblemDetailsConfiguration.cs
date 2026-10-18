@@ -13,6 +13,8 @@ public static class ProblemDetailsConfiguration
             context.ProblemDetails.Extensions.TryAdd("code", context.ProblemDetails.Status switch
             {
                 StatusCodes.Status400BadRequest => "invalid_request",
+                StatusCodes.Status401Unauthorized => "authentication_required",
+                StatusCodes.Status403Forbidden => "permission_denied",
                 StatusCodes.Status404NotFound => "not_found",
                 StatusCodes.Status503ServiceUnavailable => "source_unavailable",
                 _ => "internal_error"

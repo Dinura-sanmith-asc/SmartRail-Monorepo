@@ -21,7 +21,10 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
 
         var expectedPaths = new[] { "/api/stations", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}" };
         var generatedPaths = paths.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal).ToArray();
-        Assert.Equal(expectedPaths.Order(StringComparer.Ordinal), generatedPaths);
+        var generatedRailwayPaths = generatedPaths.Where(path => path != "/api/me").ToArray();
+        Assert.Equal(expectedPaths.Order(StringComparer.Ordinal), generatedRailwayPaths);
+        Assert.Contains("/api/me", generatedPaths);
+        Assert.Equal(expectedPaths.Length + 1, generatedPaths.Length);
         foreach (var path in expectedPaths)
         {
             Assert.Contains(path, approvedYaml, StringComparison.Ordinal);
