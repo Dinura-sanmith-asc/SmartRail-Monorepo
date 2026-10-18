@@ -33,5 +33,9 @@ export default defineConfig({
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
+    env: {
+      VITE_STATION_ID: '00000000-0000-4000-8000-000000000101',
+      VITE_API_BASE_URL: 'http://127.0.0.1:4173/api',
+    },
   },
 })

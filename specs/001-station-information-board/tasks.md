@@ -97,11 +97,11 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 ### Tests for User Story 3
 
-- [ ] T027 [P] [US3] Add refresh coordinator tests in `src/features/station-display/hooks/use-departure-updates.test.ts` for initial snapshot, newly available snapshot, source failure and no passenger-triggered action (after T007 and T023; SR-058; spec US3 scenarios 1 through 3).
+- [X] T027 [P] [US3] Add refresh coordinator tests in `src/features/station-display/hooks/use-departure-updates.test.ts` for initial snapshot, newly available snapshot, source failure and no passenger-triggered action (after T007 and T023; SR-058; spec US3 scenarios 1 through 3).
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] Implement `src/features/station-display/hooks/use-departure-updates.ts` to consume the T007 source interface and update displayed state without user action; keep cadence and transport in the source adapter rather than inventing polling/push behavior (after T027; SR-058; spec FR-005).
+- [X] T028 [US3] Implement `src/features/station-display/hooks/use-departure-updates.ts` to consume the T007 source interface and update displayed state without user action; keep cadence and transport in the source adapter rather than inventing polling/push behavior (after T027; SR-058; spec FR-005).
 
 ### Live automatic-update integration gate — BLOCKED
 
@@ -121,15 +121,15 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 ### Tests for User Story 4
 
-- [ ] T032 [P] [US4] Add display state tests in `src/features/station-display/model/display-state.test.ts` for unavailable-without-data, stale-with-last-success, revalidating and recovered transitions (after T023 and T028; SR-059; spec US4 scenarios 1–4).
-- [ ] T033 [US4] Add reconnect behavior tests in `src/features/station-display/hooks/use-revalidation.test.ts` proving online notification triggers a source revalidation but does not clear stale state by itself (after T023 and T028; SR-059; spec FR-006/FR-007).
+- [X] T032 [P] [US4] Add display state tests in `src/features/station-display/model/display-state.test.ts` for unavailable-without-data, stale-with-last-success, revalidating and recovered transitions (after T023 and T028; SR-059; spec US4 scenarios 1–4).
+- [X] T033 [US4] Add reconnect behavior tests in `src/features/station-display/hooks/use-revalidation.test.ts` proving online notification triggers a source revalidation but does not clear stale state by itself (after T023 and T028; SR-059; spec FR-006/FR-007).
 - [ ] T034 [US4] Add deterministic Playwright offline/recovery scenarios in `e2e/station-connectivity.spec.ts` using controlled request interception and/or the deterministic fixture source, not a future backend: simulate disconnect before first success and after successful data retrieval; verify cached/stale indication persists during outage and after failed revalidation; simulate reconnection and verify the stale indication is removed only after successful authoritative revalidation (after T023 and T028; SR-059; quickstart scenario 5). Do not assert a production refresh interval.
 
 ### Implementation for User Story 4
 
-- [ ] T035 [US4] Implement the display information state transitions in `src/features/station-display/model/display-state.ts` so last successful data remains in active-session memory and is never represented as current during disconnection (after T032; SR-059; spec FR-006/FR-008).
-- [ ] T036 [US4] Implement reconnection-triggered authoritative revalidation in `src/features/station-display/hooks/use-revalidation.ts`; retain the stale warning until the source confirms a successful current response (after T033 and T035; SR-059; spec FR-007).
-- [ ] T037 [US4] Implement loading, empty, error, unavailable, disconnected/stale, revalidating and recovered state views in `src/features/station-display/components/display-state-view.tsx`; show last-update only when the approved source meaning is available (after T035 and T036; SR-059, SR-035; spec FR-006–FR-008).
+- [X] T035 [US4] Implement the display information state transitions in `src/features/station-display/model/display-state.ts` so last successful data remains in active-session memory and is never represented as current during disconnection (after T032; SR-059; spec FR-006/FR-008).
+- [X] T036 [US4] Implement reconnection-triggered authoritative revalidation in `src/features/station-display/hooks/use-revalidation.ts`; retain the stale warning until the source confirms a successful current response (after T033 and T035; SR-059; spec FR-007).
+- [X] T037 [US4] Implement loading, empty, error, unavailable, disconnected/stale, revalidating and recovered state views in `src/features/station-display/components/display-state-view.tsx`; show last-update only when the approved source meaning is available (after T035 and T036; SR-059, SR-035; spec FR-006–FR-008).
 
 **Checkpoint**: Active-session outage behavior is testable with fixtures. Durable browser storage and expiry/TTL are excluded pending approved policy.
 

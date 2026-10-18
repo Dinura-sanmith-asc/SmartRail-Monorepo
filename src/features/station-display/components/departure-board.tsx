@@ -22,7 +22,7 @@ export function DepartureBoard({ configuredStationId, snapshot }: DepartureBoard
           Departure information is unavailable for this station.
         </p>
       ) : snapshot.departures.length === 0 ? (
-        <p className="text-lg text-slate-200">
+        <p className="text-lg text-slate-200" role="status" aria-live="polite">
           {isFixture ? 'No fixture departures are available for this station.' : 'No departures are currently available.'}
         </p>
       ) : (

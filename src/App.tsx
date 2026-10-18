@@ -3,10 +3,10 @@ import { readStationDisplayConfig, type ConfigErrorReason } from './app/config'
 import { findPublishedStation } from './features/station-display/api/station-reference-client'
 import { createFixtureDepartureSource } from './features/station-display/api/fixtures/fixture-departure-source'
 import { stationDisplayFixtures } from './features/station-display/api/fixtures/station-display.fixture'
-import type { StationDepartureSnapshot } from './features/station-display/model/display-model'
 import type { StationDepartureSource } from './features/station-display/api/station-departure-source'
 import { StationHeader, type StationHeaderState } from './features/station-display/components/station-header'
-import { DepartureBoard } from './features/station-display/components/departure-board'
+import { DisplayStateView } from './features/station-display/components/display-state-view'
+import { useDepartureUpdates } from './features/station-display/hooks/use-departure-updates'
 import { createHttpClient } from './shared/api/http-client'
 
 const stationDisplayConfig = readStationDisplayConfig()
@@ -25,39 +25,9 @@ function configurationMessage(reason: ConfigErrorReason): string {
 }
 
 function FixtureDepartures({ stationId, source }: { stationId: string; source: StationDepartureSource }) {
-  const [snapshot, setSnapshot] = useState<StationDepartureSnapshot | null>(null)
-  const [unavailable, setUnavailable] = useState(false)
+  const state = useDepartureUpdates(source, stationId)
 
-  useEffect(() => {
-    let active = true
-    const unsubscribe = source.subscribe((nextSnapshot) => {
-      if (active && nextSnapshot.station.stationId === stationId) setSnapshot(nextSnapshot)
-    })
-
-    void source
-      .getInitialSnapshot(stationId)
-      .then((initialSnapshot) => {
-        if (active) setSnapshot(initialSnapshot)
-      })
-      .catch(() => {
-        if (active) setUnavailable(true)
-      })
-
-    return () => {
-      active = false
-      unsubscribe()
-    }
-  }, [source, stationId])
-
-  if (snapshot) return <DepartureBoard configuredStationId={stationId} snapshot={snapshot} />
-  if (unavailable) {
-    return (
-      <p className="m-8 text-lg text-amber-200" role="alert">
-        DEMO departure fixture is unavailable for this configured station.
-      </p>
-    )
-  }
-  return <p className="m-8 text-lg text-slate-200" role="status">Loading DEMO departure fixture</p>
+  return <DisplayStateView configuredStationId={stationId} state={state} />
 }
 
 interface AppProps {
