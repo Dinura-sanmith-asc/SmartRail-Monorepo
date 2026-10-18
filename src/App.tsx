@@ -35,11 +35,25 @@ interface AppProps {
 }
 
 function App({ departureSource = fixtureDepartureSource }: AppProps) {
+  const [activeDepartureSource, setActiveDepartureSource] = useState<StationDepartureSource | null>(
+    departureSource === fixtureDepartureSource
+      ? (import.meta.env.DEV ? null : fixtureDepartureSource)
+      : departureSource,
+  )
   const [state, setState] = useState<StationHeaderState>(() =>
     stationDisplayConfig.kind === 'valid'
       ? { kind: 'loading' }
       : { kind: 'unavailable', message: configurationMessage(stationDisplayConfig.reason) },
   )
+
+  useEffect(() => {
+    if (departureSource !== fixtureDepartureSource || !import.meta.env.DEV) return
+    let active = true
+    void import('./features/station-display/api/fixtures/dev-controlled-departure-source').then(({ createDevControlledDepartureSource }) => {
+      if (active) setActiveDepartureSource(createDevControlledDepartureSource(fixtureDepartureSource))
+    })
+    return () => { active = false }
+  }, [departureSource])
 
   useEffect(() => {
     if (stationDisplayConfig.kind === 'invalid') return
@@ -65,7 +79,7 @@ function App({ departureSource = fixtureDepartureSource }: AppProps) {
   return (
     <main className="flex min-h-screen flex-col bg-slate-950">
       <StationHeader state={state} />
-      {state.kind === 'ready' ? <FixtureDepartures stationId={state.station.stationId} source={departureSource} /> : null}
+      {state.kind === 'ready' && activeDepartureSource ? <FixtureDepartures stationId={state.station.stationId} source={activeDepartureSource} /> : null}
     </main>
   )
 }
