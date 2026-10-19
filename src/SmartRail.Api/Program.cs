@@ -15,6 +15,10 @@ using SmartRail.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Database command logs can contain query structure and operational details. Keep those out of API logs;
+// application-level safe error mapping remains responsible for reporting unavailable operations.
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None);
+
 // WebApplication.CreateBuilder loads appsettings, User Secrets in Development, and environment variables.
 builder.Services.AddSingleton<IValidateOptions<CognitoJwtOptions>, CognitoJwtOptionsValidator>();
 builder.Services

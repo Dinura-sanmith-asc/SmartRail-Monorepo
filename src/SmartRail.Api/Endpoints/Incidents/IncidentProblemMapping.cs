@@ -6,6 +6,17 @@ namespace SmartRail.Api.Endpoints.Incidents;
 
 public static class IncidentProblemMapping
 {
+    public static IResult ForList(SmartRail.Application.Incidents.UseCases.ListIncidentsResult result) => result.Outcome switch
+    {
+        SmartRail.Application.Incidents.UseCases.ListIncidentsOutcome.Unauthorized => ProblemDetailsConfiguration.Create(
+            StatusCodes.Status401Unauthorized, "Authentication is required.", "unauthorized"),
+        SmartRail.Application.Incidents.UseCases.ListIncidentsOutcome.Forbidden => ProblemDetailsConfiguration.Create(
+            StatusCodes.Status403Forbidden, "The caller is not authorized to view incidents.", "forbidden"),
+        SmartRail.Application.Incidents.UseCases.ListIncidentsOutcome.Unavailable => ProblemDetailsConfiguration.Create(
+            StatusCodes.Status503ServiceUnavailable, "Incident or authorization information is temporarily unavailable.", "authority_unavailable"),
+        _ => throw new ArgumentOutOfRangeException(nameof(result))
+    };
+
     public static IResult ForCreate(CreateIncidentResult result) => result.Outcome switch
     {
         CreateIncidentOutcome.Invalid => ProblemDetailsConfiguration.Create(StatusCodes.Status400BadRequest,

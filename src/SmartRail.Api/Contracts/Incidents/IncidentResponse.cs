@@ -25,6 +25,18 @@ public sealed record IncidentResponse(
         projection.Associations.Select(item => new IncidentAssociationResponse(
             item.AssociationId, item.Kind, item.ResourceId, item.UpdateId, item.Revision)).ToArray());
 
+    public static IncidentResponse From(SmartRail.Application.Incidents.UseCases.IncidentListItem projection) => new(
+        projection.IncidentId,
+        projection.CategoryCode,
+        projection.Description,
+        ToStateLabel(projection.State),
+        projection.Revision,
+        projection.Source,
+        projection.ReportedAt,
+        projection.OccurredAt,
+        projection.Associations.Select(item => new IncidentAssociationResponse(
+            item.AssociationId, item.Kind, item.ResourceId, item.UpdateId, item.Revision)).ToArray());
+
     /// <summary>Map persisted enum names to the exact approved API labels.</summary>
     public static string ToStateLabel(string state) => state switch
     {
