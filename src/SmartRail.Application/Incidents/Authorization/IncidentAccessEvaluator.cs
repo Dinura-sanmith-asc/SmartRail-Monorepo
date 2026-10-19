@@ -15,7 +15,11 @@ public sealed class IncidentAccessEvaluator(AuthorizeOperationHandler authorizat
         var principal = new VerifiedPrincipal(verifiedSubject);
         if (isCreation)
         {
-            if (associatedStationIds.Count == 0) return AuthorizationDecision.Denied("station-scope-required");
+            // Service-only reports are valid for globally granted Controllers. The no-resource
+            // authorization check still resolves current role state and the explicit action grant;
+            // Station Staff remain denied because their creation grant requires station scope.
+            if (associatedStationIds.Count == 0)
+                return await authorization.HandleAsync(new(principal, action, ProtectedResource.None), cancellationToken);
             AuthorizationDecision? unavailable = null;
             foreach (var stationId in associatedStationIds)
             {

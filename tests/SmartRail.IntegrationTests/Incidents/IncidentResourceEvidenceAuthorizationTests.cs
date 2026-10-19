@@ -44,6 +44,34 @@ public sealed class IncidentResourceEvidenceAuthorizationTests(
     }
 
     [Fact]
+    public async Task Controller_global_create_grant_allows_service_only_report()
+    {
+        const string subject = "f004-controller-service-only-create";
+        await GrantRoleAsync(subject, RoleCode.Controller);
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var evaluator = new IncidentAccessEvaluator(scope.ServiceProvider.GetRequiredService<AuthorizeOperationHandler>());
+
+        var decision = await evaluator.AuthorizeAsync(subject, PermissionAction.CreateIncident, null,
+            Array.Empty<Guid>(), isCreation: true);
+
+        Assert.Equal(AuthorizationOutcome.Allowed, decision.Outcome);
+    }
+
+    [Fact]
+    public async Task Station_staff_service_only_report_is_denied_without_station_scope()
+    {
+        const string subject = "f004-staff-service-only-create";
+        await GrantRoleAsync(subject, RoleCode.StationStaff);
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var evaluator = new IncidentAccessEvaluator(scope.ServiceProvider.GetRequiredService<AuthorizeOperationHandler>());
+
+        var decision = await evaluator.AuthorizeAsync(subject, PermissionAction.CreateIncident, null,
+            Array.Empty<Guid>(), isCreation: true);
+
+        Assert.Equal(AuthorizationOutcome.Denied, decision.Outcome);
+    }
+
+    [Fact]
     public async Task Station_staff_requires_scope_for_every_associated_station()
     {
         const string subject = "f004-station-staff-scoped";
