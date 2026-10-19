@@ -6,8 +6,10 @@ using System.Text.Json.Nodes;
 using SmartRail.Api.Authentication;
 using SmartRail.Api.Authorization;
 using SmartRail.Api.Contracts.Identity;
+using SmartRail.Api.Contracts.Incidents;
 using SmartRail.Api.Endpoints;
 using SmartRail.Api.Endpoints.JourneysStatus;
+using SmartRail.Api.Endpoints.Incidents;
 using SmartRail.Api.Errors;
 using SmartRail.Infrastructure;
 
@@ -82,6 +84,38 @@ builder.Services.AddOpenApi(options =>
                     };
             }
         }
+        else if (context.JsonTypeInfo.Type == typeof(IncidentResponse))
+        {
+            schema.AdditionalPropertiesAllowed = false;
+            if (schema.Properties?.TryGetValue("state", out var stateSchema) == true && stateSchema is OpenApiSchema state)
+                state.Enum = new List<JsonNode>
+                {
+                    JsonValue.Create("Reported")!, JsonValue.Create("In Progress")!,
+                    JsonValue.Create("Resolved")!, JsonValue.Create("Closed")!
+                };
+            if (schema.Properties?.TryGetValue("source", out var sourceSchema) == true && sourceSchema is OpenApiSchema source)
+                source.Enum = new List<JsonNode> { JsonValue.Create("IncidentManagement")! };
+        }
+        else if (context.JsonTypeInfo.Type == typeof(IncidentAssociationInput))
+        {
+            schema.AdditionalPropertiesAllowed = false;
+            if (schema.Properties?.TryGetValue("kind", out var kindSchema) == true && kindSchema is OpenApiSchema kind)
+                kind.Enum = new List<JsonNode>
+                {
+                    JsonValue.Create("Station")!, JsonValue.Create("Service")!,
+                    JsonValue.Create("Journey")!, JsonValue.Create("Disruption")!
+                };
+        }
+        else if (context.JsonTypeInfo.Type == typeof(CreateIncidentRequest))
+        {
+            schema.AdditionalPropertiesAllowed = false;
+            if (schema.Properties?.TryGetValue("categoryCode", out var categorySchema) == true && categorySchema is OpenApiSchema category)
+                category.MinLength = 1;
+            if (schema.Properties?.TryGetValue("description", out var descriptionSchema) == true && descriptionSchema is OpenApiSchema description)
+                description.MinLength = 1;
+            if (schema.Properties?.TryGetValue("associations", out var associationsSchema) == true && associationsSchema is OpenApiSchema associations)
+                associations.MinItems = 1;
+        }
         return Task.CompletedTask;
     });
 });
@@ -120,6 +154,7 @@ app.MapRailwayNetworkEndpoints();
 app.MapIdentityEndpoints();
 app.MapJourneysStatusReadEndpoints();
 app.MapJourneysStatusPublicationEndpoints();
+app.MapIncidentEndpoints();
 
 
 app.Run();
