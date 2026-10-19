@@ -98,6 +98,7 @@ public static class DependencyInjection
             provider.GetRequiredService<SmartRail.Application.Incidents.Authorization.IncidentAccessEvaluator>());
         services.AddScoped<SmartRail.Application.Incidents.UseCases.CreateIncidentHandler>();
         services.AddScoped<SmartRail.Application.Incidents.UseCases.ListIncidentsHandler>();
+        services.AddScoped<SmartRail.Application.Incidents.UseCases.UpdateIncidentHandler>();
         services.AddScoped<SmartRail.Application.Incidents.Persistence.IIncidentUnitOfWork, Incidents.Persistence.IncidentUnitOfWork>();
         services.AddScoped<SmartRail.Application.Incidents.Persistence.IIncidentRepository, Incidents.Persistence.IncidentRepository>();
         services.RemoveAll<IIncidentResourceEvidence>();

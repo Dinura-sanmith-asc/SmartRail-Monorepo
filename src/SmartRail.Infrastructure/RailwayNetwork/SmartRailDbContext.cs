@@ -55,11 +55,11 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     private void RejectAuditMutation()
     {
         var mutation = ChangeTracker.Entries()
-            .Where(entry => entry.Entity is RoleAssignmentAudit or StationScopeAssignmentAudit or JourneyInitializationAudit or JourneyRevision)
+            .Where(entry => entry.Entity is RoleAssignmentAudit or StationScopeAssignmentAudit or JourneyInitializationAudit or JourneyRevision or IncidentRevision)
             .FirstOrDefault(entry => entry.State is EntityState.Modified or EntityState.Deleted);
         if (mutation is not null)
         {
-            throw new InvalidOperationException("Identity audit events are append-only and cannot be updated or deleted.");
+            throw new InvalidOperationException("Audit and publication revision evidence is append-only and cannot be updated or deleted.");
         }
     }
 }

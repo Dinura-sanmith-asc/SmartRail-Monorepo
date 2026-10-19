@@ -8,6 +8,10 @@ public sealed class IncidentRevisionConfiguration : IEntityTypeConfiguration<Inc
 {
     public void Configure(EntityTypeBuilder<IncidentRevision> builder)
     {
+        // Prevent EF Core from generating UPDATE statements for immutable revision evidence;
+        // SmartRailDbContext also rejects both Modified and Deleted entries at SaveChanges.
+        foreach (var property in builder.Metadata.GetProperties())
+            property.SetAfterSaveBehavior(Microsoft.EntityFrameworkCore.Metadata.PropertySaveBehavior.Throw);
         builder.ToTable("incident_revision", table =>
         {
             table.HasCheckConstraint("ck_incident_revision_positive", "revision > 0");

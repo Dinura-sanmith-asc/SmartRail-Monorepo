@@ -120,6 +120,18 @@ builder.Services.AddOpenApi(options =>
             if (schema.Properties?.TryGetValue("associations", out var associationsSchema) == true && associationsSchema is OpenApiSchema associations)
                 associations.MinItems = 1;
         }
+        else if (context.JsonTypeInfo.Type == typeof(UpdateIncidentRequest))
+        {
+            schema.AdditionalPropertiesAllowed = false;
+            if (schema.Properties?.TryGetValue("expectedRevision", out var expectedRevisionSchema) == true && expectedRevisionSchema is OpenApiSchema expectedRevision)
+                expectedRevision.Minimum = "1";
+            if (schema.Properties?.TryGetValue("state", out var updateStateSchema) == true && updateStateSchema is OpenApiSchema updateState)
+                updateState.Enum = new List<JsonNode>
+                {
+                    JsonValue.Create("Reported")!, JsonValue.Create("In Progress")!,
+                    JsonValue.Create("Resolved")!, JsonValue.Create("Closed")!
+                };
+        }
         return Task.CompletedTask;
     });
 });

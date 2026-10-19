@@ -67,8 +67,48 @@ public sealed class IncidentRepository(SmartRailDbContext dbContext) : IIncident
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public Task<bool> UpdateAsync(Incident incident, IncidentRevision revision, IReadOnlyCollection<IncidentAssociation> addAssociations,
+    public async Task<bool> UpdateAsync(Incident incident, IncidentRevision revision, IReadOnlyCollection<IncidentAssociation> addAssociations,
         IReadOnlyCollection<IncidentAssociation> removeAssociations, IncidentIdempotencyRecord idempotencyRecord,
-        int expectedRevision, CancellationToken cancellationToken = default) =>
-        throw new NotSupportedException("Incident mutation persistence is added with the approved lifecycle and association phases.");
+        int expectedRevision, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(incident);
+        ArgumentNullException.ThrowIfNull(revision);
+        ArgumentNullException.ThrowIfNull(addAssociations);
+        ArgumentNullException.ThrowIfNull(removeAssociations);
+        ArgumentNullException.ThrowIfNull(idempotencyRecord);
+        if (expectedRevision <= 0 || incident.Revision != expectedRevision + 1 ||
+            revision.IncidentId != incident.IncidentId || revision.Revision != incident.Revision ||
+            revision.State != incident.State || !revision.PreviousState.HasValue ||
+            idempotencyRecord.IncidentId != incident.IncidentId ||
+            addAssociations.Any(x => x.IncidentId != incident.IncidentId || x.AddedRevision != incident.Revision) ||
+            removeAssociations.Any(x => x.IncidentId != incident.IncidentId || x.RemovedRevision != incident.Revision))
+            throw new ArgumentException("Incident mutation, revision evidence, associations and retry record must share one expected revision.");
+
+        var incidentEntry = dbContext.Attach(incident);
+        incidentEntry.State = EntityState.Modified;
+        incidentEntry.Property(x => x.Revision).OriginalValue = expectedRevision;
+        try
+        {
+            // Claim the expected revision before inserting evidence. This makes the
+            // aggregate revision the concurrency gate even when two transactions race
+            // to insert the same (IncidentId, Revision) evidence key.
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new IncidentConcurrencyException();
+        }
+
+        foreach (var association in addAssociations) dbContext.IncidentAssociations.Add(association);
+        foreach (var association in removeAssociations)
+        {
+            var associationEntry = dbContext.Attach(association);
+            associationEntry.State = EntityState.Modified;
+            associationEntry.Property(x => x.RemovedRevision).OriginalValue = null;
+        }
+        dbContext.IncidentRevisions.Add(revision);
+        dbContext.IncidentIdempotencyRecords.Add(idempotencyRecord);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return true;
+    }
 }

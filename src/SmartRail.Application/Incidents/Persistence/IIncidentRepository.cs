@@ -6,6 +6,9 @@ public sealed record IncidentFilters(Guid? IncidentId = null, Guid? StationId = 
 public sealed record IncidentRecord(Incident Incident, IReadOnlyList<IncidentAssociation> Associations);
 public sealed record IdempotencyLookup(string ActorSubject, string Operation, string Key);
 
+/// <summary>Signals an expected-revision race after the surrounding transaction has been rolled back.</summary>
+public sealed class IncidentConcurrencyException : Exception { }
+
 /// <summary>Framework-neutral persistence port for incident state, history, links, and retries.</summary>
 public interface IIncidentRepository
 {
