@@ -21,7 +21,7 @@ This plan excludes live operations data and workflows. It does not change backen
 - `react-oidc-context` with its `oidc-client-ts` peer for OIDC callback/session integration. Configure Authorization Code + PKCE S256; disable automatic silent renewal and token revocation on sign-out; override the token-bearing user store with volatile in-memory storage. Use a separate short-lived browser state store for the redirect transaction and PKCE verifier; it must not contain access, ID, or refresh tokens.
 - Native `fetch` behind one typed `currentIdentityClient`; no API-client dependency is justified for one GET operation.
 - React Context and `useReducer` for feature-level identity/workspace view state; no additional global state library.
-- Vitest, jsdom, React Testing Library, `@testing-library/user-event`, MSW, and Playwright for deterministic unit/component/network/browser checks. These are proposed dependencies only; none are installed by this plan.
+- Vitest, jsdom, React Testing Library, `@testing-library/user-event`, MSW, and Playwright for deterministic unit/component/network/browser checks. These were installed during Milestone A; exact versions are recorded in `package.json` and `package-lock.json`.
 
 **Storage**: No application database. Keep the OIDC user/access-token state in JavaScript memory only. Use a temporary per-tab redirect transaction store for state, nonce, and PKCE verifier across Cognito's full-page redirect; clear it after callback success, failure, cancellation recovery, or stale-transaction cleanup. Never persist bearer tokens in localStorage, sessionStorage, cookies, URLs, logs, or query caches.
 

@@ -1,6 +1,6 @@
 # Quickstart: Staff Access Implementation Validation
 
-This guide records Milestone A foundation checks for Feature 001. The current application shell is not an authentication or operational workspace implementation; the user-story tasks remain outstanding.
+This guide records completed Milestones A and B for Feature 001. Milestone B implements only Controller managed-login entry, backend identity lookup, and the Controller shell. Station Staff, sign-out, operations workflows, live Cognito/backend acceptance, and production readiness remain outstanding.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ npm run test -- --run
 npm run test:e2e
 ```
 
-`test` runs Vitest and `test:e2e` runs Playwright. Playwright configuration is present, but no browser end-to-end tests exist yet; `npm run test:e2e -- --list` reports zero tests. No live browser, Cognito, or backend acceptance was run.
+`test` runs Vitest and `test:e2e` runs Playwright. Playwright uses only local placeholder runtime configuration and a controlled local OIDC/API fixture. No live Cognito or SmartRail backend acceptance was run.
 
 ## Milestone A evidence (T001–T012)
 
@@ -35,7 +35,23 @@ npm run test:e2e
 | Playwright browser tests | NOT RUN | Config discovery was checked; no E2E test files exist in Milestone A. |
 | Cognito, backend, station-scope, and production acceptance | BLOCKED | Requires external environment configuration, controlled identities, and approved owning-feature scope operation/fixtures as described below. |
 
-Full automated result: `npm run test -- --run` — 3 test files, 20 tests passed. These are local unit/component checks, not live authentication or backend acceptance. The root shell intentionally contains no login, callback processor, protected workspace, or business operations.
+Milestone A result at completion: `npm run test -- --run` — 3 test files, 20 tests passed. The foundation shell at that point intentionally had no login, callback processor, protected workspace, or business operations.
+
+## Milestone B evidence (T013–T024)
+
+| Check | Result | Evidence |
+|---|---|---|
+| OIDC config, PKCE S256 request, safe return paths, no silent renewal/revocation | PASS | Full Vitest run; config uses the Cognito issuer with managed-login authorization/token endpoints, and the installed OIDC library generated the S256 challenge. |
+| Memory token store and temporary redirect transaction | PASS | Unit/browser assertions confirmed the token-bearing user store is in-memory, no client secret is configured, redirect state is removed after callback, and no token was written to localStorage/sessionStorage. |
+| Strict current identity parser | PASS | Full Vitest run validated exact `{ subject, roles }`, opaque non-empty subject, unique recognized roles, and empty role array. |
+| `GET /api/me` adapter and lifecycle | PASS | MSW tests verified bearer header, valid Controller identity, 401, 503, timeout, offline, malformed 200, and stale response isolation after sign-out/session replacement. No 403 response was added to the identity fixtures or contract. |
+| Controller route and callback behavior | PASS | Component and local-fixture browser tests verified role-gated direct navigation, successful and rejected callbacks, consumed-state replay denial, callback URL cleanup, one code exchange, and expiry closing protected content. |
+| Vitest | PASS | `npm run test -- --run` — 7 test files, 66 tests passed. |
+| Playwright | PASS | `npm run test:e2e -- --workers=1` — 8 Chromium tests passed against the local OIDC/API fixture. This is mocked protocol evidence only. |
+| Lint and build | PASS | `npm run lint` and `npm run build` completed successfully after Milestone B implementation. |
+| Live Cognito/backend and production acceptance | BLOCKED | Requires owner-supplied Cognito/API environment, registered URLs/scopes, controlled real test identities, hosting/CORS/TLS and production operations setup. |
+
+The browser suite verifies the OIDC library's protocol behavior against a local fixture; it does not contact Cognito, prove the production app-client configuration, or count as live backend acceptance. The API response is intercepted by Playwright/MSW fixtures and does not establish production integration.
 
 ## Acceptance checks
 
@@ -54,5 +70,5 @@ Full automated result: `npm run test -- --run` — 3 test files, 20 tests passed
 - `BLOCKED`: execution cannot proceed because a prerequisite is missing, such as Cognito app-client/URI values, test identity, backend base URL/CORS, or deployment setup; name the owner/dependency.
 - `NOT RUN`: the check has not been executed. Do not report a planned check as passed.
 
-Current planning evidence: all implementation and client checks are `NOT RUN`; real Cognito/backend acceptance is `BLOCKED` until environment and test-user configuration is supplied. Backend Feature 002's prior test evidence is recorded in the sibling backend quickstart/checklist and was not rerun during this planning task.
+Current evidence: Milestones A and B local automated checks are `PASS` as listed above. Station Staff, later recovery/sign-out scope, accessibility manual review, and full feature acceptance remain `NOT RUN` or are tracked in their later task phases. Real Cognito/backend acceptance is `BLOCKED` until environment and controlled test-user configuration is supplied. Backend Feature 002 evidence was not rerun during this implementation milestone.
 

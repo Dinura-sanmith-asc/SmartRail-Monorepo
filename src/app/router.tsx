@@ -1,18 +1,22 @@
-import { createBrowserRouter, RouterProvider } from 'react-router'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
+import { CallbackPage } from '../features/staff-access/auth/CallbackPage'
+import { SignInPage } from '../features/staff-access/auth/SignInPage'
+import { ProtectedRoute } from '../features/staff-access/routes/ProtectedRoute'
+import { ControllerWorkspace } from '../features/staff-access/workspaces/ControllerWorkspace'
 
-function FoundationPage() {
-  return (
-    <main className="app-shell">
-      <header><p className="app-shell__eyebrow">SmartRail</p><h1>Railway Operations</h1></header>
-      <section aria-labelledby="welcome-heading">
-        <h2 id="welcome-heading">Operations Web foundation</h2>
-        <p>Staff access is not configured yet. Sign-in and operational workspaces will be available in a later implementation milestone.</p>
-      </section>
-    </main>
-  )
-}
-
-const router = createBrowserRouter([{ path: '*', element: <FoundationPage /> }])
+const router = createBrowserRouter([
+  { path: '/', element: <SignInPage /> },
+  { path: '/auth/callback', element: <CallbackPage /> },
+  {
+    path: '/controller/*',
+    element: (
+      <ProtectedRoute requiredRole="Controller">
+        <ControllerWorkspace />
+      </ProtectedRoute>
+    ),
+  },
+  { path: '*', element: <Navigate to="/" replace /> },
+])
 
 export function AppRouter() {
   return <RouterProvider router={router} />

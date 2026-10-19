@@ -1,10 +1,12 @@
 import { AppRouter } from './router'
-import { RuntimeConfigProvider } from './providers'
+import { ConfiguredAuthProvider, RuntimeConfigProvider } from './providers'
 
 export default function App() {
   return (
     <RuntimeConfigProvider>
-      <AppRouter />
+      <ConfiguredAuthProvider>
+        <AppRouter />
+      </ConfiguredAuthProvider>
     </RuntimeConfigProvider>
   )
 }
