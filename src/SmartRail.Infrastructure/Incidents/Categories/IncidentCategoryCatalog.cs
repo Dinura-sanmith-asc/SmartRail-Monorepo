@@ -13,14 +13,14 @@ public sealed class IncidentCategoryCatalog(IOptionsMonitor<IncidentCategoryCata
         if (configuredCodes is null || configuredCodes.Length == 0)
             return Task.FromResult(CategoryCheck.Unavailable());
 
-        var normalized = configuredCodes
-            .Where(code => !string.IsNullOrWhiteSpace(code))
-            .Select(code => code.Trim())
-            .ToHashSet(StringComparer.Ordinal);
-        if (normalized.Count == 0)
+        if (configuredCodes.Any(code => string.IsNullOrWhiteSpace(code) || code.Trim().Length > 100))
+            return Task.FromResult(CategoryCheck.Unavailable());
+        var normalized = configuredCodes.Select(code => code.Trim()).ToArray();
+        var catalog = normalized.ToHashSet(StringComparer.Ordinal);
+        if (catalog.Count != normalized.Length)
             return Task.FromResult(CategoryCheck.Unavailable());
 
-        return Task.FromResult(normalized.Contains(categoryCode?.Trim() ?? string.Empty)
+        return Task.FromResult(catalog.Contains(categoryCode?.Trim() ?? string.Empty)
             ? CategoryCheck.Approved()
             : CategoryCheck.Unknown());
     }

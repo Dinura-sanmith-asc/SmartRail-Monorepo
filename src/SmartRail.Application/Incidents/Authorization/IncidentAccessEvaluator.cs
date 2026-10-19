@@ -3,8 +3,15 @@ using SmartRail.Domain.Identity;
 
 namespace SmartRail.Application.Incidents.Authorization;
 
+public interface IIncidentAccessEvaluator
+{
+    Task<AuthorizationDecision> AuthorizeAsync(string verifiedSubject, PermissionAction action,
+        Guid? incidentId, IReadOnlyCollection<Guid> associatedStationIds, bool isCreation = false,
+        CancellationToken cancellationToken = default);
+}
+
 /// <summary>Applies current Feature 002 role grants and station scope to incident resources.</summary>
-public sealed class IncidentAccessEvaluator(AuthorizeOperationHandler authorization)
+public sealed class IncidentAccessEvaluator(AuthorizeOperationHandler authorization) : IIncidentAccessEvaluator
 {
     public async Task<AuthorizationDecision> AuthorizeAsync(string verifiedSubject, PermissionAction action,
         Guid? incidentId, IReadOnlyCollection<Guid> associatedStationIds, bool isCreation = false,
