@@ -21,6 +21,8 @@ using SmartRail.Infrastructure.JourneysStatus.Persistence;
 using SmartRail.Infrastructure.JourneysStatus.Initialization;
 using SmartRail.Infrastructure.JourneysStatus;
 using SmartRail.Infrastructure.JourneysStatus.Publication;
+using SmartRail.Application.Incidents.References;
+using SmartRail.Infrastructure.Incidents.References;
 
 namespace SmartRail.Infrastructure;
 
@@ -80,6 +82,8 @@ public static class DependencyInjection
         services.AddJourneysStatusReadServices();
         services.AddJourneysStatusPublicationServices();
         services.AddJourneysStatusOwnerBoundaryServices();
+        services.RemoveAll<IIncidentResourceEvidence>();
+        services.AddScoped<IIncidentResourceEvidence, IncidentResourceEvidenceProvider>();
         return services;
     }
 }

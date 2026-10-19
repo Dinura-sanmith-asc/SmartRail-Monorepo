@@ -3,6 +3,7 @@ using SmartRail.Domain.RailwayNetwork.Entities;
 using SmartRail.Infrastructure.RailwayNetwork.Configurations;
 using SmartRail.Domain.Identity.Entities;
 using SmartRail.Domain.JourneysStatus.Entities;
+using SmartRail.Domain.Incidents.Entities;
 
 namespace SmartRail.Infrastructure.RailwayNetwork;
 
@@ -28,6 +29,10 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<JourneyRevision> JourneyRevisions => Set<JourneyRevision>();
     public DbSet<JourneyRevisionStop> JourneyRevisionStops => Set<JourneyRevisionStop>();
     public DbSet<JourneyInitializationAudit> JourneyInitializationAudits => Set<JourneyInitializationAudit>();
+    public DbSet<Incident> Incidents => Set<Incident>();
+    public DbSet<IncidentRevision> IncidentRevisions => Set<IncidentRevision>();
+    public DbSet<IncidentAssociation> IncidentAssociations => Set<IncidentAssociation>();
+    public DbSet<IncidentIdempotencyRecord> IncidentIdempotencyRecords => Set<IncidentIdempotencyRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

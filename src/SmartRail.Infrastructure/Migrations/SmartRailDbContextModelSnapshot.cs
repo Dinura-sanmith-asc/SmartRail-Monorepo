@@ -227,6 +227,285 @@ namespace SmartRail.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.Incident", b =>
+                {
+                    b.Property<Guid>("IncidentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("incident_id");
+
+                    b.Property<string>("CategoryCode")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("category_code");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTimeOffset?>("OccurredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<DateTimeOffset>("ReportedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reported_at");
+
+                    b.Property<string>("ReporterSubject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("reporter_subject");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer")
+                        .HasColumnName("revision");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("state");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("IncidentId")
+                        .HasName("pk_incident");
+
+                    b.HasIndex("State", "UpdatedAt")
+                        .HasDatabaseName("ix_incident_state_updated_at");
+
+                    b.ToTable("incident", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_incident_required_text", "length(trim(category_code)) > 0 AND length(trim(description)) > 0 AND length(trim(reporter_subject)) > 0");
+
+                            t.HasCheckConstraint("ck_incident_revision_positive", "revision > 0");
+
+                            t.HasCheckConstraint("ck_incident_state", "state IN ('Reported','InProgress','Resolved','Closed')");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.IncidentAssociation", b =>
+                {
+                    b.Property<Guid>("AssociationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("association_id");
+
+                    b.Property<DateTimeOffset>("AddedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("added_at");
+
+                    b.Property<int>("AddedRevision")
+                        .HasColumnType("integer")
+                        .HasColumnName("added_revision");
+
+                    b.Property<int?>("DisruptionRevision")
+                        .HasColumnType("integer")
+                        .HasColumnName("disruption_revision");
+
+                    b.Property<Guid?>("DisruptionUpdateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("disruption_update_id");
+
+                    b.Property<Guid>("IncidentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("incident_id");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("kind");
+
+                    b.Property<DateTimeOffset?>("RemovedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("removed_at");
+
+                    b.Property<int?>("RemovedRevision")
+                        .HasColumnType("integer")
+                        .HasColumnName("removed_revision");
+
+                    b.Property<Guid>("ResourceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("resource_id");
+
+                    b.Property<Guid?>("ServiceReferenceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("service_reference_id");
+
+                    b.Property<Guid?>("StationReferenceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("station_reference_id");
+
+                    b.HasKey("AssociationId")
+                        .HasName("pk_incident_association");
+
+                    b.HasIndex("ServiceReferenceId");
+
+                    b.HasIndex("StationReferenceId");
+
+                    b.HasIndex("IncidentId", "AddedRevision")
+                        .HasDatabaseName("ix_incident_association_history");
+
+                    b.HasIndex("IncidentId", "Kind", "ResourceId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_incident_association_active_resource")
+                        .HasFilter("removed_revision IS NULL AND kind <> 'Disruption'");
+
+                    b.HasIndex("IncidentId", "Kind", "ResourceId", "DisruptionUpdateId", "DisruptionRevision")
+                        .IsUnique()
+                        .HasDatabaseName("ux_incident_association_active_disruption")
+                        .HasFilter("removed_revision IS NULL AND kind = 'Disruption'");
+
+                    b.ToTable("incident_association", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_incident_association_disruption", "(kind = 'Disruption' AND disruption_update_id IS NOT NULL AND disruption_revision > 0) OR (kind <> 'Disruption' AND disruption_update_id IS NULL AND disruption_revision IS NULL)");
+
+                            t.HasCheckConstraint("ck_incident_association_kind", "kind IN ('Station','Service','Journey','Disruption')");
+
+                            t.HasCheckConstraint("ck_incident_association_owner_reference", "(kind = 'Station' AND station_reference_id = resource_id AND service_reference_id IS NULL) OR (kind = 'Service' AND service_reference_id = resource_id AND station_reference_id IS NULL) OR (kind IN ('Journey','Disruption') AND station_reference_id IS NULL AND service_reference_id IS NULL)");
+
+                            t.HasCheckConstraint("ck_incident_association_removal_pair", "(removed_at IS NULL AND removed_revision IS NULL) OR (removed_at IS NOT NULL AND removed_revision IS NOT NULL)");
+
+                            t.HasCheckConstraint("ck_incident_association_resource", "resource_id <> '00000000-0000-0000-0000-000000000000'");
+
+                            t.HasCheckConstraint("ck_incident_association_revision", "added_revision > 0 AND (removed_revision IS NULL OR removed_revision > added_revision)");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.IncidentIdempotencyRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ActorSubject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("actor_subject");
+
+                    b.Property<int>("HttpStatusCode")
+                        .HasColumnType("integer")
+                        .HasColumnName("http_status_code");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("idempotency_key");
+
+                    b.Property<Guid>("IncidentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("incident_id");
+
+                    b.Property<string>("Operation")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("operation");
+
+                    b.Property<string>("PayloadHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("payload_hash");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("recorded_at");
+
+                    b.Property<string>("ResponseJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("response_json");
+
+                    b.HasKey("Id")
+                        .HasName("pk_incident_idempotency_record");
+
+                    b.HasIndex("IncidentId");
+
+                    b.HasIndex("ActorSubject", "Operation", "IdempotencyKey")
+                        .IsUnique()
+                        .HasDatabaseName("ux_incident_idempotency_scope_key");
+
+                    b.ToTable("incident_idempotency_record", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_incident_idempotency_required_text", "length(trim(actor_subject)) > 0 AND length(trim(operation)) > 0 AND length(trim(idempotency_key)) > 0 AND length(trim(payload_hash)) > 0 AND length(response_json::text) > 0");
+
+                            t.HasCheckConstraint("ck_incident_idempotency_status", "http_status_code BETWEEN 200 AND 599");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.IncidentRevision", b =>
+                {
+                    b.Property<Guid>("IncidentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("incident_id");
+
+                    b.Property<int>("Revision")
+                        .HasColumnType("integer")
+                        .HasColumnName("revision");
+
+                    b.Property<string>("ActorSubject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("actor_subject");
+
+                    b.Property<string>("AssociationEvidence")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("association_evidence");
+
+                    b.Property<DateTimeOffset>("OccurredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<string>("PreviousState")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("previous_state");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("state");
+
+                    b.HasKey("IncidentId", "Revision")
+                        .HasName("pk_incident_revision");
+
+                    b.HasIndex("OccurredAt")
+                        .HasDatabaseName("ix_incident_revision_occurred_at");
+
+                    b.ToTable("incident_revision", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_incident_revision_evidence", "length(trim(actor_subject)) > 0 AND length(trim(source)) > 0 AND length(association_evidence::text) > 0");
+
+                            t.HasCheckConstraint("ck_incident_revision_positive", "revision > 0");
+
+                            t.HasCheckConstraint("ck_incident_revision_state", "state IN ('Reported','InProgress','Resolved','Closed')");
+
+                            t.HasCheckConstraint("ck_incident_revision_transition", "previous_state IS NULL OR (previous_state='Reported' AND state='InProgress') OR (previous_state='InProgress' AND state='Resolved') OR (previous_state='Resolved' AND state='Closed')");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.Journey", b =>
                 {
                     b.Property<Guid>("JourneyInstanceId")
@@ -1032,6 +1311,48 @@ namespace SmartRail.Infrastructure.Migrations
                         .HasConstraintName("fk_identity_station_scope_audit_assignment");
                 });
 
+            modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.IncidentAssociation", b =>
+                {
+                    b.HasOne("SmartRail.Domain.Incidents.Entities.Incident", null)
+                        .WithMany("Associations")
+                        .HasForeignKey("IncidentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_incident_association_incident");
+
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.TrainService", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceReferenceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_incident_association_service");
+
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.Station", null)
+                        .WithMany()
+                        .HasForeignKey("StationReferenceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_incident_association_station");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.IncidentIdempotencyRecord", b =>
+                {
+                    b.HasOne("SmartRail.Domain.Incidents.Entities.Incident", null)
+                        .WithMany()
+                        .HasForeignKey("IncidentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_incident_idempotency_incident");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.IncidentRevision", b =>
+                {
+                    b.HasOne("SmartRail.Domain.Incidents.Entities.Incident", null)
+                        .WithMany("Revisions")
+                        .HasForeignKey("IncidentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_incident_revision_incident");
+                });
+
             modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.Journey", b =>
                 {
                     b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleRevision", null)
@@ -1168,6 +1489,13 @@ namespace SmartRail.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_train_service_route");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.Incident", b =>
+                {
+                    b.Navigation("Associations");
+
+                    b.Navigation("Revisions");
                 });
 #pragma warning restore 612, 618
         }
