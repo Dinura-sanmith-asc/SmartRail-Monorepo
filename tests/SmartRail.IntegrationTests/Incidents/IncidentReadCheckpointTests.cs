@@ -24,7 +24,7 @@ public sealed class IncidentReadCheckpointTests(PostgreSqlTestDatabaseFixture da
         using var read = await client.SendAsync(IncidentReadTestSupport.Get(oidc.CreateToken(subject), $"?incidentId={incidentId}"));
         Assert.Equal(HttpStatusCode.OK, read.StatusCode);
         using var document = JsonDocument.Parse(await read.Content.ReadAsStringAsync());
-        var response = Assert.Single(document.RootElement.EnumerateArray());
+        var response = Assert.Single(document.RootElement.GetProperty("items").EnumerateArray());
         Assert.Equal(incidentId, response.GetProperty("incidentId").GetGuid());
         Assert.Equal("Reported", response.GetProperty("state").GetString());
         Assert.Equal(1, response.GetProperty("revision").GetInt32());

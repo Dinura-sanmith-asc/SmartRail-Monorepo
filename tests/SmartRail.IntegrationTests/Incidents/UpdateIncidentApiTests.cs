@@ -145,7 +145,7 @@ public sealed class UpdateIncidentApiTests(PostgreSqlTestDatabaseFixture databas
         using var authorized = await client.SendAsync(IncidentReadTestSupport.Get(token, $"?incidentId={incidentId}"));
         Assert.Equal(HttpStatusCode.OK, authorized.StatusCode);
         using var authorizedJson = JsonDocument.Parse(await authorized.Content.ReadAsStringAsync());
-        var closed = Assert.Single(authorizedJson.RootElement.EnumerateArray());
+        var closed = Assert.Single(authorizedJson.RootElement.GetProperty("items").EnumerateArray());
         Assert.Equal(incidentId, closed.GetProperty("incidentId").GetGuid());
         Assert.Equal("Closed", closed.GetProperty("state").GetString());
         Assert.Equal(4, closed.GetProperty("revision").GetInt32());

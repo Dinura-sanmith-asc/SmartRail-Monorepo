@@ -23,15 +23,15 @@ public static class ListIncidentsEndpoint
         var result = await handler.HandleAsync(new ListIncidentsQuery(
             context.User.FindFirstValue("sub"), new IncidentFilters(incidentId, stationId, journeyId)), cancellationToken);
         if (result.Outcome != ListIncidentsOutcome.Listed) return IncidentProblemMapping.ForList(result);
-        return Results.Ok(result.Incidents.Select(IncidentResponse.From).ToArray());
+        return Results.Ok(new IncidentListResponse(result.Incidents.Select(IncidentResponse.From).ToArray()));
     }
 
     public static RouteHandlerBuilder MapGetEndpoint(RouteGroupBuilder group) => group
         .MapGet("", HandleAsync)
         .WithName("ListIncidents")
         .WithSummary("List authorized incident context")
-        .WithDescription("Returns only incident projections permitted by current role and station scope. Optional filters are combined conjunctively; an authorized empty result is returned as an empty array.")
-        .Produces<IReadOnlyList<IncidentResponse>>(StatusCodes.Status200OK)
+        .WithDescription("Returns only incident projections permitted by current role and station scope. Optional filters are combined conjunctively; an authorized empty result is returned with an empty items array.")
+        .Produces<IncidentListResponse>(StatusCodes.Status200OK)
         .Produces<ProblemResponse>(StatusCodes.Status400BadRequest, contentType: "application/problem+json")
         .Produces<ProblemResponse>(StatusCodes.Status401Unauthorized, contentType: "application/problem+json")
         .Produces<ProblemResponse>(StatusCodes.Status403Forbidden, contentType: "application/problem+json")

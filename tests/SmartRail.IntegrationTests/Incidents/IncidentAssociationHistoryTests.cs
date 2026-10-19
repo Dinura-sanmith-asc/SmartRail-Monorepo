@@ -37,7 +37,7 @@ public sealed class IncidentAssociationHistoryTests(PostgreSqlTestDatabaseFixtur
             using var response = await client.SendAsync(historical);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-            Assert.Equal(incident, Assert.Single(json.RootElement.EnumerateArray()).GetProperty("incidentId").GetGuid());
+            Assert.Equal(incident, Assert.Single(json.RootElement.GetProperty("items").EnumerateArray()).GetProperty("incidentId").GetGuid());
         }
 
         using (var removal = await client.SendAsync(IncidentOwnerTestSupport.PatchIncident(incident, token,
@@ -48,7 +48,7 @@ public sealed class IncidentAssociationHistoryTests(PostgreSqlTestDatabaseFixtur
             active.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             using var response = await client.SendAsync(active);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Empty(JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.EnumerateArray());
+            Assert.Empty(JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("items").EnumerateArray());
         }
 
         await using var verify = factory.Services.CreateAsyncScope();

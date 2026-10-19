@@ -40,7 +40,7 @@ public sealed class IncidentBoundaryRegressionTests(PostgreSqlTestDatabaseFixtur
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-            Assert.Equal(hostileText, Assert.Single(json.RootElement.EnumerateArray()).GetProperty("description").GetString());
+            Assert.Equal(hostileText, Assert.Single(json.RootElement.GetProperty("items").EnumerateArray()).GetProperty("description").GetString());
         }
 
         using (var publicJourney = await client.GetAsync($"/api/journeys/{journey:D}"))
