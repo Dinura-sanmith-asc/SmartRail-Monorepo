@@ -214,6 +214,11 @@ public sealed class JourneyPublicationApiTests(PostgreSqlTestDatabaseFixture fix
         request.Content = JsonContent.Create(new { expectedJourneyRevision = 1, status = "Delayed" });
         using var response = await client.SendAsync(request);
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        await using var verifyScope = factory.Services.CreateAsyncScope();
+        var verifyDb = verifyScope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+        Assert.Equal(1, await verifyDb.Journeys.Where(x => x.JourneyInstanceId == journeyId)
+            .Select(x => x.CurrentRevision).SingleAsync());
+        Assert.Equal(1, await verifyDb.JourneyRevisions.CountAsync(x => x.JourneyInstanceId == journeyId));
     }
 
     [Fact]
