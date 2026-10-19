@@ -24,8 +24,15 @@ Missing/invalid credentials map to 401; verified but insufficient role/scope to 
 
 - Identity & Permissions owns role mapping and station scope; it evaluates journey scope using current authoritative assignments. Feature 003 does not cache allow decisions.
 - Driver Operations owns driver assignments and observations. Feature 003 stores only an optional stable observation reference in private audit evidence after the owner confirms it is valid and readable.
-- Incident Management owns incident records/lifecycle and incident-to-journey relationships. Feature 003 may consume approved read context but never creates/updates incident lifecycle or infers official journey status from an incident.
+- Incident Management owns incident records, lifecycle, affected-journey associations, and authorized incident-context reads. The operations client composes owner-authorized incident context with Feature 003 official journey data. This is the approved interpretation of the baseline requirement that incident impact appear on affected journey views; the requirement wording is unchanged. Feature 003's public `JourneySnapshot`, update history, and station-departure projections contain no private incident records. No Feature 003 route or RBAC grant is added.
+- Feature 003 Application defines `IIncidentJourneyContextReader` as a framework-neutral owner boundary for an authorized caller and journey identity. The contract result distinguishes available context, verified no-context, denied access, and unavailable owner service; only Incident Management decides what context the caller may read. Until the owner module supplies a genuine provider, production integration returns unavailable. Test doubles are confined to isolated tests. The operations client must not infer incident context from public journey data or treat an unavailable owner read as an empty result.
 - Railway Network owns reusable schedule, route, station, service, and publication completeness. Feature 003 references these identifiers and never edits their rows.
 - Journeys & Status owns dated instance identity, official status, operational stop snapshots, revision history, and publication audit.
 
 Public projections omit private actor and Driver observation identifiers. Client-supplied roles, scopes, actor subjects, or timestamps are ignored/rejected; server evidence is authoritative.
+
+## Significant-change and client boundary
+
+Feature 003's existing journey and update reads expose cancellation/platform change type with the immutable `UpdateId`, journey revision, safe source, and publication timestamp. The passenger client owns configured in-app alert delivery and presentation and must associate the visible alert/status with that same revision. There is no notification API, native push service, or backend claim of delivery in this contract. Full SR-025/SC-007 acceptance remains open until the passenger-client behavior is implemented and tested.
+
+SR-044 acceptance remains open until Incident Management demonstrates its authorized affected-journey read and the operations client demonstrates composition with official Feature 003 journey data.

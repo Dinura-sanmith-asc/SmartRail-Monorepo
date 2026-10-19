@@ -6,7 +6,12 @@ info:
     Contract for the five approved Journeys & Status operations. Public responses
     contain published railway information only. Controller writes use existing
     Feature 002 permissions and current journey scope. This contract adds no
-    administration, Driver observation, or incident operations.
+    administration, Driver observation, or incident operations. Existing journey
+    and update reads expose safe cancellation/platform evidence (change type,
+    UpdateId, revision, source, and publication time) for the passenger client;
+    the client owns in-app alert presentation/delivery. Incident Management owns
+    authorized incident-context reads, which the operations client composes with
+    official journey data. Public JourneySnapshot contains no incident records.
 servers:
   - url: /
 tags:

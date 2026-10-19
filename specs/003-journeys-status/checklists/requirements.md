@@ -33,6 +33,8 @@
 - [x] Feature outcomes are measurable in the Success Criteria
 - [x] No unapproved implementation choices leak into the specification — approved operation schemas are recorded to resolve Gate 2; implementation technology and deployment detail remain for planning
 - [x] Requirement traceability identifies which acceptance evidence belongs to Feature 003 versus other modules and clients
+- [x] FR-013/SR-025/SC-007 separate backend significant-change evidence from passenger-client alert delivery; client acceptance remains explicitly open until tested
+- [x] SR-044/FR-015 preserve Incident Management ownership and authorized context reads, operations-client composition, and an incident-free public journey projection; owner/client acceptance remains open
 
 ## Pre-planning Gates
 
@@ -47,4 +49,6 @@
 - The six follow-up contract decisions approved on 2026-10-19 are operative across `spec.md`, planning documents, and OpenAPI. `GET /api/journeys/{id}/updates` excludes initialization snapshots and private initialization audit events; each official operational publication has one immutable `UpdateId` stored with its `JourneyRevision`.
 - Production initialization authority, source-key governance, and audit retention remain operational approval gates. These do not add public operations or alter the five approved routes or RBAC grants.
 - Client-owned and other-module-owned acceptance checks remain open until their owning specifications and test evidence exist.
+- Feature 003 backend evidence for cancellation/platform change type, UpdateId, revision, source and publication time is assigned to implementation/API tests; this does not close configured passenger alert acceptance under SR-025/SC-007.
+- SR-044's source acceptance wording is preserved and interpreted through the authorized operations view composed by the operations client. Incident Management owns the association and read; the public JourneySnapshot has no incident fields. Full owner/client acceptance is open pending evidence.
 - Approved source documents are read-only; this feature specification does not amend them.

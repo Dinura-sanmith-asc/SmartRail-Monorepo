@@ -11,7 +11,10 @@ This is a planning model for the approved Feature 003 behavior. It extends the e
 | Cognito credentials and token validation | Cognito / Feature 002 API integration | Only verified subject is passed into Application; tokens/claims are not persisted as role evidence. |
 | Active SmartRail roles and station-scope assignments | Identity & Permissions (Feature 002) | Queried on each protected authorization check; not duplicated. |
 | Driver assignments and observations | Driver Operations | Accessed through owner interfaces; observation is optional publication evidence, never official state by itself. |
-| Incident record and lifecycle | Incident Management | Associated/read through owner boundary where approved; not owned or inferred here. |
+| Incident record, lifecycle, affected-journey association, and authorized context read | Incident Management | Read through an owner boundary only; never owned or inferred here. The operations client composes authorized incident context with Feature 003 official journey data. |
+| In-app alert presentation and delivery | Passenger client | Uses detectable Feature 003 cancellation/platform evidence; no alert-delivery state or notification service is owned by this data model. |
+
+Feature 003 Application defines the framework-neutral `IIncidentJourneyContextReader` port for authorized incident-context integration. The port returns owner-authorized context or an explicit unavailable outcome. Incident Management remains responsible for access decisions and its records. Until a genuine owner provider exists, Infrastructure registers an unavailable implementation; deterministic doubles are test-only. No incident record, association table, or incident detail is added to the public JourneySnapshot, and no Feature 003 public operation is added for incident reads.
 
 ## Entity relationship overview
 
@@ -64,7 +67,7 @@ Immutable snapshot of journey state. Each official operational publication has o
 | `PublishedAt` | server-generated `timestamptz`, required | Authoritative publication instant. |
 | `PublishedBySubject` | opaque verified subject, required for Controller publication | Private audit actor; not in public response. |
 | `Source` | enum: `ScheduledBaseline`, `ControllerManual`, `ApprovedRailwayFeed` | Safe source classification. `ScheduledBaseline` applies only to an unpublished operational baseline; official update revisions use the source that actually supplied them. |
-| `PublicChangeType` and validated public fields | typed/normalized values; no unrestricted JSON projection | Status, stop/platform/timing, diversion stop-set, or correction change details; only explicit whitelisted fields are returned publicly. |
+| `PublicChangeType` and validated public fields | typed/normalized values; no unrestricted JSON projection | Status (including cancellation), stop/platform/timing, diversion stop-set, or correction change details; only explicit whitelisted fields are returned publicly through the existing journey/update reads. Significant cancellation/platform changes are detectable with the immutable `UpdateId`, revision, safe source, and publication time. |
 | `PrivateAuditEvidence` | private structured/normalized values | Evidence needed for audit; never included in public projection. Do not store credentials or raw tokens. |
 | `DriverObservationId` | nullable opaque owner ID | Optional verified Driver Operations observation reference. Feature 003 does not own referenced observation. |
 | `CorrectionOfUpdateId` | nullable UUID, same-journey FK to an earlier revision's `UpdateId` | Link to an earlier immutable operational update corrected by this publication. |
@@ -117,6 +120,7 @@ Audit writes are append-only. For conflicting identity, no Journey state is writ
 - Each official operational publication creates one immutable `UpdateId` on its `JourneyRevision`; corrections link to earlier `UpdateId` values on the same journey. Public history selects only revisions with an official-update ID, sorts ascending by revision, and excludes initialization baselines and `JourneyInitializationAudit` records.
 - The initialized schedule link must match an existing Feature 001 service, published schedule revision, operation-date completeness entry, and first-call occurrence. Missing or superseded source data is not treated as a successful empty journey.
 - Public projection contains only published journey/station details, source class, revision and timestamps; raw actor subject and observation reference remain private.
+- The passenger client may use the existing update/read evidence to present configured in-app alerts. Feature 003 does not persist notification-delivery state, add an alert endpoint, or claim client delivery; SR-025/SC-007 remain open until client evidence references the same revision.
 
 ## Indexes and constraints
 

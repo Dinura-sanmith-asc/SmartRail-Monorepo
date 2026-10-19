@@ -6,7 +6,7 @@
 
 ## Summary
 
-Add dated operational journeys to the existing six-project .NET 10 modular monolith. A journey has an authoritative opaque `journeyInstanceId`, while the service, published schedule revision, operation date, and first-calling-point departure occurrence preserve its planned schedule linkage. Distinct journey IDs may share that linkage. A controlled, non-public initializer issues and audits identities; it is deny-by-default until production authority is approved. Official status, diversion, and stop changes append immutable revisions and audit evidence in PostgreSQL. Reads project one committed revision consistently. Controller writes use current Feature 002 role and resource-scope evidence and optimistic concurrency; Driver observations remain owned by Driver Operations and never alter official status by themselves.
+Add dated operational journeys to the existing six-project .NET 10 modular monolith. A journey has an authoritative opaque `journeyInstanceId`, while the service, published schedule revision, operation date, and first-calling-point departure occurrence preserve its planned schedule linkage. Distinct journey IDs may share that linkage. A controlled, non-public initializer issues and audits identities; it is deny-by-default until production authority is approved. Official status, diversion, and stop changes append immutable revisions and audit evidence in PostgreSQL. Existing journey/update reads expose safe, detectable cancellation/platform evidence by change type, UpdateId, revision, source, and publication time; the passenger client owns alert presentation/delivery. Reads project one committed revision consistently. Controller writes use current Feature 002 role and resource-scope evidence and optimistic concurrency; Driver observations remain owned by Driver Operations and never alter official status by themselves. Incident Management owns incident associations and authorized context reads; the operations client composes that context with Feature 003 journey data, without adding incident fields to public snapshots.
 
 ## Technical Context
 
@@ -24,9 +24,9 @@ Add dated operational journeys to the existing six-project .NET 10 modular monol
 
 **Performance Goals**: No new latency, throughput, polling, retention, or availability threshold is approved. Add only indexes justified by the specified lookups and validate query behavior with PostgreSQL acceptance data.
 
-**Constraints**: Preserve all six projects and inward dependency direction. Domain has no API/EF/AWS dependencies; Application depends on Domain and owns ports/use cases; Infrastructure owns EF/PostgreSQL and cross-module adapters; API owns HTTP/authentication mapping. Reuse Feature 001 schedule and station IDs without mutating its published schedule. Reuse Feature 002 Cognito authentication, active PostgreSQL role mapping, exact RBAC grants, and current resource-scope decisions. Do not add operations, grants, modules, or client workflows.
+**Constraints**: Preserve all six projects and inward dependency direction. Domain has no API/EF/AWS dependencies; Application depends on Domain and owns ports/use cases; Infrastructure owns EF/PostgreSQL and cross-module adapters; API owns HTTP/authentication mapping. Reuse Feature 001 schedule and station IDs without mutating its published schedule. Reuse Feature 002 Cognito authentication, active PostgreSQL role mapping, exact RBAC grants, and current resource-scope decisions. Define an Application-owned incident-context port, but do not fabricate its production provider before Incident Management exists. The operations client composes authorized incident context; public journey projections remain incident-free. Do not add operations, grants, modules, or client workflows.
 
-**Scale/Scope**: Dated journey identity, stop snapshots, official updates, controlled initialization, station departure projection, and five existing API operations. User count, journey volume, retention period, feed freshness, and notification latency remain unquantified.
+**Scale/Scope**: Dated journey identity, stop snapshots, official updates, controlled initialization, station departure projection, and five existing API operations. Significant cancellation/platform evidence is available through existing reads; passenger alert delivery is downstream client work. Incident context remains owner-read and operations-client composition. User count, journey volume, retention period, feed freshness, and notification latency remain unquantified.
 
 ## Approved Decisions and Design Proposals
 
@@ -45,13 +45,13 @@ Add dated operational journeys to the existing six-project .NET 10 modular monol
 | IV. Data integrity and sources of truth | PASS | Feature 001 owns reusable schedules/stations; Journeys owns dated instance and official publication; Driver Operations owns observations; Incident Management owns incident lifecycle. Revisions and audits are atomic and append-only. |
 | V. Identity, scope, and safety | PASS | Feature 002 evaluates current mapped Controller grants and journey scope on each write; missing/unavailable evidence fails closed. No JWT group or caller-supplied actor is trusted. |
 | VI. API contracts | PASS | Exactly five approved paths in [OpenAPI](contracts/journeys-status.openapi.yaml); no new grant/path and no mutation of Feature 001/002 contracts. |
-| VII. Evidence-based quality | PASS | Domain, real PostgreSQL, API, OpenAPI, concurrency, denial-side-effect, and F001/F002 regression tests are planned and traced. Full cross-module/client E2E remains a release obligation. |
+| VII. Evidence-based quality | PASS WITH OPEN ACCEPTANCE | Domain, real PostgreSQL, API, OpenAPI, concurrency, denial-side-effect, and F001/F002 regression tests are planned and traced. Cancellation/platform evidence is backend-tested; passenger alert delivery and SR-044 operations-client composition remain open until client and owner-module evidence exists. |
 | VIII. Honest operation | PASS | Missing/stale ETA and source information remains unknown/unavailable; reads expose revision/source/time; no invented freshness or latency threshold. |
 | IX. Approved stack and deployment boundary | PASS | Existing .NET/EF/PostgreSQL stack; local-first only; AWS is manual user work after local verification. |
 
 ### Post-design gate
 
-**PASS with production approval gates recorded.** The Gate 1 identity and Gate 2 API decisions, and the six follow-up contract details approved on 2026-10-19, are operative. There are no remaining contract-detail approvals before task generation. Production journey-initialization authority, operator/source-key governance, and audit retention/approval remain operational gates; use a deny-all implementation default until those are explicitly approved. See the synchronized OpenAPI and feature documents for station-local date behavior, update ordering/contents, stop identity, public field restrictions, Driver evidence errors, and the single `UpdateId` model.
+**PASS with downstream acceptance open.** The Gate 1 identity and Gate 2 API decisions, six follow-up contract details, and the 2026-10-19 FR-013/SR-025 and SR-044 resolutions are operative. No API-contract approval remains before task execution. Cancellation/platform evidence is supplied by existing journey/update reads; passenger-client alert delivery is separate and remains open. Incident Management owns authorized incident context, which the operations client composes with official journey data; no private incident data is added to public snapshots, and no production provider is assumed before the owner module exists. Production journey-initialization authority, operator/source-key governance, and audit retention/approval remain operational gates; use a deny-all implementation default until approved.
 
 ## Project Structure
 
@@ -89,12 +89,12 @@ These are proposed feature folders in existing projects, not new projects. Follo
 
 ## Delivery and Verification Approach
 
-1. Use the approved contract semantics in `spec.md` and OpenAPI as the source for implementation tasks; preserve the separately open production initialization authority gate.
+1. Use the approved contract semantics in `spec.md` and OpenAPI as the source for implementation tasks; preserve the separately open production initialization authority gate. Existing journey/update reads expose significant-change evidence; passenger alert delivery is owned by the passenger client and stays open until tested.
 2. Add Domain types and lifecycle/identity invariants; add Application ports and handlers without framework dependencies.
 3. Add Infrastructure mappings, repository transactions, revision concurrency, controlled initializer, and additive migration.
 4. Add the five API operations and safe Problem Details mappings; bind existing Feature 002 actions to resource-aware authorization.
-5. Verify Domain/Application behavior, isolated PostgreSQL schema/constraints/audits/rollback/races, HTTP positive and negative outcomes, OpenAPI, and F001/F002 regressions.
-6. Run full solution build and tests locally, record SR-to-test evidence, and keep downstream UI/other-module evidence open until their owning work passes.
+5. Verify Domain/Application behavior, isolated PostgreSQL schema/constraints/audits/rollback/races, HTTP positive and negative outcomes, OpenAPI, and F001/F002 regressions. Explicitly verify cancellation and platform change type, UpdateId, revision, source, and publication time across existing journey/update/station reads.
+6. Run full solution build and tests locally, record SR-to-test evidence, and keep passenger alert delivery, SR-044 Incident Management/operations-client evidence, and other downstream UI/module evidence open until their owning work passes.
 
 ## Complexity Tracking
 

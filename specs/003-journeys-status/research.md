@@ -50,7 +50,7 @@ For each protected status, cancellation, diversion, or stop update:
 4. If the update references `driverObservationId`, the Application adapter asks Driver Operations through its authorized read boundary and verifies that the observation exists and may be referenced. It does not copy or own the observation and does not let it update official status.
 5. If any required evidence is missing, revoked, stale, or unavailable, deny or return unavailable before a state change.
 
-Incident Management owns incident entities and lifecycle; Feature 003 may expose approved affected-journey context through an owner port only where required by the approved scenario. It must not derive cancellation or disruption status from incident state alone. No current owner module is reimplemented here.
+Incident Management owns incident entities, lifecycle, affected-journey associations, and authorized incident-context reads. The operations client composes that authorized context with Feature 003 official journey data, satisfying the approved SR-044 affected-journey-view outcome without putting private incident records in public `JourneySnapshot` responses. Define a framework-neutral `IIncidentJourneyContextReader` port in Feature 003 Application for the owning boundary; until Incident Management provides a genuine provider, the port reports unavailable and no production adapter is fabricated. Incident state never independently determines official journey status. Full SR-044 acceptance remains open until both owner-module and operations-client evidence exists.
 
 ### API/OpenAPI representation
 
@@ -81,7 +81,7 @@ Required test dimensions include identity collisions, replay/idempotency, confli
 | SR-019 | Feature 003 backend + passenger client | Approved active/terminal status labels map from authoritative status; client rendering remains downstream. |
 | SR-021, SR-035 | Feature 003 backend + passenger client | ETA absent/stale/unavailable is explicit and never synthesized; source and time retained. |
 | SR-022 | Feature 003 backend + passenger client | Diversion/status/platform/time change appears for the selected journey; Feature 001 schedule unchanged. |
-| SR-025, SR-048 | Feature 003 + configured channel/client | Change event and in-app notification/status are associated to same revision; no unapproved delivery threshold. |
+| SR-025, SR-048 | Feature 003 + passenger client | Feature 003 exposes cancellation/platform change type, immutable UpdateId, revision, safe source, and publication time through existing journey/update reads. Passenger client owns alert presentation/delivery; full SR-025/SC-007 acceptance stays open until a client test proves the alert and visible status reference the same revision. No new notification API, native push service, or unapproved delivery threshold. |
 | SR-031, SR-034, SR-040 | Feature 003 backend | Authorized manual update persists actor/time and latest revision; forbidden actors cannot mutate state. |
 | SR-046 | Feature 003 backend | Only exact Controller cancellation grant succeeds; Driver/StationStaff denied and unchanged. |
 | SR-054, SR-056, SR-058, SR-059 | Station-display client + Feature 003 backend | Departure/platform/status revision returned; client refresh, offline, stale and display behavior remains downstream. |
@@ -90,7 +90,7 @@ Required test dimensions include identity collisions, replay/idempotency, confli
 | FR-021 / SC-016 | Feature 003 backend | Ascending complete public operational history; initial snapshot/internal initialization audit excluded; one same-journey UpdateId correction chain. |
 | FR-022 / SC-017 | Feature 003 backend | Retained/new/removed stop identity behavior and atomic rejection of duplicate, invalid, or foreign IDs. |
 | FR-023 / SC-018 | Feature 003 backend + Driver Operations boundary | Observation ownership and target-journey association with approved error mapping and no-write denial cases. |
-| SR-044 | Incident Management + Feature 003 boundary | Incident owner can associate an incident to journeys; display context is read-only and does not infer status. |
+| SR-044 | Incident Management + operations client + Feature 003 boundary | Incident Management owns association and authorized read; the operations client composes authorized context with official journey data. Feature 003 public snapshots contain no incident fields. Full acceptance stays open pending owner and client evidence. |
 | SR-001, SR-038, SR-064–066, SR-102, SR-109, SR-114 | Owning clients/modules + release E2E | Cross-boundary operational access, text status, refresh/freshness, denial/error/no-network states; not closed by this backend plan alone. |
 
 ## Unresolved decisions and approvals
