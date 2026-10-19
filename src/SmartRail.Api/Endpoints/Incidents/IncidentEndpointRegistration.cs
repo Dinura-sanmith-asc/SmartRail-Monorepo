@@ -10,6 +10,7 @@ public static class IncidentEndpointRegistration
             .RequireAuthorization();
         CreateIncidentEndpoint.MapPostEndpoint(group);
         ListIncidentsEndpoint.MapGetEndpoint(group);
+        UpdateIncidentEndpoint.MapPatchEndpoint(group);
         return endpoints;
     }
 }

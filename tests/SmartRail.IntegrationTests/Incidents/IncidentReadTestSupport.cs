@@ -13,7 +13,14 @@ namespace SmartRail.IntegrationTests.Incidents;
 
 internal static class IncidentReadTestSupport
 {
-    public static async Task GrantStationScopeAsync(IServiceProvider services, string subject, Guid stationId)
+    public static async Task RevokeStationScopeAsync(IServiceProvider services, Guid assignmentId)
+    {
+        await using var scope = services.CreateAsyncScope();
+        var repository = scope.ServiceProvider.GetRequiredService<SmartRail.Application.Identity.Persistence.IStationScopeRepository>();
+        Assert.True(await repository.RevokeAsync(assignmentId, "test-scope-revoker", DateTimeOffset.UtcNow.AddSeconds(1), Guid.NewGuid()));
+    }
+
+    public static async Task<Guid> GrantStationScopeAsync(IServiceProvider services, string subject, Guid stationId)
     {
         await using var scope = services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
@@ -22,6 +29,7 @@ internal static class IncidentReadTestSupport
         db.StationScopeAssignments.Add(assignment);
         db.StationScopeAssignmentAudits.Add(StationScopeAssignmentAudit.ForGrant(Guid.NewGuid(), assignment));
         await db.SaveChangesAsync();
+        return assignment.Id;
     }
 
     public static async Task RevokeRoleAsync(IServiceProvider services, Guid assignmentId)
@@ -44,6 +52,19 @@ internal static class IncidentReadTestSupport
     public static HttpRequestMessage Get(string token, string query = "")
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "/api/incidents" + query);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return request;
+    }
+
+    public static HttpRequestMessage Patch(Guid incidentId, int expectedRevision, string state,
+        string token, string key, string? extraJson = null)
+    {
+        var body = extraJson ?? System.Text.Json.JsonSerializer.Serialize(new { expectedRevision, state });
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"/api/incidents/{incidentId:D}")
+        {
+            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json")
+        };
+        request.Headers.Add("Idempotency-Key", key);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return request;
     }

@@ -6,6 +6,22 @@ namespace SmartRail.Api.Endpoints.Incidents;
 
 public static class IncidentProblemMapping
 {
+    public static IResult ForUpdate(UpdateIncidentResult result) => result.Outcome switch
+    {
+        UpdateIncidentOutcome.Invalid => ProblemDetailsConfiguration.Create(StatusCodes.Status400BadRequest,
+            "The incident update is invalid.", "invalid_incident_update"),
+        UpdateIncidentOutcome.Unauthorized => ProblemDetailsConfiguration.Create(StatusCodes.Status401Unauthorized,
+            "Authentication is required.", "authentication_required"),
+        UpdateIncidentOutcome.Forbidden => ProblemDetailsConfiguration.Create(StatusCodes.Status403Forbidden,
+            "Permission or required station scope is denied.", "permission_denied"),
+        UpdateIncidentOutcome.NotFound => ProblemDetailsConfiguration.Create(StatusCodes.Status404NotFound,
+            "The incident was not found or is inaccessible.", "incident_not_found"),
+        UpdateIncidentOutcome.Conflict => ProblemDetailsConfiguration.Create(StatusCodes.Status409Conflict,
+            "The incident revision or idempotency key conflicts with current state.", "incident_conflict"),
+        _ => ProblemDetailsConfiguration.Create(StatusCodes.Status503ServiceUnavailable,
+            "Incident or authorization information is temporarily unavailable.", "authority_unavailable")
+    };
+
     public static IResult ForList(SmartRail.Application.Incidents.UseCases.ListIncidentsResult result) => result.Outcome switch
     {
         SmartRail.Application.Incidents.UseCases.ListIncidentsOutcome.Unauthorized => ProblemDetailsConfiguration.Create(
