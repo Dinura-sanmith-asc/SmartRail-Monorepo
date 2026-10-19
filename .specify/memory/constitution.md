@@ -1,50 +1,52 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: unratified template -> 1.0.0
+- Modified principles: template placeholders -> I. Requirements and Traceability; II. React Architecture; III. Identity and Least Privilege; IV. Railway Data Integrity; V. Approved Backend Integration; VI. Operational Safety; VII. User Experience and Accessibility; VIII. Quality and Verification; IX. Spec-Driven Development
+- Added sections: Platform Boundaries and Constraints; Definition of Done and Review
+- Removed sections: none
+- Follow-up TODOs: ratification date pending human approval; Feature 002 and OpenAPI contract files are not present in this repository and must be consulted during feature planning
+-->
+# SmartRail Railway Operations Web Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Requirements and Traceability
+Every Operations Web feature MUST cite the approved SR requirement IDs that apply to this application and identify its source acceptance checks. The 53 approved Must Have requirements govern the whole SmartRail platform; they MUST NOT be treated as 53 Operations Web requirements. In the current inventory, SR-038 through SR-053 are the Operations Web requirements, with their individual approved priorities preserved. Controller workflows are governed by the applicable dashboard, status-edit, cancellation, and publication requirements (including SR-038, SR-040, SR-046, and SR-048) and the Controller permissions in the RBAC matrix. Station Staff workflows are governed by the applicable incident requirements (including SR-041, SR-042, and SR-049 through SR-052) and station/resource-scoped RBAC permissions. Shared requirements MUST be assessed for this application's acceptance where applicable, including identity and role authorization (SR-089 through SR-091 and SR-093), safe message rendering and error handling (SR-095 and SR-100), and status accessibility (SR-102). Cross-application requirements include shared service boundaries and propagation (SR-001, SR-010, SR-031, and SR-048); the feature specification MUST cite any other shared requirement whose acceptance scenario depends on the Operations Web. Specifications MUST preserve Must, Should, Could, and Won't priorities and MUST NOT silently add business scope. Each implemented requirement MUST trace through its feature specification, technical plan, implementation tasks, React code, automated tests, and acceptance evidence. This keeps platform-wide commitments distinct from this application's obligations and makes delivered behavior reviewable.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. React Architecture
+The Operations Web MUST use React, TypeScript, and Vite. Application setup and routing, feature presentation and workflows, API integration, identity and permission handling, shared UI, and shared infrastructure MUST have clear responsibilities. TypeScript types MUST describe application and API data at integration boundaries; unvalidated external data MUST NOT be treated as trusted domain state. Teams MUST avoid duplicated business rules, unnecessary application-wide abstractions, and dependencies without a documented need. Routing, state-management, networking, and UI packages MUST be selected in an approved technical plan rather than mandated by this constitution.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Identity and Least Privilege
+Protected operational information and actions MUST require authentication and authorization under the approved Identity & Permissions integration and RBAC matrix. Amazon Cognito is the selected authentication provider; the backend MUST validate JWTs and remains the final authority for authorization. The UI MUST show or enable actions only when the authenticated user's approved role and scope permit them, but hiding controls MUST NOT be treated as security enforcement. Railway Controllers may perform only the controller-authorized operations in the RBAC matrix, including official journey publication and cancellation confirmation. Station Staff access MUST remain station/resource scoped and MUST NOT gain controller-only publication or cancellation rights by implication. The application MUST provide safe session expiry and logout behavior, appropriate forbidden and unauthenticated states, and MUST NOT store credentials or tokens in plaintext. Feature specifications MUST use approved Feature 002 behavior and contracts; they MUST NOT invent identity endpoints, role mappings, or permissions.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Railway Data Integrity
+The application MUST preserve the distinction between railway reference data, planned services and schedules, dated operational journeys, officially published journey state, driver observations, and incidents. Railway Network owns stations, routes, and reusable schedules; Journeys & Status owns dated journeys and official published status, timing, and platform updates; Driver Operations owns assignments and observations; Incident Management owns incident lifecycle state. The Operations Web MUST NOT calculate or publish authoritative railway status independently. Driver observations MUST NOT become official updates without an authorized controller action. The application MUST NOT fabricate train locations, estimated arrival times, delay reasons, platform assignments, or cancellation decisions. Planned, published, estimated, stale, unknown, and unavailable information MUST be distinguishable in the user interface.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Approved Backend Integration
+The application MUST consume the existing SmartRail ASP.NET Core .NET 10 backend through approved, implemented contracts owned by the relevant modules. Feature plans MUST identify the contract source and confirm the endpoint and behavior before implementation; the frontend MUST NOT redefine shared contracts or assume an endpoint exists because it appears useful. Integration code MUST use typed request and response models, centralized environment configuration, bounded timeouts, validated inputs, safe error handling, and explicit authorization-failure behavior. Production API addresses MUST NOT be hardcoded. Contract-based mocks MAY support isolated development and tests, but MUST be identified as mocks and MUST NOT count as live integration or acceptance evidence. Real integration acceptance MUST use the approved backend.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### VI. Operational Safety
+The Operations Web is an operational information and management interface; it is not a railway signalling, train-control, or movement-authority system. High-impact actions MUST be authorized by the backend for the target resource, validate their inputs, handle stale or conflicting information, prevent unintended duplicate submissions, and report success or failure without implying publication before confirmation. Where an approved audit behavior applies, the interface and integration MUST preserve it. The application MUST NOT introduce safety-critical automation, operational overrides, or publication policy that has not been approved. Feature specifications MUST define applicable state transitions and concurrency behavior from approved decisions before implementation.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### VII. User Experience and Accessibility
+Operational workflows MUST present information in a clear hierarchy and use consistent navigation and reusable interface patterns. The application MUST support keyboard operation, visible and managed focus, screen-reader interpretation, readable typography, and sufficient contrast. Alerts, confirmations, loading states, errors, and recovery actions MUST communicate their meaning clearly. Operational severity and journey state MUST NOT be conveyed by color alone. Interfaces MUST distinguish scheduled information from current official railway information and MUST expose staleness or unavailability when freshness cannot be established. Detailed layouts, chart choices, and visual libraries belong in feature specifications and plans.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### VIII. Quality and Verification
+Each feature MUST have verification proportionate to its behavior and MUST trace tests to approved acceptance criteria. Applicable checks include TypeScript and lint checks, unit and component tests, API integration, authentication and authorization, role and resource-scope negative cases, failure and retry behavior, accessibility, and end-to-end workflows. Tests MUST prove both permitted and denied actions; protected state changes MUST be verified against backend authorization, not UI visibility alone. Isolated tests MUST use deterministic mocks. Cross-system acceptance MUST use approved backend endpoints. A successful build or rendered screen alone MUST NOT be treated as evidence that a feature is complete.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### IX. Spec-Driven Development
+Every business feature MUST follow Specify, Clarify, Plan, Tasks, Analyze, Implement, Test, and Verify using the project’s GitHub Spec Kit workflow. Its specification and plan MUST be reviewed and approved before business feature implementation begins. Specifications MUST cover applicable SR IDs, actors, goals, priorities, functional behavior, validation, permissions, operational states, degraded and error states, accessibility, and acceptance scenarios. Plans MUST cover application architecture, state, navigation, approved API contracts, identity, authorization, data models, component boundaries, testing, and integration dependencies. Tasks MUST be dependency ordered, individually verifiable, and traceable to requirements and acceptance criteria. This makes scope, decisions, and evidence reviewable before code changes begin.
+
+## Platform Boundaries and Constraints
+
+The Operations Web is an independently developed React application within the wider SmartRail platform. It MUST respect ownership boundaries with the .NET backend, Flutter Passenger App, Flutter Driver App, React Station Display, and independent Catering System. The backend is the source of truth for official railway operations. Cross-application changes MUST use approved shared contracts, and acceptance MUST verify propagation to the relevant consumers when required by the cited acceptance criteria. This constitution governs the Operations Web and MUST NOT be interpreted as assigning it requirements owned by other applications or backend modules.
+
+## Definition of Done and Review
+
+A feature is ready for acceptance only when its approved requirements and applicable acceptance criteria are implemented; approved API contracts and role/resource scopes are respected; primary loading, error, empty, access-denied, and recovery states are verified; automated checks pass; applicable accessibility commitments are checked; real integrations are exercised where required; and traceability evidence is recorded. No unresolved critical defect may remain. External dependencies that prevent verification MUST be recorded as BLOCKED or NOT RUN with the reason and available evidence. Mocked behavior MUST NOT be reported as real integration. Reviews MUST check the feature against this constitution and its approved specification. These gates keep completion claims tied to evidence.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution governs Operations Web feature specifications, plans, implementation, testing, reviews, and acceptance. If a feature artifact conflicts with it, work MUST stop at the conflict until the artifact is corrected or an authorized constitution amendment resolves it. Amendments MUST be reviewed and approved by the project owner and MUST document the reason, affected principles, compatibility impact, and any required follow-up. Versioning follows semantic versioning: MAJOR for incompatible governance changes, MINOR for new principles or materially expanded obligations, and PATCH for clarifications that do not change obligations. Every amendment MUST update the last-amended date and include a version rationale. Feature reviews MUST record material compliance gaps and their resolution or approved disposition. Changes to approved requirements, RBAC, architecture, or API contracts require explicit review and authorization by their owners; this constitution does not itself approve those changes.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): pending human approval | **Last Amended**: 2026-10-19
