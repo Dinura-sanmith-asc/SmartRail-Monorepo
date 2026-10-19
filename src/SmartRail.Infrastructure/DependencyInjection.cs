@@ -91,8 +91,8 @@ public static class DependencyInjection
                 .Select(value => value.Value ?? string.Empty)
                 .ToArray());
         services.AddScoped<IIncidentCategoryCatalog, IncidentCategoryCatalog>();
-        services.TryAddScoped<IFeature001IncidentReferenceVerifier, UnavailableIncidentReferenceVerifier>();
-        services.TryAddScoped<IFeature003IncidentReferenceVerifier, UnavailableIncidentReferenceVerifier>();
+        services.AddScoped<IFeature001IncidentReferenceVerifier, Feature001IncidentReferenceVerifier>();
+        services.AddScoped<IFeature003IncidentReferenceVerifier, Feature003IncidentReferenceVerifier>();
         services.AddScoped<SmartRail.Application.Incidents.Authorization.IncidentAccessEvaluator>();
         services.AddScoped<SmartRail.Application.Incidents.Authorization.IIncidentAccessEvaluator>(provider =>
             provider.GetRequiredService<SmartRail.Application.Incidents.Authorization.IncidentAccessEvaluator>());
