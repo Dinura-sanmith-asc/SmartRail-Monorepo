@@ -27,7 +27,7 @@ $sqlEvidence = $evidence.Replace("'", "''")
 Push-Location $repoRoot
 try {
     $context = (docker context show).Trim()
-    $endpoint = (docker context inspect $context --format '{{(index .Endpoints "docker").Host}}').Trim()
+    $endpoint = (docker context inspect $context --format '{{.Endpoints.docker.Host}}').Trim()
     if ($endpoint -notmatch '^(npipe://|unix://|windows://)') {
         throw 'Docker context is not a local named-pipe or Unix-socket endpoint; refusing to modify any database.'
     }
