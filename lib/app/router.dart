@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:smartrail_passenger/features/railway_search/domain/railway_models.dart';
 import 'package:smartrail_passenger/features/railway_search/presentation/railway_search_screen.dart';
 import 'package:smartrail_passenger/features/railway_search/presentation/search_results_screen.dart';
 import 'package:smartrail_passenger/features/railway_search/presentation/service_detail_screen.dart';
@@ -25,8 +26,15 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.serviceDetails,
       name: 'railway-service-details',
-      builder: (context, state) =>
-          ServiceDetailScreen(serviceId: state.pathParameters['serviceId']!),
+      builder: (context, state) {
+        final selection =
+            state.extra!
+                as ({ScheduledServiceChoice choice, TravelDate travelDate});
+        return ServiceDetailScreen(
+          choice: selection.choice,
+          travelDate: selection.travelDate,
+        );
+      },
     ),
   ],
 );

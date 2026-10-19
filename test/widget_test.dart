@@ -29,28 +29,41 @@ void main() {
 
     final resultsPop = appRouter.push<void>(AppRoutes.results);
     await tester.pumpAndSettle();
-    expect(
-      find.textContaining('Temporary placeholder: scheduled service results'),
-      findsOneWidget,
-    );
+    expect(find.text('Search not submitted'), findsOneWidget);
 
     final detailsPop = appRouter.push<void>(
       '/railway/services/phase-one-placeholder-id',
+      extra: (
+        choice: ScheduledServiceChoice(
+          serviceId: 'phase-one-placeholder-id',
+          serviceCode: 'SR42',
+          routeId: 'route-id',
+          routeCode: 'R1',
+          scheduleRevision: 1,
+          origin: const ScheduledCall(
+            stationId: 'origin-id',
+            stationName: 'Origin',
+            stopOrder: 1,
+            scheduledAt: '2026-10-19T08:00:00+05:30',
+          ),
+          destination: const ScheduledCall(
+            stationId: 'destination-id',
+            stationName: 'Destination',
+            stopOrder: 2,
+            scheduledAt: '2026-10-19T12:00:00+05:30',
+          ),
+        ),
+        travelDate: TravelDate(year: 2026, month: 10, day: 19),
+      ),
     );
     await tester.pumpAndSettle();
-    expect(
-      find.textContaining('Temporary placeholder for service'),
-      findsOneWidget,
-    );
-    expect(find.textContaining('phase-one-placeholder-id'), findsOneWidget);
+    expect(find.text('Scheduled service details'), findsOneWidget);
+    expect(find.text('Service information'), findsOneWidget);
 
     appRouter.pop();
     await tester.pumpAndSettle();
     await detailsPop;
-    expect(
-      find.textContaining('Temporary placeholder: scheduled service results'),
-      findsOneWidget,
-    );
+    expect(find.text('Search not submitted'), findsOneWidget);
 
     appRouter.pop();
     await tester.pumpAndSettle();

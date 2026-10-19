@@ -25,17 +25,36 @@ unexecuted integration run `PASS`.
 
 | Criterion | Verification tasks | Expected evidence | Status | Evidence / reason |
 |---|---|---|---|---|
-| SC-001 | T033, T054 | Result/card assertions against supplied search values; emulator integration comparison with backend response. | NOT RUN | |
-| SC-002 | T022, T026 | Fake/spy repository search-counter assertions show exactly zero `repository.search` calls separately for missing origin, missing destination, missing travel date, and identical origin/destination; validation is actionable. | NOT RUN | |
-| SC-003 | T033, T042, T047 | HTTP 200 with an empty `services` collection shows no results and is not confused with validation, backend, or network failures; error mapping/recovery tests cover 400, 403, 404, 500/default, 503, and no network. | NOT RUN | |
-| SC-004 | T033, T040, T054 | Result and detail tests verify backend stop order, supplied local date/time, next-day cue, and planned labels. | NOT RUN | |
-| SC-005 | T041, T054 | Navigation tests and emulator flow show exact criteria/results restored after Back. | NOT RUN | |
-| SC-006 | T049, T050 | Accessibility semantics, focus, announcements, text scaling, and control operation review. | NOT RUN | |
-| SC-007 | T040, T047 | Both partial-failure directions preserve the successful section and targeted retry. | NOT RUN | |
+| SC-001 | T033, T054 | Result/card assertions against submitted criteria; emulator integration comparison with backend response. | BLOCKED | Mocked result/card assertions passed in `flutter test` (T033); real response comparison not run because API URL and seeded data are not configured (T054). |
+| SC-002 | T022, T026 | Fake/spy repository asserts exactly zero `repository.search` calls for each invalid-criteria case. | PASS | `flutter test --no-pub` passed; `search_controller_test.dart` verifies missing origin, destination, date and identical stations. |
+| SC-003 | T033, T042, T047 | HTTP 200 empty collection renders no-results; mapping/recovery distinguish validation and backend/network failures. | PASS | Results notifier/screen, API failure mapping and recovery widget suites passed for empty, 400, 403, 404, 500, 503 and network outcomes. |
+| SC-004 | T033, T040, T054 | Result/detail tests verify returned stop order, supplied date/time, next-day cue and planned labels. | BLOCKED | Fixture/widget assertions passed for scheduled fields, preserved clock text, next-day cue and ordered stops (T033/T040); comparison with real API data is blocked with T054. |
+| SC-005 | T041, T054 | Navigation tests and emulator flow show exact criteria/results restored after Back. | BLOCKED | Local navigation and route-stack tests passed (T041); emulator acceptance with backend data is blocked with T054. |
+| SC-006 | T049, T050 | Accessible names, selected/disabled states, keyboard focus order, announcements, enlarged text and operable controls. | PASS | `search_accessibility_test.dart` passed in the 106-test suite; analyzer clean. Physical assistive-technology review is supplementary. |
+| SC-007 | T040, T047 | Both partial-failure directions preserve the successful section and targeted retry. | PASS | Detail notifier and widget tests passed for both service/stop failure directions and retrying only the failed section. |
 
-## Requirement and Integration Evidence
+## Requirement Coverage
 
-T061 adds rows or explicit references for every FR-001–FR-022 and applicable SR requirement,
-preserving SR-103/SR-104 as Should Have. Each requirement's status must follow the definitions
-above. Record emulator integration separately from fixture/mock evidence. Record supplementary
-physical-device smoke separately and do not make it a primary acceptance gate.
+Local automated coverage passed with `flutter test --no-pub` (106 tests) and `flutter analyze --no-pub` (no issues). Local verification uses fixture/mock responses; it does not replace primary real-backend acceptance.
+
+| Requirement | Approved priority | Local automated evidence | Local status | Real-backend evidence |
+|---|---|---|---|---|
+| FR-001–FR-004 | As approved in spec | station/API, anonymous search, criteria and validation tests | PASS | BLOCKED (T054/T059) |
+| FR-005–FR-007 | As approved in spec | submission, results, empty-state and result-card tests | PASS | BLOCKED (T054/T059) |
+| FR-008–FR-009 | As approved in spec | detail/route-stop screen and model tests | PASS | BLOCKED (T054/T059) |
+| FR-010–FR-016 | As approved in spec | loading, operation-specific failures, retry and partial-data tests | PASS | BLOCKED (T054/T059) |
+| FR-017 | As approved in spec | results/details navigation and Back/late-response tests | PASS | BLOCKED (T054/T059) |
+| FR-018–FR-019 | As approved in spec | semantics, announcements, text scaling and control operation tests | PASS | Not required for mock/device-independent evidence |
+| FR-020 | As approved in spec | API client tests assert only four approved GET paths and documented fields | PASS | BLOCKED (T054/T059) |
+| FR-021–FR-022 | As approved in spec | date/criteria serialization, duplicate/late response and disposal tests | PASS | BLOCKED (T054/T059) |
+| SR-002, SR-003, SR-004, SR-013, SR-089 | Preserve approved tiers | anonymous reads, service/stop mapping, scheduled-only presentation and API tests | PASS | BLOCKED (T054/T059) |
+| SR-109, SR-114 | Preserve approved tiers | client retrieval metadata, recovery and lifecycle tests | PASS | BLOCKED (T054/T059) |
+| SR-103, SR-104 | Should Have (not elevated) | accessibility names/states, announcements and enlarged-text operation tests | PASS | Not required for mock/device-independent evidence |
+
+## Integration and Build Evidence
+
+- T054 and T059: `BLOCKED` — `SMART_RAIL_API_BASE_URL`, seeded origin/destination UUIDs, and a seeded travel date are not configured. Android emulator `emulator-5554` is present.
+- T055: `NOT RUN` — no physical device is available; this is supplementary.
+- `flutter build apk --debug` was attempted once and stopped after approximately two minutes without Gradle progress output. Existing Gradle daemon logs document `Unable to establish loopback connection` during startup. No Gradle/security/architecture workaround was applied; APK verification is not passed.
+
+SC-001, SC-004, and SC-005 remain `BLOCKED` overall because their real-backend portions have not run; local automated portions passed. This matrix records traceability independently of external prerequisites and never treats unexecuted integration checks as passed.

@@ -130,6 +130,7 @@ class _FeedbackContent extends StatelessWidget {
     final theme = Theme.of(context);
     return Semantics(
       container: true,
+      liveRegion: true,
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 480),

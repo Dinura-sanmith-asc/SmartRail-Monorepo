@@ -13,9 +13,7 @@ class IntegrationTestConfig {
   });
 
   static const _baseUrl = String.fromEnvironment('SMART_RAIL_API_BASE_URL');
-  static const _originId = String.fromEnvironment(
-    'SMART_RAIL_TEST_ORIGIN_ID',
-  );
+  static const _originId = String.fromEnvironment('SMART_RAIL_TEST_ORIGIN_ID');
   static const _destinationId = String.fromEnvironment(
     'SMART_RAIL_TEST_DESTINATION_ID',
   );
@@ -26,8 +24,23 @@ class IntegrationTestConfig {
   final String destinationStationId;
   final TravelDate travelDate;
 
-  factory IntegrationTestConfig.fromEnvironment() {
-    final appConfig = AppConfig.fromValue(_baseUrl);
+  factory IntegrationTestConfig.fromEnvironment() =>
+      IntegrationTestConfig.fromValues(
+        apiBaseUrl: _baseUrl,
+        originStationId: _originId,
+        destinationStationId: _destinationId,
+        travelDate: _travelDate,
+      );
+
+  /// Validates explicit values so configuration failures can be tested without
+  /// contacting a backend or substituting fixture responses.
+  factory IntegrationTestConfig.fromValues({
+    required String apiBaseUrl,
+    required String originStationId,
+    required String destinationStationId,
+    required String travelDate,
+  }) {
+    final appConfig = AppConfig.fromValue(apiBaseUrl);
     final baseUri = appConfig.apiBaseUri;
     if (baseUri == null) {
       throw StateError(
@@ -35,18 +48,18 @@ class IntegrationTestConfig {
         'No mock backend is substituted.',
       );
     }
-    if (!_isUuid(_originId) || !_isUuid(_destinationId)) {
+    if (!_isUuid(originStationId) || !_isUuid(destinationStationId)) {
       throw StateError(
         'Real-backend tests require seeded SMART_RAIL_TEST_ORIGIN_ID and '
         'SMART_RAIL_TEST_DESTINATION_ID UUID values.',
       );
     }
-    if (_originId == _destinationId) {
+    if (originStationId == destinationStationId) {
       throw StateError('The seeded origin and destination IDs must differ.');
     }
     final TravelDate date;
     try {
-      date = TravelDate.parse(_travelDate);
+      date = TravelDate.parse(travelDate);
     } on FormatException catch (error) {
       throw StateError(
         'Real-backend tests require SMART_RAIL_TEST_DATE in YYYY-MM-DD format: $error',
@@ -54,13 +67,13 @@ class IntegrationTestConfig {
     }
     return IntegrationTestConfig(
       apiBaseUri: baseUri,
-      originStationId: _originId,
-      destinationStationId: _destinationId,
+      originStationId: originStationId,
+      destinationStationId: destinationStationId,
       travelDate: date,
     );
   }
 
-  static bool _isUuid(String value) => RegExp(
-    r'^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$',
-  ).hasMatch(value);
+  static bool _isUuid(String value) =>
+      RegExp(r'^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$')
+          .hasMatch(value);
 }

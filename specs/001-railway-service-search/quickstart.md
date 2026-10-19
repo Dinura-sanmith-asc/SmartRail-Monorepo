@@ -1,7 +1,6 @@
 # Quickstart: Search and Service Details Validation
 
-This guide is for implementation/acceptance after planning approval. No packages have been
-installed and no validation commands were run during plan generation.
+This guide records implementation and verification for Feature 001.
 
 ## Prerequisites
 
@@ -58,7 +57,7 @@ responses and require no live service. The test suite should cover:
 5. Search result planned call date/time/next-day presentation uses the response values and
    never device-timezone conversion. Service-detail first-departure time stays separately
    labeled. Route stops preserve API order and show no invented intermediate times.
-6. Back through Search → Results → Details restores retained criteria/results. Back stays
+6. Back through Search â†’ Results â†’ Details restores retained criteria/results. Back stays
    available while reads are pending; late responses after criterion edits or route departure
    do not alter or reopen the old view. Duplicate submissions do not create duplicate
    results or navigation.
@@ -108,7 +107,7 @@ Acceptance walk-through on the Android emulator with real seeded backend data:
 6. Back out during pending search/detail reads; verify no late response reopens or changes
    the departed screen.
 7. Confirm every displayed time is scheduled/planned; later-day calls retain their supplied
-   local date and clock time and show “next day”.
+   local date and clock time and show â€œnext dayâ€.
 
 A physical-device smoke flow may be recorded as supplementary evidence when a reachable
 device/backend combination is available. It does not gate the primary integration path unless
@@ -125,3 +124,28 @@ an approved requirement establishes that gate. Record any unavailable integratio
 If the integration URL, public seeded data, or backend access is not available, record that
 as an integration prerequisite and retain deterministic mocked evidence; do not substitute
 fabricated railway responses for the real-backend acceptance run.
+
+## Verification Run Record
+
+Executed from the repository root:
+
+```powershell
+flutter pub get
+flutter analyze --no-pub
+flutter test --no-pub --timeout 60s
+git diff --check
+```
+
+`flutter pub get` succeeded. Analyzer reported no issues. The full local suite passed 106 tests.
+`git diff --check` is recorded after the final documentation updates.
+
+Real-backend test configuration is supplied through `SMART_RAIL_API_BASE_URL`,
+`SMART_RAIL_TEST_ORIGIN_ID`, `SMART_RAIL_TEST_DESTINATION_ID`, and `SMART_RAIL_TEST_DATE`.
+These values were not configured, so Android emulator integration (T054/T059) is `BLOCKED`;
+mocked results are not integration evidence. No physical device was available, so supplementary
+T055 is `NOT RUN`.
+
+One `flutter build apk --debug` attempt remained silent during Gradle startup for approximately
+two minutes and was stopped. Existing daemon logs show `Unable to establish loopback connection`.
+The build is not passed; no Gradle versions, security settings, or project architecture were
+changed to work around it.
