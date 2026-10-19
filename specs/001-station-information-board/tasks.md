@@ -105,7 +105,7 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 ### Live automatic-update integration gate — BLOCKED
 
-- [ ] T029 [US3] **BLOCKED - approved automatic delivery mechanism/cadence required**: The approved snapshot contract and T025 adapter exist, but Journeys & Status v1.0.0 does not specify push, polling, or an interval. Connect `src/features/station-display/api/station-departure-adapter.ts` to the backend-approved mechanism only after that decision is published; do not select polling versus push in the frontend plan.
+- [X] T029 [US3] Implement the approved prototype HTTP polling policy in `src/features/station-display/api/station-departure-adapter.ts`, using the verified Journeys & Status v1.0.0 station-departures endpoint, configurable `VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS` (default 30000 ms), non-overlapping requests, per-request Colombo date calculation, stale/revalidation behavior, and deterministic automated tests. The interval is prototype client policy, not a production freshness SLA, backend delivery guarantee, or cache expiry threshold.
 - [ ] T030 [US3] **BLOCKED - T029 required**: Add live browser verification in `e2e/station-live-contract.spec.ts`, run only through opt-in `npm run test:e2e:live`, proving a published authoritative backend change reaches the board automatically without manual reload; assert no latency target unless separately approved.
 - [ ] T031 [US3] **CONDITIONAL / BLOCKED - T024 required**: Add use of `GET /api/journeys/{id}/updates` in `src/features/station-display/api/station-update-adapter.ts` only if the approved departures contract cannot provide the required change detection; first record that backend decision in `contracts/README.md`.
 
@@ -189,7 +189,7 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 - **Setup (Phase 1)**: T001 precedes T002-T004. T002 precedes T003. No application implementation begins before its test harness/configuration is available.
 - **Foundational (Phase 2)**: T005 and T006 can proceed in parallel after setup. T007 follows T006 and defines the shared source interface. T008 follows T006 and T007; T009 tests the fixture source before T010 implements it. T010 implements the shared interface. Fixture-backed story work depends on this foundation, not on live backend approval.
 - **User stories**: US1 establishes validated station identity. US2 uses it and T010 to render fixture-backed departures; T020-T023 are ordered after their tests and composed dependencies. US3 consumes the already-established T007 source boundary. US4 adds state/revalidation behavior. US5 verifies/refines the board; US6 verifies the passive surface.
-- **Live integration**: T024-T026 are complete against Journeys & Status OpenAPI v1.0.0; T026 passed against the migrated local Development API on 2026-10-19 with an explicitly identified local acceptance journey. T029-T030 require an approved update delivery mechanism/cadence and T025. T031 remains conditional on a backend decision that `/api/journeys/{id}/updates` is needed. T047 requires T030 and live operational-change, stale/revalidation evidence plus a verified environment; fixture evidence cannot satisfy it.
+- **Live integration**: T024-T026 are complete against Journeys & Status OpenAPI v1.0.0; T026 passed against the migrated local Development API on 2026-10-19 with an explicitly identified local acceptance journey. T029 implements the owner-approved 30000 ms prototype polling policy; T030 remains pending live browser verification against the backend. T031 remains conditional on a backend decision that `/api/journeys/{id}/updates` is needed. T047 requires T030 and live operational-change, stale/revalidation evidence plus a verified environment; fixture evidence cannot satisfy it.
 - **Quickstart edits**: T042 precedes T045; T045 precedes T046; T046 precedes T047. These tasks all edit `quickstart.md` and must run sequentially.
 
 ### User Story Dependencies
@@ -232,7 +232,7 @@ Complete Setup, Foundation and **US1 plus the fixture-backed core of US2** to de
 3. Deliver US2 fixture-backed board and operational presentation.
 4. Add US3 automatic fixture updates and US4 stale/revalidation states.
 5. Verify US5 at both approved profiles and complete US6 passive-scope checks.
-6. T026 is complete against the migrated local backend. Complete live automatic update work only after its backend delivery contract is approved, then execute T047 last.
+6. T026 is complete against the migrated local backend. T029 implements the owner-approved prototype polling policy. Complete T030 live browser verification against the backend before executing T047 last.
 
 ## Notes
 

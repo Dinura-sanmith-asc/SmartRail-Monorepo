@@ -1,6 +1,7 @@
 export interface StationDisplayConfig {
   stationId: string
   apiBaseUrl: string
+  refreshIntervalMs: number
 }
 
 export type ConfigErrorReason =
@@ -8,6 +9,7 @@ export type ConfigErrorReason =
   | 'invalid-station-id'
   | 'missing-api-base-url'
   | 'invalid-api-base-url'
+  | 'invalid-refresh-interval'
 
 export type StationDisplayConfigResult =
   | { kind: 'valid'; config: StationDisplayConfig }
@@ -16,20 +18,26 @@ export type StationDisplayConfigResult =
 export interface PublicStationDisplayEnvironment {
   VITE_STATION_ID?: string
   VITE_API_BASE_URL?: string
+  VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS?: string
 }
 
+export const DEFAULT_STATION_DEPARTURE_REFRESH_INTERVAL_MS = 30_000
+const MAX_TIMER_INTERVAL_MS = 2_147_483_647
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /**
  * These VITE_* values are public and normally embedded into the frontend at build time.
- * Configure VITE_STATION_ID and VITE_API_BASE_URL in the deployment build environment;
- * the API base URL includes the API path prefix (for example, https://api.example.test/api).
+ * Configure VITE_STATION_ID, VITE_API_BASE_URL, and optionally
+ * VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS in the deployment build environment.
+ * VITE_* values are public and normally embedded at build time. The API base URL
+ * includes the API path prefix (for example, https://api.example.test/api).
  * Never put credentials or secrets in frontend environment variables.
  */
 export function readStationDisplayConfig(
   env: PublicStationDisplayEnvironment = {
     VITE_STATION_ID: import.meta.env.VITE_STATION_ID,
     VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+    VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS: import.meta.env.VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS,
   },
 ): StationDisplayConfigResult {
   const stationId = env.VITE_STATION_ID?.trim()
@@ -48,5 +56,21 @@ export function readStationDisplayConfig(
     return { kind: 'invalid', reason: 'invalid-api-base-url' }
   }
 
-  return { kind: 'valid', config: { stationId, apiBaseUrl } }
+  const configuredInterval = env.VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS
+  let refreshIntervalMs = DEFAULT_STATION_DEPARTURE_REFRESH_INTERVAL_MS
+  if (configuredInterval !== undefined) {
+    const normalizedInterval = configuredInterval.trim()
+    const parsedInterval = Number(normalizedInterval)
+    if (
+      !/^\d+$/.test(normalizedInterval) ||
+      !Number.isSafeInteger(parsedInterval) ||
+      parsedInterval < 1 ||
+      parsedInterval > MAX_TIMER_INTERVAL_MS
+    ) {
+      return { kind: 'invalid', reason: 'invalid-refresh-interval' }
+    }
+    refreshIntervalMs = parsedInterval
+  }
+
+  return { kind: 'valid', config: { stationId, apiBaseUrl, refreshIntervalMs } }
 }

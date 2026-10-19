@@ -35,9 +35,9 @@ The project owner approved configurable HTTP polling of the verified station-dep
 
 - Fetch an initial snapshot after the configured station has been validated.
 - While connected, issue a new GET every configured interval. The default is 30000 ms.
-- Read the public Vite configuration variable `VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS`. Vite variables are public and are normally embedded at build time; they must not contain credentials or secrets. An unset variable uses the default. A configured value must be a positive finite integer; invalid values reject polling and must not create a zero-delay or uncontrolled request loop.
+- Read the public Vite configuration variable `VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS`. Vite variables are public and are normally embedded at build time; they must not contain credentials or secrets. An unset variable uses the default. A configured value must be a positive integer supported by the browser timer; invalid values reject polling and must not create a zero-delay or uncontrolled request loop.
 - Recalculate the current station-local service date in `Asia/Colombo` for every request. Do not cache the date across midnight.
-- Do not overlap snapshot requests. A reconnect event may request immediate revalidation; if a request is already in flight, coalesce/ignore the duplicate trigger until that request settles.
+- Do not overlap or queue snapshot requests. Skip a scheduled poll tick while a request is in flight. A reconnect event may request immediate revalidation; if a request is already in flight, coalesce/ignore the duplicate trigger until that request settles.
 - A failed request makes the retained last successful snapshot cached/possibly outdated. Keep that warning through subsequent failures and remove it only after a successful backend response.
 - Preserve the response's order, exact `serviceId`, nullable/unknown values, status, platform, source, revision, ambiguity and timestamp values. Do not derive delay or ETA. The contract has no delay field, and display meaning for timestamps remains subject to verification.
 

@@ -28,6 +28,13 @@ export function useDepartureUpdates(source: StationDepartureSource, stationId: s
       if (!active || snapshot.station.stationId !== stationId) return
       receivedSourceUpdate = true
       dispatch({ type: 'success', snapshot })
+    }, {
+      onRevalidated: (snapshot) => {
+        if (active && snapshot.station.stationId === stationId) dispatch({ type: 'revalidation-success', snapshot })
+      },
+      onRefreshFailure: (message) => {
+        if (active) dispatch({ type: 'failure', message })
+      },
     })
 
     void source.getInitialSnapshot(stationId).then(

@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
-import { HttpClientError } from '../../../shared/api/http-client'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { HttpClientError, type HttpClient } from '../../../shared/api/http-client'
 import { createStationDepartureAdapter } from './station-departure-adapter'
 
 const stationId = '00000000-0000-4000-8000-000000000101'
@@ -24,6 +24,8 @@ const departure = {
 }
 
 describe('approved Journeys & Status station departures adapter', () => {
+  afterEach(() => vi.useRealTimers())
+
   it('requests the Colombo local date and maps only published projection values', async () => {
     const get = vi.fn()
       .mockResolvedValueOnce({ items: [{ stationId, name: 'Contract Station' }] })
@@ -95,5 +97,77 @@ describe('approved Journeys & Status station departures adapter', () => {
       .mockResolvedValueOnce([{ ...departure, stationId: '00000000-0000-4000-8000-000000000999' }])
     const source = createStationDepartureAdapter({ get }, () => new Date('2026-10-17T18:30:00Z'))
     await expect(source.getInitialSnapshot(stationId)).rejects.toMatchObject({ kind: 'malformed-response' } as Partial<HttpClientError>)
+  })
+
+  it('polls once per configured interval, keeps station scope, reports failures and stops after unsubscribe', async () => {
+    vi.useFakeTimers()
+    const get = vi.fn()
+      .mockResolvedValueOnce({ items: [{ stationId, name: 'Contract Station' }] })
+      .mockResolvedValueOnce([departure])
+      .mockResolvedValueOnce({ items: [{ stationId, name: 'Contract Station' }] })
+      .mockResolvedValueOnce([departure])
+      .mockResolvedValueOnce({ items: [{ stationId, name: 'Contract Station' }] })
+      .mockRejectedValueOnce(new Error('offline'))
+    const source = createStationDepartureAdapter({ get }, () => new Date('2026-10-17T18:30:00Z'), 1_000)
+    const updated = vi.fn()
+    const failed = vi.fn()
+    const unsubscribe = source.subscribe(vi.fn(), { onRevalidated: updated, onRefreshFailure: failed })
+
+    await source.getInitialSnapshot(stationId)
+    await vi.advanceTimersByTimeAsync(1_000)
+    expect(updated).toHaveBeenCalledWith(expect.objectContaining({ station: { stationId, name: 'Contract Station' } }))
+    expect(failed).not.toHaveBeenCalled()
+
+    await vi.advanceTimersByTimeAsync(1_000)
+    expect(failed).toHaveBeenCalledWith('offline')
+    unsubscribe()
+    await vi.advanceTimersByTimeAsync(5_000)
+    expect(get).toHaveBeenCalledTimes(6) // each read validates the station and then reads departures
+    source.dispose?.()
+  })
+
+  it('does not overlap polls and recomputes the Colombo date after midnight', async () => {
+    vi.useFakeTimers()
+    let currentTime = new Date('2026-10-17T18:29:59Z') // 23:59:59 in Colombo
+    const pending: Array<(value: unknown) => void> = []
+    const get = vi.fn(<T>(path: string): Promise<T> => {
+      if (path === '/stations') return Promise.resolve({ items: [{ stationId, name: 'Contract Station' }] } as T)
+      return new Promise<T>((resolve) => pending.push((value) => resolve(value as T)))
+    })
+    const source = createStationDepartureAdapter({ get: get as unknown as HttpClient['get'] }, () => currentTime, 1_000)
+    const unsubscribe = source.subscribe(vi.fn())
+    const initial = source.getInitialSnapshot(stationId)
+    await vi.waitFor(() => expect(get).toHaveBeenLastCalledWith('/stations/00000000-0000-4000-8000-000000000101/departures?date=2026-10-17'))
+    pending.shift()?.([{ ...departure, operationDate: '2026-10-17', stationLocalDepartureDate: '2026-10-17' }])
+    await initial
+
+    currentTime = new Date('2026-10-17T18:30:00Z')
+    await vi.advanceTimersByTimeAsync(1_000)
+    expect(get).toHaveBeenLastCalledWith('/stations/00000000-0000-4000-8000-000000000101/departures?date=2026-10-18')
+    // Let this request remain pending while another interval elapses.
+    const reconnectRevalidation = source.revalidate(stationId)
+    await vi.advanceTimersByTimeAsync(3_000)
+    expect(get.mock.calls.filter(([path]) => String(path).includes('/departures?')).length).toBe(2)
+    pending.shift()?.([{ ...departure, operationDate: '2026-10-17', stationLocalDepartureDate: '2026-10-18' }])
+    await reconnectRevalidation
+    await vi.advanceTimersByTimeAsync(1_000)
+    expect(get).toHaveBeenLastCalledWith('/stations/00000000-0000-4000-8000-000000000101/departures?date=2026-10-18')
+    pending.shift()?.([{ ...departure, operationDate: '2026-10-17', stationLocalDepartureDate: '2026-10-18' }])
+    unsubscribe()
+    source.dispose?.()
+  })
+
+  it('validates the interval defensively and disposes its timer', async () => {
+    expect(() => createStationDepartureAdapter({ get: vi.fn() }, undefined, 0)).toThrow(RangeError)
+    vi.useFakeTimers()
+    const get = vi.fn()
+      .mockResolvedValueOnce({ items: [{ stationId, name: 'Contract Station' }] })
+      .mockResolvedValue([departure])
+    const source = createStationDepartureAdapter({ get }, () => new Date('2026-10-17T18:30:00Z'), 1_000)
+    source.subscribe(vi.fn())
+    await source.getInitialSnapshot(stationId)
+    source.dispose?.()
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(get).toHaveBeenCalledTimes(2)
   })
 })

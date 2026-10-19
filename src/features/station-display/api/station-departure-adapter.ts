@@ -2,6 +2,7 @@ import { HttpClientError, type HttpClient } from '../../../shared/api/http-clien
 import { findPublishedStation } from './station-reference-client'
 import type { StationDepartureSource } from './station-departure-source'
 import type { OperationalInformation, PublishedValue, StationDepartureSnapshot } from '../model/display-model'
+import { DEFAULT_STATION_DEPARTURE_REFRESH_INTERVAL_MS } from '../../../app/config'
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const statuses = ['Scheduled', 'Running', 'Delayed', 'Interrupted', 'Cancelled', 'Completed', 'Terminated']
@@ -87,7 +88,15 @@ function mapOperational(item: StationDepartureResponse): OperationalInformation 
   }
 }
 
-export function createStationDepartureAdapter(client: Pick<HttpClient, 'get'>, now: () => Date = () => new Date()): StationDepartureSource {
+export function createStationDepartureAdapter(
+  client: Pick<HttpClient, 'get'>,
+  now: () => Date = () => new Date(),
+  refreshIntervalMs = DEFAULT_STATION_DEPARTURE_REFRESH_INTERVAL_MS,
+): StationDepartureSource {
+  if (!Number.isSafeInteger(refreshIntervalMs) || refreshIntervalMs < 1 || refreshIntervalMs > 2_147_483_647) {
+    throw new RangeError('Refresh interval must be a positive safe browser timer interval.')
+  }
+
   const read = async (stationId: string): Promise<StationDepartureSnapshot> => {
     const stationResult = await findPublishedStation(stationId, client)
     if (stationResult.kind !== 'found') {
@@ -120,10 +129,73 @@ export function createStationDepartureAdapter(client: Pick<HttpClient, 'get'>, n
     }
   }
 
+  let stationId: string | undefined
+  let timer: ReturnType<typeof setInterval> | undefined
+  let request: Promise<StationDepartureSnapshot> | undefined
+  let disposed = false
+  const subscribers = new Set<{
+    listener: (snapshot: StationDepartureSnapshot) => void
+    handlers?: Parameters<StationDepartureSource['subscribe']>[1]
+  }>()
+
+  const startPolling = () => {
+    if (disposed || timer || !stationId || subscribers.size === 0) return
+    timer = setInterval(() => {
+      if (disposed || request || !stationId || (typeof navigator !== 'undefined' && !navigator.onLine)) return
+      const requestedStation = stationId
+      const current = read(requestedStation)
+      request = current
+      void current.then(
+        (snapshot) => {
+          if (disposed || requestedStation !== stationId) return
+          for (const subscriber of subscribers) {
+            if (subscriber.handlers?.onRevalidated) subscriber.handlers.onRevalidated(snapshot)
+            else subscriber.listener(snapshot)
+          }
+        },
+        (error: unknown) => {
+          if (disposed) return
+          const message = error instanceof Error ? error.message : 'Departure information could not be refreshed.'
+          for (const subscriber of subscribers) subscriber.handlers?.onRefreshFailure?.(message)
+        },
+      ).finally(() => { if (request === current) request = undefined })
+    }, refreshIntervalMs)
+  }
+
+  const fetch = (id: string) => {
+    stationId = id
+    startPolling()
+    if (request) return request
+    const current = read(id)
+    request = current
+    void current.then(
+      () => { if (request === current) request = undefined },
+      () => { if (request === current) request = undefined },
+    )
+    return current
+  }
+
   return {
-    getInitialSnapshot: read,
-    revalidate: read,
-    // Journeys & Status v1.0.0 defines snapshots and history reads, not a push subscription.
-    subscribe: () => () => undefined,
+    getInitialSnapshot: fetch,
+    revalidate: (id) => fetch(id),
+    subscribe: (listener, handlers) => {
+      if (disposed) return () => undefined
+      const subscriber = { listener, handlers }
+      subscribers.add(subscriber)
+      startPolling()
+      return () => {
+        subscribers.delete(subscriber)
+        if (subscribers.size === 0 && timer) {
+          clearInterval(timer)
+          timer = undefined
+        }
+      }
+    },
+    dispose: () => {
+      disposed = true
+      if (timer) clearInterval(timer)
+      timer = undefined
+      subscribers.clear()
+    },
   }
 }

@@ -14,7 +14,11 @@ import './features/station-display/station-display.css'
 const stationDisplayConfig = readStationDisplayConfig()
 const fixtureDepartureSource = createFixtureDepartureSource(stationDisplayFixtures)
 const liveDepartureSource = stationDisplayConfig.kind === 'valid'
-  ? createStationDepartureAdapter(createHttpClient({ baseUrl: stationDisplayConfig.config.apiBaseUrl }))
+  ? createStationDepartureAdapter(
+      createHttpClient({ baseUrl: stationDisplayConfig.config.apiBaseUrl }),
+      undefined,
+      stationDisplayConfig.config.refreshIntervalMs,
+    )
   : fixtureDepartureSource
 const defaultDepartureSource = import.meta.env.PROD || import.meta.env.VITE_STATION_DISPLAY_SOURCE === 'live'
   ? liveDepartureSource
@@ -29,6 +33,8 @@ function configurationMessage(reason: ConfigErrorReason): string {
     case 'missing-api-base-url':
     case 'invalid-api-base-url':
       return 'Station information is unavailable because API configuration is invalid.'
+    case 'invalid-refresh-interval':
+      return 'Station information is unavailable because refresh configuration is invalid.'
   }
 }
 

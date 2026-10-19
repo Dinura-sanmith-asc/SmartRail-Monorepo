@@ -84,4 +84,30 @@ describe('useDepartureUpdates', () => {
 
     expect(result.current).toEqual({ kind: 'loaded', snapshot: updated })
   })
+
+  it('retains stale information until an online-triggered authoritative revalidation succeeds', async () => {
+    const fixture = stationDisplayFixtures[0]
+    let refreshHandlers: Parameters<StationDepartureSource['subscribe']>[1]
+    let resolveRevalidation: ((snapshot: StationDepartureSnapshot) => void) | undefined
+    const source: StationDepartureSource = {
+      getInitialSnapshot: vi.fn().mockResolvedValue(fixture),
+      revalidate: vi.fn(() => new Promise<StationDepartureSnapshot>((resolve) => { resolveRevalidation = resolve })),
+      subscribe: vi.fn((_listener, handlers) => {
+        refreshHandlers = handlers
+        return () => undefined
+      }),
+    }
+    const { result } = renderHook(() => useDepartureUpdates(source, DEMO_STATION_IDS.central))
+    await waitFor(() => expect(result.current.kind).toBe('loaded'))
+
+    act(() => refreshHandlers?.onRefreshFailure?.('refresh failed'))
+    expect(result.current).toMatchObject({ kind: 'stale', snapshot: fixture })
+    act(() => window.dispatchEvent(new Event('online')))
+    expect(result.current).toMatchObject({ kind: 'revalidating', snapshot: fixture })
+    expect(source.revalidate).toHaveBeenCalledTimes(1)
+
+    const updated = { ...fixture, departures: [fixture.departures[1]] }
+    act(() => resolveRevalidation?.(updated))
+    await waitFor(() => expect(result.current).toEqual({ kind: 'recovered', snapshot: updated }))
+  })
 })

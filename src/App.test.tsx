@@ -9,7 +9,10 @@ const mocks = vi.hoisted(() => ({
   findStation: vi.fn(),
 }))
 
-vi.mock('./app/config', () => ({ readStationDisplayConfig: mocks.readConfig }))
+vi.mock('./app/config', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./app/config')>()),
+  readStationDisplayConfig: mocks.readConfig,
+}))
 vi.mock('./features/station-display/api/station-reference-client', () => ({
   findPublishedStation: mocks.findStation,
 }))
