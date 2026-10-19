@@ -14,8 +14,8 @@
 ## Requirement Completeness
 
 - [x] No [TBD] markers remain
-- [x] No [NEEDS CLARIFICATION] markers remain — the three requested direction decisions are recorded in the spec
-- [ ] Requirements are fully testable and unambiguous — the discriminator for distinct same-date departures with identical schedule occurrences remains open; existing API schemas still need approval to carry route-diversion revisions and optional Driver-observation evidence references
+- [x] No [NEEDS CLARIFICATION] markers remain — approved clarification and gate decisions are recorded in the spec
+- [x] Requirements are fully testable and unambiguous — Gate 1 identity and Gate 2 operation schemas/semantics are approved and recorded in `spec.md`
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
@@ -26,21 +26,21 @@
 
 ## Feature Readiness
 
-- [ ] All functional requirements have complete acceptance criteria — contract-schema approval is still required if existing operations cannot represent route diversions or observation-ID evidence, and the identical-occurrence collision case remains unresolved
+- [x] All functional requirements have complete acceptance criteria — approved identity, diversion, audit/correction, observation-reference, revision, and ambiguity behavior is recorded in `spec.md`
 - [x] User scenarios cover primary flows
 - [x] Feature outcomes are measurable in the Success Criteria
-- [x] No implementation details leak into the specification — the approved interaction boundary is stated as a product scope limit; detailed schemas remain for contracts/planning
+- [x] No unapproved implementation choices leak into the specification — approved operation schemas are recorded to resolve Gate 2; implementation technology and deployment detail remain for planning
 - [x] Requirement traceability identifies which acceptance evidence belongs to Feature 003 versus other modules and clients
 
 ## Pre-planning Gates
 
-- [ ] Gate 1 — Journey identity: BLOCKED pending approval of the authoritative journey-instance ID issuer/initialization process and passenger-safe disambiguation for a collision on the approved occurrence key
-- [ ] Gate 2 — API contracts: BLOCKED pending approved schemas for journey identity/revision, ordered route diversions, Controller audit/correction evidence, optional Driver-observation ID linkage, and consistent dependent reads; no new operation is proposed
+- [x] Gate 1 — Journey identity: APPROVED; authoritative opaque `journeyInstanceId`, controlled non-public initialization with actor/provenance audit, idempotency/conflict handling, distinct IDs for shared composites, and explicit ambiguity handling are recorded in `spec.md`. Operational authority mapping remains a deployment/governance gate.
+- [x] Gate 2 — API contracts: APPROVED; version 1.0.0 schemas/semantics cover all five existing operations, including journey identity/revision, ordered route diversions, Controller audit/correction evidence, optional verified Driver-observation ID linkage, consistent reads, and ambiguity handling. No operation or grant is added.
 
 ## Notes
 
 - Approved clarification directions are recorded in `spec.md`: allow multiple journey instances per service/date; require explicit transitions and auditable corrections; retain the current operation boundary without adding routes.
 - The approved lifecycle now specifies transition paths, cancellation/termination/completion meanings, audited terminal corrections, and stale-revision rejection.
-- Gate findings and explicitly unapproved minimal proposals are recorded in `spec.md` under Pre-planning Readiness Review. Do not treat proposals as approved behavior or claim complete Must Have coverage before both gates pass.
+- Gate 1 business and Gate 2 API-schema approvals are recorded in `spec.md`. Journey-initialization authority mapping and client/other-module acceptance evidence remain separate operational and downstream gates; they are not claimed complete by this specification.
 - Client-owned and other-module-owned acceptance checks remain open until their owning specifications and test evidence exist.
 - Approved source documents are read-only; this feature specification does not amend them.

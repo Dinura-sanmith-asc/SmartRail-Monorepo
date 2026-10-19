@@ -1,0 +1,62 @@
+# Journeys & Status Local Development Quickstart
+
+This is a future implementation verification guide. It does not create code, migrations, data, or AWS resources. Use only the local Docker PostgreSQL services and isolated test database.
+
+## Prerequisites
+
+- Windows PowerShell from the repository root.
+- .NET SDK compatible with the repository's `net10.0` projects.
+- Docker Desktop and Docker Compose.
+- Local development connection configured in API Development User Secrets; do not place credentials in this document or Git.
+- `SMART_RAIL_TEST_ADMIN_CONNECTION` set in the current test shell to the dedicated Compose test host on loopback port 5433, database `postgres`, user `smartrail_test_admin`. The integration fixture rejects other targets and creates a disposable database per fixture.
+- Local auth tests use the existing real-signature OIDC/JWKS fixtures under `tests/SmartRail.IntegrationTests/Identity`; do not configure a bypass or production auth exception.
+
+## Start local PostgreSQL
+
+```powershell
+docker compose up -d postgres postgres-test
+docker compose ps
+```
+
+Wait for both health checks to report healthy. The development service binds to `127.0.0.1:5432` / `smartrail_dev`; the test service binds to `127.0.0.1:5433`. Journeys integration tests must use only the latter.
+
+Set the integration connection string without printing it. Use the repository's existing local secret/password setup; do not copy a production or RDS connection string:
+
+```powershell
+$env:SMART_RAIL_TEST_ADMIN_CONNECTION = Read-Host 'Enter local port-5433 test admin connection string'
+```
+
+Close the shell after tests to clear the variable. Do not use `Write-Host`, transcript logging, or command history to reveal credentials.
+
+## Restore, build and test
+
+```powershell
+dotnet restore SmartRail.slnx
+dotnet build SmartRail.slnx --no-restore
+dotnet test SmartRail.slnx --no-build
+```
+
+The PostgreSQL fixture creates and drops an isolated database. A missing test service or connection is a failure to resolve, not a passing/skipped verification. Never point the test admin variable at `smartrail_dev` or AWS/RDS.
+
+## Feature test evidence expected
+
+- Domain/Application tests: approved status transition graph; terminal correction; role/scope denial; initialization validation and idempotency decisions; ambiguity is never auto-selected.
+- PostgreSQL integration tests: additive migration, schedule/station FK behavior, unique source idempotency, distinct IDs sharing the composite, conflict audit, append-only revisions, atomic stop snapshots, rollback, and one-writer/one-409 concurrent updates.
+- API tests: exactly five approved endpoints; anonymous public projections; Controller authorization and current scope; 400/401/403/404/409/503 mappings; no tokens/claims/SQL leakage; same revision in consistent reads; F001 and F002 regression suite.
+- Test fixtures may invoke the internal initializer under a deterministic test authority. No public initialization route or Development/Production authentication bypass is allowed.
+
+## OpenAPI and contract review
+
+After implementation, run the API in a local Development environment using the existing launch profile and local User Secrets. The built-in document is exposed at `/openapi/v1.json` in Development. Compare the generated document to [contracts/journeys-status.openapi.yaml](contracts/journeys-status.openapi.yaml): exactly the five paths, public-read security behavior, bearer protection on two PATCH operations, expected revision, response schemas, and safe errors. Do not expose the local API or test issuer outside loopback.
+
+## Migration procedure (implementation phase only)
+
+The migration has not been generated or applied by this plan. When its task is authorized, add the EF migration named `JourneysStatus` with EF-generated ID, inspect the generated Up/Down operations and shared snapshot, then apply it first to an isolated port-5433 test database. Do not edit prior migration files. Apply to `smartrail_dev` only under a separately approved local verification step; never run EF commands against AWS/RDS as part of Feature 003.
+
+## Current contract-review items
+
+Before creating implementation tasks, resolve the review items in [research.md](research.md): station departure date semantics for overnight journeys, update-history pagination/retention needs, stable stop ID behavior after diversion, public correction/source vocabulary, and invalid/missing observation reference responses. These are intentionally visible; do not silently add business thresholds or endpoints.
+
+## AWS boundary
+
+Feature work remains local-first. AWS resource creation, Cognito configuration, IAM, RDS, API Gateway, Lambda, SAM, and deployment are manual user operations after complete local verification. This quickstart contains no AWS commands or AWS configuration.
