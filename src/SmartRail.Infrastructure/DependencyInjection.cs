@@ -19,6 +19,7 @@ using SmartRail.Application.JourneysStatus.Initialization;
 using SmartRail.Application.JourneysStatus.Boundaries;
 using SmartRail.Infrastructure.JourneysStatus.Persistence;
 using SmartRail.Infrastructure.JourneysStatus.Initialization;
+using SmartRail.Infrastructure.JourneysStatus;
 
 namespace SmartRail.Infrastructure;
 
@@ -75,6 +76,7 @@ public static class DependencyInjection
         services.AddScoped<IJourneyScheduleLinkVerifier, JourneyScheduleLinkVerifier>();
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<InitializeJourneyHandler>();
+        services.AddJourneysStatusReadServices();
         return services;
     }
 }

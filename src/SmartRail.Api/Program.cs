@@ -7,6 +7,7 @@ using SmartRail.Api.Authentication;
 using SmartRail.Api.Authorization;
 using SmartRail.Api.Contracts.Identity;
 using SmartRail.Api.Endpoints;
+using SmartRail.Api.Endpoints.JourneysStatus;
 using SmartRail.Api.Errors;
 using SmartRail.Infrastructure;
 
@@ -115,6 +116,7 @@ app.UseAuthorization();
 
 app.MapRailwayNetworkEndpoints();
 app.MapIdentityEndpoints();
+app.MapJourneysStatusReadEndpoints();
 
 
 app.Run();
