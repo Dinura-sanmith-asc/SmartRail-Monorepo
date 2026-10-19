@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smartrail_passenger/core/widgets/async_feedback.dart';
 import 'package:smartrail_passenger/features/railway_search/application/search_controller.dart'
     as search;
+import 'package:smartrail_passenger/features/railway_search/application/search_results_notifier.dart';
+import 'package:smartrail_passenger/features/railway_search/application/search_results_state.dart';
 import 'package:smartrail_passenger/features/railway_search/application/search_state.dart';
 import 'package:smartrail_passenger/features/railway_search/domain/railway_models.dart';
 import 'package:smartrail_passenger/features/railway_search/presentation/station_picker.dart';
@@ -13,6 +18,7 @@ class RailwaySearchScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(search.searchControllerProvider);
+    final resultsState = ref.watch(searchResultsNotifierProvider);
     final controller = ref.read(search.searchControllerProvider.notifier);
     final origin = _stationFor(state.stations, state.criteria.originStationId);
     final destination = _stationFor(
@@ -43,6 +49,7 @@ class RailwaySearchScreen extends ConsumerWidget {
                   const SizedBox(height: 24),
                   _stationChoices(
                     context,
+                    ref: ref,
                     state: state,
                     controller: controller,
                     origin: origin,
@@ -50,7 +57,8 @@ class RailwaySearchScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   OutlinedButton.icon(
-                    onPressed: () => _chooseDate(context, state, controller),
+                    onPressed: () =>
+                        _chooseDate(context, state, controller, ref),
                     icon: const Icon(Icons.calendar_month_outlined),
                     label: Text(
                       _dateButtonLabel(context, state.criteria.travelDate),
@@ -69,7 +77,21 @@ class RailwaySearchScreen extends ConsumerWidget {
                   ],
                   const SizedBox(height: 20),
                   FilledButton.icon(
-                    onPressed: controller.validateCriteria,
+                    onPressed:
+                        resultsState.status == SearchResultsStatus.loading
+                        ? null
+                        : () {
+                            if (!controller.validateCriteria()) return;
+                            final criteria = ref
+                                .read(search.searchControllerProvider)
+                                .criteria;
+                            unawaited(
+                              ref
+                                  .read(searchResultsNotifierProvider.notifier)
+                                  .submit(criteria),
+                            );
+                            context.pushNamed('railway-results');
+                          },
                     icon: const Icon(Icons.search),
                     label: const Text('Search services'),
                   ),
@@ -84,6 +106,7 @@ class RailwaySearchScreen extends ConsumerWidget {
 
   Widget _stationChoices(
     BuildContext context, {
+    required WidgetRef ref,
     required SearchState state,
     required search.SearchController controller,
     required Station? origin,
@@ -110,7 +133,11 @@ class RailwaySearchScreen extends ConsumerWidget {
           stations: state.stations,
           selectedStation: origin,
           enabled: true,
-          onSelected: controller.selectOrigin,
+          onSelected: (stationId) {
+            if (stationId == state.criteria.originStationId) return;
+            ref.read(searchResultsNotifierProvider.notifier).clear();
+            controller.selectOrigin(stationId);
+          },
         ),
         const SizedBox(height: 12),
         StationPicker(
@@ -118,7 +145,11 @@ class RailwaySearchScreen extends ConsumerWidget {
           stations: state.stations,
           selectedStation: destination,
           enabled: true,
-          onSelected: controller.selectDestination,
+          onSelected: (stationId) {
+            if (stationId == state.criteria.destinationStationId) return;
+            ref.read(searchResultsNotifierProvider.notifier).clear();
+            controller.selectDestination(stationId);
+          },
         ),
       ],
     ),
@@ -128,6 +159,7 @@ class RailwaySearchScreen extends ConsumerWidget {
     BuildContext context,
     SearchState state,
     search.SearchController controller,
+    WidgetRef ref,
   ) async {
     final selected = state.criteria.travelDate;
     final today = DateTime.now();
@@ -141,7 +173,13 @@ class RailwaySearchScreen extends ConsumerWidget {
       lastDate: DateTime(9999, 12, 31),
       helpText: 'Choose travel date',
     );
-    if (date != null) controller.selectTravelDate(date);
+    if (date != null &&
+        (date.year != selected?.year ||
+            date.month != selected?.month ||
+            date.day != selected?.day)) {
+      ref.read(searchResultsNotifierProvider.notifier).clear();
+      controller.selectTravelDate(date);
+    }
   }
 
   String _dateButtonLabel(BuildContext context, TravelDate? date) {
