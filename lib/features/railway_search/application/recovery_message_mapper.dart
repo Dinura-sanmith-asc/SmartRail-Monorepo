@@ -25,10 +25,13 @@ class RecoveryMessage {
 abstract final class RecoveryMessageMapper {
   static RecoveryMessage map(ApiFailure failure) {
     final isDetailRead = switch (failure.operation) {
-      RailwayApiOperation.serviceDetail || RailwayApiOperation.routeStops =>
-        true,
-      RailwayApiOperation.stations || RailwayApiOperation.serviceSearch =>
-        false,
+      RailwayApiOperation.serviceDetail ||
+      RailwayApiOperation.routeStops => true,
+      RailwayApiOperation.journeySnapshot ||
+      RailwayApiOperation.journeyUpdates => true,
+      RailwayApiOperation.stations ||
+      RailwayApiOperation.serviceSearch => false,
+      RailwayApiOperation.stationDepartures => false,
     };
 
     return switch (failure.kind) {
@@ -66,7 +69,8 @@ abstract final class RecoveryMessageMapper {
       ApiFailureKind.timeout ||
       ApiFailureKind.network ||
       ApiFailureKind.protocol => RecoveryMessage(
-        message: 'Railway information is temporarily unavailable. Please try again.',
+        message:
+            'Railway information is temporarily unavailable. Please try again.',
         canRetry: true,
         canGoBack: true,
         canCorrectCriteria: false,

@@ -37,10 +37,10 @@ Mocked tests provide deterministic unit/widget/state evidence only; they do not 
 
 1. Start the seeded backend using its documented local setup and record its actual listening URL.
 2. Confirm anonymously that station departures return candidates for the selected origin/date and that a selected row's `serviceId` matches the Feature 001 choice. Record `journeyInstanceId` separately.
-3. Launch the Passenger integration suite with explicit API configuration, for example:
+3. Launch the Passenger integration suite with all four explicit API and fixture values, for example:
 
 ```powershell
-flutter test integration_test/journey_status -d <android-emulator-id> --dart-define=SMART_RAIL_API_BASE_URL=http://10.0.2.2:<actual-port>
+flutter test integration_test/journey_status -d <android-emulator-id> --dart-define=SMART_RAIL_API_BASE_URL=http://10.0.2.2:<actual-port> --dart-define=SMART_RAIL_TEST_ORIGIN_STATION_ID=<seeded-origin-uuid> --dart-define=SMART_RAIL_TEST_SERVICE_ID=<seeded-service-uuid> --dart-define=SMART_RAIL_TEST_DATE=<seeded-yyyy-mm-dd>
 ```
 
 Use the actual backend port and a seeded journey selected through station departures. Tests must fail clearly if configuration/data is absent and must not silently fall back to mocks.
@@ -48,6 +48,10 @@ Use the actual backend port and a seeded journey selected through station depart
 5. Compare displayed values to actual HTTP responses. Do not alter test inputs to force a desired status. Record command, device, API URL type (redacted as appropriate), actual IDs/date, response values, and result in verification evidence when implementation tasks are created.
 
 If API, seed data, or emulator is unavailable, local checks may still be reported. Record real integration as `BLOCKED` when a named prerequisite prevents execution, or `NOT RUN` when not attempted. Neither is a pass. Physical-device smoke is supplementary unless an approved requirement changes the primary acceptance device.
+
+### Current local integration blocker (2026-10-20)
+
+The API was reachable anonymously at `http://127.0.0.1:5237` (Android emulator host alias: `http://10.0.2.2:5237`). The only returned stations were Colombo Fort (`10000000-0000-0000-0000-000000000001`) and Galle (`10000000-0000-0000-0000-000000000002`). For that pair, the service search on `2026-10-17` returned service `30000000-0000-0000-0000-000000000001`, but station departures returned an empty array. On `2026-10-19`, station departures returned journey `45000000-0000-0000-0000-000000000019` for the same service, but the approved service search returned 503 `service_eligibility_unavailable`. Thus no currently observed input satisfies both the approved service search and dated-journey lookup path. Service detail and route-stop reads individually returned 200, but they cannot substitute for the missing linked service/date flow. T063 is BLOCKED until the backend presents compatible seeded data; do not run the UI suite with guessed values or report mocked/local tests as real integration evidence.
 
 ## Contract references
 

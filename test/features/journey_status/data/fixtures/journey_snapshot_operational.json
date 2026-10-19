@@ -1,0 +1,35 @@
+{
+  "journeyInstanceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
+  "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+  "scheduleId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd2",
+  "scheduleRevision": 3,
+  "operationDate": "2026-10-19",
+  "firstDepartureOccurrence": "09:15:00",
+  "revision": 7,
+  "status": "Delayed",
+  "source": "ApprovedRailwayFeed",
+  "publishedAt": "2026-10-19T09:20:00+05:30",
+  "lastUpdatedAt": "2026-10-19T09:20:00+05:30",
+  "eta": {
+    "value": "2026-10-19T11:45:00+05:30",
+    "source": "ApprovedRailwayFeed",
+    "updatedAt": "2026-10-19T09:20:00+05:30",
+    "freshness": "current"
+  },
+  "stops": [
+    {
+      "journeyStopId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2",
+      "stopOrder": 1,
+      "stationId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
+      "stationName": "Harbour Station",
+      "plannedArrivalAt": "2026-10-19T11:30:00+05:30",
+      "plannedDepartureAt": null,
+      "operationalArrivalAt": "2026-10-19T11:45:00+05:30",
+      "operationalDepartureAt": null,
+      "platform": "4",
+      "timingSource": "ApprovedRailwayFeed",
+      "timingUpdatedAt": "2026-10-19T09:20:00+05:30",
+      "ambiguity": "ambiguous"
+    }
+  ]
+}

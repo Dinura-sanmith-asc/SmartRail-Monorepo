@@ -1,6 +1,14 @@
 import 'package:smartrail_passenger/core/network/problem_details_parser.dart';
 
-enum RailwayApiOperation { stations, routeStops, serviceSearch, serviceDetail }
+enum RailwayApiOperation {
+  stations,
+  routeStops,
+  serviceSearch,
+  serviceDetail,
+  stationDepartures,
+  journeySnapshot,
+  journeyUpdates,
+}
 
 enum ApiFailureKind {
   validation,
@@ -49,15 +57,27 @@ class ApiFailure implements Exception {
     required RailwayApiOperation operation,
     ProblemDetails? problem,
   }) {
+    final isJourneyRead = switch (operation) {
+      RailwayApiOperation.stationDepartures ||
+      RailwayApiOperation.journeySnapshot ||
+      RailwayApiOperation.journeyUpdates => true,
+      RailwayApiOperation.stations ||
+      RailwayApiOperation.routeStops ||
+      RailwayApiOperation.serviceSearch ||
+      RailwayApiOperation.serviceDetail => false,
+    };
     final kind = switch (statusCode) {
       400 when operation == RailwayApiOperation.serviceSearch =>
         ApiFailureKind.validation,
+      400 when isJourneyRead => ApiFailureKind.invalidRequest,
       400
           when operation == RailwayApiOperation.routeStops ||
               operation == RailwayApiOperation.serviceDetail =>
         ApiFailureKind.invalidRequest,
       400 => ApiFailureKind.unexpected,
+      401 when isJourneyRead => ApiFailureKind.accessDenied,
       403 => ApiFailureKind.accessDenied,
+      404 when isJourneyRead => ApiFailureKind.notFound,
       404
           when operation == RailwayApiOperation.routeStops ||
               operation == RailwayApiOperation.serviceDetail =>

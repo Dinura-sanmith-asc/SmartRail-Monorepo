@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartrail_passenger/app/app.dart';
@@ -6,16 +7,21 @@ import 'package:smartrail_passenger/app/providers.dart';
 import 'package:smartrail_passenger/app/router.dart';
 import 'package:smartrail_passenger/features/railway_search/domain/railway_models.dart';
 import 'package:smartrail_passenger/features/railway_search/domain/railway_search_repository.dart';
+import 'package:smartrail_passenger/features/journey_status/application/journey_status_providers.dart';
+import 'package:smartrail_passenger/features/journey_status/domain/journey_models.dart';
+import 'package:smartrail_passenger/features/journey_status/domain/journey_status_repository.dart';
 
 void main() {
   testWidgets('all foundation routes build and use the normal back stack', (
     tester,
   ) async {
+    final journeyRepository = _FakeJourneyRepository();
     appRouter.go(AppRoutes.search);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           railwaySearchRepositoryProvider.overrideWithValue(_FakeRepository()),
+          journeyStatusRepositoryProvider.overrideWithValue(journeyRepository),
         ],
         child: SmartRailApp(
           config: AppConfig.fromValue('https://api.smartrail.example'),
@@ -60,6 +66,22 @@ void main() {
     expect(find.text('Scheduled service details'), findsOneWidget);
     expect(find.text('Service information'), findsOneWidget);
 
+    await tester.tap(find.byKey(const Key('open-journey-status')));
+    await tester.pumpAndSettle();
+    expect(journeyRepository.requestedStationId, 'origin-id');
+    expect(journeyRepository.requestedDate, '2026-10-19');
+    expect(find.text('Journey status'), findsOneWidget);
+    expect(
+      find.text(
+        'Dated journey information is not available for this service and date.',
+      ),
+      findsOneWidget,
+    );
+    appRouter.pop();
+    await tester.pumpAndSettle();
+    expect(find.text('Scheduled service details'), findsOneWidget);
+    expect(find.text('Service information'), findsOneWidget);
+
     appRouter.pop();
     await tester.pumpAndSettle();
     await detailsPop;
@@ -87,4 +109,29 @@ class _FakeRepository implements RailwaySearchRepository {
   @override
   Future<RouteStops> getRouteStops(String routeId) =>
       throw UnimplementedError();
+}
+
+class _FakeJourneyRepository implements JourneyStatusRepository {
+  String? requestedStationId;
+  String? requestedDate;
+
+  @override
+  Future<List<JourneyCandidate>> getStationDepartures({
+    required String stationId,
+    required String date,
+  }) async {
+    requestedStationId = stationId;
+    requestedDate = date;
+    return const [];
+  }
+
+  @override
+  Future<JourneyStatusSnapshot> getJourneySnapshot({
+    required String journeyInstanceId,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<List<JourneyUpdate>> getJourneyUpdates({
+    required String journeyInstanceId,
+  }) => throw UnimplementedError();
 }

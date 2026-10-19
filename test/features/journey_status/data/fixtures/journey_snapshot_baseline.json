@@ -1,0 +1,30 @@
+{
+  "journeyInstanceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+  "serviceId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
+  "scheduleId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd1",
+  "scheduleRevision": 1,
+  "operationDate": "2026-10-19",
+  "firstDepartureOccurrence": "08:30:00",
+  "revision": 1,
+  "status": "Scheduled",
+  "source": "ScheduledBaseline",
+  "publishedAt": null,
+  "lastUpdatedAt": null,
+  "eta": null,
+  "stops": [
+    {
+      "journeyStopId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1",
+      "stopOrder": 1,
+      "stationId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+      "stationName": "Central Station",
+      "plannedArrivalAt": null,
+      "plannedDepartureAt": "2026-10-19T08:30:00+05:30",
+      "operationalArrivalAt": null,
+      "operationalDepartureAt": null,
+      "platform": null,
+      "timingSource": null,
+      "timingUpdatedAt": null,
+      "ambiguity": "none"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smartrail_passenger/features/railway_search/application/retrieval_metadata.dart';
 import 'package:smartrail_passenger/features/railway_search/application/service_detail_notifier.dart';
 import 'package:smartrail_passenger/features/railway_search/application/service_detail_state.dart';
@@ -33,6 +34,19 @@ class ServiceDetailScreen extends ConsumerWidget {
               choice: choice,
               travelDate: travelDate,
               detail: state.serviceDetail,
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                key: const Key('open-journey-status'),
+                onPressed: () => context.pushNamed(
+                  'journey-lookup',
+                  extra: (choice: choice, travelDate: travelDate),
+                ),
+                icon: const Icon(Icons.train),
+                label: const Text('Journey status and updates'),
+              ),
             ),
             const SizedBox(height: 24),
             _section(
