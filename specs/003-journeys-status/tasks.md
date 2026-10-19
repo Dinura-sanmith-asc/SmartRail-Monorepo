@@ -79,18 +79,21 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 
 **Independent Test**: With a controlled authorized Controller and current journey scope, publish valid changes; verify new revision and actor/time audit. Verify disallowed roles/scopes, stale revisions, invalid transitions, and failed observation verification produce no state change.
 
+### Shared Application Contract for User Story 2
+
+- [ ] T034 [US2] Define the verified Driver Operations observation lookup port and result mapping in `src/SmartRail.Application/JourneysStatus/Boundaries/IDriverObservationVerifier.cs` and `DriverObservationVerification.cs`; preserve owner data and map required verification failures to 400/404/409/503 without publishing (SR-069, FR-008, FR-015, FR-023, SC-014, SC-018).
+
 ### Tests for User Story 2
 
-- [ ] T034 [P] [US2] Add lifecycle application tests for every approved transition, delayed/interrupted recovery, cancellation semantics, terminal rejection, linked correction, and stale revision conflict in `tests/SmartRail.UnitTests/JourneysStatus/PublishJourneyStatusHandlerTests.cs` (SR-040, SR-046, FR-003, FR-004, FR-005, FR-006, SC-002, SC-006, SC-012).
-- [ ] T035 [P] [US2] Add authorization and side-effect tests for Controller grants, cancellation-specific authorization, revoked/missing/unavailable journey scope, and denied writes in `tests/SmartRail.UnitTests/JourneysStatus/JourneyPublicationAuthorizationTests.cs` (SR-040, SR-046, SR-091, FR-014, SC-006, SC-008).
-- [ ] T036 [P] [US2] Add Driver observation boundary tests using a deterministic test-only verifier for malformed, missing/inaccessible, stale/revoked/incompatible, unavailable, and valid current-journey evidence in `tests/SmartRail.UnitTests/JourneysStatus/DriverObservationVerificationTests.cs`; do not depend on a production Driver Operations adapter (SR-069, FR-008, FR-023, SC-005, SC-014, SC-018).
+- [ ] T035 [P] [US2] Add lifecycle application tests for every approved transition, delayed/interrupted recovery, cancellation semantics, terminal rejection, linked correction, and stale revision conflict in `tests/SmartRail.UnitTests/JourneysStatus/PublishJourneyStatusHandlerTests.cs` (SR-040, SR-046, FR-003, FR-004, FR-005, FR-006, SC-002, SC-006, SC-012).
+- [ ] T036 [P] [US2] Add authorization and side-effect tests for Controller grants, cancellation-specific authorization, revoked/missing/unavailable journey scope, and denied writes in `tests/SmartRail.UnitTests/JourneysStatus/JourneyPublicationAuthorizationTests.cs` (SR-040, SR-046, SR-091, FR-014, SC-006, SC-008).
+- [ ] T037 [P] [US2] Add Driver observation boundary tests using a deterministic test-only verifier for malformed, missing/inaccessible, stale/revoked/incompatible, unavailable, and valid current-journey evidence in `tests/SmartRail.UnitTests/JourneysStatus/DriverObservationVerificationTests.cs`; do not depend on a production Driver Operations adapter (SR-069, FR-008, FR-023, SC-005, SC-014, SC-018).
 
 ### Implementation for User Story 2
 
-- [ ] T037 Add official status/cancellation publication command and handler in `src/SmartRail.Application/JourneysStatus/Commands/PublishJourneyStatus/`; derive actor from verified Feature 002 identity, require current Controller action and journey scope, and use `expectedJourneyRevision` (SR-031, SR-034, SR-040, SR-046, SR-091, FR-003, FR-004, FR-005, FR-014, FR-017).
-- [ ] T038 Add stop platform/timing publication command and handler in `src/SmartRail.Application/JourneysStatus/Commands/UpdateJourneyStop/`; accept only approved changes for the identified current journey stop and require expected revision and authorization (SR-040, SR-056, FR-005, FR-006, FR-014, FR-018).
-- [ ] T039 Add status transition, cancellation, terminal correction, and source/change-field validation in `src/SmartRail.Application/JourneysStatus/Validation/JourneyPublicationValidator.cs`; only an authorized linked correction may correct a terminal state (SR-040, SR-046, FR-003, FR-004, FR-007, FR-021, SC-012).
-- [ ] T040 Add verified Driver Operations observation lookup port and result mapping in `src/SmartRail.Application/JourneysStatus/Boundaries/IDriverObservationVerifier.cs` and `DriverObservationVerification.cs`; preserve owner data and map required verification failures to 400/404/409/503 without publishing (SR-069, FR-008, FR-015, FR-023, SC-014, SC-018).
+- [ ] T038 Add official status/cancellation publication command and handler in `src/SmartRail.Application/JourneysStatus/Commands/PublishJourneyStatus/`; derive actor from verified Feature 002 identity, require current Controller action and journey scope, and use `expectedJourneyRevision` (SR-031, SR-034, SR-040, SR-046, SR-091, FR-003, FR-004, FR-005, FR-014, FR-017).
+- [ ] T039 Add stop platform/timing publication command and handler in `src/SmartRail.Application/JourneysStatus/Commands/UpdateJourneyStop/`; accept only approved changes for the identified current journey stop and require expected revision and authorization (SR-040, SR-056, FR-005, FR-006, FR-014, FR-018).
+- [ ] T040 Add status transition, cancellation, terminal correction, and source/change-field validation in `src/SmartRail.Application/JourneysStatus/Validation/JourneyPublicationValidator.cs`; only an authorized linked correction may correct a terminal state (SR-040, SR-046, FR-003, FR-004, FR-007, FR-021, SC-012).
 - [ ] T041 Add current Feature 002 journey authorization adapter in `src/SmartRail.Infrastructure/JourneysStatus/Authorization/Feature002JourneyAuthorization.cs`; use current mapped roles and resource scope for each write, fail closed, and do not add/change grants (SR-046, SR-091, FR-014, SC-006, SC-008).
 - [ ] T042 Implement PostgreSQL append transaction for official revision, complete stop snapshot, UpdateId, actor/time audit, observation reference, and correction linkage in `src/SmartRail.Infrastructure/JourneysStatus/Persistence/JourneyPublicationRepository.cs`; stale conditional update must roll back and map to 409 (SR-010, SR-040, FR-004, FR-005, FR-021, SC-002, SC-012, SC-016).
 - [ ] T043 Implement `PATCH /api/operations/journeys/{id}/status` in `src/SmartRail.Api/Endpoints/JourneysStatus/PublishJourneyStatusEndpoint.cs` using the approved status/diversion-capable request contract and no new route (SR-034, SR-040, SR-046, FR-003, FR-004, FR-018).
@@ -157,8 +160,8 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 - [ ] T069 Add contract validation tests comparing generated OpenAPI to `specs/003-journeys-status/contracts/journeys-status.openapi.yaml` in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneysStatusOpenApiTests.cs`; assert exactly the five approved operations, schemas, anonymous reads, protected writes, and no extra routes (FR-018, SC-010).
 - [ ] T070 Add security regression tests for Feature 001 anonymous railway GET routes and Feature 002 authentication/authorization behavior in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/ExistingFeatureApiRegressionTests.cs`; confirm no contract or access change (SR-089, SR-090, SR-091, FR-014, FR-018, SC-006, SC-008).
 - [ ] T071 Add structured-log and error-response redaction tests for tokens, actor subjects, Driver observation IDs, private audit data, SQL/provider exceptions, and connection details in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneyInformationRedactionTests.cs` (FR-016, FR-021, SC-010, SC-018).
-- [ ] T072 Add cross-story automated traceability tests/evidence index mapping each direct requirement SR-007, SR-010, SR-019, SR-021, SR-022, SR-025, SR-031, SR-034, SR-035, SR-040, SR-046, SR-048, SR-054, and SR-056 and each FR-001â€“FR-023/SC-001â€“SC-018 to passing verification in `tests/SmartRail.IntegrationTests/JourneysStatus/RequirementEvidenceTests.cs` (SC-010).
-- [ ] T073 Record downstream client and module obligations in `specs/003-journeys-status/quickstart.md`: passenger/station/driver/operations status, freshness, alerts, loading/error/retry/offline/accessibility, and owning-module acceptance remain open until their own specs and tests provide evidence; explicitly keep SR-025/SC-007 alert-delivery acceptance open until the configured in-app channel demonstrates the same UpdateId/revision, and SR-058 station-display refresh acceptance open until that client is implemented and tested (SR-001, SR-025, SR-054, SR-056, SR-058, SR-059, SR-066, SR-102, SR-109, SR-114, SR-113, SC-007).
+- [ ] T072 Audit source acceptance checks against the automated tests and record a requirement-to-test evidence matrix in `specs/003-journeys-status/quickstart.md` for SR-007, SR-010, SR-019, SR-021, SR-022, SR-025, SR-031, SR-034, SR-035, SR-040, SR-046, SR-048, SR-054, and SR-056 and FR-001?FR-023/SC-001?SC-018; for SR-025/SC-007 record backend publication evidence separately from channel delivery evidence, which remains open until the client test passes (SC-010).
+- [ ] T073 Record downstream client and module obligations in `specs/003-journeys-status/quickstart.md` with two evidence states: (A) Feature 003 backend publication, UpdateId, revision, safe source/time, and readable status; (B) configured in-app alert delivery and visible matching status from the same revision. Keep the channel/client portion of SR-025/SC-007 open until its owning client is implemented and tested; keep SR-058 station-display refresh open until that client is implemented and tested (SR-001, SR-025, SR-054, SR-056, SR-058, SR-059, SR-066, SR-102, SR-109, SR-114, SR-113, SC-007).
 - [ ] T074 Record implementation and local acceptance evidence for cross-module obligations in `specs/003-journeys-status/quickstart.md`, including Feature 001 references (SR-002/003/004/013), Feature 002 authorization (SR-089/090/091), Driver Operations (SR-064/065/069), Incident Management (SR-038/041/042/044), platform observability (SR-115), and explicit train-control exclusion (SR-072); leave owner evidence open where not delivered here (SC-009, SC-010).
 - [ ] T075 Run `dotnet restore SmartRail.slnx` and `dotnet build SmartRail.slnx`; record exact results in `specs/003-journeys-status/quickstart.md` (SC-010).
 - [ ] T076 Run the complete solution unit and isolated PostgreSQL/API integration suite; record pass/fail/skip counts and test-database target in `specs/003-journeys-status/quickstart.md`; do not mark failed or skipped verification as success (SC-010).
@@ -174,7 +177,7 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 - Phase 1 setup tasks may run independently except T004 follows T001.
 - Phase 2 blocks every user story. T014-T017 define initialization ports, restricted command, validation/ID issuance, and production deny-all authority. T018-T019 configure/register persistence; T020 implements atomic initialization and revision transactions; T021 is the additive migration; T022-T023 verify behavior using unit tests and isolated PostgreSQL.
 - US1 (T024-T033) starts after T023. Its handlers precede endpoints and API integration tests.
-- US2 (T034-T048) starts after T023 and Feature 002 contracts. It is independent of US4 adapters: observation checks use the US2 Application port and test-only doubles; an absent production owner provider remains unavailable/fail-closed.
+- US2 (T035-T048) starts after T023 and Feature 002 contracts. It is independent of US4 adapters: observation checks use the US2 Application port and test-only doubles; an absent production owner provider remains unavailable/fail-closed.
 - US3 (T049-T062) depends on US1 projections and US2 publication/revision behavior. It consumes the existing Feature 001 service-search API unchanged.
 - US4 (T063-T068) verifies owner boundaries. Genuine Driver Operations/Incident Management providers are optional production integration prerequisites; until available, Infrastructure returns unavailable and dependent writes fail closed.
 - Phase 7 follows the feature implementation and its applicable tests.
@@ -190,7 +193,7 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 
 - T014 follows T012; T015-T017 follow T014. T018 follows T006-T011; T019 follows T018; T020 follows T012, T015-T016, and T019; T021 follows T018-T019; T022 follows T002, T009, and T014-T017; T023 follows T003 and T020-T022.
 - T024-T025 can be authored in parallel after T023; T026-T028 follow T012, T020, and T023; T029-T030 follow their handlers/projections; T031 follows T029-T030; T032 follows T029-T031; T033 follows T032.
-- T034-T036 can be authored in parallel after T023. T037-T039 follow those tests; T040 defines the Driver observation verification port and uses a test-only provider; T041 follows Feature 002 contracts; T042 follows T020 and T037-T041; T043-T044 follow T037-T042; T045 follows T043-T044; T046 follows T045; T047 follows T042-T046; T048 follows T043-T047. None depends on US4 tasks T065-T068.
+- T034 defines the Driver observation verifier and result contract before dependent tests or handlers. T035-T037 follow T023 and T034 and can be authored in parallel; T038-T040 follow those tests and T034; T041 follows Feature 002 contracts; T042 follows T020, T034, and T038-T041; T043-T044 follow T038-T042; T045 follows T043-T044; T046 follows T045; T047 follows T042-T046; T048 follows T043-T047. US2 tests use test-only providers and none depends on US4 tasks T065-T068.
 - T049-T051 can be authored in parallel after T023 and relevant US1/US2 contracts; T052-T055 follow the corresponding application contracts; T056 follows T052-T055; T057 follows T056; T058 follows T032-T033 and T052-T057.
 - T063-T064 use test-only doubles and follow T013; T065-T066 follow their owner contracts and retain unavailable defaults if no genuine provider exists; T067 follows T065-T066; T068 follows T067.
 - T069-T078 follow implementation evidence. T073-T074 must record client/module obligations as open until their owners provide evidence.
@@ -201,8 +204,8 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 - T005-T007 and T011-T014 follow T001; T008-T010 follow T006-T007; T015-T017 follow T014.
 - T018 follows T006-T011; T019 follows T018; T020 follows T012, T015-T016, and T019; T021 follows T018-T019; T022 follows T002, T009, and T014-T017; T023 follows T003 and T020-T022.
 - T024-T025 follow T023; T026-T028 follow T012, T020, and T023; T029-T030 follow T026-T028; T031 follows T029-T030; T032 follows T029-T031; T033 follows T032.
-- T034-T036 follow T023; T037-T039 follow T012-T013 and T034-T036; T040 follows T013 and the approved Driver Operations read boundary; T041 follows T013 and Feature 002 authorization; T042 follows T020 and T037-T041; T043-T044 follow T037-T042; T045 follows T043-T044; T046 follows T045; T047 follows T042-T046; T048 follows T043-T047. T065-T068 are not prerequisites for US2.
-- T049-T051 follow T023 and the applicable US1/US2 contracts; T052-T055 follow the corresponding query/projection requirements and T037/T042; T056 follows T052-T055; T057 follows T056; T058 follows T032-T033 and T052-T057.
+- T034 follows T013 and the approved Driver Operations read boundary contract; T035-T037 follow T023 and T034; T038-T040 follow T012-T013, T034, and T035-T037; T041 follows T013 and Feature 002 authorization; T042 follows T020, T034, and T038-T041; T043-T044 follow T038-T042; T045 follows T043-T044; T046 follows T045; T047 follows T042-T046; T048 follows T043-T047. T065-T068 are not prerequisites for US2.
+- T049-T051 follow T023 and the applicable US1/US2 contracts; T052-T055 follow the corresponding query/projection requirements and T038/T042; T056 follows T052-T055; T057 follows T056; T058 follows T032-T033 and T052-T057.
 - T063-T064 follow T013; T065-T066 follow owner contracts and must keep unavailable behavior when providers do not exist; T067 follows T065-T066; T068 follows T067.
 - T069-T070 follow endpoint registration and story tests; T071 follows public/private projection and error mapping; T072 follows all relevant story tests; T073-T074 follow evidence collection; T075-T078 follow their applicable preceding verification tasks.
 
@@ -211,7 +214,7 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 - Setup: T001-T003 can run in parallel; T004 follows T001.
 - Foundation: T005-T007, T011, T013, and T014 can be prepared in separate files; command, validation, authority, mapping, shared context, repository, and migration tasks follow their listed dependencies.
 - US1: T024 and T025 can run in parallel; handlers/projections can be developed in separate files after foundation.
-- US2: T034-T036 are separate tests. Status and stop endpoint implementations may proceed in separate files after shared application/persistence contracts; registration follows both. US2 does not wait for US4 production adapters.
+- US2: T035-T037 are separate tests. Status and stop endpoint implementations may proceed in separate files after shared application/persistence contracts; registration follows both. US2 does not wait for US4 production adapters.
 - US3: T049-T051 can run in parallel; station search-flow integration tests follow the relevant endpoints.
 - US4: T063 and T064 can run in parallel. T065-T066 may proceed separately only as genuine providers/contracts permit; otherwise their unavailable defaults remain.
 - Do not parallelize edits to `SmartRailDbContext`, the shared migration snapshot, `Program.cs`, or a shared repository file without coordinating the edit.
@@ -237,19 +240,19 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 | Approved requirement(s) | Implementation tasks | Verification tasks / ownership |
 |---|---|---|
 | SR-007; FR-001-FR-002 | T006, T009, T014-T020, T026, T029, T055 | T022-T024, T033, T056, T061, T072 |
-| SR-010, SR-031; FR-011, FR-021 | T007, T027-T028, T042, T055, T059 | T023, T025, T033, T036, T047, T051, T060, T062, T072 |
-| SR-019, SR-021, SR-035; FR-003, FR-009 | T005, T008, T026, T028 | T024, T034, T071-T072 |
+| SR-010, SR-031; FR-011, FR-021 | T007, T027-T028, T042, T055, T059 | T023, T025, T033, T037, T047, T051, T060, T062, T072 |
+| SR-019, SR-021, SR-035; FR-003, FR-009 | T005, T008, T026, T028 | T024, T035, T071-T072 |
 | SR-022; FR-010, FR-022 | T010, T052, T058 | T022-T023, T050-T051, T060, T062, T072 |
-| SR-025, SR-048; FR-011, FR-013 | T028, T042, T055, T059, T073 | T025, T047, T051, T062, T072-T073; configured client-channel evidence remains open |
-| SR-034, SR-040; FR-003-FR-008, FR-017 | T008, T037-T046 | T034-T048, T071-T072 |
-| SR-046, SR-091; FR-014 | T013, T035, T037-T046 | T035, T043-T048, T070, T072 |
+| SR-025, SR-048; FR-011, FR-013 | T028, T042, T055, T059, T073 | Backend publication/UpdateId/revision/source/time and readable status are verified by T047, T051, T062; configured channel delivery and matching visible status remain open under T073 until client evidence exists |
+| SR-034, SR-040; FR-003-FR-008, FR-017 | T008, T038-T046 | T035-T048, T071-T072 |
+| SR-046, SR-091; FR-014 | T013, T036, T038-T046 | T036, T043-T048, T070, T072 |
 | SR-054, SR-056; FR-012, FR-020 | T049-T059 | T049, T051, T056-T062, T072; station-departure data/projection is backend-owned here |
 | SR-058 | Backend revision consistency support T055, T059; station display refresh behavior is client-owned | T062 verifies consistent backend reads; client refresh acceptance remains open until the station-display client is implemented and tested (T073) |
-| SR-069; FR-008, FR-015, FR-023 | T013, T036, T040, T065 | T036, T047-T048, T063, T068, T072 |
+| SR-069; FR-008, FR-015, FR-023 | T013, T037, T034, T065 | T037, T047-T048, T063, T068, T072 |
 | FR-016, FR-018-FR-019 | T029-T033, T043-T046, T056-T057 | T033, T048, T061, T069-T071, T077 |
-| FR-001/FR-004/FR-005/FR-021/FR-022; SC-001/SC-011/SC-012/SC-016/SC-017 | T006-T023, T037-T042, T052, T058 | T018-T023, T034, T047, T050, T060, T072 |
-| SC-002-SC-010, SC-013-SC-018 | Story-specific implementation tasks above; client/module evidence is separately owned | T024-T025, T033-T036, T047-T051, T056-T064, T068-T074 |
-| Related SR-001/002/003/004/013/038/041/042/044/059/064/065/066/069/072/089/090/091/102/109/113/114/115 | Feature 001/002, owner modules, and clients retain their existing ownership; Feature 003 boundary/support tasks T013, T028, T036-T041, T051-T068, T073-T074 | Existing feature regression T070 and evidence tracking T073-T074; do not claim owner/client acceptance without their evidence |
+| FR-001/FR-004/FR-005/FR-021/FR-022; SC-001/SC-011/SC-012/SC-016/SC-017 | T006-T023, T038-T042, T052, T058 | T018-T023, T035, T047, T050, T060, T072 |
+| SC-002-SC-010, SC-013-SC-018 | Story-specific implementation tasks above; client/module evidence is separately owned | T024-T025, T033-T037, T047-T051, T056-T064, T068-T074 |
+| Related SR-001/002/003/004/013/038/041/042/044/059/064/065/066/069/072/089/090/091/102/109/113/114/115 | Feature 001/002, owner modules, and clients retain their existing ownership; Feature 003 boundary/support tasks T013, T028, T037-T041, T051-T068, T073-T074 | Existing feature regression T070 and evidence tracking T073-T074; do not claim owner/client acceptance without their evidence |
 
 ## Open Approval Gates and Downstream Obligations
 
