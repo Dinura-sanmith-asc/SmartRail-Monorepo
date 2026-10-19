@@ -70,7 +70,9 @@ public sealed class GetJourneyHandlerTests
     {
         public JourneySnapshotReadResult Snapshot { get; init; } = new(JourneyReadOutcome.NotFound);
         public JourneyHistoryReadResult History { get; init; } = new(JourneyReadOutcome.NotFound);
+        public JourneyStationDeparturesReadResult Departures { get; init; } = new(JourneyReadOutcome.NotFound);
         public Task<JourneySnapshotReadResult> ReadSnapshotAsync(Guid journeyInstanceId, CancellationToken cancellationToken) => Task.FromResult(Snapshot);
         public Task<JourneyHistoryReadResult> ReadHistoryAsync(Guid journeyInstanceId, CancellationToken cancellationToken) => Task.FromResult(History);
+        public Task<JourneyStationDeparturesReadResult> ReadStationDeparturesAsync(Guid stationId, CancellationToken cancellationToken) => Task.FromResult(Departures);
     }
 }

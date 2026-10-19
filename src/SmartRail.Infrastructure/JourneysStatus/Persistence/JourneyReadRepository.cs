@@ -74,4 +74,51 @@ public sealed class JourneyReadRepository(SmartRailDbContext dbContext) : IJourn
         await transaction.CommitAsync(cancellationToken);
         return new(JourneyReadOutcome.Found, revisions, stopsByRevision);
     }
+
+    public async Task<JourneyStationDeparturesReadResult> ReadStationDeparturesAsync(Guid stationId,
+        CancellationToken cancellationToken)
+    {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, cancellationToken);
+        var station = await dbContext.Stations.AsNoTracking()
+            .Where(item => item.StationId == stationId && item.IsPublished)
+            .Select(item => new { item.StationId, item.Name }).SingleOrDefaultAsync(cancellationToken);
+        if (station is null)
+        {
+            await transaction.CommitAsync(cancellationToken);
+            return new(JourneyReadOutcome.NotFound);
+        }
+
+        var incompleteCurrentState = await dbContext.Journeys.AsNoTracking().AnyAsync(journey =>
+            !dbContext.JourneyRevisions.Any(revision => revision.JourneyInstanceId == journey.JourneyInstanceId &&
+                revision.Revision == journey.CurrentRevision) ||
+            !dbContext.JourneyRevisionStops.Any(stop => stop.JourneyInstanceId == journey.JourneyInstanceId &&
+                stop.Revision == journey.CurrentRevision), cancellationToken);
+        if (incompleteCurrentState) return new(JourneyReadOutcome.Unavailable);
+
+        var candidates = await (from journey in dbContext.Journeys.AsNoTracking()
+                                join revision in dbContext.JourneyRevisions.AsNoTracking()
+                                    on new { journey.JourneyInstanceId, Revision = journey.CurrentRevision }
+                                    equals new { revision.JourneyInstanceId, revision.Revision }
+                                join stop in dbContext.JourneyRevisionStops.AsNoTracking()
+                                    on new { journey.JourneyInstanceId, Revision = journey.CurrentRevision }
+                                    equals new { stop.JourneyInstanceId, stop.Revision }
+                                where stop.StationId == stationId
+                                select new JourneyStationDepartureCandidate(journey, revision, stop, station.Name))
+            .ToArrayAsync(cancellationToken);
+        var candidateJourneyIds = candidates.Select(item => item.Journey.JourneyInstanceId).Distinct().ToArray();
+        if (candidateJourneyIds.Length > 0)
+        {
+            var referencedStationIds = await (from journey in dbContext.Journeys.AsNoTracking()
+                                              join stop in dbContext.JourneyRevisionStops.AsNoTracking()
+                                                  on new { journey.JourneyInstanceId, Revision = journey.CurrentRevision }
+                                                  equals new { stop.JourneyInstanceId, stop.Revision }
+                                              where candidateJourneyIds.Contains(journey.JourneyInstanceId)
+                                              select stop.StationId).Distinct().ToArrayAsync(cancellationToken);
+            var publishedStationCount = await dbContext.Stations.AsNoTracking()
+                .CountAsync(item => referencedStationIds.Contains(item.StationId) && item.IsPublished, cancellationToken);
+            if (publishedStationCount != referencedStationIds.Length) return new(JourneyReadOutcome.Unavailable);
+        }
+        await transaction.CommitAsync(cancellationToken);
+        return new(JourneyReadOutcome.Found, candidates);
+    }
 }

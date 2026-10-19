@@ -6,6 +6,7 @@ public static class JourneyReadEndpointRegistration
     {
         endpoints.MapGetJourney();
         endpoints.MapGetJourneyUpdates();
+        endpoints.MapGetStationDepartures();
         return endpoints;
     }
 }
