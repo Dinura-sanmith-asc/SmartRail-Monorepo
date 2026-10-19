@@ -8,6 +8,14 @@
 
 **Input**: User description: Establish authenticated Railway Controller and Station Staff access, role-aware operations navigation, safe session handling, and sign-out for the SmartRail Operations Web.
 
+## Clarifications
+
+### Session 2026-10-19
+
+- Q: Which browser sign-in flow is approved for the Operations Web? → A: Cognito managed login using OAuth 2.0 Authorization Code with PKCE. Specific client libraries, OAuth configuration values, and token handling implementation are for technical planning.
+- Q: Does the approved identity response include assigned station context? → A: No. `GET /api/me` returns only `subject` and `roles`; use a generic Station Staff shell until an approved owning-feature response supplies station context.
+- Q: What is the approval state of Backend Feature 002 for client integration? → A: Approved by the SmartRail Project Owner on 2026-10-19; the approved contract is available for client integration. This does not establish production Cognito configuration or deployment readiness.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Railway Controller enters the operations workspace (Priority: P1)
@@ -58,6 +66,7 @@ A person who is not authenticated, whose session is no longer valid, or whose ro
 4. **Given** a valid identity without the role or resource permission for a protected operation, **When** the backend returns a forbidden response, **Then** the Operations Web displays a safe access-denied state and does not expose protected response data.
 5. **Given** the backend cannot verify current role or scope authority, **When** it returns an authorization-unavailable response, **Then** the Operations Web grants no access, explains that access information is temporarily unavailable, and offers only a safe recovery action.
 6. **Given** the identity or workspace request fails with a service error or loss of network, **When** the user views the affected state, **Then** the application displays an understandable error and retry option; retry does not bypass authentication or authorization.
+7. **Given** the person cancels Cognito managed login or the sign-in callback does not establish a valid session, **When** the Operations Web handles that outcome, **Then** the person remains unauthenticated, protected content remains unavailable, and the application provides a safe way to retry sign-in.
 
 ---
 
@@ -85,6 +94,7 @@ An authenticated staff member can leave the Operations Web and remove access to 
 - A user selects a station or resource not in their scope: do not treat the selection as authorization evidence; the owning backend feature must decide access.
 - Identity or session errors contain Problem Details or diagnostic fields: show only safe user-facing feedback and never render tokens, claims, credential values, SQL details, or authorization internals.
 - The browser is offline during sign-in, identity loading, or retry: do not expose cached protected content as current or treat a pending request as authenticated success.
+- Cognito managed login is cancelled or its callback fails: remain unauthenticated, expose no protected content, and provide a safe retry path without replaying a protected action.
 - Sign-out is followed by browser back navigation or a stale client-side route: protected content stays unavailable in the Operations Web.
 
 ## Requirements *(mandatory)*
@@ -98,7 +108,7 @@ The wording, priorities, and acceptance checks below are copied from the approve
 | SR-038 | Must Have | Authorized railway staff shall access a web-based overview of current services, journey states and important incidents. | Role-authorized login can view live operations summary; unauthorized users cannot. | This feature establishes authenticated, role-aware entry only. The live overview and its data are a separate Operations Dashboard feature and are not claimed complete here. |
 | SR-046 | Must Have | Only roles authorized under railway policy may confirm a train cancellation; the app shall not independently decide to cancel a service. | Station and driver accounts cannot execute controller-only cancellation API. | Authorization boundary only. This feature adds no cancellation action or API; backend Feature 002 and the owning operational feature retain enforcement and acceptance evidence. |
 | SR-089 | Must Have | Public railway information shall be distinguishable from functions requiring passenger or railway-staff authentication. | Anonymous viewer can access permitted service details but not protected operational APIs. | Establish the protected Operations Web entry boundary; public railway reads remain owned by their existing backend feature. |
-| SR-090 | Must Have | Operational web and driver applications shall authenticate their users before exposing protected railway information or write actions. | Protected endpoint rejects missing/invalid token and respects session expiry. | In scope for protected workspace entry and client session handling; exact browser sign-in flow requires clarification. |
+| SR-090 | Must Have | Operational web and driver applications shall authenticate their users before exposing protected railway information or write actions. | Protected endpoint rejects missing/invalid token and respects session expiry. | In scope for protected workspace entry and client session handling using Cognito managed login with OAuth 2.0 Authorization Code and PKCE. |
 | SR-091 | Must Have | Server-side authorization shall restrict operational changes based on organizational role and the target station/journey/resource; front-end hiding alone is insufficient. | Station credentials cannot call controller-only cancellation endpoint; role/resource tests pass. | Backend authorization is authoritative. The UI's role-aware navigation is presentation only; out-of-scope operational endpoints are not added or called. |
 | SR-093 | Must Have | Driver and operational sessions shall use supported secure credential storage and controlled expiration, with no plaintext tokens in app cache. | Test device storage contains no plaintext access tokens. | In scope for the browser client: no plaintext token persistence in application storage, safe expiration handling, and no credentials in diagnostics. Storage mechanism depends on the approved Cognito browser flow. |
 | SR-100 | Must Have | Sensitive personal information and credentials shall not be exposed in verbose API errors or unrestricted application logs. | Negative tests show tokens/redacted identifiers absent from API error responses. | In scope for user-facing authentication/authorization errors and client diagnostics. The API's safe error/log behavior is owned and tested by the backend. |
@@ -110,7 +120,7 @@ SR-102 (color-independent train/disruption status) is not a functional requireme
 
 **In scope**
 
-- Initiating the approved Cognito staff sign-in flow once confirmed.
+- Initiating Cognito managed login using OAuth 2.0 Authorization Code with PKCE.
 - Establishing protected entry to a role-aware Operations Web shell for Railway Controller and Station Staff.
 - Reading the authenticated caller's current SmartRail role labels through the existing identity contract.
 - Selecting presentation and navigation affordances by returned role, including safe no-role behavior.
@@ -137,7 +147,7 @@ The current backend implementation validates Cognito access tokens and resolves 
 
 The API contract deliberately omits station scopes. The initial Station Staff shell MUST remain generic until an approved owning-feature response supplies station context. Actual resource authorization remains backend-enforced, and no new Identity endpoint is introduced to expose scopes.
 
-The sibling Feature 002 `spec.md` currently says `Status: Draft`, although its OpenAPI file, implementation, tests, and checklist contain a defined and verified backend contract. Per review, the backend owner MUST update and approve Feature 002 before Operations Web client integration begins. This feature remains Draft until that approval is recorded. Backend test results are cited from the repository's recorded verification evidence; this workflow did not rerun those tests.
+Backend Feature 002 (`../../../SmartRail/specs/002-identity-permissions/spec.md`) is **Approved** by the SmartRail Project Owner on 2026-10-19 for client integration, including its existing [OpenAPI contract](../../../SmartRail/specs/002-identity-permissions/contracts/identity-permissions.openapi.yaml). Its recorded verification evidence is referenced from the backend quickstart and checklist; this clarification workflow did not rerun backend tests. Approval does not establish production Cognito configuration, operational monitoring, or deployment readiness.
 
 ### Functional Requirements
 
@@ -151,7 +161,7 @@ The sibling Feature 002 `spec.md` currently says `Status: Draft`, although its O
 - **FR-008 (SR-090, SR-114)**: When a protected request is rejected for missing, malformed, invalid, or expired credentials, the Operations Web MUST NOT present the request as successful or expose protected response data. It MUST end protected application access and provide a clear path to authenticate again without automatically replaying a protected action.
 - **FR-009 (SR-091, SR-100, SR-114)**: When a protected operation returns `403`, the Operations Web MUST show a safe access-denied state and MUST NOT reveal protected resource details or present a side effect as successful. When the identity contract or a protected operation returns `503`, it MUST grant no access and show a distinct temporary-unavailability state with a safe retry path.
 - **FR-010 (SR-100, SR-114)**: The Operations Web MUST show understandable loading, no-role/no-data, access-denied, service-error, offline, and retry states for this feature's primary entry and identity views. Error messages and client diagnostics MUST NOT expose access tokens, credentials, private claims, or unrestricted backend diagnostics.
-- **FR-011 (SR-093)**: The application MUST NOT store access tokens in plaintext application storage or logs. On session expiry it MUST stop protected access until the approved sign-in/renewal flow establishes a valid session. The exact credential storage and renewal mechanism is blocked on the Cognito browser-flow clarification.
+- **FR-011 (SR-093)**: The application MUST NOT store access tokens in plaintext application storage or logs. On session expiry it MUST stop protected access until the user completes Cognito managed login using OAuth 2.0 Authorization Code with PKCE and a valid session is established. Specific client libraries, OAuth configuration values, credential storage, and token handling implementation belong to technical planning. The feature does not require silent renewal or global token revocation.
 - **FR-012 (Sign-out)**: The Operations Web MUST provide a sign-out action that removes its authenticated application state and makes protected routes inaccessible in that application. It MUST NOT claim that a local sign-out revokes an already-issued bearer token or Cognito-managed browser session unless that behavior is defined by the approved Cognito flow.
 - **FR-013 (Accessibility)**: All sign-in, workspace-entry, denial, error, retry, and sign-out controls MUST be operable by keyboard, have accessible names, use visible and predictable focus, and announce important state changes to assistive technology. Meaning MUST NOT depend on color alone.
 - **FR-014 (Scope boundary)**: This feature MUST NOT create sign-up, password-reset, user-management, role-management, station-scope-management, or other identity endpoints. It MUST NOT implement operational business workflows or call Journey Feature 003 APIs.
@@ -180,18 +190,18 @@ The sibling Feature 002 `spec.md` currently says `Status: Draft`, although its O
 
 - Cognito remains the approved authentication credential provider, and the API continues to accept validated Cognito access tokens as defined by the current Feature 002 implementation and OpenAPI contract.
 - The active SmartRail role mapping, not Cognito group membership, is authoritative for roles. The backend checks the current mapping and applicable resource evidence for protected operations.
-- `/api/me` is the only identity HTTP contract available to this feature. It returns current role labels but no station/resource scopes; a generic Station Staff shell is the default until the station-context clarification is answered.
+- `/api/me` is the only identity HTTP contract available to this feature. It returns current role labels but no station/resource scopes; the Station Staff shell remains generic until an approved owning-feature response supplies station context.
 - The Operations Web shell does not include a live operations overview, journey details, incidents, status changes, publication, cancellation, or other operational workflows. Their applicable requirements remain owned by later feature specifications.
 - Cognito managed login using Authorization Code with PKCE is the approved browser sign-in choice. Environment-specific app-client and callback/logout configuration must be supplied by the identity owner. The feature does not promise silent token renewal or global token revocation; expiry requires safe reauthentication, and sign-out removes access from the Operations Web.
 - The sibling Feature 002 implementation checklist records backend identity, Cognito validation, authorization matrix, safe error, and API evidence. It also marks client-side SR-093 and SR-114 evidence open. These recorded results are not a substitute for React client acceptance.
-- Backend Feature 002's current feature specification is marked Draft. The backend owner must update and approve it before Operations Web client integration begins; no integration work may treat the present contract as approved until that gate is met.
+- Backend Feature 002 is approved for client integration as of 2026-10-19. Production Cognito environment configuration, operational monitoring, and deployment remain external dependencies and are not implied by that approval.
 
 ## Authentication and Authorization Sources Reviewed
 
 - Operations Web authority: `../../.specify/memory/constitution.md`.
 - Approved platform requirement source: `../../docs/SmartRail-SDD-Handoff/evidence/requirements.xlsx`, `FINAL UNIFIED REQUIREMENTS` sheet; relevant exact wording and acceptance checks are reproduced above.
 - RBAC and endpoint inventory: `../../docs/SmartRail-SDD-Handoff/evidence/rbac-api-contracts.pdf` and its transcription in `../../docs/SmartRail-SDD-Handoff/handoff.md`.
-- Backend Feature 002 specification and decisions: `../../../SmartRail/specs/002-identity-permissions/spec.md` (currently marked Draft), `research.md`, `authorization-boundary.md`, and `plan.md`.
+- Backend Feature 002 specification and decisions: `../../../SmartRail/specs/002-identity-permissions/spec.md` (Approved for client integration on 2026-10-19), `research.md`, `authorization-boundary.md`, and `plan.md`.
 - Backend OpenAPI: `../../../SmartRail/specs/002-identity-permissions/contracts/identity-permissions.openapi.yaml`.
 - Backend authentication and current identity implementation: `../../../SmartRail/src/SmartRail.Api/Authentication/`, `../../../SmartRail/src/SmartRail.Api/Endpoints/IdentityEndpoints.cs`, `../../../SmartRail/src/SmartRail.Api/Contracts/Identity/CurrentIdentityResponse.cs`, and API authorization middleware/handler.
 - Backend tests and recorded evidence: `../../../SmartRail/tests/SmartRail.IntegrationTests/Identity/` (including `CurrentIdentityEndpointTests`, `IdentityOpenApiTests`, `CognitoJwtValidationTests`, `AuthorizationEndpointTests`, `AuthorizationMatrixTests`, and `AuthenticationPrivacyTests`) and the implementation verification table in Feature 002's checklist.
