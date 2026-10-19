@@ -1,4 +1,5 @@
 import 'package:smartrail_passenger/features/railway_search/domain/railway_models.dart';
+import 'package:smartrail_passenger/features/railway_search/application/retrieval_metadata.dart';
 
 enum DetailSectionStatus {
   loading,
@@ -20,6 +21,8 @@ class ServiceDetailState {
     this.routeStops,
     this.serviceMessage,
     this.stopsMessage,
+    this.serviceMetadata,
+    this.stopsMetadata,
   });
 
   final ScheduledServiceChoice choice;
@@ -30,6 +33,8 @@ class ServiceDetailState {
   final RouteStops? routeStops;
   final String? serviceMessage;
   final String? stopsMessage;
+  final RetrievalMetadata? serviceMetadata;
+  final RetrievalMetadata? stopsMetadata;
 
   bool get canRetryService => serviceStatus == DetailSectionStatus.unavailable;
   bool get canRetryStops => stopsStatus == DetailSectionStatus.unavailable;
@@ -41,6 +46,8 @@ class ServiceDetailState {
     RouteStops? routeStops,
     String? serviceMessage,
     String? stopsMessage,
+    RetrievalMetadata? serviceMetadata,
+    RetrievalMetadata? stopsMetadata,
     bool clearServiceMessage = false,
     bool clearStopsMessage = false,
   }) => ServiceDetailState(
@@ -54,5 +61,7 @@ class ServiceDetailState {
         ? null
         : serviceMessage ?? this.serviceMessage,
     stopsMessage: clearStopsMessage ? null : stopsMessage ?? this.stopsMessage,
+    serviceMetadata: serviceMetadata ?? this.serviceMetadata,
+    stopsMetadata: stopsMetadata ?? this.stopsMetadata,
   );
 }

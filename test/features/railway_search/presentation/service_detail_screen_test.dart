@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartrail_passenger/app/providers.dart';
+import 'package:smartrail_passenger/features/railway_search/application/service_detail_notifier.dart';
 import 'package:smartrail_passenger/features/railway_search/domain/railway_models.dart';
 import 'package:smartrail_passenger/features/railway_search/domain/railway_search_repository.dart';
 import 'package:smartrail_passenger/features/railway_search/presentation/service_detail_screen.dart';
@@ -75,6 +76,46 @@ void main() {
     expect(repository.serviceCalls, 2);
     expect(repository.routeCalls, 1);
     expect(find.text('Service SR42'), findsOneWidget);
+  });
+
+  testWidgets('labels retained route data not refreshed after failed refresh', (
+    tester,
+  ) async {
+    final repository = _Repository();
+    final container = ProviderContainer(
+      overrides: [
+        railwaySearchRepositoryProvider.overrideWithValue(repository),
+        serviceDetailClockProvider.overrideWithValue(
+          () => DateTime.utc(2026, 10, 19, 8),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          home: ServiceDetailScreen(choice: _choice, travelDate: _travelDate),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    repository.failStops = true;
+    await container
+        .read(
+          serviceDetailNotifierProvider((
+            choice: _choice,
+            travelDate: _travelDate,
+          )).notifier,
+        )
+        .retryStops();
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Not refreshed · retrieved at 2026-10-19T08:00:00.000Z'),
+      findsOneWidget,
+    );
+    expect(find.byType(ListTile), findsNWidgets(2));
+    expect(find.byKey(const Key('retry-route-stops')), findsOneWidget);
   });
 }
 

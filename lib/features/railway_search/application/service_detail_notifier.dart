@@ -1,123 +1,138 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smartrail_passenger/app/providers.dart';
 import 'package:smartrail_passenger/core/network/api_failure.dart';
+import 'package:smartrail_passenger/features/railway_search/application/retrieval_metadata.dart';
+import 'package:smartrail_passenger/features/railway_search/application/recovery_message_mapper.dart';
 import 'package:smartrail_passenger/features/railway_search/application/service_detail_state.dart';
 import 'package:smartrail_passenger/features/railway_search/domain/railway_models.dart';
 import 'package:smartrail_passenger/features/railway_search/domain/railway_search_repository.dart';
 
-/// Owns the two independent reads for one pushed details route.
-class ServiceDetailController extends ChangeNotifier {
-  ServiceDetailController(
-    this._repository, {
-    required ScheduledServiceChoice choice,
-    required TravelDate travelDate,
-  }) : state = ServiceDetailState(
-         choice: choice,
-         travelDate: travelDate,
-         serviceStatus: DetailSectionStatus.loading,
-         stopsStatus: DetailSectionStatus.loading,
-       ) {
-    unawaited(_loadService());
-    unawaited(_loadStops());
-  }
+typedef ServiceDetailRequest = ({
+  ScheduledServiceChoice choice,
+  TravelDate travelDate,
+});
+typedef DetailClock = DateTime Function();
 
-  final RailwaySearchRepository _repository;
-  ServiceDetailState state;
+final serviceDetailClockProvider = Provider<DetailClock>((ref) => DateTime.now);
+
+final serviceDetailNotifierProvider = NotifierProvider.autoDispose
+    .family<ServiceDetailNotifier, ServiceDetailState, ServiceDetailRequest>(
+      ServiceDetailNotifier.new,
+    );
+
+/// Owns independent details reads for a single route-scoped provider family entry.
+class ServiceDetailNotifier extends Notifier<ServiceDetailState> {
+  ServiceDetailNotifier(this.request);
+
+  final ServiceDetailRequest request;
+  late DetailClock _clock;
   int _serviceGeneration = 0;
   int _stopsGeneration = 0;
-  bool _servicePending = true;
-  bool _stopsPending = true;
-  bool _disposed = false;
+  bool _servicePending = false;
+  bool _stopsPending = false;
 
-  Future<void> retryService() {
-    if (_servicePending || !state.canRetryService || _disposed) {
-      return Future<void>.value();
-    }
-    return _loadService();
+  @override
+  ServiceDetailState build() {
+    final repository = ref.watch(railwaySearchRepositoryProvider);
+    _clock = ref.watch(serviceDetailClockProvider);
+    ref.onDispose(() {
+      _serviceGeneration++;
+      _stopsGeneration++;
+    });
+    final initial = ServiceDetailState(
+      choice: request.choice,
+      travelDate: request.travelDate,
+      serviceStatus: DetailSectionStatus.loading,
+      stopsStatus: DetailSectionStatus.loading,
+    );
+    scheduleMicrotask(() {
+      if (!ref.mounted) return;
+      unawaited(_loadService(repository));
+      unawaited(_loadStops(repository));
+    });
+    return initial;
   }
 
-  Future<void> retryStops() {
-    if (_stopsPending || !state.canRetryStops || _disposed) {
-      return Future<void>.value();
+  Future<void> retryService() async {
+    if (_servicePending ||
+        (!state.canRetryService && state.serviceDetail == null) ||
+        !ref.mounted) {
+      return;
     }
-    return _loadStops();
+    await _loadService(ref.read(railwaySearchRepositoryProvider));
   }
 
-  Future<void> _loadService() async {
+  Future<void> retryStops() async {
+    if (_stopsPending ||
+        (!state.canRetryStops && state.routeStops == null) ||
+        !ref.mounted) {
+      return;
+    }
+    await _loadStops(ref.read(railwaySearchRepositoryProvider));
+  }
+
+  Future<void> _loadService(RailwaySearchRepository repository) async {
     final generation = ++_serviceGeneration;
     _servicePending = true;
-    _update(
-      state.copyWith(
-        serviceStatus: DetailSectionStatus.loading,
-        clearServiceMessage: true,
-      ),
+    state = state.copyWith(
+      serviceStatus: DetailSectionStatus.loading,
+      clearServiceMessage: true,
     );
     try {
-      final detail = await _repository.getService(state.choice.serviceId);
-      if (!_active(generation, _serviceGeneration)) return;
+      final detail = await repository.getService(request.choice.serviceId);
+      if (!_isCurrent(generation, _serviceGeneration)) return;
       _servicePending = false;
-      _update(
-        state.copyWith(
-          serviceStatus: DetailSectionStatus.ready,
-          serviceDetail: detail,
-          clearServiceMessage: true,
-        ),
+      state = state.copyWith(
+        serviceStatus: DetailSectionStatus.ready,
+        serviceDetail: detail,
+        serviceMetadata: RetrievalMetadata.success(_clock()),
+        clearServiceMessage: true,
       );
     } catch (error) {
-      if (!_active(generation, _serviceGeneration)) return;
+      if (!_isCurrent(generation, _serviceGeneration)) return;
       _servicePending = false;
-      _update(
-        state.copyWith(
-          serviceStatus: _statusFor(error),
-          serviceMessage: _messageFor(error),
-        ),
+      state = state.copyWith(
+        serviceStatus: _statusFor(error),
+        serviceMessage: _messageFor(error),
+        serviceMetadata: state.serviceMetadata?.afterFailedRefresh(),
       );
     }
   }
 
-  Future<void> _loadStops() async {
+  Future<void> _loadStops(RailwaySearchRepository repository) async {
     final generation = ++_stopsGeneration;
     _stopsPending = true;
-    _update(
-      state.copyWith(
-        stopsStatus: DetailSectionStatus.loading,
-        clearStopsMessage: true,
-      ),
+    state = state.copyWith(
+      stopsStatus: DetailSectionStatus.loading,
+      clearStopsMessage: true,
     );
     try {
-      final stops = await _repository.getRouteStops(state.choice.routeId);
-      if (!_active(generation, _stopsGeneration)) return;
+      final stops = await repository.getRouteStops(request.choice.routeId);
+      if (!_isCurrent(generation, _stopsGeneration)) return;
       _stopsPending = false;
-      _update(
-        state.copyWith(
-          stopsStatus: stops.stops.isEmpty
-              ? DetailSectionStatus.empty
-              : DetailSectionStatus.ready,
-          routeStops: stops,
-          clearStopsMessage: true,
-        ),
+      state = state.copyWith(
+        stopsStatus: stops.stops.isEmpty
+            ? DetailSectionStatus.empty
+            : DetailSectionStatus.ready,
+        routeStops: stops,
+        stopsMetadata: RetrievalMetadata.success(_clock()),
+        clearStopsMessage: true,
       );
     } catch (error) {
-      if (!_active(generation, _stopsGeneration)) return;
+      if (!_isCurrent(generation, _stopsGeneration)) return;
       _stopsPending = false;
-      _update(
-        state.copyWith(
-          stopsStatus: _statusFor(error),
-          stopsMessage: _messageFor(error),
-        ),
+      state = state.copyWith(
+        stopsStatus: _statusFor(error),
+        stopsMessage: _messageFor(error),
+        stopsMetadata: state.stopsMetadata?.afterFailedRefresh(),
       );
     }
   }
 
-  bool _active(int generation, int current) =>
-      !_disposed && generation == current;
-
-  void _update(ServiceDetailState next) {
-    if (_disposed) return;
-    state = next;
-    notifyListeners();
-  }
+  bool _isCurrent(int generation, int current) =>
+      ref.mounted && generation == current;
 
   DetailSectionStatus _statusFor(Object error) {
     if (error is! ApiFailure) return DetailSectionStatus.unavailable;
@@ -130,14 +145,6 @@ class ServiceDetailController extends ChangeNotifier {
   }
 
   String _messageFor(Object error) => error is ApiFailure
-      ? error.passengerMessage
+      ? RecoveryMessageMapper.map(error).message
       : 'Railway information is temporarily unavailable. Please try again.';
-
-  @override
-  void dispose() {
-    _disposed = true;
-    _serviceGeneration++;
-    _stopsGeneration++;
-    super.dispose();
-  }
 }
