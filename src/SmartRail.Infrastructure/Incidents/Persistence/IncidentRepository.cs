@@ -78,7 +78,8 @@ public sealed class IncidentRepository(SmartRailDbContext dbContext) : IIncident
         ArgumentNullException.ThrowIfNull(idempotencyRecord);
         if (expectedRevision <= 0 || incident.Revision != expectedRevision + 1 ||
             revision.IncidentId != incident.IncidentId || revision.Revision != incident.Revision ||
-            revision.State != incident.State || !revision.PreviousState.HasValue ||
+            revision.State != incident.State ||
+            (revision.PreviousState.HasValue && !SmartRail.Domain.Incidents.IncidentLifecycle.CanTransition(revision.PreviousState.Value, revision.State)) ||
             idempotencyRecord.IncidentId != incident.IncidentId ||
             addAssociations.Any(x => x.IncidentId != incident.IncidentId || x.AddedRevision != incident.Revision) ||
             removeAssociations.Any(x => x.IncidentId != incident.IncidentId || x.RemovedRevision != incident.Revision))
@@ -102,6 +103,8 @@ public sealed class IncidentRepository(SmartRailDbContext dbContext) : IIncident
         foreach (var association in addAssociations) dbContext.IncidentAssociations.Add(association);
         foreach (var association in removeAssociations)
         {
+            if (association.IsActive || association.RemovedRevision != incident.Revision)
+                throw new ArgumentException("Only active associations removed by this incident revision can be persisted.", nameof(removeAssociations));
             var associationEntry = dbContext.Attach(association);
             associationEntry.State = EntityState.Modified;
             associationEntry.Property(x => x.RemovedRevision).OriginalValue = null;
