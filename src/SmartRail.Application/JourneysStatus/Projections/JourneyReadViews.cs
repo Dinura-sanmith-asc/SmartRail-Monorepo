@@ -5,7 +5,7 @@ public sealed record JourneySnapshotView(Guid JourneyInstanceId, Guid ServiceId,
     string Status, string Source, DateTimeOffset? PublishedAt, DateTimeOffset? LastUpdatedAt,
     IReadOnlyList<JourneyStopView> Stops, JourneyEstimateView? Eta = null);
 
-public sealed record JourneyStopView(Guid JourneyStopId, int StopOrder, Guid StationId, string? StationName,
+public sealed record JourneyStopView(Guid JourneyStopId, int StopOrder, Guid StationId, string StationName,
     DateTimeOffset? PlannedArrivalAt, DateTimeOffset? PlannedDepartureAt,
     DateTimeOffset? OperationalArrivalAt, DateTimeOffset? OperationalDepartureAt,
     string? Platform, string? TimingSource, DateTimeOffset? TimingUpdatedAt, string Ambiguity);

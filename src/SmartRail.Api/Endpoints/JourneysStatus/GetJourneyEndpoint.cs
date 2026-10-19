@@ -31,7 +31,7 @@ public static class GetJourneyEndpoint
             };
         });
 
-    private static JourneySnapshotResponse ToResponse(JourneySnapshotView view) => new(
+    public static JourneySnapshotResponse ToResponse(JourneySnapshotView view) => new(
         view.JourneyInstanceId, view.ServiceId, view.ScheduleId, view.ScheduleRevision,
         view.OperationDate, view.FirstDepartureOccurrence, view.Revision, view.Status,
         view.Stops.Select(stop => new JourneyStopResponse(stop.JourneyStopId, stop.StopOrder,

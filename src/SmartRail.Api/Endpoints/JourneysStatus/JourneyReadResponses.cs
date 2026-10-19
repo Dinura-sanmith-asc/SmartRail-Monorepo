@@ -11,12 +11,12 @@ public sealed record JourneyEstimateResponse(DateTimeOffset Value, string Source
     DateTimeOffset UpdatedAt, string Freshness);
 
 public sealed record JourneyStopResponse(Guid JourneyStopId, int StopOrder, Guid StationId,
-    string? StationName, DateTimeOffset? PlannedArrivalAt, DateTimeOffset? PlannedDepartureAt,
+    string StationName, DateTimeOffset? PlannedArrivalAt, DateTimeOffset? PlannedDepartureAt,
     DateTimeOffset? OperationalArrivalAt, DateTimeOffset? OperationalDepartureAt,
     string? Platform, string? TimingSource, DateTimeOffset? TimingUpdatedAt, string Ambiguity);
 
 public sealed record StationDepartureResponse(Guid JourneyInstanceId, Guid ServiceId, DateOnly OperationDate,
-    DateOnly StationLocalDepartureDate, int Revision, string Status, Guid StationId, string? StationName,
+    DateOnly StationLocalDepartureDate, int Revision, string Status, Guid StationId, string StationName,
     int StopOrder, DateTimeOffset? ScheduledDepartureAt, DateTimeOffset? OperationalDepartureAt,
     string? Platform, string Source, DateTimeOffset UpdatedAt, string Ambiguity);
 

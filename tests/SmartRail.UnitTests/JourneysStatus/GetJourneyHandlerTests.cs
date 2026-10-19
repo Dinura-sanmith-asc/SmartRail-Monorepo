@@ -19,7 +19,7 @@ public sealed class GetJourneyHandlerTests
         var repository = new FakeReadRepository
         {
             Snapshot = new(JourneyReadOutcome.Found, journey, revision, [later, earlier],
-                new Dictionary<Guid, string> { [earlier.StationId] = "Central" })
+                new Dictionary<Guid, string> { [earlier.StationId] = "Central", [later.StationId] = "North" })
         };
 
         var result = await new GetJourneyHandler(repository).HandleAsync(new(journey.JourneyInstanceId));

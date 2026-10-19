@@ -1,4 +1,4 @@
-﻿---
+---
 description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 ---
 
@@ -49,7 +49,7 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 
 **Checkpoint**: Domain and schema invariants pass unit tests; additive migration and transactions pass isolated PostgreSQL tests. All user-story implementation depends on T023.
 
-## Phase 3: User Story 1 â€” Passenger Views a Dated Journey (Priority: P1, MVP)
+## Phase 3: User Story 1 Ã¢â‚¬â€ Passenger Views a Dated Journey (Priority: P1, MVP)
 
 **Goal**: A passenger can retrieve a known dated journey and its complete safe operational update history, without confusing it with its reusable scheduled service.
 
@@ -73,11 +73,11 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 
 **Checkpoint**: User Story 1 is independently testable through anonymous reads with real PostgreSQL-backed journey data.
 
-## Phase 4: User Story 2 â€” Controller Publishes an Official Operational Change (Priority: P1)
+## Phase 4: User Story 2 Ã¢â‚¬â€ Controller Publishes an Official Operational Change (Priority: P1)
 
 **Goal**: An authorized Controller publishes status, cancellation, timing, platform, or correction changes as immutable and auditable journey revisions.
 
-**Independent Test**: With a controlled authorized Controller and current journey scope, publish valid changes; verify new revision and actor/time audit. Verify disallowed roles/scopes, stale revisions, invalid transitions, and failed observation verification produce no state change.
+**Independent Test**: With a controlled authorized Controller and current active role/action grants, publish valid changes under global Controller journey scope; verify new revision and actor/time audit. Verify missing/revoked grants, disallowed roles, stale revisions, invalid transitions, and failed observation verification produce no state change.
 
 ### Shared Application Contract for User Story 2
 
@@ -86,8 +86,8 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 ### Tests for User Story 2
 
 - [X] T035 [P] [US2] Add lifecycle application tests for every approved transition, delayed/interrupted recovery, cancellation semantics, terminal rejection, linked correction, and stale revision conflict in `tests/SmartRail.UnitTests/JourneysStatus/PublishJourneyStatusHandlerTests.cs` (SR-040, SR-046, FR-003, FR-004, FR-005, FR-006, SC-002, SC-006, SC-012).
-- [X] T036 [P] [US2] Add authorization and side-effect tests for current active Controller grants, the separate cancellation action, revoked/missing/unavailable role evidence, target journey validation, and denied writes in `tests/SmartRail.UnitTests/JourneysStatus/JourneyPublicationAuthorizationTests.cs`; reflect that the approved Controller grant has global journey scope and do not add Controller assignment data (SR-040, SR-046, SR-091, FR-014, SC-006, SC-008).
-- [X] T037 [P] [US2] Add Driver observation boundary tests using a deterministic test-only verifier for malformed, missing/inaccessible, stale/revoked/incompatible, unavailable, and valid current-journey evidence in `tests/SmartRail.UnitTests/JourneysStatus/DriverObservationVerificationTests.cs`; do not depend on a production Driver Operations adapter (SR-069, FR-008, FR-023, SC-005, SC-014, SC-018).
+- [X] T036 [P] [US2] Add authorization and side-effect tests for current active Controller grants, the separate cancellation action, revoked/missing/unavailable role evidence, target journey validation, and denied writes in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneyPublicationApiTests.cs`; reflect that the approved Controller grant has global journey scope and do not add Controller assignment data (SR-040, SR-046, SR-091, FR-014, SC-006, SC-008).
+- [X] T037 [P] [US2] Add Driver observation boundary tests using a deterministic test-only verifier for malformed, missing/inaccessible, stale/revoked/incompatible, unavailable, and valid current-journey evidence in `tests/SmartRail.UnitTests/JourneysStatus/PublishJourneyStatusHandlerTests.cs`; do not depend on a production Driver Operations adapter (SR-069, FR-008, FR-023, SC-005, SC-014, SC-018).
 
 ### Implementation for User Story 2
 
@@ -105,7 +105,7 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 
 **Checkpoint**: User Story 2 publishes only through existing Controller-authorized operations, and every denied/conflicted/failed-evidence write leaves official state unchanged.
 
-## Phase 5: User Story 3 â€” Passenger and Station Consumers See a Disruption Consistently (Priority: P1)
+## Phase 5: User Story 3 Ã¢â‚¬â€ Passenger and Station Consumers See a Disruption Consistently (Priority: P1)
 
 **Goal**: Journey and station departure reads reflect the same committed status/diversion revision and station-local departure date.
 
@@ -128,12 +128,12 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 - [X] T058 Extend `JourneyPublicationRepository` in `src/SmartRail.Infrastructure/JourneysStatus/Persistence/JourneyPublicationRepository.cs` to persist complete diversion snapshots transactionally and preserve prior revisions and stop IDs (FR-004, FR-010, FR-022, SC-013, SC-017).
 - [X] T059 Extend journey repository read projections in `src/SmartRail.Infrastructure/JourneysStatus/Persistence/JourneyReadRepository.cs` to return station departures and current/history reads from consistent committed revisions; add only justified indexes in `src/SmartRail.Infrastructure/JourneysStatus/Configurations/` (SR-010, SR-048, FR-011, FR-012, SC-003).
 - [X] T060 Add real PostgreSQL tests for station-local date filtering, overnight operationDate, diversion timing fallback, unknown times, diversion snapshot/history, stop-ID integrity, and same-revision reads in `tests/SmartRail.IntegrationTests/JourneysStatus/Persistence/JourneyDepartureAndDiversionTests.cs` (SR-007, SR-010, SR-022, SR-054, SR-056, FR-010, FR-020, FR-022, SC-001, SC-003, SC-013, SC-015, SC-017).
-- [X] T061 Add API integration coverage in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneySelectionFlowTests.cs` for the unchanged Feature 001 service-search endpoint → Feature 003 station departure choices → selected `journeyInstanceId` → journey detail flow; cover multiple journeys for one service/date, distinct IDs sharing one planned occurrence, passenger-safe descriptors, ambiguous choices with no automatic selection, required/invalid date, overnight departure-date behavior, empty/missing/unavailable results, and public metadata redaction without modifying Feature 001 contracts (SR-007, SR-013, SR-054, SR-056, FR-001, FR-020, SC-001, SC-011, SC-015).
+- [X] T061 Add API integration coverage in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneySelectionFlowTests.cs` for the unchanged Feature 001 service-search endpoint â†’ Feature 003 station departure choices â†’ selected `journeyInstanceId` â†’ journey detail flow; cover multiple journeys for one service/date, distinct IDs sharing one planned occurrence, passenger-safe descriptors, ambiguous choices with no automatic selection, required/invalid date, overnight departure-date behavior, empty/missing/unavailable results, and public metadata redaction without modifying Feature 001 contracts (SR-007, SR-013, SR-054, SR-056, FR-001, FR-020, SC-001, SC-011, SC-015).
 - [X] T062 Add end-to-end API integration coverage for separate cancellation and platform publications, reading journey detail, complete updates, and station departures after each change; assert change type, UpdateId, committed revision, safe source, and publication timestamp in update-history responses. Compare journey-detail and station-departure responses using only the status, revision, source, and timestamp fields exposed by each schema; do not require UpdateId or change type on projections that do not define them. These backend tests do not claim passenger alert delivery or close client acceptance (SR-010, SR-022, SR-025, SR-048, FR-011, FR-012, FR-013, SC-003, SC-007, SC-013).
 
 **Checkpoint**: User Story 3 proves that journey and station views share one committed revision and the approved local-date/overnight rules.
 
-## Phase 6: User Story 4 â€” Operational Teams Use Journey Status Without Crossing Module Authority (Priority: P2)
+## Phase 6: User Story 4 Ã¢â‚¬â€ Operational Teams Use Journey Status Without Crossing Module Authority (Priority: P2)
 
 **Goal**: Feature 003 consumes owned evidence through explicit boundaries while Driver Operations, Incident Management, and clients retain their responsibilities.
 
@@ -157,16 +157,16 @@ description: "Dependency-ordered implementation tasks for SmartRail Feature 003"
 
 **Purpose**: Verify all direct Feature 003 requirements, preserve baseline APIs and security, and record downstream acceptance obligations honestly.
 
-- [ ] T069 Add contract validation tests comparing generated OpenAPI to `specs/003-journeys-status/contracts/journeys-status.openapi.yaml` in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneysStatusOpenApiTests.cs`; assert exactly the five approved operations, schemas, anonymous reads, protected writes, and no extra routes (FR-018, SC-010).
-- [ ] T070 Add security regression tests for Feature 001 anonymous railway GET routes and Feature 002 authentication/authorization behavior in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/ExistingFeatureApiRegressionTests.cs`; confirm no contract or access change (SR-089, SR-090, SR-091, FR-014, FR-018, SC-006, SC-008).
-- [ ] T071 Add structured-log and error-response redaction tests for tokens, actor subjects, Driver observation IDs, private audit data, SQL/provider exceptions, and connection details in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneyInformationRedactionTests.cs` (FR-016, FR-021, SC-010, SC-018).
-- [ ] T072 Audit source acceptance checks against implementation and automated tests and record a requirement-to-test evidence matrix in `specs/003-journeys-status/quickstart.md` for SR-007, SR-010, SR-019, SR-021, SR-022, SR-025, SR-031, SR-034, SR-035, SR-040, SR-044, SR-046, SR-048, SR-054, and SR-056 and FR-001–FR-023/SC-001–SC-018. Record FR-013/SR-025/SC-007 backend change-evidence checks separately from passenger-client alert delivery, and SR-044 backend boundary evidence separately from owner/client composition; neither downstream obligation is closed by this audit (SC-010).
-- [ ] T073 Record downstream client and module obligations in `specs/003-journeys-status/quickstart.md`: passenger-client tasks/tests must prove configured in-app cancellation/platform alerts and visible status use the same UpdateId/revision (FR-013, SR-025, SC-007); Incident Management and operations-client tasks/tests must prove authorized incident context is composed with official journey data (SR-044). Keep both acceptance items open until evidence passes; keep SR-058 station-display refresh open until its owning client is implemented and tested (SR-001, SR-025, SR-044, SR-054, SR-056, SR-058, SR-059, SR-066, SR-102, SR-109, SR-114, SR-113, SC-007).
-- [ ] T074 Record implementation and local acceptance evidence for cross-module obligations in `specs/003-journeys-status/quickstart.md`, including Feature 001 references (SR-002/003/004/013), Feature 002 authorization (SR-089/090/091), Driver Operations (SR-064/065/069), Incident Management (SR-038/041/042/044), platform observability (SR-115), and explicit train-control exclusion (SR-072). Record SR-044 as open until the owning module and operations client demonstrate authorized association visibility; leave owner evidence open where not delivered here (SC-009, SC-010).
-- [ ] T075 Run `dotnet restore SmartRail.slnx` and `dotnet build SmartRail.slnx`; record exact results in `specs/003-journeys-status/quickstart.md` (SC-010).
-- [ ] T076 Run the complete solution unit and isolated PostgreSQL/API integration suite; record pass/fail/skip counts and test-database target in `specs/003-journeys-status/quickstart.md`; do not mark failed or skipped verification as success (SC-010).
-- [ ] T077 Run `git diff --check` and review the complete Feature 003 change set for unintended Feature 001/002 modifications, unapproved routes/grants, secrets, or control/signaling functionality; record outcome in `specs/003-journeys-status/quickstart.md` (FR-018, FR-019, SC-009, SC-010).
-- [ ] T078 Record production initialization authority, operator/source-key governance, and audit-retention approval gates in `specs/003-journeys-status/quickstart.md`; verify production initialization remains deny-by-default until those approvals, with local deterministic fixtures isolated to tests (FR-001, SC-011).
+- [X] T069 Add contract validation tests comparing generated OpenAPI to `specs/003-journeys-status/contracts/journeys-status.openapi.yaml` in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneysStatusOpenApiTests.cs`; assert exactly the five approved operations, schemas, anonymous reads, protected writes, and no extra routes (FR-018, SC-010).
+- [X] T070 Add security regression tests for Feature 001 anonymous railway GET routes and Feature 002 authentication/authorization behavior in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/ExistingFeatureApiRegressionTests.cs`; confirm no contract or access change (SR-089, SR-090, SR-091, FR-014, FR-018, SC-006, SC-008).
+- [X] T071 Add structured-log and error-response redaction tests for tokens, actor subjects, Driver observation IDs, private audit data, SQL/provider exceptions, and connection details in `tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneyInformationRedactionTests.cs` (FR-016, FR-021, SC-010, SC-018).
+- [X] T072 Audit source acceptance checks against implementation and automated tests and record a requirement-to-test evidence matrix in `specs/003-journeys-status/quickstart.md` for SR-007, SR-010, SR-019, SR-021, SR-022, SR-025, SR-031, SR-034, SR-035, SR-040, SR-044, SR-046, SR-048, SR-054, and SR-056 and FR-001â€“FR-023/SC-001â€“SC-018. Record FR-013/SR-025/SC-007 backend change-evidence checks separately from passenger-client alert delivery, and SR-044 backend boundary evidence separately from owner/client composition; neither downstream obligation is closed by this audit (SC-010).
+- [X] T073 Record downstream client and module obligations in `specs/003-journeys-status/quickstart.md`: passenger-client tasks/tests must prove configured in-app cancellation/platform alerts and visible status use the same UpdateId/revision (FR-013, SR-025, SC-007); Incident Management and operations-client tasks/tests must prove authorized incident context is composed with official journey data (SR-044). Keep both acceptance items open until evidence passes; keep SR-058 station-display refresh open until its owning client is implemented and tested (SR-001, SR-025, SR-044, SR-054, SR-056, SR-058, SR-059, SR-066, SR-102, SR-109, SR-114, SR-113, SC-007).
+- [X] T074 Record implementation and local acceptance evidence for cross-module obligations in `specs/003-journeys-status/quickstart.md`, including Feature 001 references (SR-002/003/004/013), Feature 002 authorization (SR-089/090/091), Driver Operations (SR-064/065/069), Incident Management (SR-038/041/042/044), platform observability (SR-115), and explicit train-control exclusion (SR-072). Record SR-044 as open until the owning module and operations client demonstrate authorized association visibility; leave owner evidence open where not delivered here (SC-009, SC-010).
+- [X] T075 Run `dotnet restore SmartRail.slnx` and `dotnet build SmartRail.slnx`; record exact results in `specs/003-journeys-status/quickstart.md` (SC-010).
+- [X] T076 Run the complete solution unit and isolated PostgreSQL/API integration suite; record pass/fail/skip counts and test-database target in `specs/003-journeys-status/quickstart.md`; do not mark failed or skipped verification as success (SC-010).
+- [X] T077 Run `git diff --check` and review the complete Feature 003 change set for unintended Feature 001/002 modifications, unapproved routes/grants, secrets, or control/signaling functionality; record outcome in `specs/003-journeys-status/quickstart.md` (FR-018, FR-019, SC-009, SC-010).
+- [X] T078 Record production initialization authority, operator/source-key governance, and audit-retention approval gates in `specs/003-journeys-status/quickstart.md`; verify production initialization remains deny-by-default until those approvals, with local deterministic fixtures isolated to tests (FR-001, SC-011).
 
 **Final checkpoint**: Local Feature 003 implementation is eligible for acceptance only when direct requirement evidence is complete. Downstream client and other-module requirements remain open until the owning work provides evidence; production governance remains an explicit gate. No AWS resource creation or deployment is part of this feature.
 

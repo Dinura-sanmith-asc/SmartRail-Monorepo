@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using Microsoft.OpenApi;
 using SmartRail.Api.Errors;
+using SmartRail.Application.JourneysStatus.Queries;
 using SmartRail.Application.JourneysStatus.Publication;
 using SmartRail.Domain.JourneysStatus;
 
@@ -13,7 +15,12 @@ public static class JourneyPublicationEndpoints
         endpoints.MapPatch("/api/operations/journeys/{id}/status", PublishStatusAsync)
             .WithName("PublishJourneyStatusOrDiversion").WithTags("Journey operations")
             .WithSummary("Publish an official journey status or route diversion")
-            .WithDescription("Requires a verified Controller and the existing Feature 002 grant. Cancellation additionally requires ConfirmJourneyCancellation. Actor and publication time are server-derived.")
+            .WithDescription("Resolves the verified caller's current Feature 002 grants for this operation. The approved Controller grant has global journey scope; the target journey and operation are validated. Cancellation also requires ConfirmJourneyCancellation. Actor and publication time are server-derived.")
+            .AddOpenApiOperationTransformer((operation, context, _) =>
+            {
+                if (context.Document is { } document) AddCognitoSecurity(operation, document);
+                return Task.CompletedTask;
+            })
             .Produces<JourneySnapshotResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest, "application/problem+json")
             .ProducesProblem(StatusCodes.Status401Unauthorized, "application/problem+json")
@@ -26,7 +33,12 @@ public static class JourneyPublicationEndpoints
         endpoints.MapPatch("/api/operations/journeys/{id}/stops/{stopId}", UpdateStopAsync)
             .WithName("PublishJourneyStopChange").WithTags("Journey operations")
             .WithSummary("Publish a stop platform or operational timing change")
-            .WithDescription("Requires a verified Controller with current Feature 002 journey authorization. Only platform and operational timing are changed.")
+            .WithDescription("Resolves the verified caller's current Feature 002 grants for this operation. The approved Controller grant has global journey scope; the target journey and stop are validated. Only platform and operational timing are changed.")
+            .AddOpenApiOperationTransformer((operation, context, _) =>
+            {
+                if (context.Document is { } document) AddCognitoSecurity(operation, document);
+                return Task.CompletedTask;
+            })
             .Produces<JourneySnapshotResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest, "application/problem+json")
             .ProducesProblem(StatusCodes.Status401Unauthorized, "application/problem+json")
@@ -38,8 +50,17 @@ public static class JourneyPublicationEndpoints
         return endpoints;
     }
 
+    private static void AddCognitoSecurity(OpenApiOperation operation, OpenApiDocument document)
+    {
+        operation.Security ??= [];
+        operation.Security.Add(new OpenApiSecurityRequirement
+        {
+            [new OpenApiSecuritySchemeReference("CognitoAccessToken", document)] = []
+        });
+    }
+
     private static async Task<IResult> PublishStatusAsync(Guid id, PublishJourneyStatusRequest request,
-        HttpContext context, JourneyPublicationHandler handler, CancellationToken cancellationToken)
+        HttpContext context, JourneyPublicationHandler handler, GetJourneyHandler readHandler, CancellationToken cancellationToken)
     {
         var subject = context.User.FindFirstValue("sub");
         if (string.IsNullOrWhiteSpace(subject))
@@ -51,11 +72,11 @@ public static class JourneyPublicationEndpoints
             request.RouteDiversion?.Stops?.Select(x => new DivertedStopInput(x.JourneyStopId, x.StationId, x.StopOrder,
                 x.RouteStopId, x.PlannedArrivalAt, x.PlannedDepartureAt, x.OperationalArrivalAt,
                 x.OperationalDepartureAt, x.Platform)).ToArray(), request.DriverObservationId, request.CorrectionOfUpdateId);
-        return MapResult(await handler.PublishStatusAsync(command, cancellationToken));
+        return await MapResult(await handler.PublishStatusAsync(command, cancellationToken), id, readHandler, cancellationToken);
     }
 
     private static async Task<IResult> UpdateStopAsync(Guid id, Guid stopId, PublishJourneyStopChangeRequest request,
-        HttpContext context, JourneyPublicationHandler handler, CancellationToken cancellationToken)
+        HttpContext context, JourneyPublicationHandler handler, GetJourneyHandler readHandler, CancellationToken cancellationToken)
     {
         var subject = context.User.FindFirstValue("sub");
         if (string.IsNullOrWhiteSpace(subject))
@@ -64,19 +85,29 @@ public static class JourneyPublicationEndpoints
             subject, request.Platform, request.OperationalArrivalAt,
             request.OperationalDepartureAt, request.DriverObservationId, request.CorrectionOfUpdateId,
             request.PlatformSpecified, request.OperationalArrivalSpecified, request.OperationalDepartureSpecified);
-        return MapResult(await handler.UpdateStopAsync(command, cancellationToken));
+        return await MapResult(await handler.UpdateStopAsync(command, cancellationToken), id, readHandler, cancellationToken);
     }
 
-    private static IResult MapResult(JourneyPublicationResult result) => result.Outcome switch
+    private static Task<IResult> MapResult(JourneyPublicationResult result, Guid journeyId,
+        GetJourneyHandler readHandler, CancellationToken cancellationToken) => JourneyReadProblemMapping.Safe(async () =>
     {
-        JourneyPublicationOutcome.Published when result.State is not null => Results.Ok(JourneyPublicationResponseMapping.From(result.State)),
-        JourneyPublicationOutcome.Invalid => Problem(400),
-        JourneyPublicationOutcome.Unauthorized => Problem(403),
-        JourneyPublicationOutcome.NotFound => Problem(404),
-        JourneyPublicationOutcome.Conflict => Problem(409),
-        JourneyPublicationOutcome.Unavailable => Problem(503),
-        _ => Problem(503)
-    };
+        if (result.Outcome == JourneyPublicationOutcome.Published && result.State is not null)
+        {
+            var current = await readHandler.HandleAsync(new(journeyId), cancellationToken);
+            return current.Outcome == SmartRail.Application.JourneysStatus.Queries.JourneyReadOutcome.Found && current.Value is not null
+                ? Results.Ok(GetJourneyEndpoint.ToResponse(current.Value)) : Problem(503);
+        }
+
+        return result.Outcome switch
+        {
+            JourneyPublicationOutcome.Invalid => Problem(400),
+            JourneyPublicationOutcome.Unauthorized => Problem(403),
+            JourneyPublicationOutcome.NotFound => Problem(404),
+            JourneyPublicationOutcome.Conflict => Problem(409),
+            JourneyPublicationOutcome.Unavailable => Problem(503),
+            _ => Problem(503)
+        };
+    });
 
     private static IResult Problem(int status) => status switch
     {
@@ -109,20 +140,4 @@ public sealed class PublishJourneyStopChangeRequest
     public DateTimeOffset? OperationalDepartureAt { get => _departure; set { _departure = value; OperationalDepartureSpecified = true; } }
     public Guid? DriverObservationId { get; init; }
     public Guid? CorrectionOfUpdateId { get; init; }
-}
-
-public static class JourneyPublicationResponseMapping
-{
-    public static JourneySnapshotResponse From(JourneyPublicationState state)
-    {
-        var official = state.Revision.PublicationKind != JourneyPublicationKind.InitializationBaseline;
-        return new(state.Journey.JourneyInstanceId, state.Journey.ServiceId, state.Journey.ScheduleId,
-            state.Journey.ScheduleRevision, state.Journey.OperationDate, state.Journey.FirstDepartureOccurrence,
-            state.Revision.Revision, state.Revision.Status.ToString(),
-            state.Stops.Select(stop => new JourneyStopResponse(stop.JourneyStopId, stop.StopOrder, stop.StationId, null,
-                stop.PlannedArrivalAt, stop.PlannedDepartureAt, stop.OperationalArrivalAt,
-                stop.OperationalDepartureAt, stop.Platform, stop.TimingSource, stop.TimingUpdatedAt,
-                stop.AmbiguityState)).ToArray(), state.Revision.Source.ToString(),
-            official ? state.Revision.PublishedAt : null, official ? state.Revision.PublishedAt : null, null);
-    }
 }

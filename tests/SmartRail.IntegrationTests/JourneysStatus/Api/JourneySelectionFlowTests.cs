@@ -124,6 +124,7 @@ public sealed class JourneySelectionFlowTests(PostgreSqlTestDatabaseFixture fixt
             var update = Assert.Single(cancelHistory.RootElement.EnumerateArray());
             var departure = Assert.Single(cancelDepartures.RootElement.EnumerateArray(),
                 item => item.GetProperty("journeyInstanceId").GetGuid() == cancellationJourney);
+            Assert.NotEqual(Guid.Empty, update.GetProperty("updateId").GetGuid());
             Assert.Equal("Cancelled", update.GetProperty("status").GetString());
             Assert.Equal("status", update.GetProperty("publicChange").GetProperty("changeType").GetString());
             Assert.Equal(update.GetProperty("revision").GetInt32(), cancelledDetail.RootElement.GetProperty("revision").GetInt32());
@@ -153,6 +154,7 @@ public sealed class JourneySelectionFlowTests(PostgreSqlTestDatabaseFixture fixt
         var platformUpdate = Assert.Single(platformHistory.RootElement.EnumerateArray());
         var platformDeparture = Assert.Single(platformDepartures.RootElement.EnumerateArray(),
             item => item.GetProperty("journeyInstanceId").GetGuid() == platformJourney);
+        Assert.NotEqual(Guid.Empty, platformUpdate.GetProperty("updateId").GetGuid());
         Assert.Equal("stopChange", platformUpdate.GetProperty("publicChange").GetProperty("changeType").GetString());
         Assert.Equal("6", platformUpdate.GetProperty("publicChange").GetProperty("platform").GetString());
         Assert.Equal("6", platformDeparture.GetProperty("platform").GetString());

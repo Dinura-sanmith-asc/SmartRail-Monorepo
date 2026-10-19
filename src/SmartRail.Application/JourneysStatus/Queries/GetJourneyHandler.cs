@@ -20,7 +20,7 @@ public sealed class GetJourneyHandler(IJourneyReadRepository repository)
         var stationNames = result.PublishedStationNames ?? new Dictionary<Guid, string>();
         var stops = result.Stops.OrderBy(stop => stop.StopOrder).Select(stop => new JourneyStopView(
             stop.JourneyStopId, stop.StopOrder, stop.StationId,
-            stationNames.TryGetValue(stop.StationId, out var name) ? name : null,
+            stationNames.TryGetValue(stop.StationId, out var name) ? name : throw new JourneyReadProjectionException("Published station name is unavailable."),
             stop.PlannedArrivalAt, stop.PlannedDepartureAt, stop.OperationalArrivalAt,
             stop.OperationalDepartureAt, stop.Platform, SafeTimingSource(stop.TimingSource), stop.TimingUpdatedAt,
             stop.AmbiguityState)).ToArray();

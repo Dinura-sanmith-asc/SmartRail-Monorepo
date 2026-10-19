@@ -26,7 +26,11 @@ public static class GetStationDeparturesEndpoint
                                 In = parameter.In,
                                 Description = parameter.Description,
                                 Required = true,
-                                Schema = parameter.Schema
+                                Schema = new OpenApiSchema
+                                {
+                                    Type = JsonSchemaType.String,
+                                    Format = "date"
+                                }
                             }
                             : parameter);
                     }

@@ -5,7 +5,9 @@ info:
   description: >-
     Contract for the five approved Journeys & Status operations. Public responses
     contain published railway information only. Controller writes use existing
-    Feature 002 permissions and current journey scope. This contract adds no
+    Feature 002 active roles and action grants. Controller grants provide global
+    journey scope, with target validation and a separate cancellation grant. This
+    contract adds no
     administration, Driver observation, or incident operations. Existing journey
     and update reads expose safe cancellation/platform evidence (change type,
     UpdateId, revision, source, and publication time) for the passenger client;
@@ -110,7 +112,8 @@ paths:
       summary: Publish an official journey status or route diversion
       description: >-
         Requires a verified Controller with the existing PublishOfficialJourneyStatus
-        grant and current journey scope. A cancellation additionally requires the
+        grant, which provides global journey scope for Controllers. Validate the
+        target journey and operation. A cancellation additionally requires the
         existing ConfirmJourneyCancellation grant. A diversion is a complete
         ordered replacement calling-point set for this dated journey only; it
         never changes Feature 001 schedules. Actor and publication time are
@@ -144,7 +147,8 @@ paths:
       summary: Publish a stop platform or operational timing change
       description: >-
         Requires a verified Controller with the existing
-        ChangePlatformOrOperationalTiming grant and current journey scope.
+        current ChangePlatformOrOperationalTiming grant, which provides global
+        journey scope for Controllers. Validate the target journey and stop.
         This operation changes only the identified stop's platform and/or
         operational timing. Actor and publication time are server-derived.
       security:
