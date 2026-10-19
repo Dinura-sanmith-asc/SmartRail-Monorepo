@@ -26,19 +26,19 @@
 - [x] Invalid input, missing/retired references, unavailable owner evidence, revoked or insufficient permissions, retries, concurrent updates, and no-automatic-publication cases are identified.
 - [x] Protected incident data, public journey data, and owner-module data are distinguished.
 - [x] Client-owned error, network, freshness, and rendering obligations are tracked separately from backend behavior.
-- [ ] Controller incident resource scope is explicitly approved; current grants are recorded, but their resource scope remains unresolved.
-- [ ] Exact lifecycle transitions, resolution/closure/reopen/correction behavior, concurrency response, and duplicate-submission semantics are approved.
-- [ ] Incident schema and impact-association payloads, report-time meaning, owner-evidence failure behavior, and response/error mapping are approved within the existing operation inventory.
-- [x] No `[NEEDS CLARIFICATION]` placeholder markers are used; unresolved business decisions are listed explicitly for the clarification phase.
+- [x] Controller incident scope is explicitly approved as global for the existing Controller incident grants; Station Staff remain scoped to current station assignments, including the approved multi-station rule.
+- [x] Lifecycle state names/transitions, resolution/closure semantics, terminal-state reopening policy, minimum transition evidence, stale-revision handling, and lifecycle retry semantics are explicitly approved; SR-047 correction workflow and SR-051 full audit chronology remain deferred.
+- [x] Report fields, timestamp distinction, fail-closed owner verification, association semantics, existing-operation filters/write behavior, HTTP status mapping, concurrency, and idempotent retries are approved. Exact controlled category-code values remain an explicit pre-implementation approval gate; exact serialized projections are for planning.
+- [x] No `[NEEDS CLARIFICATION]` placeholder markers are used; the approved category-code values are listed explicitly as a pre-implementation business approval gate.
 
 ## Feature Readiness
 
 - [x] Each direct Must Have has a feature responsibility and measurable acceptance evidence.
 - [x] Backend acceptance is separated from operations-client, station-client, and cross-module acceptance.
 - [x] Incident changes cannot automatically publish or modify official Feature 003 journey status.
-- [ ] All material authorization, lifecycle, and existing-operation contract decisions are resolved; proceed through `$speckit-clarify` before `$speckit-plan`.
+- [x] All material authorization, lifecycle, report-data, association, and existing-operation contract decisions are resolved; the approved category-code catalogue remains a pre-implementation gate and does not block `$speckit-plan`.
 
 ## Notes
 
-- Unchecked items represent genuine business or contract decisions, not missing implementation detail. Resolve them before planning the affected behavior.
+- The controlled category-code values remain a genuine pre-implementation business approval gate and must be supplied before incident creation is implemented.
 - This checklist records requirements quality only; it does not indicate implementation completion.

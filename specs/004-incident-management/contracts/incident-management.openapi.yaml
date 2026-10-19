@@ -1,0 +1,258 @@
+openapi: 3.1.0
+info:
+  title: SmartRail Incident Management API
+  version: 1.0.0
+  description: >-
+    Protected Incident Management operations. Category codes resolve through an
+    approved controlled catalogue; the catalogue values are a pre-implementation
+    business gate and are intentionally not enumerated here.
+servers:
+  - url: /
+security:
+  - cognitoBearer: []
+paths:
+  /api/incidents:
+    get:
+      operationId: listIncidents
+      summary: List authorized incidents
+      description: >-
+        Optional filters are combined. Authorization and station scope are
+        applied server-side. No authorized match returns an empty 200 response.
+      parameters:
+        - name: incidentId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+        - name: stationId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+        - name: journeyId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Authorized incident collection; empty when no authorized match exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Incident' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    post:
+      operationId: createIncident
+      summary: Report an incident
+      description: >-
+        Creates an incident with verified references. The server supplies the
+        incident ID, reporter identity and report timestamp. Category values
+        must come from the separately approved controlled catalogue.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateIncidentRequest' }
+      responses:
+        '201':
+          description: Incident created; identical idempotent replay returns the original result.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Incident' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/incidents/{id}:
+    patch:
+      operationId: updateIncident
+      summary: Update incident lifecycle or impact associations
+      description: >-
+        Applies an approved forward lifecycle transition and/or explicit
+        association additions/removals atomically against the expected revision.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateIncidentRequest' }
+      responses:
+        '200':
+          description: Incident updated; identical idempotent replay returns the original result.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Incident' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+components:
+  securitySchemes:
+    cognitoBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cognito JWT validated by Feature 002; current PostgreSQL role grants are checked for each protected operation.
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Stable retry key scoped to verified actor and operation. Same key and same request replays the original result; different content conflicts. Retention is not specified here.
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    BadRequest:
+      description: Malformed request, invalid reference shape, unknown category code, or invalid lifecycle/association command.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unauthorized:
+      description: Missing, invalid, or expired credentials.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: Verified identity lacks the approved role grant or required current station scope.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: Incident or owner reference is unknown or inaccessible.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: Expected revision is stale or idempotency key was reused with different content.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unavailable:
+      description: Required authorization, category catalogue, or owner verification authority is unavailable; no unverified write is persisted.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+  schemas:
+    IncidentState:
+      type: string
+      enum: [Reported, In Progress, Resolved, Closed]
+    AssociationKind:
+      type: string
+      enum: [Station, Service, Journey, Disruption]
+    IncidentAssociation:
+      type: object
+      required: [associationId, kind, resourceId]
+      properties:
+        associationId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/AssociationKind' }
+        resourceId: { type: string, format: uuid }
+        updateId:
+          type: string
+          format: uuid
+          description: Stable Feature 003 UpdateId for a Disruption link; omitted for other kinds.
+        revision:
+          type: integer
+          minimum: 1
+          description: Published Feature 003 revision identified by updateId when kind is Disruption.
+    Incident:
+      type: object
+      required: [incidentId, categoryCode, description, state, revision, source, reportedAt, associations]
+      properties:
+        incidentId: { type: string, format: uuid }
+        categoryCode:
+          type: string
+          description: Code from the explicitly approved controlled incident category catalogue.
+        description: { type: string }
+        state: { $ref: '#/components/schemas/IncidentState' }
+        revision: { type: integer, minimum: 1 }
+        source:
+          type: string
+          const: IncidentManagement
+          description: Safe server-owned source classification; private actor and audit evidence are excluded.
+        reportedAt: { type: string, format: date-time, description: Server-generated UTC report timestamp. }
+        occurredAt:
+          type: [string, 'null']
+          format: date-time
+          description: Optional reporter-supplied occurrence time; distinct from reportedAt.
+        associations:
+          type: array
+          items: { $ref: '#/components/schemas/IncidentAssociation' }
+      additionalProperties: false
+      description: Excludes reporter subject, private audit evidence, raw claims and credentials.
+    CreateIncidentRequest:
+      type: object
+      required: [categoryCode, description, associations]
+      properties:
+        categoryCode: { type: string, minLength: 1 }
+        description: { type: string, minLength: 1 }
+        occurredAt:
+          type: [string, 'null']
+          format: date-time
+        associations:
+          type: array
+          minItems: 1
+          minContains: 1
+          contains:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum: [Station, Service]
+            required: [kind]
+          items: { $ref: '#/components/schemas/AssociationInput' }
+      additionalProperties: false
+      description: At least one Station or Service association is required; journey/disruption links may also be supplied when verified.
+    AssociationInput:
+      type: object
+      required: [kind, resourceId]
+      properties:
+        kind: { $ref: '#/components/schemas/AssociationKind' }
+        resourceId: { type: string, format: uuid }
+        updateId: { type: string, format: uuid }
+        revision: { type: integer, minimum: 1 }
+      additionalProperties: false
+    UpdateIncidentRequest:
+      type: object
+      required: [expectedRevision]
+      properties:
+        expectedRevision: { type: integer, minimum: 1 }
+        state: { $ref: '#/components/schemas/IncidentState' }
+        addAssociations:
+          type: array
+          items: { $ref: '#/components/schemas/AssociationInput' }
+        removeAssociationIds:
+          type: array
+          uniqueItems: true
+          items: { type: string, format: uuid }
+      additionalProperties: false
+      description: At least one of state, addAssociations or removeAssociationIds must be supplied; no reopening is permitted.
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri-reference }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string, format: uri-reference }
+        traceId: { type: string }
+        code: { type: string }
+      additionalProperties: true
