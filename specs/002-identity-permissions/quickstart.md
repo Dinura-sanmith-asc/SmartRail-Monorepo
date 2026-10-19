@@ -3,6 +3,8 @@
 **Feature**: SmartRail 002 — Identity & Permissions
 **Status**: Local Feature 002 verification completed on 2026-10-18. AWS setup and deployment remain manual user-operated work and were not performed.
 
+**Approval and acceptance boundary**: The specification and existing API contract were approved for client integration by the SmartRail Project Owner on 2026-10-19. Backend implementation and local verification remain supported by the previously recorded evidence; tests were not rerun for this approval update. Approval does not establish production deployment readiness or platform-wide acceptance.
+
 ## Deployment boundary
 
 Complete Feature 002 development and full SmartRail verification in the local environment before AWS deployment. Keep local settings and secrets separate from AWS environment settings. Use deterministic test issuer/JWKS keys and identity fixtures only in isolated tests; do not add a production authentication bypass. AWS resources, IAM, Cognito configuration, RDS, API Gateway, Lambda, SAM and deployment operations are performed manually by the user with step-by-step guidance after local verification. This feature implementation must not provision AWS resources or run AWS deployment commands. The approved AWS architecture remains the target.
@@ -21,7 +23,7 @@ The development connection was resolved from .NET User Secrets. Its effective ta
 
 ## Completed local verification
 
-From the SmartRail repository root, after the implementation tasks are approved and completed:
+From the SmartRail repository root, to reproduce local verification after implementation completion:
 
 ```powershell
 docker compose up -d postgres postgres-test
@@ -78,4 +80,4 @@ No owning Flutter/React feature specifications or client implementation/test evi
 
 The six-project solution and Modular Monolith boundaries remain unchanged. Local configuration is separate from AWS settings. Production role and station-scope maintenance remains deny-by-default pending the governance approvals listed in `plan.md` (authorized operators, bootstrap/separation-of-duties, audit retention/access, environment-specific Cognito values, key rotation/revocation monitoring, and owner-module scope-provider readiness). AWS IAM, Cognito, RDS, API Gateway, Lambda, SAM and deployment resources were not configured or provisioned. These are manual user-operated steps after complete local system verification.
 
-Final local readiness: **GO for Feature 002 local backend use with controlled fixtures and owner-provider limits**. Production activation and overall MVP acceptance remain gated as stated above. `git diff --check` passed on 2026-10-18; final scope review found no changes to Feature 001 endpoint declarations/contracts, no new projects, no production authentication bypass and no AWS deployment operations.
+Final local backend verification: **PASS for Feature 002 with controlled fixtures and owner-provider limits**. This is an implementation and backend verification result only. The specification is approved for client integration; production activation and overall MVP acceptance remain gated as stated above. `git diff --check` passed on 2026-10-18; final scope review found no changes to Feature 001 endpoint declarations/contracts, no new projects, no production authentication bypass and no AWS deployment operations.

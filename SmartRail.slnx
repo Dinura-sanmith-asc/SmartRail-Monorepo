@@ -9,4 +9,7 @@
     <Project Path="tests/SmartRail.IntegrationTests/SmartRail.IntegrationTests.csproj" />
     <Project Path="tests/SmartRail.UnitTests/SmartRail.UnitTests.csproj" />
   </Folder>
+  <Folder Name="/AppHost/">
+    <Project Path="SmartRail.AppHost/SmartRail.AppHost.csproj" />
+  </Folder>
 </Solution>

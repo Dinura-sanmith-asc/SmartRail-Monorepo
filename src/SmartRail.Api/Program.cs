@@ -29,6 +29,7 @@ builder.Services.AddScoped<IAuthorizationHandler, SmartRailAuthorizationHandler>
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SmartRailAuthorizationMiddlewareResultHandler>();
 
 builder.Services.AddSmartRailInfrastructure(builder.Configuration);
+builder.Services.AddHealthChecks();
 builder.Services.AddSmartRailProblemDetails();
 
 const string ReactDevCors = "ReactDevelopment";
@@ -114,6 +115,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHealthChecks("/health").AllowAnonymous();
 app.MapRailwayNetworkEndpoints();
 app.MapIdentityEndpoints();
 app.MapJourneysStatusReadEndpoints();

@@ -1,6 +1,6 @@
 # Tasks: SmartRail Identity & Permissions
 
-**Input**: Approved Feature 002 design documents in `specs/002-identity-permissions/`.
+**Input**: Feature 002 design documents in `specs/002-identity-permissions/`; the specification was approved for client integration by the SmartRail Project Owner on 2026-10-19 as recorded in `spec.md`.
 
 **Prerequisites**: Constitution, `spec.md`, `plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/`, and the requirements checklist.
 
@@ -10,7 +10,7 @@
 
 - `[P]` marks tasks that can proceed concurrently because they edit separate files and have no unfinished task dependency.
 - `[US1]` through `[US4]` trace work to the Feature 002 user stories in `spec.md`.
-- All paths are repository-relative. Tasks are intentionally unchecked; this file does not claim implementation completion.
+- All paths are repository-relative. Checkbox states record the completion state supported by the implementation and verification evidence. Checked tasks describe completed backend work; they do not imply formal specification approval, production deployment readiness, or platform-wide acceptance.
 
 ## Phase 1 — Foundation and Authentication Setup
 

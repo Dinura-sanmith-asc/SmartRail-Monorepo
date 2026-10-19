@@ -2,7 +2,9 @@
 
 **Branch**: `feature-02/Identity-&-Permissions` | **Date**: 2026-10-18 | **Spec**: [spec.md](spec.md)
 
-**Input**: Clarified Feature 002 specification, SmartRail constitution, approved MoSCoW baseline and RBAC/API inventory, and the implemented Feature 001 modular-monolith foundation.
+**Input**: Clarified Feature 002 specification (approved by the SmartRail Project Owner on 2026-10-19 for client integration), SmartRail constitution, approved MoSCoW baseline and RBAC/API inventory, and the implemented Feature 001 modular-monolith foundation.
+
+**Document and delivery status**: The specification was approved on 2026-10-19 for client integration after the recorded backend implementation and local verification. This records the approval chronology and does not establish production deployment readiness or platform-wide acceptance.
 
 ## Summary
 
@@ -44,7 +46,7 @@ Expose only the already-approved authenticated `GET /api/me` operation for this 
 ### Pre-design gate
 
 - **I. Approved scope and traceability — PASS**: SR-089, SR-090, SR-091, SR-093, SR-100 and SR-114 are preserved and mapped to design and test evidence. The historical group-claim wording is visibly superseded by Option B. RBAC grants are not changed.
-- **II. Specification before implementation — PASS**: the clarified Feature 002 spec is the source for this plan. This workflow creates design artifacts only; no tasks or implementation are included.
+- **II. Specification before implementation — exception in recorded chronology**: implementation and verification were recorded complete before the SmartRail Project Owner approved the specification on 2026-10-19. The approval is recorded as occurring on that date; it does not imply prior approval or change the recorded sequence.
 - **III. Modular monolith and inward dependencies — PASS**: all work remains in the existing API, Application, Domain, Infrastructure and two test projects. Domain has no API, EF Core or AWS dependency; Infrastructure implements Application ports; API handles JWT/HTTP enforcement.
 - **IV. Data integrity and explicit sources of truth — PASS**: Cognito owns credentials; PostgreSQL role assignments own active SmartRail roles; Identity owns station-staff station scopes; Driver Operations, Incident Management and Catering Adapter supply their own resource evidence. Every authorization source is explicit.
 - **V. Server-enforced identity, scope and safety — PASS**: role, ownership and target scope are checked on the server. Missing or unverifiable authorization data fails closed. Drivers cannot publish official status; Controller-only actions remain as approved.
@@ -55,7 +57,7 @@ Expose only the already-approved authenticated `GET /api/me` operation for this 
 
 ### Post-design gate
 
-**PASS with production approval gates recorded below.** The design does not depend on public role administration or unapproved role grants. Test fixtures may provide deterministic mapping rows in isolated test databases. Production activation is gated on approving who can provision/revoke mappings and station scopes, audit evidence/retention, and environment-specific Cognito configuration.
+**Design review: PASS with production gates recorded below.** The specification is approved for client integration as recorded in [spec.md](spec.md); this does not approve production deployment. The design does not depend on public role administration or unapproved role grants. Test fixtures may provide deterministic mapping rows in isolated test databases. Production activation is gated on approving who can provision/revoke mappings and station scopes, audit evidence/retention, environment-specific Cognito configuration and monitoring, and owner-module scope-provider readiness.
 
 ## Project Structure
 

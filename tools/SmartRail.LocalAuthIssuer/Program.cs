@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-const string issuer = "http://127.0.0.1:5107";
 const string clientId = "smartrail-local-manual-client";
 var identities = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 {
@@ -13,12 +12,18 @@ var identities = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase
     ["Roleless"] = "smartrail-manual-roleless"
 };
 
+var builder = WebApplication.CreateBuilder(args);
+if (!builder.Environment.IsDevelopment())
+    throw new InvalidOperationException("SmartRail.LocalAuthIssuer may run only in Development.");
+
+var issuer = builder.Configuration["LocalAuth:Issuer"];
+if (!Uri.TryCreate(issuer, UriKind.Absolute, out var issuerUri) ||
+    issuerUri.Scheme != Uri.UriSchemeHttp || !issuerUri.IsLoopback)
+    throw new InvalidOperationException("LocalAuth:Issuer must be an HTTP loopback URL.");
+
 using var rsa = RSA.Create(2048);
 var publicKey = rsa.ExportParameters(false);
 var keyId = "smartrail-local-" + Guid.NewGuid().ToString("N");
-var builder = WebApplication.CreateBuilder(args);
-builder.Environment.EnvironmentName = Environments.Development;
-builder.WebHost.UseUrls(issuer);
 var app = builder.Build();
 
 app.MapGet("/health", () => Results.Json(new { status = "ready", issuer }));

@@ -14,6 +14,15 @@ Run PowerShell from the SmartRail repository root. Ensure the local development 
 
 This sets the API's Development User Secrets issuer and human client ID to the loopback test issuer, and removes the resource audience for these no-audience test JWTs. It does not alter the database connection secret. Environment variables override User Secrets; the script stops if current-session `Authentication__Cognito__*` overrides exist. When finished, restore your prior local issuer/client/audience values with `dotnet user-secrets set` as appropriate. Never use these values in Production or AWS.
 
+## Start both services with Aspire
+
+From the repository root, run:
+
+```powershell
+aspire run --apphost SmartRail.AppHost/SmartRail.AppHost.csproj
+```
+
+Aspire starts the issuer first and waits for its HTTP `/health` check before starting the API. The AppHost uses its `aspire` launch profiles on loopback ports 5108 (issuer) and 5237 (API), so existing standalone services on ports 5107 and 5236 are left untouched. It passes the same issuer endpoint to the issuer metadata/JWT generation and `Authentication:Cognito:Issuer` for API validation. PostgreSQL continues to come from the API's existing Development User Secrets; Aspire does not create or migrate a database. The API retains its configured allowed client IDs and audience policy.
 ## Start the issuer and API
 
 Open separate PowerShell windows at the repository root.
@@ -76,3 +85,15 @@ To get an already expired, correctly signed token for the 401 check, use `GET ht
 5. Call the four public Feature 001 reads without an Authorization header: `GET /api/stations`, `GET /api/routes/{id}/stops`, `GET /api/services?origin={stationId}&destination={stationId}&date=YYYY-MM-DD`, and `GET /api/services/{id}`. They remain anonymous. Their data may be empty until local railway reference data and a schedule are loaded.
 
 This issuer is an isolated development test tool. It is not Cognito, is not production-grade identity infrastructure, and must never be exposed beyond loopback. No AWS or RDS configuration is used.
+
+## Run API and local issuer together with Aspire
+
+From the repository root, run:
+
+```powershell
+aspire run --apphost .\SmartRail.AppHost\SmartRail.AppHost.csproj
+```
+
+Aspire starts the development-only issuer and then SmartRail API after the issuer health check succeeds. The issuer advertises the endpoint URL assigned by Aspire, and the API validates that exact same issuer. The Aspire launch profiles use ports 5108 (issuer) and 5237 (API), leaving the standalone profiles above available on 5107 and 5236. PostgreSQL continues to use the API's existing Development User Secrets connection string; Aspire does not create another database or apply migrations. Client ID and configured audience validation remain enabled as configured for the API.
+
+Use the Aspire issuer and API URLs shown in the dashboard for manual requests. Request tokens from `/issue/Passenger`, `/issue/Driver`, `/issue/StationStaff`, `/issue/Controller` or `/issue/Roleless`, then call `/api/me`. The issuer is loopback-only and refuses to start outside Development. Do not expose its URLs publicly or store tokens in source control or logs.

@@ -4,7 +4,20 @@
 
 **Created**: 2026-10-17
 
-**Status**: Draft
+**Status**: Approved
+
+## Approval Record
+
+- **Feature identifier**: `002-identity-permissions`
+- **Specification version**: Current review candidate (no prior document version recorded)
+- **Current approval status**: Approved for client integration
+- **Approval authority**: SmartRail Project Owner
+- **Approval date**: 2026-10-19
+- **Contract reference**: [Approved Identity & Permissions OpenAPI contract](contracts/identity-permissions.openapi.yaml) and [authorization boundary](contracts/authorization-boundary.md)
+- **Verification evidence reference**: [Feature 002 local verification record](quickstart.md) and [requirements/evidence checklist](checklists/requirements.md)
+- **Outstanding external dependencies**: production Cognito environment configuration and monitoring; role and station-scope assignment governance; readiness of owner-module scope providers; audit retention/access policy; client acceptance for SR-093 and SR-114; platform-wide MVP acceptance.
+
+This approval covers the completed backend specification and its existing API contract for client integration. It does not constitute production deployment approval or full SmartRail platform acceptance. Backend verification evidence is recorded in the linked references; tests were not rerun as part of this approval update.
 
 **Input**: User description: Define the authentication and authorization foundation for SmartRail passenger, driver, station-staff and railway-controller workflows.
 
