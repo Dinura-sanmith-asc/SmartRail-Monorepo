@@ -84,16 +84,16 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 
 ### Tests for User Story 2 (write and observe expected failure before implementation)
 
-- [ ] T025 [P] [US2] Add Station Staff shell and role-union tests in `tests/components/staff-access/station/StationStaffWorkspace.test.tsx` for Station Staff-only, multiple recognized staff roles, and absence of Controller-only affordances unless Controller is also returned.
-- [ ] T026 [P] [US2] Add negative resource-scope route/presentation tests in `tests/components/staff-access/station/resourceScopeBoundary.test.tsx` proving selected station/resource values never create access and the generic shell contains no inferred assignment.
+- [X] T025 [P] [US2] Add Station Staff shell and role-union tests in `tests/components/staff-access/station/StationStaffWorkspace.test.tsx` for Station Staff-only, multiple recognized staff roles, and absence of Controller-only affordances unless Controller is also returned. Focused and full Vitest runs passed.
+- [X] T026 [P] [US2] Add negative resource-scope route/presentation tests in `tests/components/staff-access/station/resourceScopeBoundary.test.tsx` proving selected station/resource values never create access and the generic shell contains no inferred assignment. Focused and full Vitest runs passed.
 - [ ] T027 [P] [US2] Add direct URL and backend-denial browser tests in `tests/e2e/staff-access/station-scope.spec.ts` proving route selection is presentation-only and an owning protected operation's out-of-scope denial reveals no data or success state.
 
 ### Implementation for User Story 2
 
-- [ ] T028 [US2] Implement the generic Station Staff workspace and its navigation affordances in `src/features/staff-access/workspaces/StationStaffWorkspace.tsx` and `src/features/staff-access/workspaces/StationStaffWorkspace.css`; do not show a selected station as assigned scope.
-- [ ] T029 [US2] Implement current-role presentation mapping and multi-role affordance union in `src/features/staff-access/routes/rolePresentation.ts` and integrate it with `src/app/router.tsx`; roles come only from the current `/api/me` response.
-- [ ] T030 [US2] Implement route denial for missing/nonstaff role, wrong role, stale session, and crafted client navigation in `src/features/staff-access/routes/ProtectedRoute.tsx`; ensure backend authorization remains required for every future protected operation.
-- [ ] T031 [US2] Run T025–T027 and record client presentation results and any owning-backend scope fixture dependency in `specs/001-staff-access/quickstart.md`; do not claim this feature itself proves backend resource authorization.
+- [X] T028 [US2] Implement the generic Station Staff workspace and its navigation affordances in `src/features/staff-access/workspaces/StationStaffWorkspace.tsx` and `src/features/staff-access/workspaces/StationStaffWorkspace.css`; do not show a selected station as assigned scope.
+- [X] T029 [US2] Implement current-role presentation mapping and multi-role affordance union in `src/features/staff-access/routes/rolePresentation.ts` and integrate it with `src/app/router.tsx`; roles come only from the current `/api/me` response.
+- [X] T030 [US2] Implement route denial for missing/nonstaff role, wrong role, stale session, and crafted client navigation in `src/features/staff-access/routes/ProtectedRoute.tsx`; ensure backend authorization remains required for every future protected operation.
+- [X] T031 [US2] Run T025–T027 and record client presentation results and any owning-backend scope fixture dependency in `specs/001-staff-access/quickstart.md`; do not claim this feature itself proves backend resource authorization. Results recorded; the unavailable owning-operation fixture remains blocked as documented.
 
 **Checkpoint**: Both staff shells are role-derived, Station Staff is generic, and no client route asserts station/resource permission.
 

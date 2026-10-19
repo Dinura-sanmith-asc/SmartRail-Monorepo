@@ -1,6 +1,6 @@
 # Quickstart: Staff Access Implementation Validation
 
-This guide records completed Milestones A and B for Feature 001. Milestone B implements only Controller managed-login entry, backend identity lookup, and the Controller shell. Station Staff, sign-out, operations workflows, live Cognito/backend acceptance, and production readiness remain outstanding.
+This guide records completed Milestones A and B and the completed client-presentation portion of Milestone C for Feature 001. Milestone C adds the generic Station Staff shell, role-derived navigation, and route protection. Station-scope backend-denial evidence, sign-out, later recovery work, live Cognito/backend acceptance, and production readiness remain outstanding.
 
 ## Prerequisites
 
@@ -53,6 +53,22 @@ Milestone A result at completion: `npm run test -- --run` — 3 test files, 20 t
 
 The browser suite verifies the OIDC library's protocol behavior against a local fixture; it does not contact Cognito, prove the production app-client configuration, or count as live backend acceptance. The API response is intercepted by Playwright/MSW fixtures and does not establish production integration.
 
+## Milestone C evidence (T025–T031)
+
+| Task/check | Result | Evidence |
+|---|---|---|
+| T025 Station Staff shell and role-union tests | PASS | Component tests cover Station Staff-only navigation, no Controller affordance without the Controller role, union navigation for both roles, active navigation, and keyboard operation. |
+| T026 resource-scope presentation boundary | PASS | Component tests verify URL-selected station/resource values do not appear as assignments or grant the Station Staff route; Passenger-only and Controller-only identities are denied. A loading identity shows no protected shell, and removing Station Staff from the current role set removes the shell. |
+| T027 direct URL browser tests | PASS | Local Playwright tests verify unauthenticated direct Station Staff and Controller URLs do not reveal workspace content; selected station/resource query values reveal no assigned scope. |
+| T027 owning-operation backend-denial browser test | BLOCKED | No approved protected operational operation or controlled out-of-scope fixture is available in Feature 001's contract set. No endpoint or operation was invented; this portion remains open with T051. |
+| T028–T030 generic shell, role mapping, and route guard | PASS | `npm run build` and the full test suites passed. Role affordances derive from current `/api/me.roles`; routes require their exact staff role and loading/changed role states fail closed. |
+| Vitest | PASS | `npm run test -- --run` — 9 test files, 75 tests passed. |
+| Playwright | PASS | `npm run test:e2e -- --workers=1` — 10 Chromium tests passed against local OIDC/API fixtures. These are client presentation/protocol checks, not live backend resource authorization. |
+| Lint and build | PASS | `npm run lint` and `npm run build` completed successfully after Milestone C changes. |
+| Live Cognito/backend and production acceptance | BLOCKED | Requires owner-supplied environment configuration, controlled real test identities, CORS/TLS/hosting setup, and production monitoring/deployment readiness. |
+
+The Station Staff shell is generic and displays no assigned station or live operational data. Role-derived navigation and route guards control presentation only. Every future protected operation still requires backend authorization; this milestone makes no station-scoped API call and does not establish resource-scope acceptance.
+
 ## Acceptance checks
 
 1. In-memory component mocks cover managed-login UI and error states. Browser tests use an isolated local authorization-server fixture or controlled protocol harness to exercise redirect/callback state and PKCE S256 challenge/exchange success and mismatch, missing/invalid/replayed callback state, exactly one callback processor/code exchange, cancelled/failed login, callback URL cleanup on success/failure, and expired-session reauthentication. Neither is real Cognito acceptance.
@@ -70,5 +86,5 @@ The browser suite verifies the OIDC library's protocol behavior against a local 
 - `BLOCKED`: execution cannot proceed because a prerequisite is missing, such as Cognito app-client/URI values, test identity, backend base URL/CORS, or deployment setup; name the owner/dependency.
 - `NOT RUN`: the check has not been executed. Do not report a planned check as passed.
 
-Current evidence: Milestones A and B local automated checks are `PASS` as listed above. Station Staff, later recovery/sign-out scope, accessibility manual review, and full feature acceptance remain `NOT RUN` or are tracked in their later task phases. Real Cognito/backend acceptance is `BLOCKED` until environment and controlled test-user configuration is supplied. Backend Feature 002 evidence was not rerun during this implementation milestone.
+Current evidence: Milestones A and B and the client-presentation portion of Milestone C local automated checks are `PASS` as listed above. The owning-operation backend-denial portion of T027 remains `BLOCKED` pending an approved operation and controlled fixture. Later recovery/sign-out scope, accessibility manual review, and full feature acceptance remain `NOT RUN` or are tracked in their later task phases. Real Cognito/backend acceptance is `BLOCKED` until environment and controlled test-user configuration is supplied. Backend Feature 002 evidence was not rerun during this implementation milestone.
 

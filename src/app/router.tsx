@@ -3,6 +3,7 @@ import { CallbackPage } from '../features/staff-access/auth/CallbackPage'
 import { SignInPage } from '../features/staff-access/auth/SignInPage'
 import { ProtectedRoute } from '../features/staff-access/routes/ProtectedRoute'
 import { ControllerWorkspace } from '../features/staff-access/workspaces/ControllerWorkspace'
+import { StationStaffWorkspace } from '../features/staff-access/workspaces/StationStaffWorkspace'
 
 const router = createBrowserRouter([
   { path: '/', element: <SignInPage /> },
@@ -12,6 +13,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute requiredRole="Controller">
         <ControllerWorkspace />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/station-staff/*',
+    element: (
+      <ProtectedRoute requiredRole="Station Staff">
+        <StationStaffWorkspace />
       </ProtectedRoute>
     ),
   },
