@@ -79,6 +79,7 @@ public static class DependencyInjection
         services.AddScoped<InitializeJourneyHandler>();
         services.AddJourneysStatusReadServices();
         services.AddJourneysStatusPublicationServices();
+        services.AddJourneysStatusOwnerBoundaryServices();
         return services;
     }
 }
