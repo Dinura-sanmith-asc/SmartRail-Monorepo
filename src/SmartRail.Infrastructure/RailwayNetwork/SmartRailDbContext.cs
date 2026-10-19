@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartRail.Domain.RailwayNetwork.Entities;
 using SmartRail.Infrastructure.RailwayNetwork.Configurations;
 using SmartRail.Domain.Identity.Entities;
+using SmartRail.Domain.JourneysStatus.Entities;
 
 namespace SmartRail.Infrastructure.RailwayNetwork;
 
@@ -23,6 +24,10 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<RoleAssignmentAudit> RoleAssignmentAudits => Set<RoleAssignmentAudit>();
     public DbSet<StationScopeAssignment> StationScopeAssignments => Set<StationScopeAssignment>();
     public DbSet<StationScopeAssignmentAudit> StationScopeAssignmentAudits => Set<StationScopeAssignmentAudit>();
+    public DbSet<Journey> Journeys => Set<Journey>();
+    public DbSet<JourneyRevision> JourneyRevisions => Set<JourneyRevision>();
+    public DbSet<JourneyRevisionStop> JourneyRevisionStops => Set<JourneyRevisionStop>();
+    public DbSet<JourneyInitializationAudit> JourneyInitializationAudits => Set<JourneyInitializationAudit>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,7 +50,7 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     private void RejectAuditMutation()
     {
         var mutation = ChangeTracker.Entries()
-            .Where(entry => entry.Entity is RoleAssignmentAudit or StationScopeAssignmentAudit)
+            .Where(entry => entry.Entity is RoleAssignmentAudit or StationScopeAssignmentAudit or JourneyInitializationAudit or JourneyRevision)
             .FirstOrDefault(entry => entry.State is EntityState.Modified or EntityState.Deleted);
         if (mutation is not null)
         {

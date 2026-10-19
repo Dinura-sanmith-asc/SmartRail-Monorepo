@@ -227,6 +227,347 @@ namespace SmartRail.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.Journey", b =>
+                {
+                    b.Property<Guid>("JourneyInstanceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_instance_id");
+
+                    b.Property<int>("CurrentRevision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer")
+                        .HasColumnName("current_revision");
+
+                    b.Property<TimeOnly>("FirstDepartureOccurrence")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("first_departure_occurrence");
+
+                    b.Property<string>("InitializationProvenance")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("initialization_provenance");
+
+                    b.Property<DateTimeOffset>("InitializedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("initialized_at");
+
+                    b.Property<string>("InitializedBySubject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("initialized_by_subject");
+
+                    b.Property<DateOnly>("OperationDate")
+                        .HasColumnType("date")
+                        .HasColumnName("operation_date");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("schedule_id");
+
+                    b.Property<int>("ScheduleRevision")
+                        .HasColumnType("integer")
+                        .HasColumnName("schedule_revision");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("service_id");
+
+                    b.Property<string>("SourceInstanceKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("source_instance_key");
+
+                    b.Property<string>("SourceSystem")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("source_system");
+
+                    b.HasKey("JourneyInstanceId")
+                        .HasName("pk_journey");
+
+                    b.HasIndex("ScheduleId", "OperationDate")
+                        .HasDatabaseName("ix_journey_schedule_operation_date");
+
+                    b.HasIndex("ServiceId", "OperationDate")
+                        .HasDatabaseName("ix_journey_service_operation_date");
+
+                    b.HasIndex("SourceSystem", "SourceInstanceKey")
+                        .IsUnique()
+                        .HasDatabaseName("ux_journey_source_key");
+
+                    b.ToTable("journey", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_journey_current_revision_positive", "current_revision > 0");
+
+                            t.HasCheckConstraint("ck_journey_required_text", "length(trim(source_system)) > 0 AND length(trim(source_instance_key)) > 0 AND length(trim(initialized_by_subject)) > 0 AND length(trim(initialization_provenance)) > 0");
+
+                            t.HasCheckConstraint("ck_journey_schedule_revision_positive", "schedule_revision > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.JourneyInitializationAudit", b =>
+                {
+                    b.Property<Guid>("JourneyInitializationAuditId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_initialization_audit_id");
+
+                    b.Property<string>("ActorSubject")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("actor_subject");
+
+                    b.Property<string>("Decision")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("decision");
+
+                    b.Property<TimeOnly?>("FirstDepartureOccurrence")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("first_departure_occurrence");
+
+                    b.Property<Guid?>("JourneyInstanceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_instance_id");
+
+                    b.Property<DateTimeOffset>("OccurredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<DateOnly?>("OperationDate")
+                        .HasColumnType("date")
+                        .HasColumnName("operation_date");
+
+                    b.Property<string>("Provenance")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("provenance");
+
+                    b.Property<Guid?>("ScheduleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("schedule_id");
+
+                    b.Property<int?>("ScheduleRevision")
+                        .HasColumnType("integer")
+                        .HasColumnName("schedule_revision");
+
+                    b.Property<Guid?>("ServiceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("service_id");
+
+                    b.Property<string>("SourceInstanceKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("source_instance_key");
+
+                    b.Property<string>("SourceSystem")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("source_system");
+
+                    b.HasKey("JourneyInitializationAuditId")
+                        .HasName("pk_journey_initialization_audit");
+
+                    b.HasIndex("JourneyInstanceId", "OccurredAt")
+                        .HasDatabaseName("ix_journey_init_audit_journey");
+
+                    b.HasIndex("SourceSystem", "SourceInstanceKey", "OccurredAt")
+                        .HasDatabaseName("ix_journey_init_audit_source");
+
+                    b.ToTable("journey_initialization_audit", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_journey_init_audit_decision", "decision IN ('Accepted','IdempotentReplay','RejectedConflict','RejectedAuthorization','RejectedValidation')");
+
+                            t.HasCheckConstraint("ck_journey_init_audit_revision", "schedule_revision IS NULL OR schedule_revision > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.JourneyRevision", b =>
+                {
+                    b.Property<Guid>("JourneyInstanceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_instance_id");
+
+                    b.Property<int>("Revision")
+                        .HasColumnType("integer")
+                        .HasColumnName("revision");
+
+                    b.Property<Guid?>("CorrectionOfUpdateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("correction_of_update_id");
+
+                    b.Property<Guid?>("DriverObservationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("driver_observation_id");
+
+                    b.Property<int?>("PreviousRevision")
+                        .HasColumnType("integer")
+                        .HasColumnName("previous_revision");
+
+                    b.Property<string>("PrivateAuditEvidence")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)")
+                        .HasColumnName("private_audit_evidence");
+
+                    b.Property<string>("PublicChangeType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("public_change_type");
+
+                    b.Property<string>("PublicationKind")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("publication_kind");
+
+                    b.Property<DateTimeOffset>("PublishedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_at");
+
+                    b.Property<string>("PublishedBySubject")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("published_by_subject");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<Guid?>("UpdateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("update_id");
+
+                    b.HasKey("JourneyInstanceId", "Revision")
+                        .HasName("pk_journey_revision");
+
+                    b.HasIndex("UpdateId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_journey_revision_update_id")
+                        .HasFilter("update_id IS NOT NULL");
+
+                    b.HasIndex("JourneyInstanceId", "PublishedAt")
+                        .HasDatabaseName("ix_journey_revision_published_at");
+
+                    b.HasIndex("JourneyInstanceId", "Revision")
+                        .HasDatabaseName("ix_journey_revision_history");
+
+                    b.ToTable("journey_revision", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_journey_revision_actor", "publication_kind = 'InitializationBaseline' OR (published_by_subject IS NOT NULL AND length(trim(published_by_subject)) > 0)");
+
+                            t.HasCheckConstraint("ck_journey_revision_positive", "revision > 0");
+
+                            t.HasCheckConstraint("ck_journey_revision_previous", "previous_revision IS NULL OR (previous_revision > 0 AND previous_revision < revision)");
+
+                            t.HasCheckConstraint("ck_journey_revision_source", "(publication_kind = 'InitializationBaseline' AND source = 'ScheduledBaseline') OR (publication_kind <> 'InitializationBaseline' AND source IN ('ControllerManual', 'ApprovedRailwayFeed'))");
+
+                            t.HasCheckConstraint("ck_journey_revision_status", "status IN ('Scheduled','Running','Delayed','Interrupted','Cancelled','Completed','Terminated')");
+
+                            t.HasCheckConstraint("ck_journey_revision_update_id", "(publication_kind = 'InitializationBaseline' AND update_id IS NULL) OR (publication_kind <> 'InitializationBaseline' AND update_id IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.JourneyRevisionStop", b =>
+                {
+                    b.Property<Guid>("JourneyInstanceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_instance_id");
+
+                    b.Property<int>("Revision")
+                        .HasColumnType("integer")
+                        .HasColumnName("revision");
+
+                    b.Property<Guid>("JourneyStopId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_stop_id");
+
+                    b.Property<string>("AmbiguityState")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ambiguity_state");
+
+                    b.Property<DateTimeOffset?>("OperationalArrivalAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("operational_arrival_at");
+
+                    b.Property<DateTimeOffset?>("OperationalDepartureAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("operational_departure_at");
+
+                    b.Property<DateTimeOffset?>("PlannedArrivalAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("planned_arrival_at");
+
+                    b.Property<DateTimeOffset?>("PlannedDepartureAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("planned_departure_at");
+
+                    b.Property<string>("Platform")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("platform");
+
+                    b.Property<Guid?>("RouteStopId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("route_stop_id");
+
+                    b.Property<Guid>("StationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("station_id");
+
+                    b.Property<int>("StopOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("stop_order");
+
+                    b.Property<string>("TimingSource")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("timing_source");
+
+                    b.Property<DateTimeOffset?>("TimingUpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("timing_updated_at");
+
+                    b.HasKey("JourneyInstanceId", "Revision", "JourneyStopId")
+                        .HasName("pk_journey_revision_stop");
+
+                    b.HasIndex("RouteStopId");
+
+                    b.HasIndex("StationId")
+                        .HasDatabaseName("ix_journey_stop_station");
+
+                    b.HasIndex("JourneyInstanceId", "Revision", "StopOrder")
+                        .IsUnique()
+                        .HasDatabaseName("ux_journey_stop_revision_order");
+
+                    b.ToTable("journey_revision_stop", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_journey_stop_ambiguity", "ambiguity_state IN ('none','ambiguous')");
+
+                            t.HasCheckConstraint("ck_journey_stop_order_positive", "stop_order > 0");
+
+                            t.HasCheckConstraint("ck_journey_stop_platform_not_blank", "platform IS NULL OR length(trim(platform)) > 0");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.Route", b =>
                 {
                     b.Property<Guid>("RouteId")
@@ -689,6 +1030,56 @@ namespace SmartRail.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_identity_station_scope_audit_assignment");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.Journey", b =>
+                {
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleRevision", null)
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_journey_schedule");
+
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.TrainService", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_journey_service");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.JourneyRevision", b =>
+                {
+                    b.HasOne("SmartRail.Domain.JourneysStatus.Entities.Journey", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyInstanceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_journey_revision_journey");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.JourneysStatus.Entities.JourneyRevisionStop", b =>
+                {
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.RouteStop", null)
+                        .WithMany()
+                        .HasForeignKey("RouteStopId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_journey_stop_route_stop");
+
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.Station", null)
+                        .WithMany()
+                        .HasForeignKey("StationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_journey_stop_station");
+
+                    b.HasOne("SmartRail.Domain.JourneysStatus.Entities.JourneyRevision", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyInstanceId", "Revision")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_journey_stop_revision");
                 });
 
             modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.RouteStop", b =>
