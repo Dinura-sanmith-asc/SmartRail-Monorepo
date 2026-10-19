@@ -16,7 +16,10 @@ public sealed class IdentityOpenApiTests(PostgreSqlTestDatabaseFixture database,
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var root = document.RootElement;
         var paths = root.GetProperty("paths");
-        Assert.Equal(new[] { "/api/me", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}", "/api/stations" }, paths.EnumerateObject().Select(p => p.Name).Order().ToArray());
+        var expectedPaths = new[] { "/api/me", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}", "/api/stations",
+            "/api/journeys/{id}", "/api/journeys/{id}/updates",
+            "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}" };
+        Assert.Equal(expectedPaths.Order(StringComparer.Ordinal), paths.EnumerateObject().Select(p => p.Name).Order(StringComparer.Ordinal).ToArray());
         var me = paths.GetProperty("/api/me").GetProperty("get");
         Assert.Contains(me.GetProperty("security").EnumerateArray(), item => item.TryGetProperty("CognitoAccessToken", out _));
         Assert.True(me.GetProperty("responses").TryGetProperty("200", out var success));

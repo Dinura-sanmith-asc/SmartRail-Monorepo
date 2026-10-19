@@ -69,7 +69,7 @@ public static class JourneyPublicationEndpoints
 
     private static IResult MapResult(JourneyPublicationResult result) => result.Outcome switch
     {
-        JourneyPublicationOutcome.Published when result.State is not null => Results.Ok(JourneySnapshotResponse.From(result.State)),
+        JourneyPublicationOutcome.Published when result.State is not null => Results.Ok(JourneyPublicationResponseMapping.From(result.State)),
         JourneyPublicationOutcome.Invalid => Problem(400),
         JourneyPublicationOutcome.Unauthorized => Problem(403),
         JourneyPublicationOutcome.NotFound => Problem(404),
@@ -111,25 +111,18 @@ public sealed class PublishJourneyStopChangeRequest
     public Guid? CorrectionOfUpdateId { get; init; }
 }
 
-public sealed record JourneySnapshotResponse(Guid JourneyInstanceId, Guid ServiceId, Guid ScheduleId,
-    int ScheduleRevision, DateOnly OperationDate, TimeOnly FirstDepartureOccurrence, int Revision,
-    string Status, DateTimeOffset? PublishedAt, DateTimeOffset? LastUpdatedAt, string Source,
-    IReadOnlyList<JourneyStopResponse> Stops)
+public static class JourneyPublicationResponseMapping
 {
     public static JourneySnapshotResponse From(JourneyPublicationState state)
     {
         var official = state.Revision.PublicationKind != JourneyPublicationKind.InitializationBaseline;
         return new(state.Journey.JourneyInstanceId, state.Journey.ServiceId, state.Journey.ScheduleId,
             state.Journey.ScheduleRevision, state.Journey.OperationDate, state.Journey.FirstDepartureOccurrence,
-            state.Revision.Revision, state.Revision.Status.ToString(), official ? state.Revision.PublishedAt : null,
-            official ? state.Revision.PublishedAt : null, state.Revision.Source.ToString(),
-            state.Stops.Select(stop => new JourneyStopResponse(stop.JourneyStopId, stop.StopOrder, stop.StationId,
+            state.Revision.Revision, state.Revision.Status.ToString(),
+            state.Stops.Select(stop => new JourneyStopResponse(stop.JourneyStopId, stop.StopOrder, stop.StationId, null,
                 stop.PlannedArrivalAt, stop.PlannedDepartureAt, stop.OperationalArrivalAt,
                 stop.OperationalDepartureAt, stop.Platform, stop.TimingSource, stop.TimingUpdatedAt,
-                stop.AmbiguityState)).ToArray());
+                stop.AmbiguityState)).ToArray(), state.Revision.Source.ToString(),
+            official ? state.Revision.PublishedAt : null, official ? state.Revision.PublishedAt : null, null);
     }
 }
-public sealed record JourneyStopResponse(Guid JourneyStopId, int StopOrder, Guid StationId,
-    DateTimeOffset? PlannedArrivalAt, DateTimeOffset? PlannedDepartureAt,
-    DateTimeOffset? OperationalArrivalAt, DateTimeOffset? OperationalDepartureAt,
-    string? Platform, string? TimingSource, DateTimeOffset? TimingUpdatedAt, string Ambiguity);

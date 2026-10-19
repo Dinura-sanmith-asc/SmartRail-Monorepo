@@ -117,6 +117,7 @@ app.UseAuthorization();
 app.MapRailwayNetworkEndpoints();
 app.MapIdentityEndpoints();
 app.MapJourneysStatusReadEndpoints();
+app.MapJourneysStatusPublicationEndpoints();
 
 
 app.Run();

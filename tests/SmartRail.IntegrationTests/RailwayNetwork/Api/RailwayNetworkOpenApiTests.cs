@@ -6,7 +6,7 @@ namespace SmartRail.IntegrationTests.RailwayNetwork.Api;
 public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fixture) : IClassFixture<PostgreSqlTestDatabaseFixture>
 {
     [Fact]
-    public async Task Generated_openapi_matches_the_four_approved_read_paths_and_yaml_contract()
+    public async Task Generated_openapi_preserves_railway_contract_and_exposes_approved_identity_and_journey_paths()
     {
         using var factory = await RailwayNetworkApiTestHost.CreateAsync(fixture);
         using var client = factory.CreateClient();
@@ -19,13 +19,13 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
         var approvedYaml = await File.ReadAllTextAsync(Path.Combine(repository!.FullName,
             "specs", "001-railway-network-search", "contracts", "railway-network.openapi.yaml"));
 
-        var expectedPaths = new[] { "/api/stations", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}" };
+        var expectedRailwayPaths = new[] { "/api/stations", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}" };
+        var expectedFeaturePaths = expectedRailwayPaths.Concat(new[] { "/api/me", "/api/journeys/{id}",
+            "/api/journeys/{id}/updates",
+            "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}" }).ToArray();
         var generatedPaths = paths.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal).ToArray();
-        var generatedRailwayPaths = generatedPaths.Where(path => path != "/api/me").ToArray();
-        Assert.Equal(expectedPaths.Order(StringComparer.Ordinal), generatedRailwayPaths);
-        Assert.Contains("/api/me", generatedPaths);
-        Assert.Equal(expectedPaths.Length + 1, generatedPaths.Length);
-        foreach (var path in expectedPaths)
+        Assert.Equal(expectedFeaturePaths.Order(StringComparer.Ordinal), generatedPaths);
+        foreach (var path in expectedRailwayPaths)
         {
             Assert.Contains(path, approvedYaml, StringComparison.Ordinal);
             Assert.True(paths.GetProperty(path).TryGetProperty("get", out _));

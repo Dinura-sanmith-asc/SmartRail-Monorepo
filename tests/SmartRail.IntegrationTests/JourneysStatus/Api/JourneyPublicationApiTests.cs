@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmartRail.Application.JourneysStatus.Boundaries;
+using SmartRail.Application.JourneysStatus.Publication;
+using SmartRail.Application.Identity.Authorization;
+using SmartRail.Application.Identity.Persistence;
 using SmartRail.Domain.Identity;
 using SmartRail.Domain.JourneysStatus;
 using SmartRail.Infrastructure.JourneysStatus.Initialization;
@@ -124,6 +127,96 @@ public sealed class JourneyPublicationApiTests(PostgreSqlTestDatabaseFixture fix
     }
 
     [Fact]
+    public async Task Controller_without_cancellation_grant_cannot_cancel()
+    {
+        await ResetIsolatedDatabaseAsync();
+        await using var oidc = new LocalOidcFixture();
+        await oidc.InitializeAsync();
+        using var baseFactory = await IdentityApiTestHost.CreateAsync(fixture, oidc, installProbe: false, environment: "Testing", seedRailway: true);
+        using var factory = baseFactory.WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<IJourneyPublicationAuthorization>();
+            services.AddScoped<IJourneyPublicationAuthorization>(provider =>
+                new DenyCancellationAuthorization(provider.GetRequiredService<AuthorizeOperationHandler>()));
+        }));
+        using var client = factory.CreateClient();
+        var journeyId = await SeedJourneyAsync(factory.Services, "cancel-denied-api-" + Guid.NewGuid().ToString("N"));
+        const string subject = "verified-cancellation-denied-controller";
+        await IdentityTestData.GrantRoleAsync(factory.Services, subject, RoleCode.Controller);
+
+        using var request = IdentityTestData.Bearer(HttpMethod.Patch, $"/api/operations/journeys/{journeyId}/status", oidc.CreateToken(subject));
+        request.Content = JsonContent.Create(new { expectedJourneyRevision = 1, status = "Cancelled" });
+        using var response = await client.SendAsync(request);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+        Assert.Equal(1, await db.Journeys.Where(x => x.JourneyInstanceId == journeyId).Select(x => x.CurrentRevision).SingleAsync());
+        Assert.Equal(1, await db.JourneyRevisions.CountAsync(x => x.JourneyInstanceId == journeyId));
+    }
+
+    [Theory]
+    [InlineData(RoleCode.Controller, true)]
+    [InlineData(RoleCode.Driver, false)]
+    [InlineData(RoleCode.StationStaff, false)]
+    public async Task Current_role_mapping_controls_publication_and_revocation(RoleCode role, bool canPublish)
+    {
+        await ResetIsolatedDatabaseAsync();
+        await using var oidc = new LocalOidcFixture();
+        await oidc.InitializeAsync();
+        using var factory = await IdentityApiTestHost.CreateAsync(fixture, oidc, installProbe: false, environment: "Testing", seedRailway: true);
+        using var client = factory.CreateClient();
+        var journeyId = await SeedJourneyAsync(factory.Services, "role-api-" + Guid.NewGuid().ToString("N"));
+        var subject = "verified-role-" + role + "-" + Guid.NewGuid().ToString("N");
+        var assignmentId = await IdentityTestData.GrantRoleAsync(factory.Services, subject, role);
+
+        using var request = IdentityTestData.Bearer(HttpMethod.Patch, $"/api/operations/journeys/{journeyId}/status", oidc.CreateToken(subject));
+        request.Content = JsonContent.Create(new { expectedJourneyRevision = 1, status = "Delayed" });
+        using var response = await client.SendAsync(request);
+        Assert.Equal(canPublish ? HttpStatusCode.OK : HttpStatusCode.Forbidden, response.StatusCode);
+
+        if (role == RoleCode.Controller)
+        {
+            using var dbScope = factory.Services.CreateScope();
+            var repository = dbScope.ServiceProvider.GetRequiredService<IRoleAssignmentRepository>();
+            Assert.True(await repository.RevokeAsync(assignmentId, "test-revoker", DateTimeOffset.UtcNow,
+                Guid.NewGuid(), "integration-test"));
+            using var revokedRequest = IdentityTestData.Bearer(HttpMethod.Patch, $"/api/operations/journeys/{journeyId}/status", oidc.CreateToken(subject));
+            revokedRequest.Content = JsonContent.Create(new { expectedJourneyRevision = 2, status = "Interrupted" });
+            using var revoked = await client.SendAsync(revokedRequest);
+            Assert.Equal(HttpStatusCode.Forbidden, revoked.StatusCode);
+            Assert.Equal(2, await dbScope.ServiceProvider.GetRequiredService<SmartRailDbContext>().Journeys
+                .Where(x => x.JourneyInstanceId == journeyId).Select(x => x.CurrentRevision).SingleAsync());
+        }
+
+        await using var checkScope = factory.Services.CreateAsyncScope();
+        var db = checkScope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+        Assert.Equal(canPublish ? 2 : 1, await db.JourneyRevisions.CountAsync(x => x.JourneyInstanceId == journeyId));
+    }
+
+    [Fact]
+    public async Task Unavailable_current_role_evidence_fails_closed()
+    {
+        await ResetIsolatedDatabaseAsync();
+        await using var oidc = new LocalOidcFixture();
+        await oidc.InitializeAsync();
+        using var factory = await IdentityApiTestHost.CreateAsync(fixture, oidc, installProbe: false, environment: "Testing", seedRailway: true);
+        using var client = factory.CreateClient();
+        var journeyId = await SeedJourneyAsync(factory.Services, "role-unavailable-api-" + Guid.NewGuid().ToString("N"));
+        const string subject = "verified-role-unavailable-controller";
+        await IdentityTestData.GrantRoleAsync(factory.Services, subject, RoleCode.Controller);
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+            await db.Database.ExecuteSqlRawAsync("DROP TABLE identity_role_assignment CASCADE");
+        }
+
+        using var request = IdentityTestData.Bearer(HttpMethod.Patch, $"/api/operations/journeys/{journeyId}/status", oidc.CreateToken(subject));
+        request.Content = JsonContent.Create(new { expectedJourneyRevision = 1, status = "Delayed" });
+        using var response = await client.SendAsync(request);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Invalid_optional_driver_observation_is_unavailable_and_anonymous_write_is_unauthorized()
     {
         await ResetIsolatedDatabaseAsync();
@@ -176,5 +269,24 @@ public sealed class JourneyPublicationApiTests(PostgreSqlTestDatabaseFixture fix
     {
         public Task<DriverObservationVerification> VerifyAsync(string verifiedActorSubject, Guid observationId,
             Guid journeyInstanceId, CancellationToken cancellationToken = default) => Task.FromResult(result);
+    }
+
+    private sealed class DenyCancellationAuthorization(AuthorizeOperationHandler authorization) : IJourneyPublicationAuthorization
+    {
+        public async Task<PublicationAuthorizationDecision> AuthorizeAsync(string verifiedSubject, Guid journeyInstanceId,
+            SmartRail.Domain.Identity.PermissionAction action, CancellationToken cancellationToken = default)
+        {
+            if (action == SmartRail.Domain.Identity.PermissionAction.ConfirmJourneyCancellation)
+                return new(PublicationAuthorizationOutcome.Denied);
+
+            var result = await authorization.HandleAsync(new(new VerifiedPrincipal(verifiedSubject), action,
+                ProtectedResource.Journey(journeyInstanceId)), cancellationToken);
+            return result.Outcome switch
+            {
+                AuthorizationOutcome.Allowed => new(PublicationAuthorizationOutcome.Allowed),
+                AuthorizationOutcome.Unavailable => new(PublicationAuthorizationOutcome.Unavailable),
+                _ => new(PublicationAuthorizationOutcome.Denied)
+            };
+        }
     }
 }
