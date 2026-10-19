@@ -106,10 +106,10 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 ### Live automatic-update integration gate — BLOCKED
 
 - [X] T029 [US3] Implement the approved prototype HTTP polling policy in `src/features/station-display/api/station-departure-adapter.ts`, using the verified Journeys & Status v1.0.0 station-departures endpoint, configurable `VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS` (default 30000 ms), non-overlapping requests, per-request Colombo date calculation, stale/revalidation behavior, and deterministic automated tests. The interval is prototype client policy, not a production freshness SLA, backend delivery guarantee, or cache expiry threshold.
-- [ ] T030 [US3] **BLOCKED - T029 required**: Add live browser verification in `e2e/station-live-contract.spec.ts`, run only through opt-in `npm run test:e2e:live`, proving a published authoritative backend change reaches the board automatically without manual reload; assert no latency target unless separately approved.
+- [ ] T030 [US3] **BLOCKED - dedicated migrated development/test API, seeded current-date journey, and authorized Controller test identity required**: Run `npm run test:e2e:live` with the required isolated test settings. The live Playwright test uses the existing authorized stop-change PATCH, then verifies the published station-departure revision reaches Chromium by the configured poll without reload; assert no production latency target. Do not mark complete until the real backend publication and automatic display update pass.
 - [ ] T031 [US3] **CONDITIONAL / BLOCKED - T024 required**: Add use of `GET /api/journeys/{id}/updates` in `src/features/station-display/api/station-update-adapter.ts` only if the approved departures contract cannot provide the required change detection; first record that backend decision in `contracts/README.md`.
 
-**Checkpoint**: Fixture auto-update can be verified independently; live SR-058 remains blocked until the backend update contract is approved and tested.
+**Checkpoint**: Fixture auto-update and the T029 prototype client polling are verified independently. Live SR-058 remains blocked until T030's authorized backend change is observed in Chromium.
 
 ---
 

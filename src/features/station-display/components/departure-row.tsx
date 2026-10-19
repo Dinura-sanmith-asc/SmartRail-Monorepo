@@ -8,7 +8,11 @@ interface DepartureRowProps {
 export function DepartureRow({ departure }: DepartureRowProps) {
   return (
     <li className="departure-board__item">
-      <article aria-label={`${departure.serviceLabel} departure`} className="departure-row">
+      <article
+        aria-label={`${departure.serviceLabel} departure`}
+        className="departure-row"
+        data-departure-id={departure.departureId}
+      >
         <div className="departure-row__layout">
           <div className="departure-row__identity">
         <h3>{departure.serviceLabel}{departure.identityAmbiguous ? ' — ambiguous identity' : ''}</h3>

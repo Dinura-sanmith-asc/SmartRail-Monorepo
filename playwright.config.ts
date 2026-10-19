@@ -23,12 +23,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium-fixture',
-      testIgnore: '**/station-live-contract.spec.ts',
+      testIgnore: '**/station-live-*.spec.ts',
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'chromium-live',
-      testMatch: '**/station-live-contract.spec.ts',
+      testMatch: '**/station-live-*.spec.ts',
       use: { ...devices['Desktop Chrome'] },
     },
   ],
@@ -41,6 +41,7 @@ export default defineConfig({
       VITE_STATION_ID: process.env.VITE_STATION_ID ?? '10000000-0000-0000-0000-000000000001',
       VITE_API_BASE_URL: process.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:4173/api',
       VITE_STATION_DISPLAY_SOURCE: process.env.VITE_STATION_DISPLAY_SOURCE ?? 'fixture',
+      STATION_DISPLAY_LIVE_CONTROLLER_TOKEN: '',
     },
   },
 })
