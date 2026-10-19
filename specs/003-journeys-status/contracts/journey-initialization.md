@@ -30,7 +30,7 @@ The actor and accepted timestamp are server-derived. Reject missing IDs/keys, ma
 | Case | Result |
 |---|---|
 | New source key, valid linkage, authorized actor | Issue/persist one journey ID, initial snapshot, and accepted audit evidence atomically. |
-| Same source key and same ID/linkage/provenance identity | Idempotent success returning the existing journey; do not append a second journey. An optional replay audit can be appended if approved retention policy requires it. |
+| Same source key and same authoritative journey ID/linkage | Idempotent success returning the existing journey; do not append a second journey. Provenance is retained as source evidence but does not change identity equality. An optional replay audit can be appended if approved retention policy requires it. |
 | Same source key with different ID or linkage | Reject; do not alter journey; append a conflict audit in a separate transaction. |
 | Same journey ID with a different source key/linkage | Reject and audit conflict; never merge or rebind. |
 | Different authoritative IDs with identical schedule linkage | Preserve both as distinct journeys; do not place a uniqueness constraint on the linkage composite. Passenger selection must expose ambiguity where public descriptors cannot distinguish them. |
@@ -39,7 +39,7 @@ The actor and accepted timestamp are server-derived. Reject missing IDs/keys, ma
 
 ## Transaction and audit invariants
 
-- A successful initialization creates the root, initial revision, initial stop snapshot, and accepted audit in a single PostgreSQL transaction.
+- A successful initialization creates the root, a baseline revision without a public `UpdateId`, initial stop snapshot, and accepted internal audit in a single PostgreSQL transaction. The baseline and internal audit are excluded from `GET /api/journeys/{id}/updates`.
 - Unique `(source_system, source_instance_key)` and the journey primary key provide race-safe duplicate protection. A concurrent identical replay resolves to the committed row; a concurrent conflicting write is rejected and audited.
 - Conflict auditing occurs only after the candidate state transaction has been rolled back/rejected, in a separate append-only transaction. Thus rejected state does not partially persist while conflict evidence can be retained.
 - Audit captures decision, source key/system, candidate or accepted journey identity, schedule linkage, provenance, actor when verified, and server timestamp. Never store JWTs, passwords, signing keys, or unbounded raw manifest payloads.

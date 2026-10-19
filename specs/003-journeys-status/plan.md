@@ -51,7 +51,7 @@ Add dated operational journeys to the existing six-project .NET 10 modular monol
 
 ### Post-design gate
 
-**PASS for technical planning, with implementation and production gates recorded.** The two business/API gates are approved. Production journey-initialization authority, operator/source-key governance, and audit retention/approval remain operational gates; use a deny-all implementation default until those are explicitly approved. Proposed station-departure query semantics and update-history pagination are listed as contract details for review before task generation/implementation, not as approved business rules.
+**PASS with production approval gates recorded.** The Gate 1 identity and Gate 2 API decisions, and the six follow-up contract details approved on 2026-10-19, are operative. There are no remaining contract-detail approvals before task generation. Production journey-initialization authority, operator/source-key governance, and audit retention/approval remain operational gates; use a deny-all implementation default until those are explicitly approved. See the synchronized OpenAPI and feature documents for station-local date behavior, update ordering/contents, stop identity, public field restrictions, Driver evidence errors, and the single `UpdateId` model.
 
 ## Project Structure
 
@@ -89,7 +89,7 @@ These are proposed feature folders in existing projects, not new projects. Follo
 
 ## Delivery and Verification Approach
 
-1. Confirm proposed schema details listed in `research.md` that affect query behavior before implementation tasks.
+1. Use the approved contract semantics in `spec.md` and OpenAPI as the source for implementation tasks; preserve the separately open production initialization authority gate.
 2. Add Domain types and lifecycle/identity invariants; add Application ports and handlers without framework dependencies.
 3. Add Infrastructure mappings, repository transactions, revision concurrency, controlled initializer, and additive migration.
 4. Add the five API operations and safe Problem Details mappings; bind existing Feature 002 actions to resource-aware authorization.

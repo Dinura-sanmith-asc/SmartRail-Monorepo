@@ -41,8 +41,8 @@ The PostgreSQL fixture creates and drops an isolated database. A missing test se
 ## Feature test evidence expected
 
 - Domain/Application tests: approved status transition graph; terminal correction; role/scope denial; initialization validation and idempotency decisions; ambiguity is never auto-selected.
-- PostgreSQL integration tests: additive migration, schedule/station FK behavior, unique source idempotency, distinct IDs sharing the composite, conflict audit, append-only revisions, atomic stop snapshots, rollback, and one-writer/one-409 concurrent updates.
-- API tests: exactly five approved endpoints; anonymous public projections; Controller authorization and current scope; 400/401/403/404/409/503 mappings; no tokens/claims/SQL leakage; same revision in consistent reads; F001 and F002 regression suite.
+- PostgreSQL integration tests: additive migration, schedule/station FK behavior, unique source idempotency, distinct IDs sharing the composite, conflict audit, append-only revisions with one `UpdateId` per official publication, same-journey correction references, atomic stop snapshots, rollback, and one-writer/one-409 concurrent updates.
+- API tests: exactly five approved endpoints; `date` filtering by station-local scheduled departure date in Asia/Colombo while preserving operationDate; overnight and diverted-stop cases with no invented times; complete ascending public update history excluding initialization; stable stop IDs and rejection of duplicate/foreign IDs; Controller authorization and current scope; observation verification 400/404/409/503 plus existing 401/403; no private evidence leakage; same revision in consistent reads; F001 and F002 regression suite.
 - Test fixtures may invoke the internal initializer under a deterministic test authority. No public initialization route or Development/Production authentication bypass is allowed.
 
 ## OpenAPI and contract review
@@ -53,9 +53,9 @@ After implementation, run the API in a local Development environment using the e
 
 The migration has not been generated or applied by this plan. When its task is authorized, add the EF migration named `JourneysStatus` with EF-generated ID, inspect the generated Up/Down operations and shared snapshot, then apply it first to an isolated port-5433 test database. Do not edit prior migration files. Apply to `smartrail_dev` only under a separately approved local verification step; never run EF commands against AWS/RDS as part of Feature 003.
 
-## Current contract-review items
+## Approved contract details
 
-Before creating implementation tasks, resolve the review items in [research.md](research.md): station departure date semantics for overnight journeys, update-history pagination/retention needs, stable stop ID behavior after diversion, public correction/source vocabulary, and invalid/missing observation reference responses. These are intentionally visible; do not silently add business thresholds or endpoints.
+The six contract decisions approved on 2026-10-19 are synchronized in the spec and OpenAPI: station-local date filtering, update-history content/order, stable diverted-stop identity, closed public metadata, Driver observation failure behavior, and one `UpdateId` stored with each official publication revision. No arbitrary pagination cap is added. Production initialization authority and audit governance remain approval gates; test initialization is limited to isolated fixtures.
 
 ## AWS boundary
 

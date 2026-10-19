@@ -23,7 +23,7 @@ Feature 001 Service ──< ScheduleRevision ──< ServiceOperationDate
 
 JourneyInitializationSource 1──< Journey
 Journey 1──< JourneyRevision 1──< JourneyRevisionStop
-   │                 └──< JourneyUpdateEvidence
+   └──< JourneyInitializationAudit (private, separate lifecycle)
    └── current_revision (optimistic concurrency token)
 ```
 
@@ -40,7 +40,7 @@ Aggregate/root for one dated operational instance.
 | `ScheduleId` | UUID, required FK | Exact published Feature 001 schedule revision identity. |
 | `ScheduleRevision` | integer, required | Revision value copied for explicit contract linkage; enforce matching referenced revision. |
 | `OperationDate` | PostgreSQL `date`, required | Journey's approved operating-date anchor; not changed by later stop times crossing midnight. |
-| `FirstDepartureOccurrence` | `time without time zone` plus approved occurrence discriminator if available | Schedule-linkage value for the first calling-point departure. It is not unique across journeys. See unresolved occurrence contract question. |
+| `FirstDepartureOccurrence` | Feature 001 scheduled departure occurrence value | Schedule-linkage value for the first calling point. It is not unique across journeys and does not determine `JourneyInstanceId`; distinct authoritative IDs may share it. |
 | `SourceSystem` | bounded string, required | Issuing manifest/feed namespace. |
 | `SourceInstanceKey` | bounded string, required | Stable idempotency key within source system. Unique with `SourceSystem`. |
 | `InitializedAt` | `timestamptz`, required | Server-recorded accepted initialization instant. |
@@ -52,22 +52,24 @@ No unique constraint is placed on service/schedule/date/occurrence. Distinct aut
 
 ### JourneyRevision
 
-Immutable snapshot of official state after one successful publication.
+Immutable snapshot of journey state. Each official operational publication has one `UpdateId` on its revision. The initial journey baseline is not a public operational update and has no `UpdateId`.
 
 | Field | Type/constraint | Purpose |
 |---|---|---|
 | `JourneyInstanceId`, `Revision` | composite PK; restrictive FK to Journey | Stable ordered history for one journey. |
+| `UpdateId` | nullable UUID, unique when present | Exactly one immutable public update identity for an official operational publication; null only on initialization baseline revisions that are not operational publications. |
 | `Status` | recognized domain value | Resulting official status after the event. |
-| `PublicationKind` | recognized value | Status, stop change, route diversion, correction, initialization/snapshot. |
+| `PublicationKind` | recognized value | Status, stop change, route diversion, correction, or private initialization baseline. |
 | `PreviousRevision` | nullable positive integer | Revision from which this publication was made. |
 | `PublishedAt` | server-generated `timestamptz`, required | Authoritative publication instant. |
 | `PublishedBySubject` | opaque verified subject, required for Controller publication | Private audit actor; not in public response. |
-| `Source` | safe bounded classification | Manual Controller publication or another approved source category; no claim of a feed not used. |
-| `ChangeEvidence` | structured, validated JSON or normalized values | Changed fields and evidence needed to reconstruct the publication. Exclude credentials. |
+| `Source` | enum: `ScheduledBaseline`, `ControllerManual`, `ApprovedRailwayFeed` | Safe source classification. `ScheduledBaseline` applies only to an unpublished operational baseline; official update revisions use the source that actually supplied them. |
+| `PublicChangeType` and validated public fields | typed/normalized values; no unrestricted JSON projection | Status, stop/platform/timing, diversion stop-set, or correction change details; only explicit whitelisted fields are returned publicly. |
+| `PrivateAuditEvidence` | private structured/normalized values | Evidence needed for audit; never included in public projection. Do not store credentials or raw tokens. |
 | `DriverObservationId` | nullable opaque owner ID | Optional verified Driver Operations observation reference. Feature 003 does not own referenced observation. |
-| `CorrectionOfUpdateId` | nullable UUID | Link to prior immutable update when this publication corrects it. |
+| `CorrectionOfUpdateId` | nullable UUID, same-journey FK to an earlier revision's `UpdateId` | Link to an earlier immutable operational update corrected by this publication. |
 
-The pair `(JourneyInstanceId, Revision)` is unique. Append-only behavior is enforced in application persistence and a DbContext audit-mutation guard; database permissions/trigger policy may provide additional protection if operationally approved. A normal update appends; it does not update prior revisions.
+The pair `(JourneyInstanceId, Revision)` is unique. `UpdateId` has a unique constraint; correction references resolve only to an earlier revision on the same journey. A database check/application invariant requires `UpdateId` on official operational publication revisions and leaves it null only for the initial baseline. Append-only behavior is enforced in application persistence and tested; database permissions/trigger policy may provide additional protection if operationally approved. A normal update appends; it does not update prior revisions. This revision row is the sole authoritative publication history; no parallel `JourneyUpdate`/`JourneyUpdateEvidence` table is created.
 
 ### JourneyRevisionStop
 
@@ -85,7 +87,7 @@ Full ordered calling-point snapshot for a specific journey revision.
 | `TimingSource`, `TimingUpdatedAt` | nullable safe source and `timestamptz` | Freshness/evidence for operational timing. |
 | `AmbiguityState` | recognized value | Allows passenger departure projection to flag identical public descriptors; never silently auto-select. |
 
-The full set of stops for a revision is inserted atomically. Unique `(JourneyInstanceId, Revision, StopOrder)` enforces order uniqueness. For diversion, retained stops keep stable `JourneyStopId`; newly added stops receive new IDs; prior revisions retain removed stops. Verify stop-ID semantics before implementation as identified in `research.md`.
+The full set of stops for a revision is inserted atomically. Unique `(JourneyInstanceId, Revision, StopOrder)` enforces order uniqueness. For diversion, a caller supplies the current `JourneyStopId` to retain that identity; omitted IDs mean newly added stops and receive server-generated IDs. Do not infer identity from station ID or order. Reject duplicate, malformed, invalid, or foreign IDs with no partial write. Prior revisions retain removed stops.
 
 ### JourneyInitializationAudit
 
@@ -103,10 +105,6 @@ Append-only record of initialization decisions and conflicts.
 
 Audit writes are append-only. For conflicting identity, no Journey state is written; the conflict audit is appended in a separate transaction after rejection. Restrictive FKs are used only for accepted known journey/schedule relationships so rejected evidence can be recorded safely.
 
-### JourneyUpdateEvidence (optional normalized table)
-
-If change evidence cannot be represented safely and queryably in `JourneyRevision`, use one append-only event table with UUID `UpdateId`, journey/revision FK, source, verified actor, server time, optional observation ID, correction reference, and validated change payload. Do not duplicate the same authoritative history in two competing tables. Finalize one persistence representation during implementation task design.
-
 ## Lifecycle and revision invariants
 
 - Only the approved transition graph in `spec.md` is valid. Terminal states are closed to normal updates; a correction is a new linked revision.
@@ -115,6 +113,8 @@ If change evidence cannot be represented safely and queryably in `JourneyRevisio
 - Journey current revision, revision event, and complete revision-stop set are committed in one PostgreSQL transaction.
 - No two revisions share the same `(JourneyInstanceId, Revision)`; revision numbers advance by one under the aggregate concurrency protocol.
 - A Driver observation reference is verified through Driver Operations before commit; it never supplies official status automatically.
+- If included, a Driver observation must be accessible through its owner and associated with the target journey/current operational context. Malformed ID is 400; missing/inaccessible is 404; stale/revoked/incompatible is 409; unavailable owner verification is 503. Existing 401/403 behavior is preserved; failure never creates a publication.
+- Each official operational publication creates one immutable `UpdateId` on its `JourneyRevision`; corrections link to earlier `UpdateId` values on the same journey. Public history selects only revisions with an official-update ID, sorts ascending by revision, and excludes initialization baselines and `JourneyInitializationAudit` records.
 - The initialized schedule link must match an existing Feature 001 service, published schedule revision, operation-date completeness entry, and first-call occurrence. Missing or superseded source data is not treated as a successful empty journey.
 - Public projection contains only published journey/station details, source class, revision and timestamps; raw actor subject and observation reference remain private.
 
@@ -126,10 +126,14 @@ If change evidence cannot be represented safely and queryably in `JourneyRevisio
 - Unique `(journey_instance_id, revision)` on revision.
 - Unique `(journey_instance_id, revision, stop_order)` and PK/FK on revision stops.
 - Index `(station_id, operation_date)` through the current revision-stop projection/read path for station departures; verify with `EXPLAIN` before adding denormalization.
-- Index `(journey_instance_id, published_at DESC)` for update history.
+- Unique `update_id`; index `(journey_instance_id, revision)` for ordered update history and `(journey_instance_id, published_at)` for time-based diagnostics.
 - FKs to Feature 001 schedule/service/date/station records and internal revision rows use restrictive delete behavior. Historical journey/audit data must not disappear when a reusable schedule is retired.
 - Checks: positive revisions and stop order, required source/id fields, nonempty IDs, valid lifecycle values, publication time present, and valid expected/revision linkage.
 - No uniqueness on the composite service/schedule/date/occurrence; doing so contradicts Gate 1.
+
+## Station departure date projection
+
+`GET /api/stations/{id}/departures?date=YYYY-MM-DD` interprets `date` as the station-local calendar date in `Asia/Colombo`. For a planned call, derive the date from its known scheduled departure instant. Keep the journey's `OperationDate` unchanged in the response, including for overnight journeys whose later station departure falls on the next calendar date. For a diversion-only station stop without a scheduled departure, use its verified published operational departure instant to determine its local calendar date. If neither scheduled nor operational departure is available, do not assign the stop to a requested date; retain the missing time as null and never synthesize it. Results may use the known effective departure instant for stable sorting, then `JourneyInstanceId`; unknown-time stops are not date-filtered into the result.
 
 ## Migration approach
 

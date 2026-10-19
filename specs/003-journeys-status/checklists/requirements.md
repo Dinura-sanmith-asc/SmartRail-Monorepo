@@ -16,6 +16,7 @@
 - [x] No [TBD] markers remain
 - [x] No [NEEDS CLARIFICATION] markers remain — approved clarification and gate decisions are recorded in the spec
 - [x] Requirements are fully testable and unambiguous — Gate 1 identity and Gate 2 operation schemas/semantics are approved and recorded in `spec.md`
+- [x] Follow-up contract details are explicitly approved and synchronized: station-local departure date, history ordering/content, stop identity, public metadata, Driver-observation errors, and one UpdateId per official publication
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
@@ -27,6 +28,7 @@
 ## Feature Readiness
 
 - [x] All functional requirements have complete acceptance criteria — approved identity, diversion, audit/correction, observation-reference, revision, and ambiguity behavior is recorded in `spec.md`
+- [x] Overnight/diverted departure dates, no-invented-time handling, update-history inclusion/exclusion, and invalid stop-reference outcomes are testable
 - [x] User scenarios cover primary flows
 - [x] Feature outcomes are measurable in the Success Criteria
 - [x] No unapproved implementation choices leak into the specification — approved operation schemas are recorded to resolve Gate 2; implementation technology and deployment detail remain for planning
@@ -42,5 +44,7 @@
 - Approved clarification directions are recorded in `spec.md`: allow multiple journey instances per service/date; require explicit transitions and auditable corrections; retain the current operation boundary without adding routes.
 - The approved lifecycle now specifies transition paths, cancellation/termination/completion meanings, audited terminal corrections, and stale-revision rejection.
 - Gate 1 business and Gate 2 API-schema approvals are recorded in `spec.md`. Journey-initialization authority mapping and client/other-module acceptance evidence remain separate operational and downstream gates; they are not claimed complete by this specification.
+- The six follow-up contract decisions approved on 2026-10-19 are operative across `spec.md`, planning documents, and OpenAPI. `GET /api/journeys/{id}/updates` excludes initialization snapshots and private initialization audit events; each official operational publication has one immutable `UpdateId` stored with its `JourneyRevision`.
+- Production initialization authority, source-key governance, and audit retention remain operational approval gates. These do not add public operations or alter the five approved routes or RBAC grants.
 - Client-owned and other-module-owned acceptance checks remain open until their owning specifications and test evidence exist.
 - Approved source documents are read-only; this feature specification does not amend them.

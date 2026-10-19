@@ -37,7 +37,12 @@ paths:
       tags: [Journeys]
       operationId: getJourneyUpdates
       summary: Get published updates for a journey
-      description: Returns immutable public update projections. A valid journey with no updates returns an empty array. Raw actor subjects and Driver observation IDs are omitted.
+      description: >-
+        Returns the complete public operational update history in ascending
+        journey revision order, with no arbitrary page limit. The initial
+        snapshot and private initialization audit events are excluded. A valid
+        journey with no operational updates returns an empty array. Raw actor
+        subjects, private evidence and Driver observation IDs are omitted.
       security: []
       parameters:
       - $ref: '#/components/parameters/JourneyId'
@@ -58,12 +63,18 @@ paths:
       operationId: getStationDepartures
       summary: Get dated journey departures at a station
       description: >-
-        Returns public departure projections for the requested operation date.
+        Returns public departure projections for the requested station-local
+        calendar date in Asia/Colombo, based on scheduled departure time where
+        present. The original journey operationDate is returned separately.
         Each journey's snapshot is internally consistent and carries its own
-        revision. Identical public descriptors remain separate and are marked
-        ambiguous; the service never chooses one automatically. The exact
-        operation-date versus station-local-date interpretation is a planning
-        review item recorded in research.md.
+        revision. Order known departure instants ascending, then journey ID as a
+        deterministic tie-break. Identical public descriptors remain separate and are marked
+        ambiguous; the service never chooses one automatically. The station-local
+        date of an overnight departure is determined at the station, while the
+        journey retains its original operationDate. A diversion-only stop
+        without scheduled departure uses a verified published operational
+        departure time; without either known time it is not assigned to a date
+        result. Missing times are never invented.
       security: []
       parameters:
       - name: id
@@ -71,10 +82,10 @@ paths:
         required: true
         description: Existing Feature 001 station UUID.
         schema: {type: string, format: uuid}
-      - name: operationDate
+      - name: date
         in: query
         required: true
-        description: YYYY-MM-DD date used to select dated journey instances; interpretation is subject to the contract review noted above.
+        description: Station-local scheduled departure calendar date in Asia/Colombo (YYYY-MM-DD). For a diversion-only stop with no scheduled departure, a verified published operational departure time determines its local date; if neither is known, the stop is not assigned to a date result.
         schema: {type: string, format: date}
       responses:
         '200':
@@ -173,12 +184,12 @@ components:
       schema: {type: string, format: uuid}
   responses:
     BadRequest:
-      description: Invalid identifier, date, status, revision value, or change payload
+      description: Invalid identifier, date, status, revision value, malformed Driver observation reference, or duplicate/invalid/foreign diversion stop reference. No partial publication is committed.
       content:
         application/problem+json:
           schema: {$ref: '#/components/schemas/Problem'}
     Unauthorized:
-      description: Missing, invalid, or expired Cognito access token
+      description: Missing, invalid, or expired Cognito access token. Existing Feature 002 behavior is preserved.
       content:
         application/problem+json:
           schema: {$ref: '#/components/schemas/Problem'}
@@ -188,17 +199,17 @@ components:
         application/problem+json:
           schema: {$ref: '#/components/schemas/Problem'}
     NotFound:
-      description: Journey, station, or journey stop does not exist or is not available for this public projection
+      description: Journey, station, stop, or supplied Driver observation is missing or inaccessible; inaccessible observations do not reveal cross-resource existence.
       content:
         application/problem+json:
           schema: {$ref: '#/components/schemas/Problem'}
     Conflict:
-      description: Expected journey revision is stale, or the requested transition conflicts with current state
+      description: Expected journey revision is stale, transition conflicts with current state, or supplied Driver observation evidence is stale, revoked, or incompatible with the target journey.
       content:
         application/problem+json:
           schema: {$ref: '#/components/schemas/Problem'}
     Unavailable:
-      description: Authorization, schedule, or required owner evidence is unavailable; no write is committed
+      description: Authorization, schedule, or required Driver Operations owner verification is unavailable; no write is committed.
       content:
         application/problem+json:
           schema: {$ref: '#/components/schemas/Problem'}
@@ -216,9 +227,9 @@ components:
         firstDepartureOccurrence: {type: string, format: time}
         revision: {type: integer, minimum: 1}
         status: {$ref: '#/components/schemas/JourneyStatus'}
-        source: {type: string, description: Safe public source classification.}
-        publishedAt: {type: string, format: date-time}
-        lastUpdatedAt: {type: string, format: date-time}
+        source: {$ref: '#/components/schemas/PublicSource'}
+        publishedAt: {type: [string, 'null'], format: date-time, description: Null until an official operational publication exists; schedule baseline time is not presented as a journey update.}
+        lastUpdatedAt: {type: [string, 'null'], format: date-time}
         eta:
           oneOf:
           - {$ref: '#/components/schemas/Estimate'}
@@ -254,17 +265,18 @@ components:
       required: [value, source, updatedAt, freshness]
       properties:
         value: {type: string, format: date-time}
-        source: {type: string}
+        source: {$ref: '#/components/schemas/PublicSource'}
         updatedAt: {type: string, format: date-time}
         freshness: {type: string, enum: [current, stale, lastKnown]}
     StationDeparture:
       type: object
       additionalProperties: false
-      required: [journeyInstanceId, serviceId, operationDate, revision, status, stationId, stopOrder, scheduledDepartureAt, ambiguity]
+      required: [journeyInstanceId, serviceId, operationDate, stationLocalDepartureDate, revision, status, stationId, stopOrder, scheduledDepartureAt, ambiguity]
       properties:
         journeyInstanceId: {type: string, format: uuid}
         serviceId: {type: string, format: uuid}
         operationDate: {type: string, format: date}
+        stationLocalDepartureDate: {type: string, format: date, description: Station-local calendar date used to match this departure in Asia/Colombo.}
         revision: {type: integer, minimum: 1}
         status: {$ref: '#/components/schemas/JourneyStatus'}
         stationId: {type: string, format: uuid}
@@ -273,23 +285,107 @@ components:
         scheduledDepartureAt: {type: [string, 'null'], format: date-time}
         operationalDepartureAt: {type: [string, 'null'], format: date-time}
         platform: {type: [string, 'null']}
-        source: {type: string}
+        source: {$ref: '#/components/schemas/PublicSource'}
         updatedAt: {type: string, format: date-time}
         ambiguity: {type: string, enum: [none, ambiguous]}
+    PublicSource:
+      type: string
+      enum: [ScheduledBaseline, ControllerManual, ApprovedRailwayFeed]
+      description: Safe public source classification. ScheduledBaseline identifies a pre-update schedule projection; operational updates use ControllerManual or ApprovedRailwayFeed only when that source supplied the publication.
+    OperationalUpdateSource:
+      type: string
+      enum: [ControllerManual, ApprovedRailwayFeed]
+      description: Source classification for official operational updates only.
     JourneyUpdate:
       type: object
       additionalProperties: false
-      required: [updateId, journeyInstanceId, revision, kind, status, source, publishedAt]
+      required: [updateId, journeyInstanceId, revision, kind, status, source, publishedAt, publicChange]
       properties:
         updateId: {type: string, format: uuid}
         journeyInstanceId: {type: string, format: uuid}
         revision: {type: integer, minimum: 1}
-        kind: {type: string, enum: [initialization, status, stopChange, routeDiversion, correction]}
+        kind: {type: string, enum: [status, stopChange, routeDiversion, correction], description: Must match publicChange; correction uses changeType correction and a same-journey earlier correctionOfUpdateId.}
         status: {$ref: '#/components/schemas/JourneyStatus'}
-        source: {type: string}
+        source: {$ref: '#/components/schemas/OperationalUpdateSource'}
         publishedAt: {type: string, format: date-time}
-        correctionOfUpdateId: {type: [string, 'null'], format: uuid}
-        publicChange: {type: object, additionalProperties: true}
+        correctionOfUpdateId: {type: [string, 'null'], format: uuid, description: Required for a correction and must identify an earlier UpdateId on the same journey.}
+        publicChange: {$ref: '#/components/schemas/PublicChange'}
+      allOf:
+      - if:
+          properties:
+            kind: {const: correction}
+        then:
+          required: [correctionOfUpdateId]
+          properties:
+            correctionOfUpdateId: {type: string, format: uuid}
+      - if:
+          properties:
+            correctionOfUpdateId: {type: string}
+        then:
+          properties:
+            kind: {const: correction}
+    PublicChange:
+      oneOf:
+      - {$ref: '#/components/schemas/StatusPublicChange'}
+      - {$ref: '#/components/schemas/StopPublicChange'}
+      - {$ref: '#/components/schemas/RouteDiversionPublicChange'}
+      - {$ref: '#/components/schemas/CorrectionPublicChange'}
+      discriminator:
+        propertyName: changeType
+    StatusPublicChange:
+      type: object
+      additionalProperties: false
+      required: [changeType, status]
+      properties:
+        changeType: {type: string, const: status}
+        status: {$ref: '#/components/schemas/JourneyStatus'}
+    StopPublicChange:
+      type: object
+      additionalProperties: false
+      required: [changeType, journeyStopId]
+      properties:
+        changeType: {type: string, const: stopChange}
+        journeyStopId: {type: string, format: uuid}
+        platform: {type: [string, 'null']}
+        operationalArrivalAt: {type: [string, 'null'], format: date-time}
+        operationalDepartureAt: {type: [string, 'null'], format: date-time}
+      anyOf:
+      - required: [platform]
+      - required: [operationalArrivalAt]
+      - required: [operationalDepartureAt]
+    RouteDiversionPublicChange:
+      type: object
+      additionalProperties: false
+      required: [changeType, divertedStops]
+      properties:
+        changeType: {type: string, const: routeDiversion}
+        divertedStops:
+          type: array
+          items: {$ref: '#/components/schemas/PublicDivertedStop'}
+    CorrectionPublicChange:
+      type: object
+      additionalProperties: false
+      required: [changeType, correctedChange]
+      properties:
+        changeType: {type: string, const: correction}
+        correctedChange:
+          oneOf:
+          - {$ref: '#/components/schemas/StatusPublicChange'}
+          - {$ref: '#/components/schemas/StopPublicChange'}
+          - {$ref: '#/components/schemas/RouteDiversionPublicChange'}
+    PublicDivertedStop:
+      type: object
+      additionalProperties: false
+      required: [journeyStopId, stationId, stopOrder]
+      properties:
+        journeyStopId: {type: string, format: uuid}
+        stationId: {type: string, format: uuid}
+        stopOrder: {type: integer, minimum: 1}
+        scheduledArrivalAt: {type: [string, 'null'], format: date-time}
+        scheduledDepartureAt: {type: [string, 'null'], format: date-time}
+        operationalArrivalAt: {type: [string, 'null'], format: date-time}
+        operationalDepartureAt: {type: [string, 'null'], format: date-time}
+        platform: {type: [string, 'null']}
     PublishJourneyStatusRequest:
       type: object
       additionalProperties: false
@@ -302,12 +398,10 @@ components:
           additionalProperties: false
           required: [stops]
           properties:
-            reason: {type: string}
             stops:
               type: array
-              minItems: 2
               items: {$ref: '#/components/schemas/DivertedStop'}
-        driverObservationId: {type: [string, 'null'], format: uuid, description: Optional verified Driver Operations evidence reference; never returned in public projections.}
+        driverObservationId: {type: [string, 'null'], format: uuid, description: Optional Driver Operations reference. When supplied, successful owner verification and association with the target journey are required; this ID is never returned publicly.}
         correctionOfUpdateId: {type: [string, 'null'], format: uuid}
       anyOf:
       - required: [status]
@@ -316,7 +410,15 @@ components:
       type: object
       additionalProperties: false
       required: [stationId, stopOrder]
+      description: >-
+        Include journeyStopId to retain an existing stop identity. Omit it for a
+        new calling point; the server creates its ID. IDs must be unique within
+        the replacement set and belong to the current target journey revision.
+        Duplicate, malformed, invalid, or foreign references are rejected with
+        400 and cause no partial publication. Removed stops remain in prior
+        immutable revisions.
       properties:
+        journeyStopId: {type: string, format: uuid, description: Omit for a new stop; include the current same-journey ID to retain identity.}
         stationId: {type: string, format: uuid}
         stopOrder: {type: integer, minimum: 1}
         routeStopId: {type: [string, 'null'], format: uuid}
@@ -334,7 +436,7 @@ components:
         platform: {type: [string, 'null']}
         operationalArrivalAt: {type: [string, 'null'], format: date-time}
         operationalDepartureAt: {type: [string, 'null'], format: date-time}
-        driverObservationId: {type: [string, 'null'], format: uuid}
+        driverObservationId: {type: [string, 'null'], format: uuid, description: If supplied, successful owner verification and association with the target journey are required; never returned publicly.}
         correctionOfUpdateId: {type: [string, 'null'], format: uuid}
       anyOf:
       - required: [platform]
