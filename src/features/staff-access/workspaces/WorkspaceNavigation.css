@@ -1,0 +1,4 @@
+.workspace-signout:focus-visible {
+  outline: 3px solid #f0a800;
+  outline-offset: 3px;
+}

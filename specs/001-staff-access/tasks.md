@@ -107,18 +107,18 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 
 ### Tests for User Story 3 (write and observe expected failure before implementation)
 
-- [ ] T032 [P] [US3] Add access-state integration tests in `tests/components/staff-access/recovery/AccessRecovery.test.tsx` for unauthenticated route, callback cancel/failure, 401 reauthentication without replay, 403 safe denial on a protected operation only, 503 authority-unavailable, empty roles, malformed identity, offline, and timeout.
-- [ ] T033 [P] [US3] Add accessibility tests in `tests/components/staff-access/recovery/AccessRecovery.accessibility.test.tsx` for keyboard-only sign-in/retry/navigation, visible focus, accessible names, status announcements, and meaning that does not rely on color.
-- [ ] T034 [P] [US3] Add safe-output tests in `tests/unit/staff-access/recovery/safeDiagnostics.test.ts` injecting tokens, private claims, authorization internals, and raw Problem Details into failures and asserting none appear in rendered messages or diagnostics.
-- [ ] T035 [P] [US3] Add expiry, reload, and browser-storage security audit tests in `tests/e2e/staff-access/session-expiry.spec.ts`; prove access, ID, and refresh tokens are absent from localStorage, sessionStorage, application cookies, persistent application caches, browser URLs/history, and client diagnostic logs; prove only temporary OAuth transaction state/PKCE verifier is retained across redirect separately from token-bearing session state and is cleaned after success/failure; prove full-page refresh without memory session requires reauthentication and expiry closes protected content without action replay.
+- [X] T032 [P] [US3] Add access-state integration tests in `tests/components/staff-access/recovery/AccessRecovery.test.tsx` for unauthenticated route, callback cancel/failure, 401 reauthentication without replay, 403 safe denial on a protected operation only, 503 authority-unavailable, empty roles, malformed identity, offline, and timeout. Focused and full Vitest runs passed.
+- [X] T033 [P] [US3] Add accessibility tests in `tests/components/staff-access/recovery/AccessRecovery.accessibility.test.tsx` for keyboard-only sign-in/retry/navigation, visible focus, accessible names, status announcements, and meaning that does not rely on color. Six automated tests passed; no manual screen-reader claim is made.
+- [X] T034 [P] [US3] Add safe-output tests in `tests/unit/staff-access/recovery/safeDiagnostics.test.ts` injecting tokens, private claims, authorization internals, and raw Problem Details into failures and asserting none appear in rendered messages or diagnostics. Two tests passed; the 403 request is a generic fetch fixture and defines no backend endpoint.
+- [X] T035 [P] [US3] Add expiry, reload, and browser-storage security audit tests in `tests/e2e/staff-access/session-expiry.spec.ts`; prove access, ID, and refresh tokens are absent from localStorage, sessionStorage, application cookies, persistent application caches, browser URLs/history, and client diagnostic logs; prove only temporary OAuth transaction state/PKCE verifier is retained across redirect separately from token-bearing session state and is cleaned after success/failure; prove full-page refresh without memory session requires reauthentication and expiry closes protected content without action replay. Three local-fixture Chromium tests passed; no live integration is implied.
 
 ### Implementation for User Story 3
 
-- [ ] T036 [US3] Implement safe authentication and identity recovery states in `src/features/staff-access/auth/AuthRecovery.tsx` and `src/features/staff-access/identity/IdentityRecovery.tsx`; distinguish 401, 403, 503, malformed response, timeout, offline, and no-role outcomes.
-- [ ] T037 [US3] Implement expiry handling and protected-state clearing in `src/features/staff-access/auth/sessionLifecycle.ts` and `src/features/staff-access/identity/IdentityProvider.tsx`; require fresh managed login and never silently renew or replay a protected action.
-- [ ] T038 [US3] Implement safe retry and response redaction behavior in `src/features/staff-access/identity/currentIdentityClient.ts` and `src/shared/api/safeError.ts`; retry must call the same authenticated contract and must not convert 503 into empty roles.
-- [ ] T039 [US3] Complete keyboard, focus, live-region, and accessible status behavior in `src/shared/ui/AccessState.tsx`, `src/features/staff-access/auth/SignInPage.tsx`, and the workspace navigation components.
-- [ ] T040 [US3] Run T032–T035 and record results in `specs/001-staff-access/quickstart.md`; distinguish automated accessibility assertions from any manual screen-reader check.
+- [X] T036 [US3] Implement safe authentication and identity recovery states in `src/features/staff-access/auth/AuthRecovery.tsx` and `src/features/staff-access/identity/IdentityRecovery.tsx`; distinguish 401, 403, 503, malformed response, timeout, offline, and no-role outcomes.
+- [X] T037 [US3] Implement expiry handling and protected-state clearing in `src/features/staff-access/auth/sessionLifecycle.ts` and `src/features/staff-access/identity/IdentityProvider.tsx`; require fresh managed login and never silently renew or replay a protected action.
+- [X] T038 [US3] Implement safe retry and response redaction behavior in `src/features/staff-access/identity/currentIdentityClient.ts` and `src/shared/api/safeError.ts`; retry must call the same authenticated contract and must not convert 503 into empty roles. Recovery retry reuses `getCurrentIdentity`; existing contract classification/redaction is exercised by the 503, 401, and safe-diagnostics tests.
+- [X] T039 [US3] Complete keyboard, focus, live-region, and accessible status behavior in `src/shared/ui/AccessState.tsx`, `src/features/staff-access/auth/SignInPage.tsx`, and the workspace navigation components. Automated accessibility tests passed; manual screen-reader verification remains outstanding.
+- [X] T040 [US3] Run T032–T035 and record results in `specs/001-staff-access/quickstart.md`; distinguish automated accessibility assertions from any manual screen-reader check. Evidence and integration limits are recorded.
 
 **Checkpoint**: Every specified unavailable/denied state fails closed, is accessible, and exposes no sensitive details.
 
@@ -132,16 +132,16 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 
 ### Tests for User Story 4 (write and observe expected failure before implementation)
 
-- [ ] T041 [P] [US4] Add local sign-out unit/component tests in `tests/components/staff-access/signout/SignOut.test.tsx` for clearing in-memory identity/token, protected data cache, route state, and active transaction state before remote navigation.
-- [ ] T042 [P] [US4] Add Cognito logout URL tests in `tests/unit/staff-access/auth/cognitoLogout.test.ts` requiring HTTPS managed-login `/logout`, configured `client_id`, URL-encoded registered `logout_uri`, and no generic `post_logout_redirect_uri` assumption or access-token-revocation claim.
-- [ ] T043 [P] [US4] Add browser sign-out tests in `tests/e2e/staff-access/signout-history.spec.ts` for configured remote logout navigation, unavailable/failed navigation fallback, direct protected URL, browser Back, and no protected request after local sign-out.
+- [X] T041 [P] [US4] Add local sign-out unit/component tests in `tests/components/staff-access/signout/SignOut.test.tsx` for clearing in-memory identity/token, protected data cache, route state, and active transaction state before remote navigation. Five sign-out ordering/fallback/idempotency tests and one delayed `/api/me` sign-out race test passed; the app has no separate protected-data cache.
+- [X] T042 [P] [US4] Add Cognito logout URL tests in `tests/unit/staff-access/auth/cognitoLogout.test.ts` requiring HTTPS managed-login `/logout`, configured `client_id`, URL-encoded registered `logout_uri`, and no generic `post_logout_redirect_uri` assumption or access-token-revocation claim. URL validation and missing-configuration tests passed.
+- [X] T043 [P] [US4] Add browser sign-out tests in `tests/e2e/staff-access/signout-history.spec.ts` for configured remote logout navigation, unavailable/failed navigation fallback, direct protected URL, browser Back, and no protected request after local sign-out. Four Chromium tests passed for Controller, Station Staff, multi-role, and remote-navigation failure fixtures.
 
 ### Implementation for User Story 4
 
-- [ ] T044 [US4] Implement local-first sign-out and transaction/cache cleanup in `src/features/staff-access/auth/signOut.ts` and wire the accessible control into `src/features/staff-access/workspaces/WorkspaceNavigation.tsx`.
-- [ ] T045 [US4] Implement Cognito managed-login remote logout URL construction/navigation in `src/features/staff-access/auth/cognitoLogout.ts` using configured `client_id` and registered allowed `logout_uri`; if configuration or navigation fails, retain the signed-out local entry and never claim token revocation.
-- [ ] T046 [US4] Implement protected route revalidation and browser-history safety after sign-out in `src/app/router.tsx` and `src/features/staff-access/routes/ProtectedRoute.tsx`; do not restore cached protected views.
-- [ ] T047 [US4] Run T041–T043 and record local logout and remote logout test results separately in `specs/001-staff-access/quickstart.md`.
+- [X] T044 [US4] Implement local-first sign-out and transaction/cache cleanup in `src/features/staff-access/auth/signOut.ts` and wire the accessible control into `src/features/staff-access/workspaces/WorkspaceNavigation.tsx`. The local session gate closes routes before OIDC removal; no independent protected-data cache exists.
+- [X] T045 [US4] Implement Cognito managed-login remote logout URL construction/navigation in `src/features/staff-access/auth/cognitoLogout.ts` using configured `client_id` and registered allowed `logout_uri`; if configuration or navigation fails, retain the signed-out local entry and never claim token revocation. Missing logout URI is allowed for local sign-out fallback; no secret or token is placed in the URL.
+- [X] T046 [US4] Implement protected route revalidation and browser-history safety after sign-out in `src/app/router.tsx` and `src/features/staff-access/routes/ProtectedRoute.tsx`; do not restore cached protected views. The local termination gate plus replace-to-entry navigation passed direct URL, Back/Forward, and no-replay tests.
+- [X] T047 [US4] Run T041–T043 and record local logout and remote logout test results separately in `specs/001-staff-access/quickstart.md`. Full Vitest, Playwright, lint, and build results are recorded for Milestone E.
 
 **Checkpoint**: Local logout removes access even when Cognito remote logout is unavailable; no global revocation behavior is implied.
 
@@ -162,7 +162,7 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 
 **Purpose**: Verify traceability, accessible/security behavior, the full client test suite, and documentation evidence without overstating environment-dependent acceptance.
 
-- [ ] T052 Review source, tests, and `specs/001-staff-access/quickstart.md` against the SR/FR/SC traceability matrix below; mark only checks with recorded evidence PASS and leave external checks BLOCKED or NOT RUN.
+- [X] T052 Review source, tests, and `specs/001-staff-access/quickstart.md` against the SR/FR/SC traceability matrix below; mark only checks with recorded evidence PASS and leave external checks BLOCKED or NOT RUN. Evidence: F1 source and automated-test review plus the requirement-by-requirement evidence matrix and dependency register in `specs/001-staff-access/quickstart.md`.
 - [ ] T053 Run manual keyboard and representative screen-reader checks after T052, and record assistive technology/browser versions and outcomes in `specs/001-staff-access/quickstart.md`.
 - [ ] T054 Run `npm run lint` and `npm run build` after T053; record actual command output/status in `specs/001-staff-access/quickstart.md`.
 - [ ] T055 Run `npm run test -- --run` and `npm run test:e2e` after T054; record actual command output/status and fixture/environment boundary in `specs/001-staff-access/quickstart.md`.
@@ -254,7 +254,7 @@ Task: T035 expiry/reload browser tests in tests/e2e/staff-access/session-expiry.
 
 ## Notes
 
-- Every task is unchecked at generation time; no implementation or tests are claimed complete.
+- Task checkboxes record implementation or review work completed with evidence; the accepted baseline alone is not completion evidence.
 - `[P]` means separate-file ownership with no unmet dependency, not merely that work could be delegated.
 - The approved backend identity contract is `GET /api/me` with `subject` and current `roles`; it provides no station scope and defines 200, 401, and 503, not 403.
 - Cognito sign-out uses its managed-login `/logout` contract with `client_id` and registered `logout_uri`. Local state is cleared first; failure of remote navigation cannot restore local access.

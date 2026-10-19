@@ -36,6 +36,12 @@ describe('parseRuntimeConfig', () => {
     expect(() => parseRuntimeConfig({ VITE_SMARTRAIL_API_BASE_URL: validEnvironment.VITE_SMARTRAIL_API_BASE_URL })).toThrow(RuntimeConfigError)
   })
 
+  it('allows the app to remain usable for local sign-out when remote logout is not configured', () => {
+    const environment = { ...validEnvironment }
+    delete (environment as Partial<typeof validEnvironment>).VITE_COGNITO_LOGOUT_URI
+    expect(parseRuntimeConfig(environment).cognito.logoutUri).toBeNull()
+  })
+
   it('rejects malformed endpoint and redirect URLs', () => {
     expect(() =>
       parseRuntimeConfig({

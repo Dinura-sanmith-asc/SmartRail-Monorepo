@@ -34,3 +34,18 @@ export function createTransactionStateStore(): StateStore {
   }
   return new WebStorageStateStore({ store: window.sessionStorage, prefix: 'smartrail.oidc.transaction.' })
 }
+
+/** Remove only temporary OIDC redirect transactions, never token-bearing user data. */
+export function clearTransactionState(): void {
+  if (typeof window === 'undefined') return
+  try {
+    const storage = window.sessionStorage
+    const prefix = 'smartrail.oidc.transaction.'
+    for (let index = storage.length - 1; index >= 0; index -= 1) {
+      const key = storage.key(index)
+      if (key?.startsWith(prefix)) storage.removeItem(key)
+    }
+  } catch {
+    // Storage may be unavailable; callers still invalidate local access.
+  }
+}

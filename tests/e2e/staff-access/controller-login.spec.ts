@@ -220,7 +220,7 @@ test.describe('Controller managed-login browser protocol (mocked local fixture)'
     await beginSignIn(page)
     await expect(page.getByRole('heading', { name: /controller workspace/i })).toBeVisible()
 
-    await expect(page.getByRole('alert').filter({ hasText: /authentication is required/i })).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible({ timeout: 10_000 })
     await expectControllerWorkspaceHidden(page)
   })
 })

@@ -11,14 +11,15 @@ export type IdentityState =
   | { status: 'authority-unavailable' }
   | { status: 'error'; failure: SafeFailureKind }
 
-export type IdentityContextValue = { state: IdentityState }
+export type IdentityContextValue = { state: IdentityState; retryIdentity?: () => void }
 
-export const IdentityContext = createContext<IdentityContextValue>({ state: { status: 'loading' } })
+export const IdentityContext = createContext<IdentityContextValue>({ state: { status: 'loading' }, retryIdentity: () => undefined })
 
 export function useIdentity() {
   const context = useContext(IdentityContext)
   return {
     ...context,
+    retryIdentity: context.retryIdentity ?? (() => undefined),
     identity: context.state.status === 'authenticated' ? context.state.identity : null,
   }
 }

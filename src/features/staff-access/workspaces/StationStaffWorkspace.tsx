@@ -1,12 +1,7 @@
-import { NavLink } from 'react-router'
-import { useIdentity } from '../identity/identityContext'
-import { getWorkspaceAffordances } from '../routes/rolePresentation'
+import { WorkspaceNavigation } from './WorkspaceNavigation'
 import './StationStaffWorkspace.css'
 
 export function StationStaffWorkspace() {
-  const { identity } = useIdentity()
-  const affordances = getWorkspaceAffordances(identity?.roles ?? [])
-
   return (
     <main className="app-shell station-staff-shell" aria-labelledby="station-staff-heading">
       <header className="station-staff-shell__header">
@@ -16,13 +11,7 @@ export function StationStaffWorkspace() {
           Your operational workspace is ready. Station and resource access is checked by the relevant service.
         </p>
       </header>
-      <nav className="workspace-navigation" aria-label="Operations navigation">
-        {affordances.map(({ role, label, href }) => (
-          <NavLink key={role} to={href} end className="workspace-navigation__link">
-            {label}
-          </NavLink>
-        ))}
-      </nav>
+      <WorkspaceNavigation />
       <section className="station-staff-shell__content" aria-label="Station Staff workspace">
         <p>Operational services are not shown in this workspace.</p>
       </section>

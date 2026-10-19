@@ -5,7 +5,7 @@ export type PublicRuntimeConfig = {
     managedLoginDomain: string
     appClientId: string
     callbackUri: string
-    logoutUri: string
+    logoutUri: string | null
     scopes: string[]
   }
 }
@@ -44,6 +44,12 @@ function absoluteUrl(environment: Environment, key: string, trimRootSlash = fals
     : parsed.toString()
 }
 
+function optionalAbsoluteUrl(environment: Environment, key: string): string | null {
+  const value = environment[key]
+  if (typeof value !== 'string' || !value.trim()) return null
+  return absoluteUrl(environment, key)
+}
+
 export function parseRuntimeConfig(environment: Environment): PublicRuntimeConfig {
   if (Object.keys(environment).some((key) => /CLIENT_SECRET/i.test(key))) {
     throw new RuntimeConfigError('Client secrets are not allowed in public runtime configuration')
@@ -61,7 +67,7 @@ export function parseRuntimeConfig(environment: Environment): PublicRuntimeConfi
       managedLoginDomain: absoluteUrl(environment, 'VITE_COGNITO_MANAGED_LOGIN_DOMAIN', true),
       appClientId: requiredValue(environment, 'VITE_COGNITO_APP_CLIENT_ID'),
       callbackUri: absoluteUrl(environment, 'VITE_COGNITO_CALLBACK_URI'),
-      logoutUri: absoluteUrl(environment, 'VITE_COGNITO_LOGOUT_URI'),
+      logoutUri: optionalAbsoluteUrl(environment, 'VITE_COGNITO_LOGOUT_URI'),
       scopes: [...new Set(scopes)],
     },
   }

@@ -4,6 +4,7 @@ import { parseRuntimeConfig, RuntimeConfigError } from '../config/runtimeConfig'
 import { RuntimeConfigContext, useRuntimeConfig } from '../config/runtimeConfigContext'
 import { createOidcConfig } from '../features/staff-access/auth/oidcConfig'
 import { StaffAuthProvider } from '../features/staff-access/auth/AuthProvider'
+import { buildCognitoLogoutUrl } from '../features/staff-access/auth/cognitoLogout'
 
 export function RuntimeConfigProvider({ children }: { children: ReactNode }) {
   const result = useMemo(() => {
@@ -39,6 +40,13 @@ export function ConfiguredAuthProvider({ children }: { children: ReactNode }) {
       return { settings: null, unavailable: true }
     }
   }, [config])
+  const remoteLogoutUrl = useMemo(() => {
+    try {
+      return buildCognitoLogoutUrl(config)
+    } catch {
+      return null
+    }
+  }, [config])
   if (setup.unavailable || !setup.settings) {
     return (
       <main role="alert">
@@ -47,5 +55,5 @@ export function ConfiguredAuthProvider({ children }: { children: ReactNode }) {
       </main>
     )
   }
-  return <StaffAuthProvider settings={setup.settings} apiBaseUrl={config.apiBaseUrl}>{children}</StaffAuthProvider>
+  return <StaffAuthProvider settings={setup.settings} apiBaseUrl={config.apiBaseUrl} remoteLogoutUrl={remoteLogoutUrl}>{children}</StaffAuthProvider>
 }
