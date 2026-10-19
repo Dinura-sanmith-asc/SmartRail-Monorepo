@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:smartrail_passenger/app/app_config.dart';
 import 'package:smartrail_passenger/core/network/http_api_client.dart';
 import 'package:smartrail_passenger/features/railway_search/data/railway_network_api.dart';
+import 'package:smartrail_passenger/features/railway_search/data/railway_search_repository_impl.dart';
+import 'package:smartrail_passenger/features/railway_search/domain/railway_search_repository.dart';
 
 typedef HttpClientFactory = http.Client Function();
 
@@ -36,3 +38,7 @@ final railwayApiClientProvider = Provider<RailwayNetworkApi>((ref) {
     ),
   );
 });
+
+final railwaySearchRepositoryProvider = Provider<RailwaySearchRepository>(
+  (ref) => RailwaySearchRepositoryImpl(ref.watch(railwayApiClientProvider)),
+);

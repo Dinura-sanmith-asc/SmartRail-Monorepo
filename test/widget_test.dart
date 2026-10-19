@@ -2,7 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smartrail_passenger/app/app.dart';
 import 'package:smartrail_passenger/app/app_config.dart';
+import 'package:smartrail_passenger/app/providers.dart';
 import 'package:smartrail_passenger/app/router.dart';
+import 'package:smartrail_passenger/features/railway_search/domain/railway_models.dart';
+import 'package:smartrail_passenger/features/railway_search/domain/railway_search_repository.dart';
 
 void main() {
   testWidgets('all foundation routes build and use the normal back stack', (
@@ -11,6 +14,9 @@ void main() {
     appRouter.go(AppRoutes.search);
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [
+          railwaySearchRepositoryProvider.overrideWithValue(_FakeRepository()),
+        ],
         child: SmartRailApp(
           config: AppConfig.fromValue('https://api.smartrail.example'),
         ),
@@ -18,10 +24,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.textContaining('Temporary placeholder: railway search'),
-      findsOneWidget,
-    );
+    expect(find.text('Search railway services'), findsOneWidget);
+    expect(find.text('No published stations are available.'), findsOneWidget);
 
     final resultsPop = appRouter.push<void>(AppRoutes.results);
     await tester.pumpAndSettle();
@@ -51,9 +55,23 @@ void main() {
     appRouter.pop();
     await tester.pumpAndSettle();
     await resultsPop;
-    expect(
-      find.textContaining('Temporary placeholder: railway search'),
-      findsOneWidget,
-    );
+    expect(find.text('Search railway services'), findsOneWidget);
   });
+}
+
+class _FakeRepository implements RailwaySearchRepository {
+  @override
+  Future<List<Station>> listStations() async => const [];
+
+  @override
+  Future<ServiceSearchResponse> search(SearchCriteria criteria) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ServiceDetail> getService(String serviceId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<RouteStops> getRouteStops(String routeId) =>
+      throw UnimplementedError();
 }
