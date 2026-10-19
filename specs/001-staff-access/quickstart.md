@@ -185,10 +185,10 @@ Perform this only in a controlled, approved test environment with a non-producti
 
 | Check | Result | Evidence boundary |
 |---|---|---|
-| `npm run lint` | Pending F1 execution | Record actual result after this section is completed. |
-| `npm run build` | Pending F1 execution | Record actual result after this section is completed. |
-| `npm run test -- --run` | Pending F1 execution | Record actual result after this section is completed. |
-| `npm run test:e2e` | Pending F1 execution | Record actual result after this section is completed; browser tests use local fixtures. |
-| `git diff --check` | Pending F1 execution | Record actual result after all documentation changes. |
-| Changed-file/security boundary review | Pending F1 execution | Confirm no backend/API/requirement changes or secret material after reviewing the final diff. |
+| `npm run lint` | `PASS` | Completed successfully; no lint diagnostics. |
+| `npm run build` | `PASS` | Completed successfully; TypeScript build and Vite production bundle generated. |
+| `npm run test -- --run` | `PASS` on sequential rerun | 16 test files and 110 tests passed. The first attempt was run concurrently with other commands and failed to start workers (16 worker startup errors); the serialized rerun passed. |
+| `npm run test:e2e -- --workers=1` | `PASS` | 17 Chromium tests passed against the local OIDC/API fixture. The initial default 10-worker run had 15 passes and 2 timing failures under concurrent CPU load; the serialized run passed. No live Cognito/backend acceptance was run. |
+| `git diff --check` | `PASS` | Final check exited successfully; only Git's expected LF-to-CRLF working-copy notice appeared. |
+| Changed-file/security boundary review | `PASS` for the current working diff | The only modified path is this quickstart. No backend/API/approved-requirement changes or secret material are present in the diff; `.env.example` is a tracked placeholder-only template with reserved `.invalid` hosts and no credentials. Existing implementation source was reviewed for token storage, redaction, session expiry, and logout boundaries as summarized above. |
 
