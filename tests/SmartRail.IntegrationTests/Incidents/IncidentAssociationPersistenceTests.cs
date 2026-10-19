@@ -62,7 +62,7 @@ public sealed class IncidentAssociationPersistenceTests(PostgreSqlTestDatabaseFi
         using var response = await client.SendAsync(get);
         response.EnsureSuccessStatusCode();
         using var result = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        var incident = Assert.Single(result.RootElement.EnumerateArray());
+        var incident = Assert.Single(result.RootElement.GetProperty("items").EnumerateArray());
         var links = incident.GetProperty("associations").EnumerateArray().ToArray();
         Assert.Equal(5, links.Length);
         Assert.Equal(new[] { firstJourney, secondJourney }.Order().ToArray(), links.Where(link => link.GetProperty("kind").GetString() == "Journey")

@@ -30,7 +30,7 @@ public sealed class ListIncidentsApiTests(PostgreSqlTestDatabaseFixture database
         using var response = await client.SendAsync(IncidentReadTestSupport.Get(oidc.CreateToken(subject)));
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Contains(body.RootElement.EnumerateArray(), item => item.GetProperty("incidentId").GetGuid() == incidentId);
+        Assert.Contains(body.RootElement.GetProperty("items").EnumerateArray(), item => item.GetProperty("incidentId").GetGuid() == incidentId);
         Assert.DoesNotContain("reporterSubject", body.RootElement.GetRawText(), StringComparison.OrdinalIgnoreCase);
 
         using var noToken = await client.GetAsync("/api/incidents");
@@ -59,15 +59,15 @@ public sealed class ListIncidentsApiTests(PostgreSqlTestDatabaseFixture database
         using var exact = await client.SendAsync(IncidentReadTestSupport.Get(oidc.CreateToken(subject), $"?incidentId={incidentA}&stationId={stationA}"));
         Assert.Equal(HttpStatusCode.OK, exact.StatusCode);
         using var exactBody = JsonDocument.Parse(await exact.Content.ReadAsStringAsync());
-        Assert.Single(exactBody.RootElement.EnumerateArray());
+        Assert.Single(exactBody.RootElement.GetProperty("items").EnumerateArray());
 
         using var contradictory = await client.SendAsync(IncidentReadTestSupport.Get(oidc.CreateToken(subject), $"?incidentId={incidentA}&stationId={stationB}"));
         Assert.Equal(HttpStatusCode.OK, contradictory.StatusCode);
-        Assert.Equal("[]", await contradictory.Content.ReadAsStringAsync());
+        Assert.Equal("{\"items\":[]}", await contradictory.Content.ReadAsStringAsync());
 
         using var noMatches = await client.SendAsync(IncidentReadTestSupport.Get(oidc.CreateToken(subject), $"?incidentId={Guid.NewGuid()}"));
         Assert.Equal(HttpStatusCode.OK, noMatches.StatusCode);
-        Assert.Equal("[]", await noMatches.Content.ReadAsStringAsync());
+        Assert.Equal("{\"items\":[]}", await noMatches.Content.ReadAsStringAsync());
         Assert.NotEqual(incidentA, incidentB);
     }
 
@@ -86,12 +86,12 @@ public sealed class ListIncidentsApiTests(PostgreSqlTestDatabaseFixture database
             $"?incidentId={incidentId}&stationId={stationId}&journeyId={journeyId}"));
         Assert.Equal(HttpStatusCode.OK, matched.StatusCode);
         using var matchedBody = JsonDocument.Parse(await matched.Content.ReadAsStringAsync());
-        Assert.Single(matchedBody.RootElement.EnumerateArray());
+        Assert.Single(matchedBody.RootElement.GetProperty("items").EnumerateArray());
 
         using var mismatch = await client.SendAsync(IncidentReadTestSupport.Get(oidc.CreateToken(subject),
             $"?incidentId={incidentId}&stationId={stationId}&journeyId={Guid.NewGuid()}"));
         Assert.Equal(HttpStatusCode.OK, mismatch.StatusCode);
-        Assert.Equal("[]", await mismatch.Content.ReadAsStringAsync());
+        Assert.Equal("{\"items\":[]}", await mismatch.Content.ReadAsStringAsync());
     }
 
     [Fact]
@@ -111,13 +111,13 @@ public sealed class ListIncidentsApiTests(PostgreSqlTestDatabaseFixture database
 
         using var deniedByScope = await client.SendAsync(IncidentReadTestSupport.Get(oidc.CreateToken(staff), $"?incidentId={incidentId}"));
         Assert.Equal(HttpStatusCode.OK, deniedByScope.StatusCode);
-        Assert.Equal("[]", await deniedByScope.Content.ReadAsStringAsync());
+        Assert.Equal("{\"items\":[]}", await deniedByScope.Content.ReadAsStringAsync());
 
         await IncidentReadTestSupport.GrantStationScopeAsync(factory.Services, staff, stationB);
         using var allowed = await client.SendAsync(IncidentReadTestSupport.Get(oidc.CreateToken(staff), $"?incidentId={incidentId}"));
         Assert.Equal(HttpStatusCode.OK, allowed.StatusCode);
         using var body = JsonDocument.Parse(await allowed.Content.ReadAsStringAsync());
-        Assert.Single(body.RootElement.EnumerateArray());
+        Assert.Single(body.RootElement.GetProperty("items").EnumerateArray());
     }
 
     [Fact]

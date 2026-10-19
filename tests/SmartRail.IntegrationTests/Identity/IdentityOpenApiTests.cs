@@ -18,8 +18,13 @@ public sealed class IdentityOpenApiTests(PostgreSqlTestDatabaseFixture database,
         var paths = root.GetProperty("paths");
         var expectedPaths = new[] { "/api/me", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}", "/api/stations",
             "/api/journeys/{id}", "/api/journeys/{id}/updates", "/api/stations/{id}/departures",
-            "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}" };
+            "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}",
+            "/api/incidents", "/api/incidents/{id}" };
         Assert.Equal(expectedPaths.Order(StringComparer.Ordinal), paths.EnumerateObject().Select(p => p.Name).Order(StringComparer.Ordinal).ToArray());
+        Assert.Equal(new[] { "get", "post" }, paths.GetProperty("/api/incidents").EnumerateObject()
+            .Select(operation => operation.Name).Order(StringComparer.Ordinal).ToArray());
+        Assert.Equal(new[] { "patch" }, paths.GetProperty("/api/incidents/{id}").EnumerateObject()
+            .Select(operation => operation.Name).ToArray());
         var me = paths.GetProperty("/api/me").GetProperty("get");
         Assert.Contains(me.GetProperty("security").EnumerateArray(), item => item.TryGetProperty("CognitoAccessToken", out _));
         Assert.True(me.GetProperty("responses").TryGetProperty("200", out var success));

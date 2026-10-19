@@ -8,8 +8,8 @@ namespace SmartRail.Api.Contracts.Incidents;
 public sealed record CreateIncidentRequest(
     string? CategoryCode,
     string? Description,
-    DateTimeOffset? OccurredAt,
-    IReadOnlyList<IncidentAssociationInput>? Associations)
+    IReadOnlyList<IncidentAssociationInput>? Associations,
+    DateTimeOffset? OccurredAt = null)
 {
     public CreateIncidentInput ToInput()
     {
