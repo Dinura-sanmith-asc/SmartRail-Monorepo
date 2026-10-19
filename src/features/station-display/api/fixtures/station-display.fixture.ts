@@ -2,9 +2,9 @@ import type { StationContext, StationDepartureSnapshot } from '../../model/displ
 
 /** Synthetic examples for development and tests only. They are not railway information. */
 export const DEMO_STATION_IDS = {
-  central: '00000000-0000-4000-8000-000000000101',
+  central: '10000000-0000-0000-0000-000000000001', // Colombo Fort
   quiet: '00000000-0000-4000-8000-000000000102',
-  harbor: '00000000-0000-4000-8000-000000000103',
+  harbor: '10000000-0000-0000-0000-000000000002', // Galle
 } as const
 
 export const stationDisplayFixtures: readonly StationDepartureSnapshot[] = [
