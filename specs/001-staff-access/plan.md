@@ -2,7 +2,7 @@
 
 **Branch**: `feature-01` (current Git branch at review) | **Date**: 2026-10-19 | **Spec**: [spec.md](spec.md)
 
-**Plan Version**: 0.1.0 | **Plan Status**: Draft — pending project-owner review and approval
+**Plan Version**: 0.1.0 | **Plan Status**: Approved
 
 **Input**: Clarified Feature 001 specification and SmartRail Operations Web constitution. Backend Feature 002 and its existing OpenAPI contract are approved for client integration as of 2026-10-19.
 
@@ -165,7 +165,7 @@ Detailed test matrix and status rules are in [quickstart.md](quickstart.md). Moc
 
 ## Post-design Constitution Check
 
-- All selected libraries support the existing React/TypeScript/Vite boundary and are justified by this feature's actual needs; no package is installed here.
+- All selected libraries support the existing React/TypeScript/Vite boundary and are justified by this feature's actual needs; the Milestone A implementation installed the approved dependencies. No production configuration or credentials are committed.
 - No auth token is intentionally persisted; transaction-only callback state is short-lived and contains no bearer token.
 - No route or client state is treated as backend authorization; current role projection drives presentation only.
 - OpenAPI, role mapping, and backend scope rules remain unchanged. The Station Staff workspace is generic because `/api/me` carries no scope.
@@ -181,13 +181,13 @@ No constitution violations or additional architecture layers are proposed. The a
 
 - **Feature**: 001-staff-access — Staff Authentication & Role-Aware Operations Foundation
 - **Technical plan version**: 0.1.0
-- **Plan status**: Draft — pending project-owner review and approval
-- **Approval authority**: SmartRail Project Owner — pending
-- **Approval date**: Pending
-- **Specification status**: Draft — pending approval; the plan is not authorized for implementation until both the specification and plan have been reviewed and approved under Constitution Principle IX
+- **Plan status**: Approved
+- **Approval authority**: SmartRail Project Owner
+- **Approval date**: 2026-10-19
+- **Specification status**: Approved on 2026-10-19; the specification and plan have both been reviewed and approved under Constitution Principle IX
 - **Approved backend contract reference**: Backend Feature 002 [`identity-permissions.openapi.yaml`](../../../SmartRail/specs/002-identity-permissions/contracts/identity-permissions.openapi.yaml), approved for client integration on 2026-10-19
 - **Recorded backend verification reference**: Backend Feature 002 [`quickstart.md`](../../../SmartRail/specs/002-identity-permissions/quickstart.md) and [`requirements.md`](../../../SmartRail/specs/002-identity-permissions/checklists/requirements.md); backend evidence was inspected and not rerun for this plan
 - **Client verification evidence**: Not run; planned acceptance and evidence status are in [quickstart.md](quickstart.md)
-- **Constitution ratification**: Pending project-owner ratification as recorded in `.specify/memory/constitution.md`; this record does not ratify or amend it
+- **Constitution ratification**: Operations Web Constitution v1.0.0 ratified by the SmartRail Project Owner on 2026-10-19
 - **Outstanding dependencies**: Cognito environment/app-client configuration; API base URL, CORS, TLS and hosting; controlled role-mapped test identities; approved owning-feature protected operation for resource-scope acceptance; production monitoring and deployment
-- **Approval boundary**: Plan approval authorizes the described client implementation scope only. It does not approve production deployment, production Cognito configuration, or full SmartRail platform acceptance.
+- **Approval boundary**: This plan approval authorizes the described client implementation scope only. It does not approve production deployment, production Cognito configuration, or full SmartRail platform acceptance.

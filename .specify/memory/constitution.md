@@ -4,7 +4,8 @@ Sync Impact Report
 - Modified principles: template placeholders -> I. Requirements and Traceability; II. React Architecture; III. Identity and Least Privilege; IV. Railway Data Integrity; V. Approved Backend Integration; VI. Operational Safety; VII. User Experience and Accessibility; VIII. Quality and Verification; IX. Spec-Driven Development
 - Added sections: Platform Boundaries and Constraints; Definition of Done and Review
 - Removed sections: none
-- Follow-up TODOs: ratification date pending human approval; Feature 002 and OpenAPI contract files are not present in this repository and must be consulted during feature planning
+- Ratified by the SmartRail Project Owner on 2026-10-19 (Constitution v1.0.0).
+- Follow-up TODOs: none.
 -->
 # SmartRail Railway Operations Web Constitution
 
@@ -49,4 +50,4 @@ A feature is ready for acceptance only when its approved requirements and applic
 
 This constitution governs Operations Web feature specifications, plans, implementation, testing, reviews, and acceptance. If a feature artifact conflicts with it, work MUST stop at the conflict until the artifact is corrected or an authorized constitution amendment resolves it. Amendments MUST be reviewed and approved by the project owner and MUST document the reason, affected principles, compatibility impact, and any required follow-up. Versioning follows semantic versioning: MAJOR for incompatible governance changes, MINOR for new principles or materially expanded obligations, and PATCH for clarifications that do not change obligations. Every amendment MUST update the last-amended date and include a version rationale. Feature reviews MUST record material compliance gaps and their resolution or approved disposition. Changes to approved requirements, RBAC, architecture, or API contracts require explicit review and authorization by their owners; this constitution does not itself approve those changes.
 
-**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): pending human approval | **Last Amended**: 2026-10-19
+**Version**: 1.0.0 | **Ratified**: 2026-10-19 by SmartRail Project Owner | **Last Amended**: 2026-10-19

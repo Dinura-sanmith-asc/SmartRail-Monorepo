@@ -6,11 +6,13 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 
 **Input**: Design documents from `specs/001-staff-access/`
 
-**Prerequisites**: Approved Feature 001 specification and project-owner review of `plan.md`; `research.md`, `data-model.md`, `contracts/identity-client.md`, and `quickstart.md` provide implementation decisions and boundaries.
+**Prerequisites**: Project-owner-approved Feature 001 specification and technical plan; `research.md`, `data-model.md`, `contracts/identity-client.md`, and `quickstart.md` provide implementation decisions and boundaries.
 
 **Tests**: Test-driven work was explicitly requested. Each story writes its focused automated tests before the implementation and confirms the new tests fail for the expected reason before making them pass. Do not report mocked OAuth/API tests as live Cognito/backend acceptance.
 
-**Organization**: Tasks are grouped by the four specification user stories. All tasks start unchecked; this file records work to do and does not claim implementation completion.
+**Organization**: Tasks are grouped by setup, foundation, and the four specification user stories. Checkboxes record only work completed with evidence; the accepted baseline is not itself completion evidence.
+
+**Implementation baseline approval**: The SmartRail Project Owner accepted this 57-task baseline on 2026-10-19 for subsequent implementation. Milestone A records only evidenced completion; later implementation tasks remain unchecked.
 
 ## Format: `[ID] [P?] [Story?] Description`
 
@@ -22,11 +24,11 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 
 **Purpose**: Prepare the existing React 19, TypeScript, and Vite application for the planned feature and its test stack. Do not implement staff-access behavior in this phase.
 
-- [ ] T001 Add only the plan-approved compatible React Router, `react-oidc-context`/`oidc-client-ts`, Vitest/jsdom, Testing Library/user-event, MSW, and Playwright dependencies in `package.json` and update the lockfile; verify package peer compatibility before selecting versions.
-- [ ] T002 [P] Configure Vitest with the Vite config and jsdom environment in `vite.config.ts` and `src/test/setup.ts`.
-- [ ] T003 [P] Configure Playwright browser-test discovery and local web-server settings in `playwright.config.ts`.
-- [ ] T004 Add deterministic `test` and `test:e2e` scripts while preserving existing scripts in `package.json`.
-- [ ] T005 Configure a reusable MSW server and baseline request handlers in `src/test/msw.ts` for isolated component/network tests.
+- [X] T001 Add only the plan-approved compatible React Router, `react-oidc-context`/`oidc-client-ts`, Vitest/jsdom, Testing Library/user-event, MSW, and Playwright dependencies in `package.json` and update the lockfile; verify package peer compatibility before selecting versions. Installed compatible versions and `npm ls --depth=0` passed; npm reported 0 vulnerabilities. Verified `.gitignore` ignores Node build/dependency outputs, logs, and env files (retaining `.env.example`) and flat ESLint ignores cover `node_modules`, build outputs, coverage, and minified JS.
+- [X] T002 [P] Configure Vitest with the Vite config and jsdom environment in `vite.config.ts` and `src/test/setup.ts`. Vitest 5.0.5 loaded the jsdom setup and MSW lifecycle successfully during focused test discovery.
+- [X] T003 [P] Configure Playwright browser-test discovery and local web-server settings in `playwright.config.ts`. Config import and test directory/web-server URL assertions passed; browser execution remains for final verification.
+- [X] T004 Add deterministic `test` and `test:e2e` scripts while preserving existing scripts in `package.json`. `npm run test -- --run` and `npm run test:e2e -- --help` resolved to Vitest and Playwright.
+- [X] T005 Configure a reusable MSW server and baseline request handlers in `src/test/msw.ts` for isolated component/network tests. The Vitest setup imported and started the handler server without error.
 
 ---
 
@@ -34,13 +36,13 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 
 **Purpose**: Establish public runtime configuration, typed API/error boundaries, and shared accessible presentation states used by all stories. No role-specific route may grant access before this foundation exists.
 
-- [ ] T006 [P] Write runtime-configuration validation tests in `tests/unit/config/runtimeConfig.test.ts` for missing API base URL, missing Cognito values, malformed URLs, and public configuration that must never contain a client secret.
-- [ ] T007 Implement typed runtime-configuration parsing and safe startup failure states in `src/config/runtimeConfig.ts` and `src/app/providers.tsx` to satisfy T006.
-- [ ] T008 [P] Write shared safe-error classification tests in `tests/unit/shared/safeError.test.ts` for 401, 403, 503, timeout, offline, malformed response, and redaction of tokens, claims, and backend internals.
-- [ ] T009 Implement bounded fetch/error classification helpers in `src/shared/api/safeError.ts` and `src/shared/api/fetchJson.ts` to satisfy T008; use `AbortController`, the planned 15-second client timeout, and never log bearer headers or response bodies.
-- [ ] T010 [P] Write accessible shared-state component tests in `tests/components/shared/AccessState.test.tsx` for loading, no-access, forbidden, unavailable, offline, retry, focus, keyboard operation, and non-color status meaning.
-- [ ] T011 Implement shared loading, denial, unavailable, offline, and retry presentation in `src/shared/ui/AccessState.tsx` and `src/shared/ui/AccessState.css` to satisfy T010.
-- [ ] T012 Create the root application shell and route composition in `src/app/App.tsx`, `src/app/router.tsx`, and `src/main.tsx`, keeping callback ownership and protected content rendering for the user-story phases.
+- [X] T006 [P] Write runtime-configuration validation tests in `tests/unit/config/runtimeConfig.test.ts` for missing API base URL, missing Cognito values, malformed URLs, and public configuration that must never contain a client secret. The initial run failed because the implementation module was not present yet (expected RED state).
+- [X] T007 Implement typed runtime-configuration parsing and safe startup failure states in `src/config/runtimeConfig.ts` and `src/app/providers.tsx` to satisfy T006. `npm run test -- --run` passed runtime config cases for required values, malformed URLs, and rejecting client-secret keys without exposing values.
+- [X] T008 [P] Write shared safe-error classification tests in `tests/unit/shared/safeError.test.ts` for 401, 403, 503, timeout, offline, malformed response, and redaction of tokens, claims, and backend internals. The initial run failed because the implementation module was not present yet (expected RED state).
+- [X] T009 Implement bounded fetch/error classification helpers in `src/shared/api/safeError.ts` and `src/shared/api/fetchJson.ts` to satisfy T008; use `AbortController`, the planned 15-second client timeout, and never log bearer headers or response bodies. Utility behavior and safe classification passed in the full Vitest run; live API behavior was not tested.
+- [X] T010 [P] Write accessible shared-state component tests in `tests/components/shared/AccessState.test.tsx` for loading, no-access, forbidden, unavailable, offline, retry, focus, keyboard operation, and non-color status meaning. Eight component assertions passed in the full Vitest run.
+- [X] T011 Implement shared loading, denial, unavailable, offline, and retry presentation in `src/shared/ui/AccessState.tsx` and `src/shared/ui/AccessState.css` to satisfy T010. Eight component assertions passed, including keyboard retry and text status.
+- [X] T012 Create the root application shell and route composition in `src/app/App.tsx`, `src/app/router.tsx`, and `src/main.tsx`, keeping callback ownership and protected content rendering for the user-story phases. `npm run build` passed; the shell contains no sign-in or operational routes.
 
 **Checkpoint**: Test tooling and shared error/config/access-state boundaries are available. Cognito/API production values remain external.
 
@@ -165,7 +167,7 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 - [ ] T054 Run `npm run lint` and `npm run build` after T053; record actual command output/status in `specs/001-staff-access/quickstart.md`.
 - [ ] T055 Run `npm run test -- --run` and `npm run test:e2e` after T054; record actual command output/status and fixture/environment boundary in `specs/001-staff-access/quickstart.md`.
 - [ ] T056 Run `git diff --check` and review all changed feature files after T055 for accidental backend/API/requirement changes and secret material; record the result in `specs/001-staff-access/quickstart.md`.
-- [ ] T057 Complete `specs/001-staff-access/checklists/requirements.md` after T056 only for evidence-backed client acceptance; retain open SR-093/SR-114 obligations until their client checks are recorded and do not change Feature 001 Draft status without owner authorization.
+- [ ] T057 Complete `specs/001-staff-access/checklists/requirements.md` after T056 only for evidence-backed client acceptance; retain open SR-093/SR-114 obligations until their client checks are recorded and preserve the owner-approved Feature 001 status unless the project owner changes it.
 
 ## Traceability Matrix
 
@@ -257,4 +259,4 @@ Task: T035 expiry/reload browser tests in tests/e2e/staff-access/session-expiry.
 - The approved backend identity contract is `GET /api/me` with `subject` and current `roles`; it provides no station scope and defines 200, 401, and 503, not 403.
 - Cognito sign-out uses its managed-login `/logout` contract with `client_id` and registered `logout_uri`. Local state is cleared first; failure of remote navigation cannot restore local access.
 - One OIDC provider processes the callback. The React callback route is presentation-only.
-- Keep `specs/001-staff-access/spec.md` Draft until formal owner approval. Do not edit the constitution, backend repository, OpenAPI contract, requirements, or business behavior in implementation tasks.
+- Feature 001 specification and plan are approved by the SmartRail Project Owner on 2026-10-19; the 57 tasks are the accepted implementation baseline. Do not edit the approved requirements, backend repository, OpenAPI contract, or business behavior without the relevant owner authorization.

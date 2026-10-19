@@ -1,0 +1,24 @@
+.access-state {
+  max-width: 42rem;
+  margin: 3rem auto;
+  padding: 1.5rem;
+  color: #172033;
+  background: #fff;
+  border: 1px solid #aab4c4;
+  border-radius: 0.5rem;
+}
+
+.access-state p { margin: 0; line-height: 1.5; }
+
+.access-state__retry {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  color: #fff;
+  background: #174ea6;
+  border: 0;
+  border-radius: 0.25rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.access-state__retry:focus-visible { outline: 3px solid #f0a800; outline-offset: 3px; }

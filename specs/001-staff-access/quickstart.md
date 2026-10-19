@@ -1,17 +1,17 @@
-# Quickstart: Staff Access Plan Validation
+# Quickstart: Staff Access Implementation Validation
 
-This is a validation guide for the planned Feature 001 implementation. No application implementation or tests are claimed as complete by this document.
+This guide records Milestone A foundation checks for Feature 001. The current application shell is not an authentication or operational workspace implementation; the user-story tasks remain outstanding.
 
 ## Prerequisites
 
-- Install project dependencies only during the separately approved implementation phase; this plan did not install packages.
+- The approved implementation phase installed the plan-selected React Router, OIDC libraries, Vitest/jsdom, Testing Library, MSW, and Playwright dependencies. No environment credentials or API behavior are embedded in the repository.
 - For deterministic client tests, use mocked OIDC callbacks and MSW handlers that match [the approved identity client mapping](contracts/identity-client.md). Label mocked auth as `PASS` only for the named client check, never as real Cognito integration.
 - For live acceptance, obtain environment-specific Cognito issuer/domain, public app-client ID, callback/logout URIs, approved scopes, SmartRail API base URL/CORS, and controlled Controller and Station Staff test identities from their owners. No production values or secrets are included here.
 - Station/resource-scope acceptance is blocked until the owning backend feature supplies an existing approved protected-operation contract and controlled fixtures for allowed, out-of-scope, missing, revoked, stale, and unavailable scope evidence. Feature 001 does not define or invent this operation.
 
 ## Planned commands
 
-Commands after dependencies and test scripts are added during implementation:
+Available implementation checks:
 
 ```powershell
 npm run lint
@@ -20,7 +20,22 @@ npm run test -- --run
 npm run test:e2e
 ```
 
-The existing `package.json` currently defines `dev`, `build`, `lint`, and `preview` only. The `test` and `test:e2e` scripts are proposed; they are not currently runnable and no dependencies were installed for planning.
+`test` runs Vitest and `test:e2e` runs Playwright. Playwright configuration is present, but no browser end-to-end tests exist yet; `npm run test:e2e -- --list` reports zero tests. No live browser, Cognito, or backend acceptance was run.
+
+## Milestone A evidence (T001–T012)
+
+| Check | Result | Evidence |
+|---|---|---|
+| Runtime configuration parsing and rejection of client-secret keys | PASS | `npm run test -- --run`; 5 runtime config tests passed. |
+| Safe API failure classification and message redaction | PASS | `npm run test -- --run`; 7 safe-error tests passed. Fetch helper uses a 15-second AbortController timeout; no live endpoint was called. |
+| Shared accessible loading, denial, unavailable, offline, and retry states | PASS | `npm run test -- --run`; 8 component tests passed, including keyboard focus/Enter and text status. |
+| Vitest/MSW setup and fixture loading | PASS | Full Vitest run loaded setup and MSW server. |
+| Application build | PASS | `npm run build` completed TypeScript build and Vite production bundle. |
+| Lint | PASS | `npm run lint` completed successfully. |
+| Playwright browser tests | NOT RUN | Config discovery was checked; no E2E test files exist in Milestone A. |
+| Cognito, backend, station-scope, and production acceptance | BLOCKED | Requires external environment configuration, controlled identities, and approved owning-feature scope operation/fixtures as described below. |
+
+Full automated result: `npm run test -- --run` — 3 test files, 20 tests passed. These are local unit/component checks, not live authentication or backend acceptance. The root shell intentionally contains no login, callback processor, protected workspace, or business operations.
 
 ## Acceptance checks
 
