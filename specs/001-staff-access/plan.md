@@ -1,6 +1,8 @@
 # Implementation Plan: Staff Authentication & Role-Aware Operations Foundation
 
-**Branch**: `001-staff-access` | **Date**: 2026-10-19 | **Spec**: [spec.md](spec.md)
+**Branch**: `feature-01` (current Git branch at review) | **Date**: 2026-10-19 | **Spec**: [spec.md](spec.md)
+
+**Plan Version**: 0.1.0 | **Plan Status**: Draft — pending project-owner review and approval
 
 **Input**: Clarified Feature 001 specification and SmartRail Operations Web constitution. Backend Feature 002 and its existing OpenAPI contract are approved for client integration as of 2026-10-19.
 
@@ -157,6 +159,7 @@ Detailed test matrix and status rules are in [quickstart.md](quickstart.md). Moc
 | Cognito public SPA app client with no client secret and PKCE S256 enabled | Environment owner configuration required | Real callback/token integration |
 | Approved SmartRail API base URL, CORS for web origin, TLS and deployment hosting/history fallback | Environment/deployment configuration outstanding | Live browser-to-backend acceptance |
 | Controlled Controller and Station Staff test identities/current role mapping | External test-environment setup required | Positive real-role acceptance |
+| Existing approved owning-feature protected operation and controlled scope fixtures covering allowed, out-of-scope, missing, revoked, stale, and unavailable station-scope evidence | No approved protected-operation contract/test target is identified in Feature 001's contract set; the owning backend feature must supply the operation and controlled fixtures | Server-side resource-scope acceptance; T051 remains blocked until supplied |
 | Production monitoring and deployment setup | Not performed by this feature | Production readiness; outside this plan's acceptance |
 | SR-093 and SR-114 client verification | Planned only | Client acceptance after implementation and test evidence |
 
@@ -173,3 +176,18 @@ Detailed test matrix and status rules are in [quickstart.md](quickstart.md). Moc
 ## Complexity Tracking
 
 No constitution violations or additional architecture layers are proposed. The auth context/provider and one typed API adapter are feature-scoped; no general-purpose data/cache framework or backend service is introduced.
+
+## Plan Approval Record
+
+- **Feature**: 001-staff-access — Staff Authentication & Role-Aware Operations Foundation
+- **Technical plan version**: 0.1.0
+- **Plan status**: Draft — pending project-owner review and approval
+- **Approval authority**: SmartRail Project Owner — pending
+- **Approval date**: Pending
+- **Specification status**: Draft — pending approval; the plan is not authorized for implementation until both the specification and plan have been reviewed and approved under Constitution Principle IX
+- **Approved backend contract reference**: Backend Feature 002 [`identity-permissions.openapi.yaml`](../../../SmartRail/specs/002-identity-permissions/contracts/identity-permissions.openapi.yaml), approved for client integration on 2026-10-19
+- **Recorded backend verification reference**: Backend Feature 002 [`quickstart.md`](../../../SmartRail/specs/002-identity-permissions/quickstart.md) and [`requirements.md`](../../../SmartRail/specs/002-identity-permissions/checklists/requirements.md); backend evidence was inspected and not rerun for this plan
+- **Client verification evidence**: Not run; planned acceptance and evidence status are in [quickstart.md](quickstart.md)
+- **Constitution ratification**: Pending project-owner ratification as recorded in `.specify/memory/constitution.md`; this record does not ratify or amend it
+- **Outstanding dependencies**: Cognito environment/app-client configuration; API base URL, CORS, TLS and hosting; controlled role-mapped test identities; approved owning-feature protected operation for resource-scope acceptance; production monitoring and deployment
+- **Approval boundary**: Plan approval authorizes the described client implementation scope only. It does not approve production deployment, production Cognito configuration, or full SmartRail platform acceptance.

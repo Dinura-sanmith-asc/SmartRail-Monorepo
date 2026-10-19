@@ -1,12 +1,28 @@
 # Feature Specification: Staff Authentication & Role-Aware Operations Foundation
 
-**Feature Branch**: `not created (no before_specify hook is configured)`
+**Feature Branch**: `feature-01` (current Git branch at review; feature directory remains `specs/001-staff-access`)
 
 **Created**: 2026-10-19
 
 **Status**: Draft
 
+**Specification Version**: 0.1.0
+
 **Input**: User description: Establish authenticated Railway Controller and Station Staff access, role-aware operations navigation, safe session handling, and sign-out for the SmartRail Operations Web.
+
+## Feature Approval Record
+
+- **Feature**: 001-staff-access — Staff Authentication & Role-Aware Operations Foundation
+- **Specification version**: 0.1.0
+- **Specification status**: Draft — pending project-owner review and approval
+- **Approval authority**: SmartRail Project Owner — pending
+- **Approval date**: Pending
+- **Approved contract reference**: Backend Feature 002 `GET /api/me`, [`identity-permissions.openapi.yaml`](../../../SmartRail/specs/002-identity-permissions/contracts/identity-permissions.openapi.yaml), approved for client integration on 2026-10-19
+- **Backend verification evidence reference**: [`quickstart.md`](../../../SmartRail/specs/002-identity-permissions/quickstart.md) and [`requirements.md`](../../../SmartRail/specs/002-identity-permissions/checklists/requirements.md) in Backend Feature 002; these are backend evidence only and do not establish Operations Web acceptance
+- **Operations Web verification evidence**: Client tests and live integration are not run; see [quickstart.md](quickstart.md). Client acceptance remains pending.
+- **Constitution ratification**: Pending project-owner ratification as recorded in `.specify/memory/constitution.md`; this record does not ratify or amend it
+- **Outstanding external dependencies**: Cognito environment/app-client configuration; API base URL, CORS, TLS and hosting; controlled role-mapped test identities; an approved owning-feature protected operation for resource-scope acceptance; production monitoring and deployment
+- **Approval boundary**: Approval, when recorded, covers this feature specification and its planned client integration scope. It does not approve production deployment, production Cognito configuration, or full SmartRail platform acceptance.
 
 ## Clarifications
 

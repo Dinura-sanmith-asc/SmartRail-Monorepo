@@ -55,9 +55,9 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 ### Tests for User Story 1 (write and observe expected failure before implementation)
 
 - [ ] T013 [P] [US1] Add OIDC configuration and authorization-request tests in `tests/unit/staff-access/auth/oidcConfig.test.ts` for Authorization Code + PKCE S256, safe same-origin return paths, disabled automatic silent renewal, and disabled token revocation.
-- [ ] T014 [P] [US1] Add browser protocol tests in `tests/e2e/staff-access/controller-login.spec.ts` for managed-login redirect, valid code exchange, state validation, one callback processor, Controller identity loading, and callback URL cleanup; use a controlled local fixture and label results as mocked protocol evidence.
+- [ ] T014 [P] [US1] Add browser protocol tests in `tests/e2e/staff-access/controller-login.spec.ts` for valid, missing, invalid/mismatched, and replayed/consumed OAuth state; valid, missing, and invalid authorization code; failed/cancelled authentication; exactly one callback processor; safe callback URL/history cleanup; and proof that every rejected callback leaves protected workspace inaccessible. Use a controlled local fixture and label results as mocked protocol evidence.
 - [ ] T015 [P] [US1] Add identity response parser tests in `tests/unit/staff-access/identity/currentIdentity.test.ts` for exact `{ subject, roles }`, non-empty opaque subject, unique approved role labels, and valid empty roles.
-- [ ] T016 [P] [US1] Add MSW contract tests in `tests/components/staff-access/identity/currentIdentityClient.test.tsx` for authenticated `GET /api/me`, bearer header, valid Controller response, `401`, `503`, timeout, network failure, and malformed 200; assert no invented 403 response for `/api/me`.
+- [ ] T016 [P] [US1] Add MSW contract and identity-lifecycle tests in `tests/components/staff-access/identity/currentIdentityClient.test.tsx` for authenticated `GET /api/me`, bearer header, valid Controller response, `401`, `503`, timeout, network failure, malformed 200, and no invented 403 response for `/api/me`; delay an identity response, sign out or expire/replace the session before releasing it, then assert the old response cannot restore identity, navigation, or protected content.
 - [ ] T017 [P] [US1] Add Controller route and shell tests in `tests/components/staff-access/controller/ControllerWorkspace.test.tsx` for current Controller role, no role, Passenger/Driver-only roles, unknown labels, and direct protected-route navigation.
 
 ### Implementation for User Story 1
@@ -66,7 +66,7 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 - [ ] T019 [US1] Configure the OIDC token-bearing user store as volatile memory and the separate short-lived per-tab transaction store in `src/features/staff-access/auth/sessionStore.ts`; store only OAuth state, nonce, PKCE verifier, and validated return path across redirect.
 - [ ] T020 [US1] Implement the provider-owned callback lifecycle in `src/features/staff-access/auth/AuthProvider.tsx` and presentation-only `/auth/callback` route in `src/features/staff-access/auth/CallbackPage.tsx`; the route must never parse/exchange the authorization code a second time and must clear callback query data on success or failure.
 - [ ] T021 [US1] Implement current identity types, strict runtime parser, and `GET /api/me` adapter in `src/features/staff-access/identity/currentIdentity.ts` and `src/features/staff-access/identity/currentIdentityClient.ts` using the approved contract only.
-- [ ] T022 [US1] Implement identity/session state and stale-request invalidation in `src/features/staff-access/identity/identityState.ts` and `src/features/staff-access/identity/IdentityProvider.tsx`; a stale response must never grant workspace access after expiry, sign-out, or a newer identity request.
+- [ ] T022 [US1] Implement identity/session state and stale-request invalidation in `src/features/staff-access/identity/identityState.ts` and `src/features/staff-access/identity/IdentityProvider.tsx`; cancel an in-flight identity request on sign-out/expiry where possible and use an equivalent generation/session-identity guard so a stale response cannot grant access after sign-out, expiry, or session replacement; satisfy the delayed-response test in T016.
 - [ ] T023 [US1] Implement public sign-in entry, Controller shell, and Controller route gate in `src/features/staff-access/auth/SignInPage.tsx`, `src/features/staff-access/workspaces/ControllerWorkspace.tsx`, and `src/app/router.tsx`; only current `/api/me.roles` may select Controller presentation.
 - [ ] T024 [US1] Run the focused tests from T013–T017 and record the results in `specs/001-staff-access/quickstart.md`; mocked fixture success is not Cognito acceptance.
 
@@ -108,7 +108,7 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 - [ ] T032 [P] [US3] Add access-state integration tests in `tests/components/staff-access/recovery/AccessRecovery.test.tsx` for unauthenticated route, callback cancel/failure, 401 reauthentication without replay, 403 safe denial on a protected operation only, 503 authority-unavailable, empty roles, malformed identity, offline, and timeout.
 - [ ] T033 [P] [US3] Add accessibility tests in `tests/components/staff-access/recovery/AccessRecovery.accessibility.test.tsx` for keyboard-only sign-in/retry/navigation, visible focus, accessible names, status announcements, and meaning that does not rely on color.
 - [ ] T034 [P] [US3] Add safe-output tests in `tests/unit/staff-access/recovery/safeDiagnostics.test.ts` injecting tokens, private claims, authorization internals, and raw Problem Details into failures and asserting none appear in rendered messages or diagnostics.
-- [ ] T035 [P] [US3] Add expiry and reload browser tests in `tests/e2e/staff-access/session-expiry.spec.ts` for expiry closing protected content, no automatic action replay, and a full page reload without memory session requiring managed-login reauthentication.
+- [ ] T035 [P] [US3] Add expiry, reload, and browser-storage security audit tests in `tests/e2e/staff-access/session-expiry.spec.ts`; prove access, ID, and refresh tokens are absent from localStorage, sessionStorage, application cookies, persistent application caches, browser URLs/history, and client diagnostic logs; prove only temporary OAuth transaction state/PKCE verifier is retained across redirect separately from token-bearing session state and is cleaned after success/failure; prove full-page refresh without memory session requires reauthentication and expiry closes protected content without action replay.
 
 ### Implementation for User Story 3
 
@@ -152,7 +152,7 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 - [ ] T048 Obtain and validate Cognito issuer, managed-login domain, public app-client ID, registered callback/logout URLs, approved scopes, PKCE S256 setting, and authorized test identities; this task is BLOCKED until the Cognito environment owner supplies configuration. Record non-secret environment identity in `specs/001-staff-access/quickstart.md` without committing credentials.
 - [ ] T049 Obtain approved API base URL, TLS/CORS/hosting history fallback, and a test environment with current Controller and Station Staff mappings; this task is BLOCKED until the API/environment owner supplies configuration. Record dependency owners in `specs/001-staff-access/quickstart.md`.
 - [ ] T050 Run browser-backed Cognito managed-login and real `GET /api/me` acceptance for Controller and Station Staff identities, including valid/invalid/expired sessions and configured Cognito logout; this task is BLOCKED until T048 and T049 are complete. Record evidence and separate UI logout from token revocation in `specs/001-staff-access/quickstart.md`.
-- [ ] T051 Verify Station Staff allowed and out-of-scope resource outcomes against the owning backend operation; this task is BLOCKED until that owning feature provides an approved protected-operation test target. Record server-side evidence without adding a scope endpoint or attributing the check to `/api/me`.
+- [ ] T051 Verify Station Staff allowed station scope, out-of-scope station, missing scope evidence, revoked scope, stale scope, and unavailable authorization authority against the same existing approved owning-feature protected operation; this task is BLOCKED because no approved protected-operation contract/test target is identified in Feature 001's contract set, until the owning backend feature supplies one and its controlled scope fixtures. Record the exact dependency and server-side evidence in `specs/001-staff-access/quickstart.md`; do not invent an endpoint or attribute the checks to `/api/me`.
 
 ---
 
@@ -160,12 +160,12 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 
 **Purpose**: Verify traceability, accessible/security behavior, the full client test suite, and documentation evidence without overstating environment-dependent acceptance.
 
-- [ ] T052 [P] Review source, tests, and `specs/001-staff-access/quickstart.md` against the SR/FR/SC traceability matrix below; mark only checks with recorded evidence PASS and leave external checks BLOCKED or NOT RUN.
-- [ ] T053 [P] Run manual keyboard and representative screen-reader checks and record assistive technology/browser versions and outcomes in `specs/001-staff-access/quickstart.md`.
-- [ ] T054 Run `npm run lint` and `npm run build`; record actual command output/status in `specs/001-staff-access/quickstart.md`.
-- [ ] T055 Run `npm run test -- --run` and `npm run test:e2e`; record actual command output/status and fixture/environment boundary in `specs/001-staff-access/quickstart.md`.
-- [ ] T056 Run `git diff --check` and review all changed feature files for accidental backend/API/requirement changes and secret material; record the result in `specs/001-staff-access/quickstart.md`.
-- [ ] T057 Complete `specs/001-staff-access/checklists/requirements.md` only for evidence-backed client acceptance; retain open SR-093/SR-114 obligations until their client checks are recorded and do not change Feature 001 Draft status without owner authorization.
+- [ ] T052 Review source, tests, and `specs/001-staff-access/quickstart.md` against the SR/FR/SC traceability matrix below; mark only checks with recorded evidence PASS and leave external checks BLOCKED or NOT RUN.
+- [ ] T053 Run manual keyboard and representative screen-reader checks after T052, and record assistive technology/browser versions and outcomes in `specs/001-staff-access/quickstart.md`.
+- [ ] T054 Run `npm run lint` and `npm run build` after T053; record actual command output/status in `specs/001-staff-access/quickstart.md`.
+- [ ] T055 Run `npm run test -- --run` and `npm run test:e2e` after T054; record actual command output/status and fixture/environment boundary in `specs/001-staff-access/quickstart.md`.
+- [ ] T056 Run `git diff --check` and review all changed feature files after T055 for accidental backend/API/requirement changes and secret material; record the result in `specs/001-staff-access/quickstart.md`.
+- [ ] T057 Complete `specs/001-staff-access/checklists/requirements.md` after T056 only for evidence-backed client acceptance; retain open SR-093/SR-114 obligations until their client checks are recorded and do not change Feature 001 Draft status without owner authorization.
 
 ## Traceability Matrix
 
@@ -211,6 +211,7 @@ description: "Dependency-ordered implementation tasks for Staff Authentication &
 - In US3, T032–T035 target separate test files and can proceed in parallel. Changes to `IdentityProvider.tsx`, `currentIdentityClient.ts`, `safeError.ts`, and shared accessible components must be serialized with earlier story edits to those same files.
 - In US4, T041–T043 are parallel tests. T044 and T045 target separate files; integrate and test before T046 route-history changes.
 - The external dependency requests represented by T048 and T049 can proceed in parallel; T050 cannot start until both are complete.
+- In Phase 8, T052–T057 are sequential because each records or reviews evidence in `quickstart.md` or the requirements checklist. They are not marked `[P]`; complete each in task-ID order.
 
 ## Parallel Examples
 

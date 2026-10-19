@@ -7,6 +7,7 @@ This is a validation guide for the planned Feature 001 implementation. No applic
 - Install project dependencies only during the separately approved implementation phase; this plan did not install packages.
 - For deterministic client tests, use mocked OIDC callbacks and MSW handlers that match [the approved identity client mapping](contracts/identity-client.md). Label mocked auth as `PASS` only for the named client check, never as real Cognito integration.
 - For live acceptance, obtain environment-specific Cognito issuer/domain, public app-client ID, callback/logout URIs, approved scopes, SmartRail API base URL/CORS, and controlled Controller and Station Staff test identities from their owners. No production values or secrets are included here.
+- Station/resource-scope acceptance is blocked until the owning backend feature supplies an existing approved protected-operation contract and controlled fixtures for allowed, out-of-scope, missing, revoked, stale, and unavailable scope evidence. Feature 001 does not define or invent this operation.
 
 ## Planned commands
 
