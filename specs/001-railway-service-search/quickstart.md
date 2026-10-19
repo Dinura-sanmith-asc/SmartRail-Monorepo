@@ -131,21 +131,22 @@ Executed from the repository root:
 
 ```powershell
 flutter pub get
-flutter analyze --no-pub
-flutter test --no-pub --timeout 60s
+flutter analyze
+flutter test --timeout 120s
 git diff --check
 ```
 
-`flutter pub get` succeeded. Analyzer reported no issues. The full local suite passed 106 tests.
-`git diff --check` is recorded after the final documentation updates.
+`flutter pub get` succeeded. `flutter analyze` reported no issues. The full local suite passed 106 tests.
+`git diff --check` was run after the final documentation updates.
 
-Real-backend test configuration is supplied through `SMART_RAIL_API_BASE_URL`,
-`SMART_RAIL_TEST_ORIGIN_ID`, `SMART_RAIL_TEST_DESTINATION_ID`, and `SMART_RAIL_TEST_DATE`.
-These values were not configured, so Android emulator integration (T054/T059) is `BLOCKED`;
-mocked results are not integration evidence. No physical device was available, so supplementary
-T055 is `NOT RUN`.
+Real-backend integration (T054/T059) passed on Android emulator `emulator-5554` with explicit
+defines: API `http://10.0.2.2:5236`, origin `10000000-0000-0000-0000-000000000001`, destination
+`10000000-0000-0000-0000-000000000002`, and date `2026-10-17`. Both integration tests passed.
+Backend requests to all four approved GET endpoints returned HTTP 200. Detailed IDs, response
+schedule values, command, and evidence are in `verification-matrix.md`. T055 physical-device
+smoke remains supplementary and `NOT RUN`.
 
-One `flutter build apk --debug` attempt remained silent during Gradle startup for approximately
-two minutes and was stopped. Existing daemon logs show `Unable to establish loopback connection`.
-The build is not passed; no Gradle versions, security settings, or project architecture were
-changed to work around it.
+`flutter build apk --debug --no-pub --verbose` passed using Android Studio JBR Java 21.0.10 and
+produced `build/app/outputs/flutter-apk/app-debug.apk`. No Gradle versions, security settings,
+or project architecture were changed. Historical daemon logs record the former loopback startup
+error under Microsoft JDK 17.0.19; the build passed in the current environment.

@@ -138,7 +138,7 @@ Future<void> _selectStation(
   final searchField = find.byType(TextField);
   await tester.enterText(searchField, name);
   await tester.pumpAndSettle();
-  await tester.tap(find.text(name));
+  await tester.tap(find.text(name).last);
   await tester.pumpAndSettle();
 }
 

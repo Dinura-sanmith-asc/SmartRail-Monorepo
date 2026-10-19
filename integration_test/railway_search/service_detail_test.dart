@@ -136,7 +136,7 @@ Future<void> _selectStation(
   await tester.pumpAndSettle();
   await tester.enterText(find.byType(TextField), name);
   await tester.pumpAndSettle();
-  await tester.tap(find.text(name));
+  await tester.tap(find.text(name).last);
   await tester.pumpAndSettle();
 }
 
