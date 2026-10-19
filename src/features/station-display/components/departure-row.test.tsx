@@ -21,20 +21,23 @@ describe('DepartureRow', () => {
     render(<DepartureRow departure={departure} />)
 
     expect(screen.getByText('DEMO TEST Service A')).toBeInTheDocument()
-    expect(screen.getByText('Scheduled')).toBeInTheDocument()
+    expect(screen.getByText('Scheduled departure')).toBeInTheDocument()
     expect(screen.getByText('08:15')).toBeInTheDocument()
   })
 
   it('keeps unavailable and unknown operational values explicit', () => {
     render(<DepartureRow departure={departure} />)
 
-    expect(screen.getByText('Platform unknown')).toBeInTheDocument()
-    expect(screen.getByText('Delay unavailable')).toBeInTheDocument()
+    expect(screen.getByText('Platform')).toBeInTheDocument()
+    expect(screen.getByText('Unknown')).toBeInTheDocument()
+    expect(screen.getByText('Delay')).toBeInTheDocument()
+    expect(screen.getByText('Unavailable')).toBeInTheDocument()
   })
 
   it('renders status meaning as text without requiring color', () => {
     render(<DepartureRow departure={departure} />)
 
-    expect(screen.getByText('Status: DEMO delayed')).toBeInTheDocument()
+    expect(screen.getByText('Status')).toBeInTheDocument()
+    expect(screen.getByText('DEMO delayed')).toBeInTheDocument()
   })
 })

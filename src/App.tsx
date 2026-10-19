@@ -8,6 +8,7 @@ import { StationHeader, type StationHeaderState } from './features/station-displ
 import { DisplayStateView } from './features/station-display/components/display-state-view'
 import { useDepartureUpdates } from './features/station-display/hooks/use-departure-updates'
 import { createHttpClient } from './shared/api/http-client'
+import './features/station-display/station-display.css'
 
 const stationDisplayConfig = readStationDisplayConfig()
 const fixtureDepartureSource = createFixtureDepartureSource(stationDisplayFixtures)
@@ -77,7 +78,7 @@ function App({ departureSource = fixtureDepartureSource }: AppProps) {
   }, [])
 
   return (
-    <main className="flex min-h-screen flex-col bg-slate-950">
+    <main className="station-display">
       <StationHeader state={state} />
       {state.kind === 'ready' && activeDepartureSource ? <FixtureDepartures stationId={state.station.stationId} source={activeDepartureSource} /> : null}
     </main>

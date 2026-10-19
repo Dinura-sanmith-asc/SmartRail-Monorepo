@@ -143,14 +143,14 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 ### Tests for User Story 5
 
-- [ ] T038 [P] [US5] Add Playwright viewport scenarios in `e2e/station-display-profiles.spec.ts` at 1920 × 1080 and 1366 × 768; assert station, scheduled time, service identity, status and critical disruption are visible at both profiles (after T023 and T037; SR-054, SR-056, SR-061; spec SC-006).
-- [ ] T039 [P] [US5] Add real-browser axe checks and text/symbol status assertions in `e2e/station-accessibility.spec.ts` for applicable WCAG 2.2 AA criteria; record any manual contrast checks in `specs/001-station-information-board/quickstart.md` (after T023 and T037; constitution IV/V).
+- [X] T038 [P] [US5] Add Playwright viewport scenarios in `e2e/station-display-profiles.spec.ts` at 1920 × 1080 and 1366 × 768; assert station, scheduled time, service identity, status and critical disruption are visible at both profiles (after T023 and T037; SR-054, SR-056, SR-061; spec SC-006).
+- [X] T039 [P] [US5] Add real-browser axe checks and text/symbol status assertions in `e2e/station-accessibility.spec.ts` for applicable WCAG 2.2 AA criteria; record any manual contrast checks in `specs/001-station-information-board/quickstart.md` (after T023 and T037; constitution IV/V).
 
 ### Implementation for User Story 5
 
-- [ ] T040 [US5] Implement responsive board, row and disruption layout rules in `src/features/station-display/station-display.css` for both approved landscape viewports without adding viewing-distance or hardware claims (after T038 and T039; SR-054, SR-056, SR-061; spec FR-009).
-- [ ] T041 [US5] Refine typography, hierarchy, focus/announcement semantics, contrast and text/symbol status treatment in `src/features/station-display/components/departure-row.tsx`, `src/features/station-display/components/operational-change.tsx`, `src/features/station-display/components/display-state-view.tsx` and `src/features/station-display/station-display.css` to satisfy WCAG 2.2 AA; ensure critical disruption is not hidden at 1366 × 768 (after T040; spec FR-009/FR-010/FR-012).
-- [ ] T042 [US5] Capture and review browser evidence for both approved viewport profiles in `specs/001-station-information-board/quickstart.md`, including populated, delayed and cancelled states (after T041; SR-061; spec SC-006).
+- [X] T040 [US5] Implement responsive board, row and disruption layout rules in `src/features/station-display/station-display.css` for both approved landscape viewports without adding viewing-distance or hardware claims (after T038 and T039; SR-054, SR-056, SR-061; spec FR-009).
+- [X] T041 [US5] Refine typography, hierarchy, focus/announcement semantics, contrast and text/symbol status treatment in `src/features/station-display/components/departure-row.tsx`, `src/features/station-display/components/operational-change.tsx`, `src/features/station-display/components/display-state-view.tsx` and `src/features/station-display/station-display.css` to satisfy WCAG 2.2 AA; ensure critical disruption is not hidden at 1366 × 768 (after T040; spec FR-009/FR-010/FR-012).
+- [X] T042 [US5] Capture and review browser evidence for both approved viewport profiles in `specs/001-station-information-board/quickstart.md`, including populated, delayed and cancelled states (after T041; SR-061; spec SC-006).
 
 **Checkpoint**: US5 passes only with real-browser evidence at both approved viewports; jsdom layout assertions are insufficient.
 
@@ -164,11 +164,11 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 ### Tests for User Story 6
 
-- [ ] T043 [P] [US6] Add Playwright assertions in `e2e/station-passive-display.spec.ts` that the public display exposes no station selector, editing, publishing, controller, authentication or kiosk actions (after T023 and T037; spec US6 scenarios 1–3; constitution frontend constraints).
+- [X] T043 [P] [US6] Add Playwright assertions in `e2e/station-passive-display.spec.ts` that the public display exposes no station selector, editing, publishing, controller, authentication or kiosk actions (after T023 and T037; spec US6 scenarios 1–3; constitution frontend constraints).
 
 ### Implementation for User Story 6
 
-- [ ] T044 [US6] Keep `src/App.tsx` and `src/features/station-display/components/` limited to passive public information and remove any starter/template interaction that is not part of the approved display scope (after T043; SR-061; spec FR-011).
+- [X] T044 [US6] Keep `src/App.tsx` and `src/features/station-display/components/` limited to passive public information and remove any starter/template interaction that is not part of the approved display scope (after T043; SR-061; spec FR-011).
 
 **Checkpoint**: US6 is complete when the board remains passive across loading, error, stale and populated states.
 

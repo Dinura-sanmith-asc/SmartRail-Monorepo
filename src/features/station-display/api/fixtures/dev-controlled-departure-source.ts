@@ -3,6 +3,7 @@ import type { StationDepartureSource } from '../station-departure-source'
 
 interface BrowserTestControl {
   sourceAvailable: boolean
+  platformChangeNotice?: boolean
   holdNextRevalidation: boolean
   revalidationCalls: number
   pendingRevalidation?: {
@@ -20,6 +21,21 @@ export function createDevControlledDepartureSource(source: StationDepartureSourc
   if (!control) return source
 
   let lastSnapshot: StationDepartureSnapshot | undefined
+  const prepare = (snapshot: StationDepartureSnapshot) => {
+    if (!control.platformChangeNotice || snapshot.departures.length === 0) return snapshot
+    return {
+      ...snapshot,
+      departures: snapshot.departures.map((departure, index) => index === 0
+        ? {
+            ...departure,
+            operational: {
+              ...departure.operational,
+              platform: { kind: 'known' as const, value: 'DEMO platform change notice: platform 2' },
+            },
+          }
+        : departure),
+    }
+  }
   const handleResolution = (event: Event) => {
     const pending = control.pendingRevalidation
     if (!pending) return
@@ -29,14 +45,14 @@ export function createDevControlledDepartureSource(source: StationDepartureSourc
       pending.reject(new Error('Controlled fixture revalidation failed.'))
       return
     }
-    const snapshot = detail.serviceLabel
+    const snapshot = prepare(detail.serviceLabel
       ? {
           ...pending.snapshot,
           departures: pending.snapshot.departures.map((departure, index) =>
             index === 0 ? { ...departure, serviceLabel: detail.serviceLabel! } : departure,
           ),
         }
-      : pending.snapshot
+      : pending.snapshot)
     lastSnapshot = snapshot
     pending.resolve(snapshot)
   }
@@ -45,7 +61,7 @@ export function createDevControlledDepartureSource(source: StationDepartureSourc
   return {
     async getInitialSnapshot(stationId) {
       if (!control.sourceAvailable) throw new Error('Controlled fixture source is unavailable.')
-      const snapshot = await source.getInitialSnapshot(stationId)
+      const snapshot = prepare(await source.getInitialSnapshot(stationId))
       lastSnapshot = snapshot
       return snapshot
     },

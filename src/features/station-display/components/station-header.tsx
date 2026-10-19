@@ -11,17 +11,17 @@ interface StationHeaderProps {
 
 export function StationHeader({ state }: StationHeaderProps) {
   return (
-    <header className="w-full border-b border-slate-700 bg-slate-900 px-8 py-6 text-white">
+    <header className="station-display__header">
       {state.kind === 'loading' ? (
-        <p className="text-lg text-slate-200" role="status" aria-live="polite">
+        <p className="display-state-message" role="status" aria-live="polite">
           Loading station information
         </p>
       ) : state.kind === 'unavailable' ? (
-        <p className="text-lg text-amber-200" role="alert">
+        <p className="display-state-message display-state-message--alert" role="alert">
           {state.message}
         </p>
       ) : (
-        <h1 className="text-3xl font-semibold tracking-wide">{state.station.name}</h1>
+        <h1 className="station-display__station-name">{state.station.name}</h1>
       )}
     </header>
   )

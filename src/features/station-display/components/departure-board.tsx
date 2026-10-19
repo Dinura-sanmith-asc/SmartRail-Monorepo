@@ -10,23 +10,23 @@ export function DepartureBoard({ configuredStationId, snapshot }: DepartureBoard
   const isFixture = snapshot.origin === 'fixture'
 
   return (
-    <section aria-labelledby="departure-heading" className="w-full flex-1 px-8 py-7 text-white">
+    <section aria-labelledby="departure-heading" className="departure-board">
       {isFixture ? (
-        <p className="mb-6 inline-flex rounded bg-amber-300 px-4 py-2 text-lg font-extrabold text-slate-950" role="note">
+        <p className="departure-board__demo-label" role="note">
           DEMO DATA — NOT LIVE
         </p>
       ) : null}
-      <h2 id="departure-heading" className="mb-5 text-2xl font-semibold">Departures</h2>
+      <h2 id="departure-heading" className="departure-board__title">Departures</h2>
       {snapshot.station.stationId !== configuredStationId ? (
-        <p role="alert" className="text-lg text-amber-200">
+        <p role="alert" className="display-state-message display-state-message--alert">
           Departure information is unavailable for this station.
         </p>
       ) : snapshot.departures.length === 0 ? (
-        <p className="text-lg text-slate-200" role="status" aria-live="polite">
+        <p className="display-state-message" role="status" aria-live="polite">
           {isFixture ? 'No fixture departures are available for this station.' : 'No departures are currently available.'}
         </p>
       ) : (
-        <ul className="space-y-4" aria-label="Station departures">
+        <ul className="departure-board__list" aria-label="Station departures">
           {snapshot.departures.map((departure) => (
             <DepartureRow departure={departure} key={departure.departureId} />
           ))}

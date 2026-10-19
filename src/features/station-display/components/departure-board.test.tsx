@@ -22,10 +22,12 @@ describe('DepartureBoard', () => {
     render(<DepartureBoard configuredStationId={central.station.stationId} snapshot={central} />)
 
     const rows = screen.getAllByRole('listitem')
-    expect(within(rows[0]).getByText('Status: DEMO delayed')).toBeInTheDocument()
-    expect(within(rows[0]).getByText('Platform: DEMO platform 2')).toBeInTheDocument()
-    expect(within(rows[1]).getByRole('status')).toHaveTextContent('Cancelled')
-    expect(within(rows[1]).queryByText('Platform: DEMO platform 2')).not.toBeInTheDocument()
+    expect(within(rows[0]).getByText('Status')).toBeInTheDocument()
+    expect(within(rows[0]).getByText('DEMO delayed')).toBeInTheDocument()
+    expect(within(rows[0]).getByText('Platform')).toBeInTheDocument()
+    expect(within(rows[0]).getByText('DEMO platform 2')).toBeInTheDocument()
+    expect(within(rows[1]).getByRole('status', { name: 'Cancellation status: Cancelled' })).toHaveTextContent('Cancelled')
+    expect(within(rows[1]).queryByText('DEMO platform 2')).not.toBeInTheDocument()
   })
 
   it('refuses a snapshot associated with a different station instead of falling back', () => {

@@ -25,8 +25,8 @@ export function DisplayStateView({ configuredStationId, state }: DisplayStateVie
 
   return (
     <>
-      {status ? <p className="mx-8 mt-6 text-lg text-amber-200" role={state.kind === 'error' || state.kind === 'unavailable' ? 'alert' : 'status'}>{status}</p> : null}
-      {updateTime ? <p className="mx-8 mt-2 text-sm text-slate-300">Last updated: {updateTime.displayValue}</p> : null}
+      {status ? <p className={`display-state-message${state.kind === 'error' || state.kind === 'unavailable' ? ' display-state-message--alert' : ''}`} role={state.kind === 'error' || state.kind === 'unavailable' ? 'alert' : 'status'} aria-live="polite">{status}</p> : null}
+      {updateTime ? <p className="display-state-message display-state-message--timestamp">Last updated: {updateTime.displayValue}</p> : null}
       {snapshot ? <DepartureBoard configuredStationId={configuredStationId} snapshot={snapshot} /> : null}
     </>
   )

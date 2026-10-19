@@ -14,9 +14,13 @@ describe('OperationalChange', () => {
 
     render(<OperationalChange operational={operational} />)
 
-    expect(screen.getByText('Platform: DEMO platform change example')).toBeInTheDocument()
-    expect(screen.getByText('Delay: DEMO delay example')).toBeInTheDocument()
-    expect(screen.getByText('Status: DEMO delayed')).toBeInTheDocument()
+    expect(screen.getByText('Platform')).toBeInTheDocument()
+    expect(screen.getByText('DEMO platform change example')).toBeInTheDocument()
+    expect(screen.getByText('Delay')).toBeInTheDocument()
+    expect(screen.getByText('DEMO delay example')).toBeInTheDocument()
+    expect(screen.getByText('Status')).toBeInTheDocument()
+    expect(screen.getByText('DEMO delayed')).toBeInTheDocument()
+    expect(screen.getByText('No cancellation reported')).toBeInTheDocument()
   })
 
   it('prominently identifies a supplied cancellation with a text label', () => {
@@ -29,7 +33,7 @@ describe('OperationalChange', () => {
 
     render(<OperationalChange operational={operational} />)
 
-    expect(screen.getByRole('status')).toHaveTextContent('Cancelled')
+    expect(screen.getByRole('status', { name: 'Cancellation status: Cancelled' })).toHaveTextContent('Cancelled')
   })
 
   it('shows a supplied update time only when its meaning is explicit', () => {
@@ -42,7 +46,8 @@ describe('OperationalChange', () => {
     }
 
     const { rerender } = render(<OperationalChange operational={operational} />)
-    expect(screen.getByText('Fixture update time: DEMO fixture time example')).toBeInTheDocument()
+    expect(screen.getByText('Fixture update time')).toBeInTheDocument()
+    expect(screen.getByText('DEMO fixture time example')).toBeInTheDocument()
 
     rerender(
       <OperationalChange
@@ -62,10 +67,12 @@ describe('OperationalChange', () => {
 
     render(<OperationalChange operational={operational} />)
 
-    expect(screen.getByText('Status unknown')).toBeInTheDocument()
-    expect(screen.getByText('Platform unknown')).toBeInTheDocument()
-    expect(screen.getByText('Delay unavailable')).toBeInTheDocument()
-    expect(screen.getByText('Cancellation status unknown')).toBeInTheDocument()
+    expect(screen.getByText('Status')).toBeInTheDocument()
+    expect(screen.getByText('Platform')).toBeInTheDocument()
+    expect(screen.getByText('Delay')).toBeInTheDocument()
+    expect(screen.getByText('Cancellation')).toBeInTheDocument()
+    expect(screen.getAllByText('Unknown')).toHaveLength(3)
+    expect(screen.getByText('Unavailable')).toBeInTheDocument()
     expect(screen.queryByText(/minutes/)).not.toBeInTheDocument()
   })
 })
