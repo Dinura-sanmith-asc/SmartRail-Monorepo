@@ -15,6 +15,11 @@ public sealed record JourneyStopResponse(Guid JourneyStopId, int StopOrder, Guid
     DateTimeOffset? OperationalArrivalAt, DateTimeOffset? OperationalDepartureAt,
     string? Platform, string? TimingSource, DateTimeOffset? TimingUpdatedAt, string Ambiguity);
 
+public sealed record StationDepartureResponse(Guid JourneyInstanceId, Guid ServiceId, DateOnly OperationDate,
+    DateOnly StationLocalDepartureDate, int Revision, string Status, Guid StationId, string? StationName,
+    int StopOrder, DateTimeOffset? ScheduledDepartureAt, DateTimeOffset? OperationalDepartureAt,
+    string? Platform, string Source, DateTimeOffset UpdatedAt, string Ambiguity);
+
 public sealed record JourneyUpdateResponse(Guid UpdateId, Guid JourneyInstanceId, int Revision,
     string Kind, string Status, string Source, DateTimeOffset PublishedAt,
     Guid? CorrectionOfUpdateId, JourneyPublicChangeResponse PublicChange);
