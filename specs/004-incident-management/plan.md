@@ -4,7 +4,7 @@
 
 ## Summary
 
-Implement the three approved protected Incident Management operations in the existing .NET 10 modular monolith. Feature 004 owns incident records, the forward-only lifecycle, immutable transition evidence, and explicit impact associations. It validates station/service references through Feature 001 and journey/disruption references through Feature 003, without copying those modules' authoritative state or publishing journey changes. PostgreSQL transactions enforce revision, idempotency, and audit invariants. The approved category code catalogue is a pre-implementation gate: creation remains disabled until the business owner supplies the controlled values.
+Implement the three approved protected Incident Management operations in the existing .NET 10 modular monolith. Feature 004 owns incident records, the forward-only lifecycle, immutable transition evidence, and explicit impact associations. It validates station/service references through Feature 001 and journey/disruption references through Feature 003, without copying those modules' authoritative state or publishing journey changes. PostgreSQL transactions enforce revision, idempotency, and audit invariants. The approved category code catalogue is a production-enablement gate: production creation remains disabled until the business owner supplies the controlled values. Local implementation and automated verification may use explicit test-only values isolated from normal Development/Production configuration.
 
 Direct Must Have scope is SR-041, SR-042, and SR-044. SR-038 remains an Operations endpoint/client dependency. Applicable identity, authorization, privacy, reliability and client requirements are traced in [spec.md](spec.md); backend evidence alone does not close owner-module or client acceptance.
 
@@ -123,7 +123,7 @@ Use the existing Docker PostgreSQL services and current local authentication fix
 
 ## Remaining Gates and Risks
 
-1. **Business gate — category codes**: approved category vocabulary must be supplied before incident creation is enabled. No default, free-text category, or silently permissive mode.
+1. **Business gate — category codes**: approved category vocabulary must be supplied before production incident creation is enabled. Isolated local tests may use explicit test-only values; no default, free-text category, or silently permissive mode is allowed.
 2. **Owner integration gate**: production Feature 001/003 verification adapters must be available and authoritative. Until then those calls fail closed; test doubles are test-only.
 3. **Downstream acceptance**: Operations summary/composition and client evidence for SR-038/SR-044 remain open.
 4. **Existing auth boundary**: Feature 002 incident evidence exposes one station. Feature 004 must perform per-associated-station checks via the existing station-scope path and test it; do not rely on the single-station evidence field for all-stations authorization.

@@ -4,8 +4,10 @@ info:
   version: 1.0.0
   description: >-
     Protected Incident Management operations. Category codes resolve through an
-    approved controlled catalogue; the catalogue values are a pre-implementation
-    business gate and are intentionally not enumerated here.
+    approved controlled catalogue before production incident creation is enabled.
+    Isolated local tests may use test-only values not loaded by the production
+    configuration. The production catalogue remains unapproved and is not
+    enumerated here.
 servers:
   - url: /
 security:

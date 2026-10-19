@@ -2,7 +2,7 @@
 
 **Feature Branch**: `feature-04-incident-management`  
 **Created**: 2026-10-19  
-**Status**: Draft — Feature 004 clarifications approved; the controlled category vocabulary remains a pre-implementation approval gate
+**Status**: Draft — Feature 004 clarifications approved; the controlled category vocabulary remains a production-enablement approval gate; isolated local implementation and tests may use explicit test-only category values
 **Input**: Approved SmartRail MVP requirements, RBAC/API baseline, and accepted Feature 002/003 ownership decisions
 
 ## User Scenarios & Testing
@@ -146,7 +146,7 @@ The wording, priority, approval disposition, and acceptance checks below are tra
 
 ### Functional Requirements
 
-- **FR-001 (SR-041)**: SmartRail MUST allow an authenticated user with the approved incident-creation grant and required resource scope to record an incident with a description, a category, and at least one verified railway location/reference (station or affected service). The server MUST assign the report timestamp; a reporter-supplied occurrence time is optional and stored separately. Category values MUST come from a controlled vocabulary, but its entries require separate approval before implementation. No severity classification or additional business field is introduced.
+- **FR-001 (SR-041)**: SmartRail MUST allow an authenticated user with the approved incident-creation grant and required resource scope to record an incident with a description, a category, and at least one verified railway location/reference (station or affected service). The server MUST assign the report timestamp; a reporter-supplied occurrence time is optional and stored separately. Category values MUST come from a controlled vocabulary. The entries require separate approval before production incident creation is enabled; isolated local implementation and automated tests may use explicit test-only category values that are unavailable in normal Development/Production configuration. No severity classification or additional business field is introduced.
 - **FR-002 (SR-041)**: A successfully recorded incident MUST have an opaque server-generated stable identifier, retain its verified railway references, and be attributable to the authenticated reporting identity. Malformed fields/references are invalid; unknown or inaccessible references are safely reported as not found. If required owner verification is unavailable, creation MUST fail as unavailable without persisting the incident or an unverified link.
 - **FR-003 (SR-041; SR-091)**: Incident creation MUST use Feature 002's current server-side role and applicable resource-scope decisions. Station Staff incident creation MUST include a station in current scope; reading or updating an incident associated with multiple stations requires current scope covering every associated station. Controller incident grants have global incident scope under the explicit Feature 004 approval. Missing, revoked, insufficient, or unavailable authorization evidence MUST NOT grant access or change state.
 - **FR-004 (SR-038; SR-044)**: Authorized users MUST be able to retrieve incident context only within their approved access. Feature 004 owns incident reads and associations; the operations client composes that context with Feature 003 official journey data.
@@ -235,7 +235,7 @@ The approved category vocabulary has not been supplied and remains an approval g
 
 All requested authorization, lifecycle, report-data, association, and API-operation semantics have been clarified and approved. One deliberately deferred business input remains:
 
-- **Category vocabulary**: The approved source requires a category but supplies no category values. Keep `categoryCode` required and backed by a controlled railway category catalogue. The catalogue values must be approved before incident creation implementation and category-specific acceptance. Do not invent categories or a severity taxonomy. This gate does not block technical planning.
+- **Category vocabulary**: The approved source requires a category but supplies no category values. Keep `categoryCode` required and backed by a controlled railway category catalogue. The catalogue values must be approved before production incident creation is enabled and production category-specific acceptance. Isolated local implementation and automated tests may use explicit test-only category values that are unavailable in normal Development/Production configuration. Do not invent categories or a severity taxonomy. This gate does not block technical planning.
 
 ### Approved Clarification — Incident Authorization Scope
 
@@ -255,9 +255,9 @@ All requested authorization, lifecycle, report-data, association, and API-operat
 
 - Each incident receives an opaque server-generated stable identifier. The authenticated Feature 002 identity supplies reporter attribution; clients cannot supply the actor identity.
 - The required report data is a description, a category, and at least one verified railway location/reference (station or affected service). The server supplies the report timestamp. A reporter-supplied occurrence time is optional and distinct from report time.
-- Category is a required code from a controlled vocabulary, but no category values have been approved in this clarification. The vocabulary must be explicitly approved before implementation; no severity classification or new business field is introduced.
+- Category is a required code from a controlled vocabulary, but no category values have been approved in this clarification. The vocabulary must be explicitly approved before production incident creation is enabled; isolated local implementation and tests may use explicit test-only values unavailable in normal Development/Production configuration. No severity classification or new business field is introduced.
 - Feature 001 verifies station/service references; Feature 003 verifies any supplied journey or published-disruption references. Unknown or inaccessible references are safely reported as not found. When required owner verification is unavailable, the request fails as unavailable and creates neither an incident nor an unverified association. Existing authentication/authorization behavior remains 401/403 under Feature 002.
-- Exact serialized association/disruption and response projection schemas are technical planning details within the approved operation semantics. The controlled category vocabulary remains the pre-implementation approval gate.
+- Exact serialized association/disruption and response projection schemas are technical planning details within the approved operation semantics. The controlled category vocabulary remains a production-enablement approval gate; explicit test-only values may be used only in isolated local tests.
 
 ### Approved Clarification — Impact Associations
 
@@ -274,11 +274,11 @@ All requested authorization, lifecycle, report-data, association, and API-operat
 - PATCH requires `expectedRevision`, and can carry a permitted forward state transition and/or explicit association additions/removals. It returns `200` on success. A stable `Idempotency-Key` returns the original result for an identical replay and `409` for conflicting reuse.
 - Error behavior: `400` malformed input; `401` missing/invalid credentials; `403` verified but insufficient permission/scope; `404` unknown or inaccessible incident/reference; `409` stale revision or idempotency conflict; `503` required authorization/owner verification unavailable. Use safe RFC 9457 Problem Details.
 - Incident operations are protected. Reporter subjects, private audit evidence, credentials, and tokens are excluded from response projections; public Feature 003 operations/contracts remain untouched.
-- Exact serialized response schema is a planning detail. `categoryCode` remains required and must resolve against an explicitly approved controlled railway category catalogue before implementation; the actual catalogue values are the pre-implementation approval gate.
+- Exact serialized response schema is a planning detail. `categoryCode` remains required and must resolve against an explicitly approved controlled railway category catalogue before production creation is enabled; the actual catalogue values are the production-enablement approval gate. Isolated local verification may use test-only values.
 
 ### Clarification Record
 
-- Approved: incident-specific authorization scope, lifecycle/retry semantics, minimum incident-report data/owner-verification rules, impact-association behavior, API filters, request/write semantics, response status behavior, and the existing three-operation boundary. The approved category-code list remains a pre-implementation business approval gate; exact serialized response schemas/projections are for technical planning.
+- Approved: incident-specific authorization scope, lifecycle/retry semantics, minimum incident-report data/owner-verification rules, impact-association behavior, API filters, request/write semantics, response status behavior, and the existing three-operation boundary. The approved category-code list remains a production-enablement business approval gate; isolated local implementation/testing may use explicitly configured test-only values; exact serialized response schemas/projections are for technical planning.
 - The previously approved Feature 003 incident-visibility decision is preserved: Incident Management owns incident records, affected-journey associations, and authorized incident-context reads; the operations client composes that context with Feature 003 official journey data; private incident records are not exposed in the public JourneySnapshot.
 
 ## Out of Scope and Deferred Baseline Items

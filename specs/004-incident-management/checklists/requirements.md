@@ -28,17 +28,17 @@
 - [x] Client-owned error, network, freshness, and rendering obligations are tracked separately from backend behavior.
 - [x] Controller incident scope is explicitly approved as global for the existing Controller incident grants; Station Staff remain scoped to current station assignments, including the approved multi-station rule.
 - [x] Lifecycle state names/transitions, resolution/closure semantics, terminal-state reopening policy, minimum transition evidence, stale-revision handling, and lifecycle retry semantics are explicitly approved; SR-047 correction workflow and SR-051 full audit chronology remain deferred.
-- [x] Report fields, timestamp distinction, fail-closed owner verification, association semantics, existing-operation filters/write behavior, HTTP status mapping, concurrency, and idempotent retries are approved. Exact controlled category-code values remain an explicit pre-implementation approval gate; exact serialized projections are for planning.
-- [x] No `[NEEDS CLARIFICATION]` placeholder markers are used; the approved category-code values are listed explicitly as a pre-implementation business approval gate.
+- [x] Report fields, timestamp distinction, fail-closed owner verification, association semantics, existing-operation filters/write behavior, HTTP status mapping, concurrency, and idempotent retries are approved. Exact controlled category-code values remain an explicit production-enablement approval gate; isolated local implementation and tests may use test-only values; exact serialized projections are for planning.
+- [x] No `[NEEDS CLARIFICATION]` placeholder markers are used; the approved category-code values are listed explicitly as a production-enablement business approval gate; test-only values may be used only in isolated local verification.
 
 ## Feature Readiness
 
 - [x] Each direct Must Have has a feature responsibility and measurable acceptance evidence.
 - [x] Backend acceptance is separated from operations-client, station-client, and cross-module acceptance.
 - [x] Incident changes cannot automatically publish or modify official Feature 003 journey status.
-- [x] All material authorization, lifecycle, report-data, association, and existing-operation contract decisions are resolved; the approved category-code catalogue remains a pre-implementation gate and does not block `$speckit-plan`.
+- [x] All material authorization, lifecycle, report-data, association, and existing-operation contract decisions are resolved; the approved category-code catalogue remains a production-enablement gate and does not block local implementation/testing or `$speckit-plan`.
 
 ## Notes
 
-- The controlled category-code values remain a genuine pre-implementation business approval gate and must be supplied before incident creation is implemented.
+- The controlled category-code values remain a genuine production-enablement business approval gate and must be supplied before production incident creation is enabled; explicit test-only values may support isolated local implementation and verification.
 - This checklist records requirements quality only; it does not indicate implementation completion.

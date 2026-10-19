@@ -7,7 +7,7 @@ This guide is for Feature 004 implementation and verification after task approva
 - .NET 10 SDK and repository package restore available.
 - Docker Desktop running with the existing SmartRail PostgreSQL services.
 - Existing local OIDC/JWKS fixture for signed JWTs; no AWS Cognito setup or authentication bypass.
-- The category-code catalogue approval is required before tests may expect successful incident creation with production category values. Unit and contract tests can use explicitly named test-only category fixtures.
+- The category-code catalogue approval is required before production incident creation is enabled or production category acceptance is claimed. Isolated local signed-token HTTP, integration and unit tests may use explicitly named test-only category fixtures; these values must never load through normal Development/Production configuration.
 
 ## Local services and test database safety
 
