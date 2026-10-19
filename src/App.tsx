@@ -3,6 +3,7 @@ import { readStationDisplayConfig, type ConfigErrorReason } from './app/config'
 import { findPublishedStation } from './features/station-display/api/station-reference-client'
 import { createFixtureDepartureSource } from './features/station-display/api/fixtures/fixture-departure-source'
 import { stationDisplayFixtures } from './features/station-display/api/fixtures/station-display.fixture'
+import { createStationDepartureAdapter } from './features/station-display/api/station-departure-adapter'
 import type { StationDepartureSource } from './features/station-display/api/station-departure-source'
 import { StationHeader, type StationHeaderState } from './features/station-display/components/station-header'
 import { DisplayStateView } from './features/station-display/components/display-state-view'
@@ -12,6 +13,12 @@ import './features/station-display/station-display.css'
 
 const stationDisplayConfig = readStationDisplayConfig()
 const fixtureDepartureSource = createFixtureDepartureSource(stationDisplayFixtures)
+const liveDepartureSource = stationDisplayConfig.kind === 'valid'
+  ? createStationDepartureAdapter(createHttpClient({ baseUrl: stationDisplayConfig.config.apiBaseUrl }))
+  : fixtureDepartureSource
+const defaultDepartureSource = import.meta.env.PROD || import.meta.env.VITE_STATION_DISPLAY_SOURCE === 'live'
+  ? liveDepartureSource
+  : fixtureDepartureSource
 
 function configurationMessage(reason: ConfigErrorReason): string {
   switch (reason) {
@@ -35,7 +42,7 @@ interface AppProps {
   departureSource?: StationDepartureSource
 }
 
-function App({ departureSource = fixtureDepartureSource }: AppProps) {
+function App({ departureSource = defaultDepartureSource }: AppProps) {
   const [activeDepartureSource, setActiveDepartureSource] = useState<StationDepartureSource | null>(
     departureSource === fixtureDepartureSource
       ? (import.meta.env.DEV ? null : fixtureDepartureSource)

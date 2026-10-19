@@ -20,6 +20,9 @@ export function OperationalChange({ operational }: OperationalChangeProps) {
       <dl className="operational-change__grid">
         {renderValue('Status', operational.status, operational.status.kind === 'known' ? 'operational-change__entry--status' : '')}
         {renderValue('Platform', operational.platform)}
+        {operational.operationalDepartureTime
+          ? renderValue('Operational departure', operational.operationalDepartureTime)
+          : null}
         {renderValue('Delay', operational.delay, operational.delay.kind === 'known' ? 'operational-change__entry--delay' : '')}
         <div className={`operational-change__entry${operational.cancellation.kind === 'known' && operational.cancellation.value ? ' operational-change__entry--cancelled' : ''}`}>
           <dt>Cancellation</dt>

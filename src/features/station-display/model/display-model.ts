@@ -18,6 +18,7 @@ export interface ScheduledDepartureTime {
 export interface OperationalInformation {
   status: PublishedValue<string>
   platform: PublishedValue<string>
+  operationalDepartureTime?: PublishedValue<string>
   delay: PublishedValue<string>
   cancellation: PublishedValue<boolean>
   updateTime?: {
@@ -34,6 +35,10 @@ export interface StationDeparture {
   serviceLabel: string
   scheduledTime: ScheduledDepartureTime
   operational: OperationalInformation
+  /** Source revision, when the authoritative contract supplies one. */
+  sourceRevision?: number
+  /** Ambiguous public identity is shown to readers and never resolved by the client. */
+  identityAmbiguous?: boolean
 }
 
 export interface StationDepartureSnapshot {

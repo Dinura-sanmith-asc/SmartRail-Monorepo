@@ -79,11 +79,11 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 - [X] T022 [US2] Implement `src/features/station-display/components/departure-board.tsx` using only rows associated with the configured station and source-provided order; provide a no-departures state (after T018 and T021; SR-054; spec US1 scenarios 1 through 3).
 - [X] T023 [US2] Wire the T010 non-live fixture source into `src/App.tsx` for isolated UI development, after station identity (T016) and board composition (T022) are available; always show a persistent visible fixture/demo label whenever fixture data renders (T018 verifies the label; SR-054, SR-061).
 
-### Backend contract gate for User Story 2 — BLOCKED
+### Backend contract gate for User Story 2 — T026 COMPLETE
 
-- [ ] T024 [US2] **BLOCKED — backend approval required**: Update `specs/001-station-information-board/contracts/README.md` to reference the approved contract for `GET /api/stations/{id}/departures` only after the backend owner supplies its response schema, public projection, station/date/time/timezone rules, “upcoming” ordering, operational and unknown-value meanings, timestamps/revisions, and error behavior.
-- [ ] T025 [US2] **BLOCKED - T024 and T007 required; backend approval required**: Implement the live station departures adapter in `src/features/station-display/api/station-departure-adapter.ts` against the approved `GET /api/stations/{id}/departures` contract; implement the same T007 source interface as the fixture adapter. Do not add request/response fields or business rules absent from that approved contract.
-- [ ] T026 [US2] **BLOCKED - T024 and T025 required**: Add live contract-backed departure acceptance coverage in `e2e/station-live-contract.spec.ts` for selected-station isolation, schedule/status meaning, empty/unknown values and API failures; run it only through opt-in `npm run test:e2e:live` after the backend gate, and never let fixtures pass this task.
+- [X] T024 [US2] Update `specs/001-station-information-board/contracts/README.md` to reference the approved Journeys & Status OpenAPI v1.0.0 contract for `GET /api/stations/{id}/departures`, including its public projection, station-local date/timezone rules, returned ordering, operational/unknown-value meanings, revision/update timestamp, ambiguity behavior and errors. The contract does not define an automatic delivery mechanism or cadence.
+- [X] T025 [US2] Implement `src/features/station-display/api/station-departure-adapter.ts` against Journeys & Status OpenAPI v1.0.0 and the T007 `StationDepartureSource` interface. Request the station-local Colombo date, validate the public response, preserve source ordering/identity/revision/ambiguity, and map nullable operational values without deriving delay or inventing service codes.
+- [X] T026 [US2] Run the opt-in live contract check against the migrated local SmartRail Development API. `npm run test:e2e:live` passed 2/2 in Chromium on 2026-10-19: the configured Colombo Fort station rendered the real dated departure projection, and malformed dates/unpublished station IDs returned the documented RFC 9457 Problem responses. The API response matched the v1.0.0 fields and values; one explicitly identified local acceptance journey was initialized through the backend repository workflow against the existing fixture service/schedule. This verifies T026's live API compatibility scope only; T047 remains outstanding.
 
 **Checkpoint**: Fixture-backed US2 may be demonstrated as fixture data. It is not live SR-054/SR-056 acceptance until the blocked contract tasks pass.
 
@@ -105,7 +105,7 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 
 ### Live automatic-update integration gate — BLOCKED
 
-- [ ] T029 [US3] **BLOCKED - approved departure/change contract and T025 required**: Connect `src/features/station-display/api/station-departure-adapter.ts` to the backend-approved automatic update mechanism and interval only after those decisions are published; do not select polling versus push in the frontend plan.
+- [ ] T029 [US3] **BLOCKED - approved automatic delivery mechanism/cadence required**: The approved snapshot contract and T025 adapter exist, but Journeys & Status v1.0.0 does not specify push, polling, or an interval. Connect `src/features/station-display/api/station-departure-adapter.ts` to the backend-approved mechanism only after that decision is published; do not select polling versus push in the frontend plan.
 - [ ] T030 [US3] **BLOCKED - T029 required**: Add live browser verification in `e2e/station-live-contract.spec.ts`, run only through opt-in `npm run test:e2e:live`, proving a published authoritative backend change reaches the board automatically without manual reload; assert no latency target unless separately approved.
 - [ ] T031 [US3] **CONDITIONAL / BLOCKED - T024 required**: Add use of `GET /api/journeys/{id}/updates` in `src/features/station-display/api/station-update-adapter.ts` only if the approved departures contract cannot provide the required change detection; first record that backend decision in `contracts/README.md`.
 
@@ -189,7 +189,7 @@ description: "Dependency-ordered implementation tasks for the SmartRail Station 
 - **Setup (Phase 1)**: T001 precedes T002-T004. T002 precedes T003. No application implementation begins before its test harness/configuration is available.
 - **Foundational (Phase 2)**: T005 and T006 can proceed in parallel after setup. T007 follows T006 and defines the shared source interface. T008 follows T006 and T007; T009 tests the fixture source before T010 implements it. T010 implements the shared interface. Fixture-backed story work depends on this foundation, not on live backend approval.
 - **User stories**: US1 establishes validated station identity. US2 uses it and T010 to render fixture-backed departures; T020-T023 are ordered after their tests and composed dependencies. US3 consumes the already-established T007 source boundary. US4 adds state/revalidation behavior. US5 verifies/refines the board; US6 verifies the passive surface.
-- **Live integration**: T024 is blocked until the backend publishes/approves departure semantics. T025 requires T007 and T024; T026 requires T024 and T025. T029-T030 require the approved update mechanism/interval and T025. T031 is conditional on backend approval that `/api/journeys/{id}/updates` is needed. T047 requires T030 and the live departure, operational, stale/revalidation evidence plus a verified environment; fixture evidence cannot satisfy it.
+- **Live integration**: T024-T026 are complete against Journeys & Status OpenAPI v1.0.0; T026 passed against the migrated local Development API on 2026-10-19 with an explicitly identified local acceptance journey. T029-T030 require an approved update delivery mechanism/cadence and T025. T031 remains conditional on a backend decision that `/api/journeys/{id}/updates` is needed. T047 requires T030 and live operational-change, stale/revalidation evidence plus a verified environment; fixture evidence cannot satisfy it.
 - **Quickstart edits**: T042 precedes T045; T045 precedes T046; T046 precedes T047. These tasks all edit `quickstart.md` and must run sequentially.
 
 ### User Story Dependencies
@@ -232,7 +232,7 @@ Complete Setup, Foundation and **US1 plus the fixture-backed core of US2** to de
 3. Deliver US2 fixture-backed board and operational presentation.
 4. Add US3 automatic fixture updates and US4 stale/revalidation states.
 5. Verify US5 at both approved profiles and complete US6 passive-scope checks.
-6. Unblock and complete live integration only after backend contracts are approved, then execute T047 after T030.
+6. T026 is complete against the migrated local backend. Complete live automatic update work only after its backend delivery contract is approved, then execute T047 last.
 
 ## Notes
 

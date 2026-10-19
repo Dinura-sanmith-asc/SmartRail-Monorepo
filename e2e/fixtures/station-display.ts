@@ -1,6 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 
-export const configuredStationId = '00000000-0000-4000-8000-000000000101'
+export const configuredStationId = '10000000-0000-0000-0000-000000000001'
 export const configuredStationName = 'DEMO Central Station'
 
 export async function openStationDisplay(

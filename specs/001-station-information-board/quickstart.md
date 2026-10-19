@@ -1,13 +1,13 @@
 # Quickstart: Station Display Validation
 
-This guide describes validation scenarios for implementation. It does not claim the feature or future live endpoints are currently implemented.
+This guide records fixture verification and the live contract integration status. Contract implementation does not by itself establish live environment acceptance.
 
 ## Prerequisites
 
 - Node.js 24.x (the inspected local environment is 24.18.0; the installed Vite 8 requires Node 20.19+ or 22.12+).
 - npm and repository dependencies installed with the committed lockfile.
 - During fixture-only UI work, use an explicitly labeled contract fixture. Do not identify fixture output as live railway data.
-- For live acceptance, an environment with the approved Journeys & Status contract and a published test station/departure dataset is required.
+- For live acceptance, set `STATION_DISPLAY_LIVE_STATION_ID` and `STATION_DISPLAY_LIVE_API_BASE_URL` to a verified backend environment with a published test station/departure dataset.
 
 ## Current repository checks
 
@@ -20,16 +20,15 @@ npm run build
 
 These validate linting and TypeScript/production compilation. They do not prove acceptance behavior or live integration.
 
-## Planned feature test commands
-
-Implementation tasks must add and verify test scripts before relying on them:
+## Test commands
 
 ```powershell
 npm run test:unit
 npm run test:e2e
+npm run test:e2e:live
 ```
 
-Use Vitest/React Testing Library for state and component behavior and Playwright for browser scenarios. Playwright should run the Vite app with its test web server; viewport contexts must use the two approved landscape profiles.
+`npm run test:e2e` runs only fixtures. `npm run test:e2e:live` refuses to start unless the two live environment variables above are set, then selects the live API source. Use Vitest/React Testing Library for state and component behavior and Playwright for browser scenarios.
 
 ## Validation scenarios
 
@@ -40,11 +39,11 @@ Use Vitest/React Testing Library for state and component behavior and Playwright
 5. **Connectivity and recovery**: After one successful response, interrupt the source; confirm the prior data is visibly cached/possibly outdated and last update appears only when reliable. Restore connectivity; confirm stale indication remains until a successful authoritative revalidation. Start offline with no prior response and confirm unavailable state.
 6. **Approved display profiles**: Run the primary board scenario at 1920 × 1080 and 1366 × 768. Confirm station identity, scheduled time, service identity and operational status remain readable and important disruption information is not hidden at either profile.
 7. **Accessibility and passive use**: Inspect semantic headings/status announcements and WCAG 2.2 AA criteria. Confirm status is understandable without color. Confirm no station selector, station-management, controller or kiosk actions are exposed.
-8. **Live contract acceptance (blocked)**: Repeat the station/departure, operational update, automatic refresh and recovery scenarios against the backend only after its contract, public projection, revision/time semantics and error behavior are approved. Record source contract version and verification evidence; fixtures alone cannot pass this gate.
+8. **Live contract acceptance (T026 complete)**: Journeys & Status OpenAPI v1.0.0 is approved and the T025 adapter maps its station departure snapshots. After the existing additive Journeys & Status migration was applied to local Development, one explicitly identified acceptance journey was initialized through the backend `JourneyInitializationRepository` workflow, using the fixture service/schedule already present in the database. On 2026-10-19, `npm run test:e2e:live` passed 2/2 in Chromium against the Aspire API: the configured Colombo Fort board rendered the real dated projection, and malformed-date/unpublished-station requests returned the documented `application/problem+json` responses. Automatic live propagation and central-service outage/revalidation acceptance still need an approved delivery mechanism and verified environment.
 
 ## Expected result
 
-Fixture scenarios may validate the independent UI and state presentation. The feature is not live-integration complete until the future endpoint contracts are verified and the display passes the source acceptance checks for SR-054, SR-056, SR-058 and SR-059, with the station prototype evidence for SR-061 and applicable cross-cutting requirement evidence.
+Fixture scenarios validate independent UI and state presentation. T026 now verifies the live departure snapshot and API error contract. Live acceptance for SR-058 and SR-059, and the final T047 acceptance, remain incomplete until automatic update delivery is approved and live update/recovery evidence passes.
 
 ## Browser verification evidence — T038–T044
 
@@ -72,12 +71,12 @@ Three Playwright scenarios passed for populated, unavailable, and stale states. 
 ### Quality gate results for this batch
 
 - `npm run test:e2e`: passed, 12 tests; zero skipped.
-- `npm run test:unit`: passed, 12 files and 47 tests.
+- `npm run test:unit -- --pool=threads --maxWorkers=1`: passed, 13 files and 50 tests.
 - `npm run lint`: passed.
 - `npm run build`: passed.
 - `git diff --check`: passed.
 
-The production build was inspected and contains no development browser-control identifiers. These results verify the fixture-driven frontend and do not constitute live backend acceptance. Live integration remains contract-gated.
+The production build was inspected and contains no development browser-control identifiers. These results verify the fixture-driven frontend and do not constitute live backend acceptance. An earlier default-pool Vitest invocation stalled without output in this Windows environment; the single-worker thread-pool invocation above completed successfully.
 
 ## Consolidated requirement verification — T045
 
@@ -85,16 +84,16 @@ Requirement wording and priorities remain governed by the approved inventory and
 
 | Requirement | Story / acceptance scenarios | Frontend capability and tasks | Automated evidence | Browser / screenshot evidence | Fixture status | Live / overall status and remaining dependency |
 |---|---|---|---|---|---|---|
-| SR-054 | US1 scenarios 1–4; US2 scenarios 1, 5 | Configured-station board, source ordering, scheduled labels, empty state; T013, T016–T018, T021–T023, T038 | `station-header.test.tsx`, `departure-board.test.tsx`, `App.test.tsx`, `departure-row.test.tsx` | Profile tests at 1920 × 1080 and 1366 × 768; screenshots below | Implemented and fixture-verified | Backend-dependent / blocked: approved `GET /api/stations/{id}/departures` contract and live acceptance T024–T026 are pending. Fixtures do not satisfy SR-054 acceptance. |
-| SR-056 | US2 scenarios 2–5 | Textual platform, delay, cancellation and unknown-value presentation; T019–T021, T038–T039 | `operational-change.test.tsx`, `departure-row.test.tsx` | Both profile screenshots and populated-state axe/browser checks | Implemented and fixture-verified | Backend-dependent / blocked: authoritative operational projection, field meaning and update-time semantics require approved contract and T024–T026. |
-| SR-058 | US3 scenarios 1–3 | Source interface and automatic snapshot presentation without passenger action; T007, T027–T030 | `use-departure-updates.test.ts` | `station-connectivity.spec.ts` verifies fixture revalidation; profile suite verifies rendered fixture changes | Implemented and fixture-verified | Backend-dependent / blocked: approved delivery mechanism, revision/timestamp semantics and live propagation T029–T030 are pending. No refresh interval is claimed. |
+| SR-054 | US1 scenarios 1–4; US2 scenarios 1, 5 | Configured-station board, source ordering, scheduled labels, empty state; T013, T016–T018, T021–T026, T038 | `station-header.test.tsx`, `departure-board.test.tsx`, `App.test.tsx`, `departure-row.test.tsx`, `station-departure-adapter.test.ts` | Fixture profile tests at both approved sizes; live contract spec passed 2/2 against local Development API | Live snapshot and error-contract verified for the local acceptance dataset | Journeys & Status v1.0.0; T026 passed 2026-10-19. Final T047 acceptance remains pending. |
+| SR-056 | US2 scenarios 2–5 | Textual platform, status, operational time and unknown handling; delay is not derived; T019–T021, T025–T026, T038–T039 | `operational-change.test.tsx`, `departure-row.test.tsx`, `station-departure-adapter.test.ts` | Both fixture profile screenshots; live browser contract spec added | Implemented and fixture/adapter-verified | Backend schema has no delay or service code; contract meanings are preserved. Live environment acceptance remains pending T026/T047. |
+| SR-058 | US3 scenarios 1–3 | Source interface and automatic snapshot presentation without passenger action; T007, T027–T030 | `use-departure-updates.test.ts`, `station-departure-adapter.test.ts` | Fixture revalidation browser checks; live propagation test remains blocked | Implemented for fixtures; live refresh is blocked | v1.0.0 exposes snapshot revision and full journey update history, but defines no delivery mechanism or cadence; T029–T030 remain blocked. |
 | SR-059 | US4 scenarios 1–4 | Unavailable-before-first-load, stale last-success retention, and revalidation-gated recovery; T032–T037, T034 | `display-state.test.ts`, `use-revalidation.test.ts` | Four deterministic connectivity browser scenarios; axe includes stale and unavailable states | Implemented and fixture-verified | Live backend acceptance remains blocked: authoritative cache/freshness semantics and verified environment are not available; T047 pending. |
 | SR-061 | US1 scenario 1; US5 scenarios 1–3; US6 scenarios 1–3 | Functional station-specific passive display; T013, T016, T038–T044 | `App.test.tsx`, component tests; passive-display suite | Both profile screenshots; populated, unavailable and stale passive checks | Implemented and fixture-verified for the Station Display prototype | Prototype evidence is present. This does not establish live data acceptance or physical deployment suitability. |
 | SR-001 | Station Display-specific evidence: US2 scenarios 2–5 and US3 scenario 1 | UI preserves source-provided status meaning and can render source updates; T019–T021, T027–T028 | `operational-change.test.tsx`, `use-departure-updates.test.ts` | Fixture profile and update scenarios only | Partially verified for this application | External cross-application verification pending. Passenger, operations, driver/operator and station channels must retrieve the same journey update/revision. The SmartRail cross-application integration/release verification workstream owns evidence; assignment remains with the release owner. Full SR-001 acceptance is pending shared end-to-end verification. |
 | SR-002 | US1 scenarios 1 and 4 | Validates configured stable station ID against published station records; T011–T016 | `config.test.ts`, `station-reference-client.test.ts`, `station-header.test.tsx` | Browser tests preserve the normal published-station lookup path with a deterministic `/api/stations` response | Partially verified: frontend mapping and fixture response tested | Full requirement acceptance remains external/backend-dependent because station record creation and shared channel exposure are outside this frontend. The existing OpenAPI contract covers public reads only. |
 | SR-003 | US1 scenarios 2–3; US2 scenario 1 | Board preserves returned departure ordering and does not substitute service search; T018, T022–T023 | `departure-board.test.tsx`, `App.test.tsx` | Fixture profile checks source-provided order/content | Partially verified for the display boundary | External/backend verification pending for authoritative ordered route stops and stable station IDs. This board does not call route APIs or establish platform-wide route acceptance. |
 | SR-004 | US2 scenario 1 | Scheduled service identity/time remain labeled as planned values; no service-search fallback; T017–T023 | `departure-row.test.tsx`, `departure-board.test.tsx`, `App.test.tsx` | Both profile scenarios show scheduled labels and service identity in fixtures | Partially verified for presentation semantics | External/backend verification pending that each published service references a valid route, schedule and service identity. Planned-service endpoints are not a confirmed-departure source. |
-| SR-010 | US2 scenarios 2–5 | Renders supplied changes/update times and preserves unknown values without deriving status; T019–T021 | `operational-change.test.tsx` | Fixture profile and accessibility checks show textual operational states | Partially verified with synthetic values | Backend-dependent / blocked: source authorization, shared revision and authoritative update-time meaning require approved contract and live verification; no fixture proves source authority or cross-channel consistency. |
+| SR-010 | US2 scenarios 2–5 | Renders supplied changes and preserves unknowns without deriving status or delay; T019–T021, T025–T026 | `operational-change.test.tsx`, `station-departure-adapter.test.ts` | Fixture profile and accessibility checks; live browser contract spec added | Contract-mapped, live unverified | Source, revision and timestamp values are retained/handled per v1.0.0; `updatedAt` is not labeled until its UI meaning is verified. Cross-channel consistency remains external. |
 | SR-035 | US2 scenario 5; US4 scenarios 2 and 4 | Explicit unknown/unavailable values; no inferred ETA/platform or stale-to-current conversion; T017–T019, T032–T037 | `departure-row.test.tsx`, `operational-change.test.tsx`, `display-state.test.ts` | Browser assertions cover explicit unknown/unavailable and stale labels | Implemented and fixture-verified for missing/unavailable values | Live feed-unavailable acceptance remains unverified; this application has no live position/ETA feed, and the fixture cannot prove production source behavior. |
 
 ### Accessibility, viewport and passive evidence — T045
@@ -112,19 +111,19 @@ Executed on 2026-10-19 in the repository environment:
 | Command | Result | Evidence / scope |
 |---|---|---|
 | `npm run lint` | Passed (exit 0) | ESLint completed without reported diagnostics. |
-| `npm run build` | Passed (exit 0) | `tsc -b` and Vite 8.3.4 production build succeeded; 31 modules transformed. |
-| `npm run test:unit` | Passed: 12 files, 47 tests | Vitest 5.0.5; component, API/configuration, model and hook tests. |
+| `npm run build` | Passed (exit 0) | `tsc -b` and Vite 8.3.4 production build succeeded; 32 modules transformed. |
+| `npm run test:unit -- --pool=threads --maxWorkers=1` | Passed: 13 files, 50 tests | Vitest 5.0.5; includes three Journeys & Status adapter contract-mapping cases. |
 | `npm run test:e2e` | Passed: 12, failed: 0, skipped: 0 | Playwright Chromium `chromium-fixture` project; accessibility (3), connectivity/revalidation (4), display profiles (2), passive display (3). |
 | `git diff --check` | Passed | No whitespace errors. |
 
-The browser run covered both approved landscape profiles, stale/recovery scenarios, fixture labeling, and passive behavior. The four axe analyses reported zero violations. `npm run test:e2e` invokes only `--project=chromium-fixture`; `playwright.config.ts` separates the opt-in `chromium-live` project and the live contract spec. `npm run test:e2e:live` was not run because backend contracts are unapproved.
+The browser run covered both approved landscape profiles, stale/recovery scenarios, fixture labeling, and passive behavior. The four axe analyses reported zero violations. `npm run test:e2e` invokes only `--project=chromium-fixture`; `playwright.config.ts` separates the opt-in `chromium-live` project and the live contract spec. The initial live run failed on HTTP 503 because the development database had not yet received the Journeys & Status migration. After migration and seeding the identified acceptance journey through the backend initialization repository, the successful 2/2 live run is recorded above.
 
-The production build output under `dist/` was searched for the development fixture-control module and control identifiers; none were present. Application/API source review found no new live departure endpoint or contract. The existing `/api/stations` lookup is the only station reference API used by this flow; departure/status demonstrations remain explicitly synthetic. Passive-display browser assertions found no privileged or interactive kiosk UI. No unrelated application feature was implemented in this verification batch.
+The production build output under `dist/` was searched for the development fixture-control module and control identifiers; none were present. Production composition selects the live station departure adapter; development defaults to the explicitly labeled controlled fixture. The live adapter is contract-tested but has not yet been accepted against a live backend. Passive-display browser assertions found no privileged or interactive kiosk UI.
 
 ### Acceptance boundaries and remaining evidence
 
 - **Frontend:** The listed UI and state behavior is implemented and fixture-verified within the automated coverage above.
-- **Live integration:** SR-054, SR-056 and SR-058 live acceptance, plus authoritative SR-059 recovery/freshness, remain unverified and backend-blocked. T024–T026, T029–T031 and T047 remain unchecked/blocked or conditional.
+- **Live integration:** T024–T026 are complete against Journeys & Status v1.0.0. The local Development migration applied and T026 passed 2/2 live Playwright checks on 2026-10-19 using the backend's initialization repository to add one identified acceptance journey. T029–T030 remain blocked until backend/release owners publish an automatic delivery mechanism and cadence; T031 remains conditional. T047 is the final live acceptance gate and still needs live update, outage, stale-state, and reconnection evidence.
 - **Cross-application:** SR-001 is not fully verified until shared journey update/revision evidence is obtained across passenger, operations, driver/operator and station channels. The release owner must assign the SmartRail cross-application integration/release verification workstream.
 - **Accessibility:** Keyboard, assistive-technology, physical viewing and measured contrast reviews remain outstanding; do not claim WCAG 2.2 AA conformance from axe results alone.
-- **Final acceptance evidence needed:** approved/versioned Journeys & Status contract, verified backend environment and test dataset, live automatic-update and outage/revalidation results, shared-channel SR-001 evidence, and the manual accessibility reviews listed above.
+- **Final acceptance evidence needed:** live station departure and operational projection results, approved automatic-update behavior, authoritative outage/revalidation evidence, shared-channel SR-001 evidence, and the manual accessibility reviews listed above.

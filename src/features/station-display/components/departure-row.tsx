@@ -11,7 +11,7 @@ export function DepartureRow({ departure }: DepartureRowProps) {
       <article aria-label={`${departure.serviceLabel} departure`} className="departure-row">
         <div className="departure-row__layout">
           <div className="departure-row__identity">
-            <h3>{departure.serviceLabel}</h3>
+        <h3>{departure.serviceLabel}{departure.identityAmbiguous ? ' — ambiguous identity' : ''}</h3>
             <p>Service date: {departure.serviceDate}</p>
           </div>
           <p className="departure-row__scheduled">

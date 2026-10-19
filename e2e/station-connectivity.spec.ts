@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 
-const stationId = '00000000-0000-4000-8000-000000000101'
+const stationId = '10000000-0000-0000-0000-000000000001'
 const stationName = 'DEMO Central Station'
 
 async function prepareDisplay(page: Page, sourceAvailable = true) {

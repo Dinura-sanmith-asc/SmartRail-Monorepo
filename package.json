@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test:unit": "vitest run",
     "test:e2e": "playwright test --project=chromium-fixture",
-    "test:e2e:live": "playwright test --project=chromium-live"
+    "test:e2e:live": "node scripts/run-live-e2e.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
