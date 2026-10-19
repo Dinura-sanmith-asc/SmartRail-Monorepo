@@ -1,6 +1,7 @@
 using SmartRail.Application.Identity.Authorization;
 using SmartRail.Application.Identity.Persistence;
 using SmartRail.Application.Identity.Queries;
+using SmartRail.Application.Incidents.Authorization;
 using SmartRail.Domain.Identity;
 using SmartRail.Domain.Identity.Entities;
 
@@ -101,6 +102,20 @@ public sealed class AuthorizationHandlerTests
         var request = new AuthorizationRequest(Principal, PermissionAction.ConfirmJourneyCancellation, ProtectedResource.Journey(Guid.NewGuid()));
         Assert.Equal(AuthorizationOutcome.Denied, (await staff.HandleAsync(request)).Outcome);
         Assert.Equal(AuthorizationOutcome.Allowed, (await controller.HandleAsync(request)).Outcome);
+    }
+
+    [Fact]
+    public async Task Service_only_incident_creation_requires_global_controller_grant_or_station_scope()
+    {
+        var controller = new IncidentAccessEvaluator(NewAuthorizer([RoleCode.Controller], out _));
+        var controllerDecision = await controller.AuthorizeAsync(Principal.CognitoSubject,
+            PermissionAction.CreateIncident, null, [], isCreation: true);
+        Assert.Equal(AuthorizationOutcome.Allowed, controllerDecision.Outcome);
+
+        var stationStaff = new IncidentAccessEvaluator(NewAuthorizer([RoleCode.StationStaff], out _));
+        var staffDecision = await stationStaff.AuthorizeAsync(Principal.CognitoSubject,
+            PermissionAction.CreateIncident, null, [], isCreation: true);
+        Assert.Equal(AuthorizationOutcome.Denied, staffDecision.Outcome);
     }
 
     [Fact]
