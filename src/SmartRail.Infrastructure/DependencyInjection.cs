@@ -23,6 +23,8 @@ using SmartRail.Infrastructure.JourneysStatus;
 using SmartRail.Infrastructure.JourneysStatus.Publication;
 using SmartRail.Application.Incidents.References;
 using SmartRail.Infrastructure.Incidents.References;
+using SmartRail.Application.Incidents.Categories;
+using SmartRail.Infrastructure.Incidents.Categories;
 
 namespace SmartRail.Infrastructure;
 
@@ -82,6 +84,13 @@ public static class DependencyInjection
         services.AddJourneysStatusReadServices();
         services.AddJourneysStatusPublicationServices();
         services.AddJourneysStatusOwnerBoundaryServices();
+        var incidentCategorySection = configuration.GetSection(IncidentCategoryCatalogOptions.SectionName);
+        services.Configure<IncidentCategoryCatalogOptions>(options =>
+            options.Codes = incidentCategorySection.GetSection(nameof(IncidentCategoryCatalogOptions.Codes))
+                .GetChildren()
+                .Select(value => value.Value ?? string.Empty)
+                .ToArray());
+        services.AddScoped<IIncidentCategoryCatalog, IncidentCategoryCatalog>();
         services.RemoveAll<IIncidentResourceEvidence>();
         services.AddScoped<IIncidentResourceEvidence, IncidentResourceEvidenceProvider>();
         return services;
