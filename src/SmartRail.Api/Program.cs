@@ -88,6 +88,32 @@ builder.Services.AddOpenApi(options =>
                     };
             }
         }
+        else if (context.JsonTypeInfo.Type == typeof(UpdateIncidentRequest))
+        {
+            schema.AdditionalPropertiesAllowed = false;
+            schema.Required!.Add("expectedRevision");
+            schema.Required.Remove("state");
+            if (schema.Properties?.TryGetValue("state", out var stateSchema) == true && stateSchema is OpenApiSchema state)
+                state.Enum = new List<JsonNode>
+                {
+                    JsonValue.Create("Reported")!, JsonValue.Create("In Progress")!,
+                    JsonValue.Create("Resolved")!, JsonValue.Create("Closed")!
+                };
+            if (schema.Properties?.TryGetValue("removeAssociationIds", out var removeSchema) == true && removeSchema is OpenApiSchema remove)
+                remove.UniqueItems = true;
+        }
+        else if (context.JsonTypeInfo.Type == typeof(IncidentAssociationInput))
+        {
+            schema.AdditionalPropertiesAllowed = false;
+            schema.Required!.Add("kind");
+            schema.Required.Add("resourceId");
+            if (schema.Properties?.TryGetValue("kind", out var kindSchema) == true && kindSchema is OpenApiSchema kind)
+                kind.Enum = new List<JsonNode>
+                {
+                    JsonValue.Create("Station")!, JsonValue.Create("Service")!,
+                    JsonValue.Create("Journey")!, JsonValue.Create("Disruption")!
+                };
+        }
         else if (context.JsonTypeInfo.Type == typeof(IncidentResponse))
         {
             schema.AdditionalPropertiesAllowed = false;

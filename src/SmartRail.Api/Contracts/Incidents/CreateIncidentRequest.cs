@@ -22,6 +22,3 @@ public sealed record CreateIncidentRequest(
         return new CreateIncidentInput(CategoryCode, Description, OccurredAt, associations);
     }
 }
-
-[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record IncidentAssociationInput(string? Kind, Guid ResourceId, Guid? UpdateId, int? Revision);

@@ -45,6 +45,15 @@ public sealed class Incident
         return Revision;
     }
 
+    /// <summary>Advances the aggregate revision for an association-only update.</summary>
+    public int AdvanceRevisionForAssociationChange(int expectedRevision, DateTimeOffset updatedAt)
+    {
+        if (expectedRevision != Revision) throw new InvalidOperationException("Incident revision is stale.");
+        Revision = checked(Revision + 1);
+        UpdatedAt = Utc(updatedAt, nameof(updatedAt));
+        return Revision;
+    }
+
     internal static string Required(string value, string name, int maximumLength)
     {
         if (string.IsNullOrWhiteSpace(value) || value.Trim().Length > maximumLength)

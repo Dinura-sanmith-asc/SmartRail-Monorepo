@@ -120,7 +120,8 @@ public sealed class UpdateIncidentLifecycleHandlerTests
 
     private static UpdateIncidentHandler CreateHandler(FakeIncidentRepository repository,
         AuthorizationOutcome outcome = AuthorizationOutcome.Allowed) => new(repository,
-        new InlineUnitOfWork(), new FixedAccessEvaluator(outcome), new FixedTimeProvider(IncidentTestData.Now.AddHours(1)));
+        new InlineUnitOfWork(), new FixedAccessEvaluator(outcome), new TestReferenceVerifier(), new TestReferenceVerifier(),
+        new FixedTimeProvider(IncidentTestData.Now.AddHours(1)));
 
     private static UpdateIncidentCommand Command(Incident incident, int revision, IncidentState state, string key) =>
         new(incident.IncidentId, IncidentTestData.Subject, key, new UpdateIncidentInput(revision, state));
@@ -142,6 +143,15 @@ public sealed class UpdateIncidentLifecycleHandlerTests
         public override DateTimeOffset GetUtcNow() => now;
     }
 
+    private sealed class TestReferenceVerifier : SmartRail.Application.Incidents.References.IFeature001IncidentReferenceVerifier,
+        SmartRail.Application.Incidents.References.IFeature003IncidentReferenceVerifier
+    {
+        public Task<SmartRail.Application.Incidents.References.IncidentReferenceCheck> VerifyAsync(
+            SmartRail.Application.Incidents.References.IncidentReference reference, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new SmartRail.Application.Incidents.References.IncidentReferenceCheck(
+                SmartRail.Application.Incidents.References.IncidentReferenceOutcome.Verified));
+    }
+
     private sealed class InlineUnitOfWork : IIncidentUnitOfWork
     {
         public Task<T> ExecuteAsync<T>(Func<CancellationToken, Task<T>> operation, CancellationToken cancellationToken = default) => operation(cancellationToken);
@@ -156,7 +166,9 @@ public sealed class UpdateIncidentLifecycleHandlerTests
         public void SetIncident(Incident incident) => _incidents[incident.IncidentId] = incident;
         public Task<IncidentRecord?> FindAsync(Guid incidentId, CancellationToken cancellationToken = default) =>
             Task.FromResult(_incidents.TryGetValue(incidentId, out var incident)
-                ? new IncidentRecord(incident, Array.Empty<IncidentAssociation>())
+                ? new IncidentRecord(incident, [new IncidentAssociation(Guid.NewGuid(), incidentId,
+                    SmartRail.Domain.Incidents.IncidentAssociationKind.Station, Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+                    IncidentTestData.Now, 1)])
                 : null);
         public Task<IReadOnlyList<IncidentRecord>> ListAsync(IncidentFilters filters, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<IncidentRecord>>([]);
