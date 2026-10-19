@@ -153,7 +153,19 @@ This plan does not generate `tasks.md`. Suggested implementation order for later
 7. Add separate Android emulator real-backend integration and record explicit evidence/status.
 8. Run full local verification and requirement evidence review.
 
-Safe parallel work after interfaces and fixture contract are fixed: (A) DTO/client/repository and parsing tests; (B) journey domain/state/notifier tests using fakes; (C) presentation components/tests against agreed immutable state. Keep `lib/app/providers.dart`, `lib/app/router.dart`, `lib/features/railway_search/presentation/service_detail_screen.dart`, `lib/core/network/api_failure.dart`, and their integration tests under one integration owner to avoid overlapping edits. Routing should merge after destination screens and providers compile. Do not parallelize overlapping changes to shared state types or API failure mapping.
+### Coordinated Workstream Ownership
+
+Agents share one working tree, so no two agents may edit the same source or test file concurrently. Freeze DTO, domain, repository, state and route interfaces before dependent work begins. The task-level assignments in `tasks.md` are authoritative and use these exclusive boundaries:
+
+| Owner | Tasks | File boundary |
+|---|---|---|
+| Agent A | T006–T009, T012–T016 | Journey-specific DTO/domain/API/repository source and tests only. Excludes shared API failure mapping and its test. |
+| Agent B | T020–T026 | Journey lookup/candidate state, presentation and tests only. |
+| Agent C | T027–T049 | Snapshot/history/refresh/session-alert state, presentation and tests. Serialize its own edits to shared notifier/status-screen files. |
+| Agent D | T001–T005, T057, T061–T062 | Fixtures/config and test files only. Accessibility tests follow implemented screens; UI integration tests follow compiled providers, routes and entry action. No presentation source edits. |
+| Integration orchestrator | T010–T011, T017–T019, T050–T056, T058–T060, T063–T070 | Shared failure mapping, providers, router, Feature 001 detail entry, recovery/navigation integration, serial accessibility screen changes, merges, task status and verification evidence. |
+
+T010 and T011 exclusively own `test/core/network/api_failure_mapping_test.dart` and `lib/core/network/api_failure.dart`; Agent A must not modify these files. Preserve all Feature 001 failure semantics and regression evidence. T058 is a serial integration task after T025–T026, T032, T039 and T048; Agent D authors its tests only. T061–T062 are UI-driven Android integration tests, not repository-only HTTP tests, and therefore depend on the registered GoRouter routes (T054), Feature 001 entry action (T056), providers and destination screens. The Android emulator execution T063 follows both tests and is mandatory for the real-backend acceptance claim. Its BLOCKED/NOT RUN status does not prevent local verification T065–T068 or final audit T069–T070; T064 may record that status without T063 being checked off. No mock evidence can pass T063.
 
 ## Risks and Remaining Gates
 
@@ -161,7 +173,7 @@ Safe parallel work after interfaces and fixture contract are fixed: (A) DTO/clie
 - Current backend returns `eta: null`; estimate tests need contract fixtures, while actual integration must reflect unavailability.
 - Read endpoint OpenAPI documents 400/404/503, not 401/403 or 500. Generic safe handling for unexpected statuses is required by the passenger spec, but integration cannot assume those statuses will be produced by the current backend.
 - Recheck the backend contract hash/revision and actual reachable seeded backend before implementation/acceptance. No base URL/seed is committed as an app default.
-- Automated/emulator integration is a mandatory acceptance gate when its prerequisites are available; report a missing backend/emulator as BLOCKED, never as PASS. Physical device smoke is supplementary unless an approved source changes this.
+- Automated/emulator integration is a mandatory acceptance gate when its prerequisites are available; report a missing backend/emulator as BLOCKED, never as PASS. A blocked/not-run T063 does not block independent local verification or honest final audit reporting. Physical device smoke is supplementary unless an approved source changes this.
 
 ## Constitution Check (Post-Design)
 

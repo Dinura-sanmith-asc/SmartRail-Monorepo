@@ -22,7 +22,7 @@
 | SC-002 | All seven statuses remain distinct and communicate meaning without color alone. | `test/features/journey_status/application/journey_status_notifier_test.dart`; `test/features/journey_status/presentation/journey_status_screen_test.dart`; accessibility suite (T027, T031–T032, T057–T058, T062) | NOT RUN | |
 | SC-003 | Complete update history stays in ascending revision order; empty differs from missing/error. | `test/features/journey_status/presentation/journey_updates_list_test.dart`; `test/features/journey_status/application/journey_status_notifier_test.dart` (T029–T033, T062) | NOT RUN | |
 | SC-004 | Supplied ETA includes source/freshness/time; null/absent ETA is unavailable and never derived. | `test/features/journey_status/data/journey_api_dtos_test.dart`; `test/features/journey_status/presentation/journey_status_screen_test.dart` (T006–T007, T027, T031–T032, T062) | NOT RUN | |
-| SC-005 | Loading, empty, documented errors, unexpected failures, malformed success, timeout/network, retry and stale states are distinct. | `test/core/network/api_failure_mapping_test.dart`; `test/features/journey_status/presentation/journey_recovery_test.dart`; state/widget suites (T010–T013, T034–T041, T050–T052) | NOT RUN | |
+| SC-005 | Loading, empty, documented errors, unexpected failures, malformed success, timeout/network, retry and stale states are distinct. | `test/core/network/api_failure_mapping_test.dart`; `test/features/journey_status/presentation/journey_recovery_test.dart`; state/widget suites, including synthetic diagnostic-redaction checks (T010–T013, T034–T041, T050–T052, T057) | NOT RUN | |
 | SC-006 | Significant in-app alerts use the same update ID/revision as history and no fabricated/driver change. | `test/features/journey_status/application/seen_journey_update_tracker_test.dart`; `test/features/journey_status/application/journey_update_alerts_test.dart`; `test/features/journey_status/presentation/journey_update_alert_test.dart` (T042–T049, T062) | NOT RUN | |
 | SC-007 | Anonymous flow starts from Feature 001 and Back returns to retained search/service context. | `test/features/journey_status/presentation/journey_status_navigation_test.dart`; `test/features/railway_search/presentation/journey_status_entry_navigation_test.dart`; Android integration (T053–T063) | NOT RUN | |
 
@@ -62,7 +62,7 @@
 | SR-025 | Must Have | T003, T042–T049, T062–T063 | NOT RUN | |
 | SR-089 | Must Have | T004–T005, T010–T019, T050–T064 | NOT RUN | |
 | SR-098 | Should Have | T030, T032, T045, T070 | NOT RUN | |
-| SR-100 | Must Have | T003, T006–T007, T010–T013, T029–T030, T044–T052, T070 | NOT RUN | |
+| SR-100 | Must Have | T003, T006–T007, T010–T013, T029–T030, T044–T052, T057, T067, T070; synthetic `SENTINEL_PRIVATE_TOKEN_123`, `SENTINEL_INTERNAL_ACTOR_456`, and `SENTINEL_TRACE_SECRET_789` are placed only in simulated Problem Details/diagnostic metadata, then asserted absent from passenger messages, rendered widgets, and accessibility semantics. No real credentials or personal data are used. | NOT RUN | |
 | SR-102 | Must Have | T024, T027, T031–T032, T047–T048, T057–T058 | NOT RUN | |
 | SR-103 | Should Have | T024, T047, T057–T058 | NOT RUN | |
 | SR-104 | Should Have | T031–T032, T057–T058 | NOT RUN | |
