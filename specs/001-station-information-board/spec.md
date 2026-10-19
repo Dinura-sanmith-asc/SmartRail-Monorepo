@@ -16,6 +16,10 @@
 - Q: Which display profiles are approved prototype targets? → A: Landscape 1920 × 1080 and 1366 × 768; no viewing-distance, hardware-certification or additional-resolution claim is approved.
 - Q: What automatic refresh and freshness behavior is approved? → A: While connected, the display automatically obtains updated authoritative railway information without passenger interaction. During connectivity failure, cached information is identified as cached or possibly outdated. After reconnection, the display revalidates against authoritative information before removing the stale indication. Numeric intervals and backend-dependent contract semantics remain unresolved.
 
+### Session 2026-10-19
+
+- Q: What refresh policy should the prototype use with the now-verified Journeys & Status station-departures snapshot? → A: Use configurable HTTP polling, defaulting to 30000 ms, through the existing approved GET endpoint. Fetch immediately after station validation; while connected, poll without overlapping requests and recalculate the `Asia/Colombo` station-local service date for every request, including across midnight. A reconnect event may request immediate revalidation. After a failed refresh, retain the last successful data only as cached/possibly outdated until successful revalidation. The interval is a prototype client policy, not a production freshness SLA, backend latency guarantee, push contract, or cache-expiry threshold. Preserve backend ordering, exact identity and source values; do not derive delay, status or ETA. Invalid interval configuration must not start polling or cause uncontrolled requests.
+
 ## User Scenarios & Testing
 
 ### User Story 1 - Show departures for the configured station (Priority: P1)
@@ -62,6 +66,8 @@ A passenger needs the connected board to reflect newly available authoritative d
 1. **Given** the display is connected and a new authorized departure update becomes available, **When** the update is made available to the display, **Then** the board reflects the updated departure and its provided updated time without manual reload.
 2. **Given** the update service is unavailable, **When** the display cannot obtain a newer revision, **Then** it does not claim that the visible information is current and communicates the applicable unavailable or stale state.
 3. **Given** the display is connected and the backend makes a newer authoritative revision available, **When** the display's automatic update process obtains it, **Then** the board presents the updated information without passenger interaction; no numeric interval or timing guarantee is implied.
+4. **Given** the configured station has been validated, **When** the display starts or its prototype polling interval elapses while connected, **Then** it requests the station-departure snapshot using the current `Asia/Colombo` service date; the default configured interval is 30000 ms, and the date is recalculated for each request.
+5. **Given** a refresh is already in flight or a refresh fails, **When** a scheduled poll or reconnect event occurs, **Then** the display does not overlap requests, does not present prior data as guaranteed current, and retains the cached/possibly outdated warning until a successful response is received.
 
 ### User Story 4 - Recognize disconnected or stale information (Priority: P1)
 
@@ -152,7 +158,7 @@ SR-001 to SR-004 provide shared context and reference identity; they do not auth
 - **FR-002**: The display MUST show upcoming station departures from the authoritative station-departure source. It MUST NOT substitute service-search results or treat a reusable scheduled service as a confirmed dated departure.
 - **FR-003**: For each departure, the display MUST distinguish published scheduled time from available current operational status. It MUST preserve any source-provided meaning and update time.
 - **FR-004**: The display MUST present authorized platform changes, delays and cancellations for the affected departure. Missing or unsupported operational information MUST be labeled unknown or unavailable rather than inferred.
-- **FR-005**: While connected, the display MUST automatically obtain updated authoritative railway information without passenger interaction. The change-notification or polling mechanism and timing remain subject to verified backend contract behavior; no refresh interval or timing threshold is set here.
+- **FR-005**: After station validation, the display MUST fetch the station-departure snapshot and, while connected, MUST poll the approved station-departures GET endpoint at a deployment-configurable prototype interval defaulting to 30000 ms. The interval is supplied through the public Vite variable `VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS`; Vite variables are public and normally embedded at build time, so they MUST NOT contain secrets. A missing variable uses the default; a configured value MUST be a positive finite integer, and invalid values MUST prevent polling rather than create a zero-delay or uncontrolled request loop. The poller MUST recalculate the `Asia/Colombo` station-local service date for every request, avoid overlapping requests, and support immediate reconnect-triggered revalidation. On failure, existing information MUST remain marked cached/possibly outdated until successful backend revalidation. This is a prototype client policy only; it is not a production freshness SLA, backend latency guarantee, backend push contract, or cache-expiry threshold.
 - **FR-006**: When central connectivity is unavailable, the display MUST show available previously obtained information only with a clear cached, stale or possibly-outdated indication and last-update time when available. If no usable prior information exists, it MUST show an unavailable state.
 - **FR-007**: After connectivity returns, the display MUST successfully revalidate against authoritative information before representing the board as current or removing its stale indication.
 - **FR-008**: The display MUST provide distinguishable loading, no-departures, unavailable, error, disconnected/stale and recovered states. State messaging MUST not imply a successful live update when one has not occurred.
@@ -175,7 +181,7 @@ SR-001 to SR-004 provide shared context and reference identity; they do not auth
 - **SC-001**: In verification scenarios covering all five display-specific Must Have requirements, each approved acceptance check is demonstrated with recorded evidence.
 - **SC-002**: In a station-data fixture containing departures for multiple stations, 100% of displayed departures belong to the configured station and no service-search-only result is represented as a station departure.
 - **SC-003**: In every verification case with a published cancellation, delay or platform change, the affected departure shows the authorized value and its provided updated time; missing values are never fabricated.
-- **SC-004**: In every connected update scenario, the display automatically obtains and presents updated authoritative information without manual passenger action; no numeric latency or refresh interval is asserted until approved contract behavior defines it.
+- **SC-004**: In every connected update scenario, the display automatically obtains and presents updated authoritative information without manual passenger action. Prototype polling uses the configured interval (default 30000 ms); no production latency or freshness guarantee is asserted.
 - **SC-005**: In every disconnection scenario, the board visibly indicates cached/possibly outdated data or service unavailability; it removes the warning only after authoritative information is obtained following reconnection.
 - **SC-006**: At both approved landscape profiles (1920 × 1080 and 1366 × 768), reviewers can identify station, scheduled departure time, service identity and available operational status; important disruption information is not silently hidden at 1366 × 768, and status is understandable without relying on color alone.
 - **SC-007**: Review confirms that the passenger-facing display exposes no privileged railway management actions or interactive terminal workflow.
@@ -183,11 +189,11 @@ SR-001 to SR-004 provide shared context and reference identity; they do not auth
 ## Assumptions
 
 - The experience is one passive, public station display prototype associated with exactly one station through a deployment-provided stable station identifier, not an interactive kiosk, operations dashboard or passenger application.
-- A station departure feed is the source for confirmed station departures. The currently implemented Railway Network endpoints provide stations, routes and planned services only; they are insufficient to substitute for the future departure feed.
-- Journeys & Status endpoints listed below are dependencies whose implementation and contracts require verification. The specification describes required user-visible behavior without assuming their response schemas or delivery mechanism.
+- A station departure feed is the source for confirmed station departures. The Railway Network endpoints provide stations, routes and planned services only; they are insufficient to substitute for the station departure feed.
+- Journeys & Status OpenAPI v1.0.0 is approved and its departures endpoint and response are verified for T024–T026. The prototype client uses this snapshot endpoint for HTTP polling; the contract itself does not define polling or push delivery.
 - The display may retain previously obtained information for presentation during connection loss only if it clearly communicates that the information may be outdated. Cache policy and validity are not set here.
 - Approved prototype targets are landscape 1920 × 1080 and 1366 × 768 only. No viewing distance, hardware certification or additional resolution is assumed.
-- No numeric refresh interval, freshness duration, cache expiry, retry schedule, operational threshold, revision/order rule or timestamp meaning is assumed.
+- The prototype polling interval defaults to 30000 ms and is configurable as specified in FR-005. This does not establish production cadence, backend capacity, a freshness duration, cache expiry, retry schedule, operational threshold, client revision-comparison rule, or unverified timestamp display meaning.
 - Isolated, clearly identified contract fixtures MAY support frontend UI development before live integration is available. Fixtures MUST NOT be presented as live data; final live-integration acceptance depends on verified backend behavior.
 - Requirement inventory entries reproduce workbook wording and acceptance checks; the workbook remains the governing source.
 
@@ -202,26 +208,25 @@ Feature 001 currently implements these Railway Network endpoints:
 - `GET /api/services` — published service search and planned schedule information only.
 - `GET /api/services/{id}` — published service details and schedule reference only.
 
-The following Journeys & Status endpoints are expected future dependencies and MUST NOT be treated as implemented contracts or used until their backend behavior and contracts are verified:
+The following Journeys & Status v1.0.0 operations are approved and verified; their use remains bounded by the contract register:
 
-- `GET /api/stations/{id}/departures` — required source for departures at the selected station, including whatever published schedule and latest known operational fields the approved contract supports.
-- `GET /api/journeys/{id}` — future journey detail dependency if required to render an authoritative departure's current operational information.
-- `GET /api/journeys/{id}/updates` — future update/revision dependency if required to detect and present authorized changes.
+- `GET /api/stations/{id}/departures?date=YYYY-MM-DD` — date-scoped source for the station's published departure projection, requested with the current `Asia/Colombo` station-local date. The contract does not define “upcoming-only” filtering; do not add client-side operational eligibility rules or reorder the response.
+- `GET /api/journeys/{id}` — approved but not needed when the station-departures projection contains the required public fields.
+- `GET /api/journeys/{id}/updates` — approved complete history but not needed for snapshot polling; it defines no push, cursor, wait, or polling behavior.
 
-Before implementation, confirm response schemas, date/time and timezone semantics, ordering and meaning of “upcoming,” update revision/source/time fields, unavailable-value representation, authorization/public projection, error behavior, and how a connected display learns of a newer revision. The display MUST NOT infer those contract details from the Railway Network API.
+The approved snapshot contract defines its response schema, station-local date, ordering, public fields, null values and errors. It does not define “upcoming-only” filtering, a delivery mechanism, client revision-comparison rules, backend capacity guarantees, production cadence, cache expiry/freshness thresholds, or all timestamp presentation meanings. The display MUST NOT infer those details or substitute Railway Network service search.
 
 ### Outstanding backend contract dependencies
 
-Product decisions Q1 and Q2 and the behavioral portion of Q3 have been resolved in the Clarifications session above. The following remain backend-contract dependencies and are not approved implementation assumptions:
+Product decisions Q1–Q3 have been resolved for the prototype in the Clarifications session above. The following remain unresolved and MUST NOT be treated as settled by the client polling decision:
 
-- Exact automatic refresh/polling interval and change-notification or polling mechanism.
-- Backend revision and ordering semantics, including older, duplicate or missing revisions.
-- Authoritative source/update timestamp semantics.
+- Final production refresh policy, backend capacity, and operational guarantees.
 - Cache expiry and numeric freshness thresholds.
-- Final station departure response schema and meaning of “upcoming.”
-- Error behavior and unavailable-value representation for station departure and journey data.
+- Client behavior for backend revisions across separately fetched snapshots; the contract supplies a per-journey revision but does not prescribe a client comparison/replay policy.
+- Any timestamp display meaning not verified by the contract and UI review.
+- The endpoint returns a date-scoped projection and does not define an “upcoming-only” cutoff; no cutoff is invented by the client.
 
-These questions require verification and agreement with the Journeys & Status backend owner before live integration acceptance. No specification statement here declares an endpoint, field or behavior implemented.
+These questions require verification and agreement with the relevant backend, operations or product owner before production-policy or final acceptance claims. No specification statement here expands the approved API contract.
 
 ## Out of Scope
 
@@ -229,5 +234,5 @@ These questions require verification and agreement with the Journeys & Status ba
 - Station or controller management, editing, publishing, authentication or privileged actions.
 - Creating, changing or correcting railway source data, schedules, platforms, status or disruption decisions.
 - Treating `GET /api/services` search results as confirmed station departures or live journeys.
-- Inventing train locations, ETAs, delays, platforms, operational state, refresh intervals, cache validity or timing thresholds.
+- Inventing train locations, ETAs, delays, platforms, operational state, unapproved refresh intervals, cache validity or timing thresholds.
 - Adding station arrivals, local safety notices or other deferred/non-Must Have behavior unless separately approved.

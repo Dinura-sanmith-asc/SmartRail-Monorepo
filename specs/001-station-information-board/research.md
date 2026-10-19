@@ -1,7 +1,7 @@
 # Research: Station Information & Departure Board
 
 **Date**: 2026-10-18  
-**Scope**: Resolve planning decisions using the approved station display spec, local project, approved source documents, and current official tooling documentation. This research does not define the future Journeys & Status contract.
+**Scope**: Record planning decisions using the approved station display spec, local project, approved source documents, and current official tooling documentation. Journeys & Status OpenAPI v1.0.0 is an approved external contract; this research does not modify or extend it.
 
 ## Decision 1 — Preserve the existing frontend stack and organize by feature
 
@@ -13,19 +13,19 @@
 
 ## Decision 2 — Keep station reference and live departure ownership separate
 
-**Decision**: Validate the deployment station ID against the approved public station list. Treat the existing route/service endpoints as reference/planned-schedule sources only. Use an isolated feature adapter boundary for future dated station departures and operational updates, but do not define a response schema or a proposed OpenAPI contract before backend approval.
+**Decision**: Validate the deployment station ID against the approved public station list. Treat the existing route/service endpoints as reference/planned-schedule sources only. Use an isolated feature adapter boundary for dated station departures and operational updates, mapping only the approved Journeys & Status v1.0.0 contract; do not extend or redefine its response schema.
 
-**Rationale**: The checked-in Railway Network OpenAPI defines `GET /api/stations`, `GET /api/routes/{id}/stops`, `GET /api/services` and `GET /api/services/{id}`. It explicitly states that service search is planned schedule information and not a dated operational journey or live status. The handoff and RBAC/API inventory list `/api/stations/{id}/departures`, `/api/journeys/{id}` and `/api/journeys/{id}/updates` as future endpoints, with contract behavior still to be specified.
+**Rationale**: The checked-in Railway Network OpenAPI defines `GET /api/stations`, `GET /api/routes/{id}/stops`, `GET /api/services` and `GET /api/services/{id}`. It explicitly states that service search is planned schedule information and not a dated operational journey or live status. The separately approved Journeys & Status v1.0.0 contract defines `/api/stations/{id}/departures`, `/api/journeys/{id}` and `/api/journeys/{id}/updates`; the station display uses the verified station snapshot projection for its board.
 
-**Alternatives considered**: Filter reusable service search results to synthesize departures or assume future endpoint fields. Rejected because these would misrepresent scheduled services and invent backend behavior.
+**Alternatives considered**: Filter reusable service search results to synthesize departures or extend the approved response with unsupported fields. Rejected because these would misrepresent scheduled services and invent backend behavior.
 
 ## Decision 3 — Make refresh orchestration replaceable and freshness conservative
 
-**Decision**: Keep refresh/delivery isolated behind an adapter/state boundary. While connected, the display must obtain authoritative changes automatically. During loss, retain the last successful data in active runtime memory, mark it stale/cached, and show last-update only where its meaning is verified. On recovery, keep the warning until authoritative revalidation succeeds. If there is no prior successful response, show unavailable.
+**Decision**: Keep refresh orchestration in the departure source/adapter layer, independent of presentation components. The project owner approved configurable HTTP polling of the verified `GET /api/stations/{id}/departures?date=YYYY-MM-DD` snapshot endpoint for the prototype, with public Vite configuration variable `VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS` and 30000 ms default. Fetch after station validation; while connected, poll at that interval, compute the station-local date in `Asia/Colombo` on every request, and do not overlap requests. Missing interval configuration uses the default; invalid values reject polling. Reconnect events may trigger immediate revalidation. A failed request marks the last successful data cached/possibly outdated; only a successful response clears that state. Preserve backend order and source values; do not derive delay, status or ETA.
 
-**Rationale**: This meets approved Q3 behavior while leaving polling versus push, intervals, version/order semantics, timestamp meaning and cache expiry for the Journeys & Status contract and owner. The constitution expressly prohibits inventing those thresholds.
+**Rationale**: The verified v1.0.0 contract supplies a date-scoped snapshot and a station-local `Asia/Colombo` date parameter but no push or automatic delivery behavior. Repeated GET requests are therefore an explicitly approved prototype client policy, isolated from presentation. The 30000 ms default is not a production freshness SLA, backend latency guarantee, backend push contract, cache-expiry threshold or backend capacity commitment.
 
-**Alternatives considered**: Choose a polling interval or durable storage/TTL now. Rejected because neither cadence nor cache validity is approved. Durable offline persistence is deferred; it would change exposure and stale-data risk.
+**Alternatives considered**: Backend push, a journeys update-history reader, a different prototype cadence, and durable storage/TTL. Push and cadence were not supplied by the API contract; the project owner selected HTTP snapshot polling for this prototype. The history endpoint provides no push/wait semantics and is not needed to fetch the current snapshot. Cache validity remains unresolved. Durable offline persistence is deferred because it changes exposure and stale-data risk.
 
 ## Decision 4 — Use a minimal Vite-aligned UI/browser test stack
 
@@ -52,4 +52,4 @@
 
 ## Unresolved backend decisions (explicit dependencies, not research guesses)
 
-The backend owner must approve the exact departure schema; “upcoming” and date/time/timezone ordering semantics; change notification or polling mechanism and interval; revision/order rules; source/update timestamp meanings; cache expiry/freshness thresholds; and API error/unavailable-value behavior. These are not resolved by current OpenAPI or frontend-library guidance. No future contract is generated here.
+The approved v1.0.0 contract defines the station departure response, `Asia/Colombo` date parameter, backend ordering, field/null meanings and API errors. It does not promise upcoming-only filtering or define the prototype polling policy; the latter is a project-owner-approved frontend policy recorded above. Remaining decisions are final production refresh policy, backend capacity/operational guarantees, cache expiry/freshness thresholds, client revision comparison across snapshots, and any timestamp display meaning not verified for the UI. No new backend contract is generated here.

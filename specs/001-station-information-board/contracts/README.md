@@ -27,15 +27,30 @@ Source: [Journeys & Status OpenAPI v1.0.0](../../../../SmartRail/specs/003-journ
 
 The approved departures response has **no human-readable service code and no delay value**. The display may identify a departure using its exact `serviceId`; it must not invent a code or derive delay by subtracting scheduled and operational timestamps. A null/missing scheduled or operational value remains unknown. Cancellation is represented by the contract status (`Cancelled`); platform is source-provided. The response's `revision`, `source`, and `updatedAt` remain attached to the same departure snapshot. `ambiguity: ambiguous` must remain visible and must not cause the client to choose a departure automatically.
 
-The endpoint is date-scoped, not explicitly “upcoming-only”; the contract includes departures matching that station-local date. The client supplies today's calendar date in `Asia/Colombo`, and the service's returned order is preserved. It defines no production refresh/delivery mechanism or cadence. No refresh interval is approved by this register.
+The endpoint is date-scoped, not explicitly “upcoming-only”; the contract includes departures matching that station-local date. The client supplies the current calendar date in `Asia/Colombo` for each request, including requests after midnight, and preserves the service's returned order. The OpenAPI defines no automatic delivery mechanism or cadence.
+
+## Approved prototype refresh policy — recorded 2026-10-19
+
+The project owner approved configurable HTTP polling of the verified station-departures snapshot endpoint for this prototype:
+
+- Fetch an initial snapshot after the configured station has been validated.
+- While connected, issue a new GET every configured interval. The default is 30000 ms.
+- Read the public Vite configuration variable `VITE_STATION_DEPARTURE_REFRESH_INTERVAL_MS`. Vite variables are public and are normally embedded at build time; they must not contain credentials or secrets. An unset variable uses the default. A configured value must be a positive finite integer; invalid values reject polling and must not create a zero-delay or uncontrolled request loop.
+- Recalculate the current station-local service date in `Asia/Colombo` for every request. Do not cache the date across midnight.
+- Do not overlap snapshot requests. A reconnect event may request immediate revalidation; if a request is already in flight, coalesce/ignore the duplicate trigger until that request settles.
+- A failed request makes the retained last successful snapshot cached/possibly outdated. Keep that warning through subsequent failures and remove it only after a successful backend response.
+- Preserve the response's order, exact `serviceId`, nullable/unknown values, status, platform, source, revision, ambiguity and timestamp values. Do not derive delay or ETA. The contract has no delay field, and display meaning for timestamps remains subject to verification.
+
+This is a **prototype client policy**, not a production freshness SLA, guaranteed backend update latency, backend push/delivery contract, cache-expiry threshold, or backend capacity/operational guarantee. It does not change or supplement the approved OpenAPI contract.
 
 ## Remaining live integration decisions
 
 | Decision | Current status | Required before live acceptance |
 |---|---|---|
-| Automatic delivery and cadence (T029–T030) | Not specified in Journeys & Status v1.0.0. The station endpoint is a snapshot and `/api/journeys/{id}/updates` returns history only. | Backend/release owner must publish an approved delivery mechanism and any interval before the UI can claim or verify automatic live updates. |
+| Prototype automatic polling policy (T029) | Approved by the project owner: configurable repeated GET of the v1.0.0 station-departures snapshot, default 30000 ms. The API remains a snapshot and `/api/journeys/{id}/updates` returns history only. | T029 may implement the approved client poller. This policy makes no production or backend capacity commitment and adds no push contract. |
+| Live automatic update verification (T030) | Not yet verified. T029 is not complete; the v1.0.0 OpenAPI itself promises no delivery cadence or latency. | After T029, verify a newly published backend snapshot appears on a subsequent poll without a manual action. Do not assert a timing SLA; record backend environment and observed result. |
 | `GET /api/journeys/{id}/updates` for the display (T031) | Conditional and currently unnecessary for rendering: the station departure response already carries the current projection and revision. | Reconsider only if the backend approves it as necessary for the selected delivery mechanism. This endpoint alone does not establish delivery or cadence. |
-| Live environment and representative data (T026, T047) | T026 verified against the migrated local Development API on 2026-10-19; the opt-in browser check returned a dated departure from an explicitly identified acceptance journey and passed the documented error cases. | T047 still requires an approved automatic delivery mechanism plus live operational-change and outage/revalidation evidence; the local T026 result does not complete release acceptance. |
+| Live environment and representative data (T026, T047) | T026 verified against the migrated local Development API on 2026-10-19; the opt-in browser check returned a dated departure from an explicitly identified acceptance journey and passed the documented error cases. | T047 still requires live polling/update, operational-change and outage/revalidation evidence in an approved environment; the local T026 result does not complete release acceptance. |
 
 Backend integration tests in `SmartRail/tests/SmartRail.IntegrationTests/JourneysStatus/Api/JourneySelectionFlowTests.cs` cover the endpoint's date requirement, malformed and missing dates, empty results, ambiguous identity, and synchronized cancellation/platform projections with consistent revisions and publication timestamps. `JourneysStatusOpenApiTests.cs` verifies published OpenAPI paths and required date metadata. These are backend contract tests, not live-environment acceptance for this React app.
 
