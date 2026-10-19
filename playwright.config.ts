@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const liveMode = process.env.VITE_STATION_DISPLAY_SOURCE === 'live'
-const webServerPort = liveMode ? 5173 : 4173
+const webServerPort = liveMode ? 5174 : 4173
 const webServerHost = liveMode ? 'localhost' : '127.0.0.1'
 
 export default defineConfig({
@@ -35,12 +35,17 @@ export default defineConfig({
   webServer: {
     command: `npm run dev -- --host ${webServerHost} --port ${webServerPort} --strictPort`,
     url: `http://${webServerHost}:${webServerPort}`,
-    reuseExistingServer: !process.env.CI,
+    // Fixture runs may reuse their own local server during development. Live
+    // verification must start this project's server and fail on a port clash.
+    reuseExistingServer: liveMode ? false : !process.env.CI,
     timeout: 30_000,
     env: {
-      VITE_STATION_ID: process.env.VITE_STATION_ID ?? '10000000-0000-0000-0000-000000000001',
-      VITE_API_BASE_URL: process.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:4173/api',
-      VITE_STATION_DISPLAY_SOURCE: process.env.VITE_STATION_DISPLAY_SOURCE ?? 'fixture',
+      VITE_STATION_ID:
+        process.env.VITE_STATION_ID ?? '10000000-0000-0000-0000-000000000001',
+      VITE_API_BASE_URL:
+        process.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:4173/api',
+      VITE_STATION_DISPLAY_SOURCE:
+        process.env.VITE_STATION_DISPLAY_SOURCE ?? 'fixture',
       STATION_DISPLAY_LIVE_CONTROLLER_TOKEN: '',
     },
   },
