@@ -1,11 +1,13 @@
 import type { StationDeparture } from '../model/display-model'
 import { OperationalChange } from './operational-change'
+import { useDisplayLanguage } from '../../../app/language'
 
 interface DepartureRowProps {
   departure: StationDeparture
 }
 
 export function DepartureRow({ departure }: DepartureRowProps) {
+  const { t } = useDisplayLanguage()
   return (
     <li className="departure-board__item">
       <article
@@ -16,10 +18,10 @@ export function DepartureRow({ departure }: DepartureRowProps) {
         <div className="departure-row__layout">
           <div className="departure-row__identity">
         <h3>{departure.serviceLabel}{departure.identityAmbiguous ? ' — ambiguous identity' : ''}</h3>
-            <p>Service date: {departure.serviceDate}</p>
+            <p>{t('Service date:')} {departure.serviceDate}</p>
           </div>
           <p className="departure-row__scheduled">
-            <span>Scheduled departure</span>
+            <span>{t('Scheduled departure')}</span>
             <time>{departure.scheduledTime.displayValue}</time>
           </p>
           <OperationalChange operational={departure.operational} />

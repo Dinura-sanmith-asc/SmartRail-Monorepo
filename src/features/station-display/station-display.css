@@ -259,3 +259,6 @@
     transition-duration: 0.01ms !important;
   }
 }
+.display-language { position:absolute; top:20px; right:24px; z-index:2; }
+.display-language select { min-height:40px; padding:6px 32px 6px 11px; border:1px solid #8da2b2; border-radius:8px; background:#fff; color:#17354b; font:inherit; }
+@media(max-width:700px) { .display-language { top:12px; right:12px; } }

@@ -1,5 +1,6 @@
 import type { DisplayInformationState } from '../model/display-state'
 import { DepartureBoard } from './departure-board'
+import { useDisplayLanguage } from '../../../app/language'
 
 interface DisplayStateViewProps {
   configuredStationId: string
@@ -7,6 +8,7 @@ interface DisplayStateViewProps {
 }
 
 export function DisplayStateView({ configuredStationId, state }: DisplayStateViewProps) {
+  const { t } = useDisplayLanguage()
   const snapshot = 'snapshot' in state ? state.snapshot : undefined
   const status = (() => {
     switch (state.kind) {
@@ -25,8 +27,8 @@ export function DisplayStateView({ configuredStationId, state }: DisplayStateVie
 
   return (
     <>
-      {status ? <p className={`display-state-message${state.kind === 'error' || state.kind === 'unavailable' ? ' display-state-message--alert' : ''}`} role={state.kind === 'error' || state.kind === 'unavailable' ? 'alert' : 'status'} aria-live="polite">{status}</p> : null}
-      {updateTime ? <p className="display-state-message display-state-message--timestamp">Last updated: {updateTime.displayValue}</p> : null}
+      {status ? <p className={`display-state-message${state.kind === 'error' || state.kind === 'unavailable' ? ' display-state-message--alert' : ''}`} role={state.kind === 'error' || state.kind === 'unavailable' ? 'alert' : 'status'} aria-live="polite">{t(status)}</p> : null}
+      {updateTime ? <p className="display-state-message display-state-message--timestamp">{t('Last updated:')} {updateTime.displayValue}</p> : null}
       {snapshot ? <DepartureBoard configuredStationId={configuredStationId} snapshot={snapshot} /> : null}
     </>
   )

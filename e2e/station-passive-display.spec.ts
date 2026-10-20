@@ -2,7 +2,8 @@ import { expect, test } from '@playwright/test'
 import { openStationDisplay, setSourceAvailability } from './fixtures/station-display'
 
 async function expectNoPassengerActions(page: import('@playwright/test').Page) {
-  await expect(page.locator('button, input, select, textarea, a[href], [role="button"], [role="link"], [role="combobox"]')).toHaveCount(0)
+  await expect(page.locator('button, input, select:not([aria-label="Language"]), textarea, a[href], [role="button"], [role="link"], [role="combobox"]:not([aria-label="Language"])')).toHaveCount(0)
+  await expect(page.getByRole('combobox', { name: 'Language' })).toHaveCount(1)
   await expect(page.getByText(/station management|controller action|publish|edit railway|sign in|log in|authentication|station terminal|kiosk/i)).toHaveCount(0)
 }
 

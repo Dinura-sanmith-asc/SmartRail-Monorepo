@@ -10,6 +10,7 @@ import { DisplayStateView } from './features/station-display/components/display-
 import { useDepartureUpdates } from './features/station-display/hooks/use-departure-updates'
 import { createHttpClient } from './shared/api/http-client'
 import './features/station-display/station-display.css'
+import { DisplayLanguageProvider, useDisplayLanguage } from './app/language'
 
 const stationDisplayConfig = readStationDisplayConfig()
 const fixtureDepartureSource = createFixtureDepartureSource(stationDisplayFixtures)
@@ -49,6 +50,11 @@ interface AppProps {
 }
 
 function App({ departureSource = defaultDepartureSource }: AppProps) {
+  return <DisplayLanguageProvider><StationDisplay departureSource={departureSource} /></DisplayLanguageProvider>
+}
+
+function StationDisplay({ departureSource = defaultDepartureSource }: AppProps) {
+  const { t } = useDisplayLanguage()
   const [activeDepartureSource, setActiveDepartureSource] = useState<StationDepartureSource | null>(
     departureSource === fixtureDepartureSource
       ? (import.meta.env.DEV ? null : fixtureDepartureSource)
@@ -57,7 +63,7 @@ function App({ departureSource = defaultDepartureSource }: AppProps) {
   const [state, setState] = useState<StationHeaderState>(() =>
     stationDisplayConfig.kind === 'valid'
       ? { kind: 'loading' }
-      : { kind: 'unavailable', message: configurationMessage(stationDisplayConfig.reason) },
+      : { kind: 'unavailable', message: t(configurationMessage(stationDisplayConfig.reason)) },
   )
 
   useEffect(() => {
