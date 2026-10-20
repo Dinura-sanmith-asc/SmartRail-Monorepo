@@ -2,7 +2,7 @@
 
 **Feature Branch**: `codex/f005-integration`
 **Created**: 2026-10-20
-**Status**: Ready for implementation under the user's autonomous MVP authorization
+**Status**: Backend implemented and locally verified; downstream client and operational acceptance gates remain open
 
 **Input**: Deliver authenticated assigned-journey access, driver observations and Controller review using the existing approved operations and authorization.
 
