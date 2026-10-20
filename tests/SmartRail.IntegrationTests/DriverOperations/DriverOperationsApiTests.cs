@@ -160,6 +160,74 @@ public sealed class DriverOperationsApiTests(PostgreSqlTestDatabaseFixture datab
         Assert.Equal(HttpStatusCode.ServiceUnavailable, unavailable.StatusCode);
     }
 
+    [Fact]
+    public async Task Concurrent_identical_requests_create_one_observation_and_conflicting_reuse_changes_nothing()
+    {
+        using var host = await IncidentOwnerIntegrationTestHost.CreateAsync(database, oidc);
+        using var client = host.CreateClient();
+        var journey = await IncidentOwnerIntegrationTestHost.InitializeJourneyAsync(host.Services, "concurrent");
+        await IdentityTestData.GrantRoleAsync(host.Services, Driver, RoleCode.Driver);
+        await GrantAssignmentAsync(host.Services, Driver, journey);
+        var requestId = Guid.NewGuid();
+        var responses = await Task.WhenAll(Enumerable.Range(0, 4).Select(_ => SubmitAsync(client, journey, Driver, requestId, "Same concurrent evidence")));
+        try
+        {
+            Assert.Single(responses.Where(x => x.StatusCode == HttpStatusCode.Created));
+            Assert.All(responses.Where(x => x.StatusCode != HttpStatusCode.Created), x => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
+            var ids = new List<Guid>();
+            foreach (var response in responses)
+            {
+                using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+                ids.Add(body.RootElement.GetProperty("observationId").GetGuid());
+            }
+            Assert.Single(ids.Distinct());
+        }
+        finally { foreach (var response in responses) response.Dispose(); }
+        await using var scope = host.Services.CreateAsyncScope();
+        Assert.Single(await scope.ServiceProvider.GetRequiredService<IDriverOperationsRepository>().GetObservationsAsync(journey));
+    }
+
+    [Fact]
+    public async Task Caller_supplied_authority_fields_are_rejected_and_foreign_or_revoked_observation_never_authorizes_publication()
+    {
+        using var host = await IncidentOwnerIntegrationTestHost.CreateAsync(database, oidc);
+        using var client = host.CreateClient();
+        var journey = await IncidentOwnerIntegrationTestHost.InitializeJourneyAsync(host.Services, "verified-evidence");
+        var foreignJourney = await IncidentOwnerIntegrationTestHost.InitializeJourneyAsync(host.Services, "foreign-evidence");
+        await IdentityTestData.GrantRoleAsync(host.Services, Driver, RoleCode.Driver);
+        await IdentityTestData.GrantRoleAsync(host.Services, Controller, RoleCode.Controller);
+        var assignment = await GrantAssignmentAsync(host.Services, Driver, journey);
+        using var forged = IdentityTestData.Bearer(HttpMethod.Post, $"/api/driver/journeys/{journey}/observations", oidc.CreateToken(Driver));
+        forged.Content = JsonContent.Create(new { requestId = Guid.NewGuid(), text = "Forged metadata", driverSubject = Controller, status = "Cancelled" });
+        using var forgedResponse = await client.SendAsync(forged);
+        Assert.Equal(HttpStatusCode.BadRequest, forgedResponse.StatusCode);
+        using var created = await SubmitAsync(client, journey, Driver, Guid.NewGuid(), "Genuine evidence");
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        using var createdBody = JsonDocument.Parse(await created.Content.ReadAsStringAsync());
+        var observation = createdBody.RootElement.GetProperty("observationId").GetGuid();
+        foreach (var (target, reference, expected) in new[]
+        {
+            (foreignJourney, observation, HttpStatusCode.Conflict),
+            (journey, Guid.NewGuid(), HttpStatusCode.NotFound)
+        })
+        {
+            using var request = IdentityTestData.Bearer(HttpMethod.Patch, $"/api/operations/journeys/{target}/status", oidc.CreateToken(Controller));
+            request.Content = JsonContent.Create(new { expectedJourneyRevision = 1, status = "Delayed", driverObservationId = reference });
+            using var denied = await client.SendAsync(request);
+            Assert.Equal(expected, denied.StatusCode);
+        }
+        await using (var scope = host.Services.CreateAsyncScope())
+            Assert.True(await scope.ServiceProvider.GetRequiredService<IDriverOperationsRepository>()
+                .RevokeAssignmentAsync(assignment, "test-maintainer", DateTimeOffset.UtcNow, Guid.NewGuid(), "revoked-evidence"));
+        using var revokedRequest = IdentityTestData.Bearer(HttpMethod.Patch, $"/api/operations/journeys/{journey}/status", oidc.CreateToken(Controller));
+        revokedRequest.Content = JsonContent.Create(new { expectedJourneyRevision = 1, status = "Delayed", driverObservationId = observation });
+        using var revoked = await client.SendAsync(revokedRequest);
+        Assert.Equal(HttpStatusCode.Conflict, revoked.StatusCode);
+        await using var finalScope = host.Services.CreateAsyncScope();
+        var db = finalScope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+        Assert.All(await db.Journeys.ToListAsync(), x => Assert.Equal(1, x.CurrentRevision));
+    }
+
     private async Task<HttpResponseMessage> SubmitAsync(HttpClient client, Guid journeyId, string subject, Guid requestId, string text)
     {
         using var request = IdentityTestData.Bearer(HttpMethod.Post, $"/api/driver/journeys/{journeyId}/observations", oidc.CreateToken(subject));
