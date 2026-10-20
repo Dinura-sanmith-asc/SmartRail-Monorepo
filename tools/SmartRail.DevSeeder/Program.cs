@@ -9,6 +9,8 @@ internal static class SeedEntryPoint
     {
         try
         {
+            if (args.FirstOrDefault() == "--cognito-test-roles")
+                return await CognitoTestRoleBootstrap.RunCliAsync(args);
             var allowed = new[] { "--manifest", "--check", "--confirm-local-development", "--enable-development-sample-categories" };
             if (args.Distinct(StringComparer.Ordinal).Count() != args.Length || args.Any(arg => !allowed.Contains(arg, StringComparer.Ordinal)) ||
                 (args.Contains("--manifest") || args.Contains("--check")) && args.Length != 1)

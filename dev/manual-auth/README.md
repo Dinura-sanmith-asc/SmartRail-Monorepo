@@ -1,5 +1,7 @@
 # SmartRail manual local authentication testing
 
+For PostgreSQL role mappings for **existing real Cognito test accounts**, use [the isolated Cognito test-role bootstrap](COGNITO-TEST-ROLES.md). The local issuer configuration below is a separate mode; do not switch to it when verifying your existing real Cognito sessions.
+
 This tooling lets you call the normal Development API with real RS256-signed access JWTs. The standalone issuer binds only to `127.0.0.1:5107`, creates a fresh RSA key in memory each time it starts, publishes that key through local OIDC/JWKS metadata, and discards the private key on exit. The API validates the JWT through its normal Cognito bearer handler. There is no authentication bypass and no new SmartRail API endpoint.
 
 The issuer creates five fixed subjects: Passenger (`smartrail-manual-passenger`), Driver (`smartrail-manual-driver`), StationStaff (`smartrail-manual-station-staff`), Controller (`smartrail-manual-controller`) and Roleless (`smartrail-manual-roleless`). Tokens contain only Cognito-compatible `iss`, `sub`, `token_use=access`, `client_id`, `iat` and five-minute `exp` claims. They contain no role or group claim; `/api/me` reads active roles from PostgreSQL on every request.
