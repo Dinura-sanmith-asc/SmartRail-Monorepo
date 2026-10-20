@@ -1,0 +1,7 @@
+{
+  "API_BASE_URL": "http://10.0.2.2:5237",
+  "COGNITO_ISSUER": "https://cognito-idp.REGION.amazonaws.com/USER_POOL_ID",
+  "COGNITO_CLIENT_ID": "PUBLIC_APP_CLIENT_ID",
+  "COGNITO_REDIRECT_URI": "smartraildriver://auth/callback",
+  "COGNITO_SCOPES": "openid email"
+}
