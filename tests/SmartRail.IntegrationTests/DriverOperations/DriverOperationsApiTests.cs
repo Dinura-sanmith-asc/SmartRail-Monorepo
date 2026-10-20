@@ -256,6 +256,18 @@ public sealed class DriverOperationsApiTests(PostgreSqlTestDatabaseFixture datab
         Assert.Equal(2, Assert.Single(context.GetProperty("updates").EnumerateArray()).GetProperty("revision").GetInt32());
     }
 
+    [Fact]
+    public async Task Verified_driver_with_no_assignments_receives_complete_empty_collection_not_unavailable()
+    {
+        using var host = await IncidentOwnerIntegrationTestHost.CreateAsync(database, oidc);
+        using var client = host.CreateClient();
+        await IdentityTestData.GrantRoleAsync(host.Services, Driver, RoleCode.Driver);
+        using var response = await client.SendAsync(IdentityTestData.Bearer(HttpMethod.Get, "/api/driver/assignments", oidc.CreateToken(Driver)));
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Empty(body.RootElement.GetProperty("items").EnumerateArray());
+    }
+
     private async Task<HttpResponseMessage> SubmitAsync(HttpClient client, Guid journeyId, string subject, Guid requestId, string text)
     {
         using var request = IdentityTestData.Bearer(HttpMethod.Post, $"/api/driver/journeys/{journeyId}/observations", oidc.CreateToken(subject));

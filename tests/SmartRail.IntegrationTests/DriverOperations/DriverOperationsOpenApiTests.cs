@@ -40,6 +40,25 @@ public sealed class DriverOperationsOpenApiTests(PostgreSqlTestDatabaseFixture d
         var schemaRef = submit.GetProperty("requestBody").GetProperty("content").GetProperty("application/json").GetProperty("schema").GetProperty("$ref").GetString()!;
         var schema = root.GetProperty("components").GetProperty("schemas").GetProperty(schemaRef.Split('/').Last());
         Assert.Equal(new[] { "requestId", "text" }, schema.GetProperty("properties").EnumerateObject().Select(x => x.Name).Order(StringComparer.Ordinal));
+        Assert.Equal(new[] { "requestId", "text" }, schema.GetProperty("required").EnumerateArray().Select(x => x.GetString()).Order(StringComparer.Ordinal));
+        Assert.False(schema.GetProperty("additionalProperties").GetBoolean());
+        Assert.Equal("uuid", schema.GetProperty("properties").GetProperty("requestId").GetProperty("format").GetString());
+        Assert.Equal(1, schema.GetProperty("properties").GetProperty("text").GetProperty("minLength").GetInt32());
+        Assert.Equal(4000, schema.GetProperty("properties").GetProperty("text").GetProperty("maxLength").GetInt32());
+        foreach (var path in expected.Keys.Where(x => x.Contains("{id}", StringComparison.Ordinal)))
+        {
+            var operation = paths.GetProperty(path).GetProperty(expected[path]);
+            var id = Assert.Single(operation.GetProperty("parameters").EnumerateArray(), x => x.GetProperty("name").GetString() == "id");
+            Assert.Equal("uuid", id.GetProperty("schema").GetProperty("format").GetString());
+        }
+        var schemas = root.GetProperty("components").GetProperty("schemas");
+        var observation = schemas.GetProperty("DriverObservationResponse");
+        Assert.Equal(new[] { "assignmentId", "driverSubject", "journeyInstanceId", "journeyRevision", "observationId", "reportedAtUtc", "text" },
+            observation.GetProperty("required").EnumerateArray().Select(x => x.GetString()).Order(StringComparer.Ordinal));
+        Assert.Equal(1, observation.GetProperty("properties").GetProperty("journeyRevision").GetProperty("minimum").GetInt32());
+        var context = schemas.GetProperty("DriverJourneyContextResponse").GetProperty("properties");
+        Assert.EndsWith("JourneySnapshotResponse", context.GetProperty("snapshot").GetProperty("$ref").GetString());
+        Assert.EndsWith("JourneyUpdateResponse", context.GetProperty("updates").GetProperty("items").GetProperty("$ref").GetString());
         Assert.DoesNotContain(paths.EnumerateObject(), x => x.Name.Contains("assignment", StringComparison.OrdinalIgnoreCase) &&
             x.Value.TryGetProperty("post", out _));
     }
