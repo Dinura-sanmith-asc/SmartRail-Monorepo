@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: SmartRail Driver Operations
+  version: 1.0.0
+  description: Approved three operations; observations are protected non-authoritative evidence.
+security:
+  - CognitoAccessToken: []
+paths:
+  /api/driver/assignments:
+    get:
+      operationId: GetDriverAssignments
+      summary: Current own Driver assignments or Controller-permitted current assignments
+      responses:
+        '200':
+          description: Authorized current assignments; empty collection is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Assignment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /api/driver/journeys/{id}/observations:
+    parameters:
+      - $ref: '#/components/parameters/JourneyId'
+    post:
+      operationId: SubmitDriverObservation
+      summary: Submit evidence for the caller's currently assigned journey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitObservation'
+      responses:
+        '201':
+          description: Created immutable observation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Observation'
+        '200':
+          description: Identical authorized replay of the original observation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Observation'
+        '400':
+          $ref: '#/components/responses/Invalid'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /api/operations/journeys/{id}/observations:
+    parameters:
+      - $ref: '#/components/parameters/JourneyId'
+    get:
+      operationId: ReviewDriverObservations
+      summary: Controller reads authored observation evidence for a known journey
+      responses:
+        '200':
+          description: Protected observation collection, ascending report time then stable ID
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Observation'
+        '400':
+          $ref: '#/components/responses/Invalid'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+components:
+  securitySchemes:
+    CognitoAccessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Existing Cognito access-token validation; current internal roles grant access, not JWT groups.
+  parameters:
+    JourneyId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    SubmitObservation:
+      type: object
+      additionalProperties: false
+      required: [requestId, text]
+      properties:
+        requestId:
+          type: string
+          format: uuid
+          description: Nonempty retry identity scoped to the verified submitting subject
+        text:
+          type: string
+          minLength: 1
+          maxLength: 4000
+          description: Nonblank trimmed plain text; never official status or executable markup
+    Observation:
+      type: object
+      additionalProperties: false
+      required: [observationId, journeyInstanceId, assignmentId, driverSubject, text, reportedAtUtc, journeyRevision]
+      properties:
+        observationId:
+          type: string
+          format: uuid
+        journeyInstanceId:
+          type: string
+          format: uuid
+        assignmentId:
+          type: string
+          format: uuid
+        driverSubject:
+          type: string
+          minLength: 1
+          description: Verified author; protected review/submission projection only, never public journey data
+        text:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        reportedAtUtc:
+          type: string
+          format: date-time
+        journeyRevision:
+          type: integer
+          minimum: 1
+    Assignment:
+      type: object
+      required: [assignmentId, driverSubject, journey]
+      properties:
+        assignmentId:
+          type: string
+          format: uuid
+        driverSubject:
+          type: string
+          minLength: 1
+        journey:
+          $ref: '#/components/schemas/JourneyContext'
+    JourneyContext:
+      type: object
+      description: Genuine current Feature 003 published journey projection and updates, preserving ordered stops and planned/operational timestamp distinctions.
+      required: [snapshot, updates]
+      properties:
+        snapshot:
+          type: object
+          description: Existing Feature 003 JourneySnapshotView; no private audit or observation fields
+        updates:
+          type: array
+          items:
+            type: object
+            description: Existing safe Feature 003 JourneyUpdateView, ascending revision
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+  responses:
+    Invalid:
+      description: Malformed ID or invalid request; no state change
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Forbidden:
+      description: Verified caller lacks current action or assignment evidence
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    NotFound:
+      description: Journey does not exist or is inaccessible
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Conflict:
+      description: Request identity reused with a different payload
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Unavailable:
+      description: Required current identity, assignment or owner evidence unavailable; no write
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
