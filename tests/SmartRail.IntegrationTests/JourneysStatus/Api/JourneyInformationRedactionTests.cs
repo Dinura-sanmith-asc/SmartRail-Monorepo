@@ -39,7 +39,8 @@ public sealed class JourneyInformationRedactionTests(
             driverObservationId = observationId
         });
         using var response = await client.SendAsync(request);
-        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        // Driver Operations now resolves the real missing record, rather than a missing-module placeholder.
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         var body = await response.Content.ReadAsStringAsync();
         var logs = string.Join("\n", factory.Services.GetRequiredService<IdentityTestLogCaptureProvider>().Messages);
 

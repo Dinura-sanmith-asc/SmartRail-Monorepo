@@ -172,7 +172,7 @@ public sealed class DriverOperationsApiTests(PostgreSqlTestDatabaseFixture datab
         var responses = await Task.WhenAll(Enumerable.Range(0, 4).Select(_ => SubmitAsync(client, journey, Driver, requestId, "Same concurrent evidence")));
         try
         {
-            Assert.Single(responses.Where(x => x.StatusCode == HttpStatusCode.Created));
+            Assert.Single(responses, x => x.StatusCode == HttpStatusCode.Created);
             Assert.All(responses.Where(x => x.StatusCode != HttpStatusCode.Created), x => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
             var ids = new List<Guid>();
             foreach (var response in responses)

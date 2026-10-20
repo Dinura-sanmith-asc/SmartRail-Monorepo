@@ -39,21 +39,60 @@ public sealed class DriverOperationsPersistenceTests(PostgreSqlTestDatabaseFixtu
     }
 
     [Fact]
-    public async Task Failed_audit_foreign_key_rolls_back_assignment_and_does_not_leave_partial_state()
+    public async Task Failed_audit_unique_constraint_rolls_back_assignment_and_does_not_leave_partial_state()
     {
         using var host = await IncidentOwnerIntegrationTestHost.CreateAsync(database, oidc);
         var journey = await IncidentOwnerIntegrationTestHost.InitializeJourneyAsync(host.Services, "rollback");
+        var existing = await DriverOperationsApiTests.GrantAssignmentAsync(host.Services, "existing-driver", journey);
+        Guid existingAuditId;
+        await using (var scope = host.Services.CreateAsyncScope())
+            existingAuditId = await scope.ServiceProvider.GetRequiredService<SmartRailDbContext>().Set<DriverAssignmentAudit>()
+                .Where(x => x.AssignmentId == existing).Select(x => x.AuditId).SingleAsync();
         var assignment = new DriverJourneyAssignment(Guid.NewGuid(), "rollback-driver", journey, DateTimeOffset.UtcNow,
             "test-maintainer", "test-source");
-        var invalidAudit = new DriverAssignmentAudit(Guid.NewGuid(), Guid.NewGuid(), DriverAssignmentAuditAction.Granted,
-            assignment.AssignedBySubject, assignment.AssignedAtUtc, "mismatched-assignment");
+        // Semantically valid audit data reaches PostgreSQL, where duplicate PK must roll the entire write back.
+        var invalidAudit = new DriverAssignmentAudit(existingAuditId, assignment.AssignmentId, DriverAssignmentAuditAction.Granted,
+            assignment.AssignedBySubject, assignment.AssignedAtUtc, assignment.SourceReference);
         await using (var scope = host.Services.CreateAsyncScope())
             await Assert.ThrowsAnyAsync<Exception>(() => scope.ServiceProvider.GetRequiredService<IDriverOperationsRepository>()
                 .GrantAssignmentAsync(assignment, invalidAudit));
         await using var verification = host.Services.CreateAsyncScope();
         var db = verification.ServiceProvider.GetRequiredService<SmartRailDbContext>();
-        Assert.Equal(0, await db.Set<DriverJourneyAssignment>().CountAsync());
-        Assert.Equal(0, await db.Set<DriverAssignmentAudit>().CountAsync());
+        Assert.Equal(1, await db.Set<DriverJourneyAssignment>().CountAsync());
+        Assert.Equal(1, await db.Set<DriverAssignmentAudit>().CountAsync());
+        Assert.False(await db.Set<DriverJourneyAssignment>().AnyAsync(x => x.AssignmentId == assignment.AssignmentId));
+    }
+
+    [Fact]
+    public async Task Database_foreign_keys_reject_unknown_journey_and_audit_history_cannot_be_rewritten()
+    {
+        using var host = await IncidentOwnerIntegrationTestHost.CreateAsync(database, oidc);
+        var journey = await IncidentOwnerIntegrationTestHost.InitializeJourneyAsync(host.Services, "audit-immutable");
+        await DriverOperationsApiTests.GrantAssignmentAsync(host.Services, "audit-driver", journey);
+        await using (var scope = host.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+            var audit = await db.Set<DriverAssignmentAudit>().SingleAsync();
+            db.Entry(audit).Property(x => x.EvidenceReference).CurrentValue = "rewritten-history";
+            await Assert.ThrowsAnyAsync<Exception>(() => db.SaveChangesAsync());
+        }
+        await using (var scope = host.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+            db.Remove(await db.Set<DriverAssignmentAudit>().SingleAsync());
+            await Assert.ThrowsAnyAsync<Exception>(() => db.SaveChangesAsync());
+        }
+        await using (var scope = host.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+            db.Set<DriverJourneyAssignment>().Add(new(Guid.NewGuid(), "unknown-journey-driver", Guid.NewGuid(),
+                DateTimeOffset.UtcNow, "test-maintainer", "test-source"));
+            await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
+        }
+        await using var finalScope = host.Services.CreateAsyncScope();
+        var verify = finalScope.ServiceProvider.GetRequiredService<SmartRailDbContext>();
+        Assert.Single(await verify.Set<DriverJourneyAssignment>().ToListAsync());
+        Assert.Equal("isolated-test-manifest", (await verify.Set<DriverAssignmentAudit>().SingleAsync()).EvidenceReference);
     }
 
     [Fact]
