@@ -16,3 +16,6 @@ public interface IDriverOperationsRepository
     Task<bool> RevokeAssignmentAsync(Guid assignmentId, string actorSubject, DateTimeOffset revokedAtUtc, Guid auditId,
         string evidenceReference, CancellationToken cancellationToken = default);
 }
+
+public sealed class DriverObservationWriteConflictException : Exception;
+public sealed class DriverAssignmentWriteConflictException : Exception;
