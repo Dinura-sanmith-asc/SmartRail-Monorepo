@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: SmartRail Driver Operations
   version: 1.0.0
@@ -171,13 +171,11 @@ components:
       required: [snapshot, updates]
       properties:
         snapshot:
-          type: object
-          description: Existing Feature 003 JourneySnapshotView; no private audit or observation fields
+          $ref: '../../003-journeys-status/contracts/journeys-status.openapi.yaml#/components/schemas/JourneySnapshot'
         updates:
           type: array
           items:
-            type: object
-            description: Existing safe Feature 003 JourneyUpdateView, ascending revision
+            $ref: '../../003-journeys-status/contracts/journeys-status.openapi.yaml#/components/schemas/JourneyUpdate'
     ProblemDetails:
       type: object
       properties:

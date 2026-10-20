@@ -18,7 +18,7 @@ public static class DriverOperationsEndpoints
         Secure(endpoints.MapPost("/api/driver/journeys/{id}/observations", SubmitAsync)
             .WithName("SubmitDriverObservation").WithSummary("Report non-authoritative journey evidence")
             .Accepts<SubmitDriverObservationRequest>("application/json")
-            .Produces<DriverObservationView>(201).Produces<DriverObservationView>(200)
+            .Produces<DriverObservationResponse>(201).Produces<DriverObservationResponse>(200)
             .Produces<ProblemResponse>(409, "application/problem+json"));
         Secure(endpoints.MapGet("/api/operations/journeys/{id}/observations", ReviewAsync)
             .WithName("ReviewDriverObservations").WithSummary("Control reads authored observation evidence")
@@ -31,7 +31,7 @@ public static class DriverOperationsEndpoints
     {
         var result = await handler.GetAssignmentsAsync(context.User.FindFirstValue("sub"), cancellationToken);
         return result.Value is not null && result.Outcome == DriverOutcome.Success
-            ? Results.Ok(new DriverAssignmentListResponse(result.Value)) : Error(result.Outcome);
+            ? Results.Ok(new DriverAssignmentListResponse(result.Value.Select(DriverAssignmentResponse.From).ToArray())) : Error(result.Outcome);
     }
     public static async Task<IResult> SubmitAsync(string id, HttpContext context, DriverOperationsHandler handler,
         CancellationToken cancellationToken)
@@ -45,7 +45,7 @@ public static class DriverOperationsEndpoints
         var result = await handler.SubmitObservationAsync(context.User.FindFirstValue("sub"), journeyId,
             input.RequestId, input.Text, cancellationToken);
         return result.Value is not null && result.Outcome is DriverOutcome.Created or DriverOutcome.Success
-            ? Results.Json(result.Value, statusCode: result.Outcome == DriverOutcome.Created ? 201 : 200) : Error(result.Outcome);
+            ? Results.Json(DriverObservationResponse.From(result.Value), statusCode: result.Outcome == DriverOutcome.Created ? 201 : 200) : Error(result.Outcome);
     }
     public static async Task<IResult> ReviewAsync(string id, HttpContext context, DriverOperationsHandler handler,
         CancellationToken cancellationToken)
@@ -53,7 +53,7 @@ public static class DriverOperationsEndpoints
         if (!Guid.TryParse(id, out var journeyId) || journeyId == Guid.Empty) return Error(DriverOutcome.Invalid);
         var result = await handler.GetObservationsAsync(context.User.FindFirstValue("sub"), journeyId, cancellationToken);
         return result.Value is not null && result.Outcome == DriverOutcome.Success
-            ? Results.Ok(new DriverObservationListResponse(result.Value)) : Error(result.Outcome);
+            ? Results.Ok(new DriverObservationListResponse(result.Value.Select(DriverObservationResponse.From).ToArray())) : Error(result.Outcome);
     }
     private static IResult Error(DriverOutcome outcome) => outcome switch
     {
@@ -72,6 +72,10 @@ public static class DriverOperationsEndpoints
         .Produces<ProblemResponse>(503, "application/problem+json")
         .AddOpenApiOperationTransformer((operation, context, _) =>
         {
+            if (operation.Parameters is not null)
+                foreach (var parameter in operation.Parameters)
+                    if (parameter is OpenApiParameter concrete && parameter.Name == "id" && parameter.In == ParameterLocation.Path)
+                        concrete.Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "uuid" };
             operation.Security ??= [];
             operation.Security.Add(new OpenApiSecurityRequirement
             {
