@@ -75,6 +75,7 @@ public sealed class DriverOperationsHandler(IDriverOperationsRepository reposito
             var observation = new DriverObservation(Guid.NewGuid(), assignment.AssignmentId, journeyId, subject,
                 requestId, canonicalText, timeProvider.GetUtcNow(), snapshot.Value.Revision);
             try { await repository.AddObservationAsync(observation, cancellationToken); }
+            catch (DriverAssignmentWriteConflictException) { return new(DriverOutcome.Forbidden); }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
             catch
             {

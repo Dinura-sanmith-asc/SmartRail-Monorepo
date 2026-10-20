@@ -9,6 +9,7 @@ using SmartRail.Api.Contracts.Identity;
 using SmartRail.Api.Contracts.Incidents;
 using SmartRail.Api.Endpoints;
 using SmartRail.Api.Endpoints.JourneysStatus;
+using SmartRail.Api.Endpoints.DriverOperations;
 using SmartRail.Api.Endpoints.Incidents;
 using SmartRail.Api.Errors;
 using SmartRail.Infrastructure;
@@ -199,6 +200,7 @@ app.MapRailwayNetworkEndpoints();
 app.MapIdentityEndpoints();
 app.MapJourneysStatusReadEndpoints();
 app.MapJourneysStatusPublicationEndpoints();
+app.MapDriverOperationsEndpoints();
 app.MapIncidentEndpoints();
 
 

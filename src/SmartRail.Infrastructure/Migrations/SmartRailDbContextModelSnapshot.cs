@@ -22,6 +22,165 @@ namespace SmartRail.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("SmartRail.Domain.DriverOperations.Entities.DriverAssignmentAudit", b =>
+                {
+                    b.Property<Guid>("AuditId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("audit_id");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("action");
+
+                    b.Property<string>("ActorSubject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("actor_subject");
+
+                    b.Property<Guid>("AssignmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assignment_id");
+
+                    b.Property<string>("EvidenceReference")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("evidence_reference");
+
+                    b.Property<DateTimeOffset>("OccurredAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at_utc");
+
+                    b.HasKey("AuditId");
+
+                    b.HasIndex("AssignmentId", "OccurredAtUtc");
+
+                    b.ToTable("driver_assignment_audit", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_driver_audit_action", "action IN ('Granted','Revoked')");
+
+                            t.HasCheckConstraint("ck_driver_audit_text", "length(trim(actor_subject)) > 0 AND length(trim(evidence_reference)) > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.DriverOperations.Entities.DriverJourneyAssignment", b =>
+                {
+                    b.Property<Guid>("AssignmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assignment_id");
+
+                    b.Property<DateTimeOffset>("AssignedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("assigned_at_utc");
+
+                    b.Property<string>("AssignedBySubject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("assigned_by_subject");
+
+                    b.Property<string>("DriverSubject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("driver_subject");
+
+                    b.Property<Guid>("JourneyInstanceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_instance_id");
+
+                    b.Property<DateTimeOffset?>("RevokedAtUtc")
+                        .IsConcurrencyToken()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at_utc");
+
+                    b.Property<string>("RevokedBySubject")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("revoked_by_subject");
+
+                    b.Property<string>("SourceReference")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("source_reference");
+
+                    b.HasKey("AssignmentId");
+
+                    b.HasIndex("JourneyInstanceId");
+
+                    b.HasIndex("DriverSubject", "JourneyInstanceId")
+                        .IsUnique()
+                        .HasFilter("revoked_at_utc IS NULL");
+
+                    b.ToTable("driver_journey_assignment", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_driver_assignment_revocation", "(revoked_at_utc IS NULL AND revoked_by_subject IS NULL) OR (revoked_at_utc >= assigned_at_utc AND revoked_by_subject IS NOT NULL AND length(trim(revoked_by_subject)) > 0)");
+
+                            t.HasCheckConstraint("ck_driver_assignment_text", "length(trim(driver_subject)) > 0 AND length(trim(assigned_by_subject)) > 0 AND length(trim(source_reference)) > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.DriverOperations.Entities.DriverObservation", b =>
+                {
+                    b.Property<Guid>("ObservationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("observation_id");
+
+                    b.Property<Guid>("AssignmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assignment_id");
+
+                    b.Property<string>("DriverSubject")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("driver_subject");
+
+                    b.Property<Guid>("JourneyInstanceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("journey_instance_id");
+
+                    b.Property<int>("JourneyRevision")
+                        .HasColumnType("integer")
+                        .HasColumnName("journey_revision");
+
+                    b.Property<DateTimeOffset>("ReportedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reported_at_utc");
+
+                    b.Property<Guid>("RequestId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("request_id");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)")
+                        .HasColumnName("text");
+
+                    b.HasKey("ObservationId");
+
+                    b.HasIndex("DriverSubject", "RequestId")
+                        .IsUnique();
+
+                    b.HasIndex("JourneyInstanceId", "JourneyRevision");
+
+                    b.HasIndex("JourneyInstanceId", "ReportedAtUtc");
+
+                    b.HasIndex("AssignmentId", "DriverSubject", "JourneyInstanceId");
+
+                    b.ToTable("driver_observation", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_driver_observation_revision", "journey_revision > 0");
+
+                            t.HasCheckConstraint("ck_driver_observation_text", "length(trim(text)) > 0 AND length(trim(driver_subject)) > 0");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Domain.Identity.Entities.RoleAssignment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1279,6 +1438,40 @@ namespace SmartRail.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("ck_train_service_version_positive", "version > 0");
                         });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.DriverOperations.Entities.DriverAssignmentAudit", b =>
+                {
+                    b.HasOne("SmartRail.Domain.DriverOperations.Entities.DriverJourneyAssignment", null)
+                        .WithMany()
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.DriverOperations.Entities.DriverJourneyAssignment", b =>
+                {
+                    b.HasOne("SmartRail.Domain.JourneysStatus.Entities.Journey", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyInstanceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.DriverOperations.Entities.DriverObservation", b =>
+                {
+                    b.HasOne("SmartRail.Domain.JourneysStatus.Entities.JourneyRevision", null)
+                        .WithMany()
+                        .HasForeignKey("JourneyInstanceId", "JourneyRevision")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SmartRail.Domain.DriverOperations.Entities.DriverJourneyAssignment", null)
+                        .WithMany()
+                        .HasForeignKey("AssignmentId", "DriverSubject", "JourneyInstanceId")
+                        .HasPrincipalKey("AssignmentId", "DriverSubject", "JourneyInstanceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SmartRail.Domain.Identity.Entities.RoleAssignmentAudit", b =>

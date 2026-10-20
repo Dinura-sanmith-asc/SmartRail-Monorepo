@@ -4,6 +4,7 @@ using SmartRail.Infrastructure.RailwayNetwork.Configurations;
 using SmartRail.Domain.Identity.Entities;
 using SmartRail.Domain.JourneysStatus.Entities;
 using SmartRail.Domain.Incidents.Entities;
+using SmartRail.Domain.DriverOperations.Entities;
 
 namespace SmartRail.Infrastructure.RailwayNetwork;
 
@@ -33,6 +34,9 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<IncidentRevision> IncidentRevisions => Set<IncidentRevision>();
     public DbSet<IncidentAssociation> IncidentAssociations => Set<IncidentAssociation>();
     public DbSet<IncidentIdempotencyRecord> IncidentIdempotencyRecords => Set<IncidentIdempotencyRecord>();
+    public DbSet<DriverJourneyAssignment> DriverJourneyAssignments => Set<DriverJourneyAssignment>();
+    public DbSet<DriverAssignmentAudit> DriverAssignmentAudits => Set<DriverAssignmentAudit>();
+    public DbSet<DriverObservation> DriverObservations => Set<DriverObservation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -55,7 +59,7 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     private void RejectAuditMutation()
     {
         var mutation = ChangeTracker.Entries()
-            .Where(entry => entry.Entity is RoleAssignmentAudit or StationScopeAssignmentAudit or JourneyInitializationAudit or JourneyRevision or IncidentRevision)
+            .Where(entry => entry.Entity is RoleAssignmentAudit or StationScopeAssignmentAudit or JourneyInitializationAudit or JourneyRevision or IncidentRevision or DriverAssignmentAudit or DriverObservation)
             .FirstOrDefault(entry => entry.State is EntityState.Modified or EntityState.Deleted);
         if (mutation is not null)
         {

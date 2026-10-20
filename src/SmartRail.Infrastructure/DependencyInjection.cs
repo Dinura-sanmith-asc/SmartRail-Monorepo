@@ -25,6 +25,8 @@ using SmartRail.Application.Incidents.References;
 using SmartRail.Infrastructure.Incidents.References;
 using SmartRail.Application.Incidents.Categories;
 using SmartRail.Infrastructure.Incidents.Categories;
+using SmartRail.Application.DriverOperations;
+using SmartRail.Infrastructure.DriverOperations;
 
 namespace SmartRail.Infrastructure;
 
@@ -103,6 +105,14 @@ public static class DependencyInjection
         services.AddScoped<SmartRail.Application.Incidents.Persistence.IIncidentRepository, Incidents.Persistence.IncidentRepository>();
         services.RemoveAll<IIncidentResourceEvidence>();
         services.AddScoped<IIncidentResourceEvidence, IncidentResourceEvidenceProvider>();
+        services.AddScoped<IDriverOperationsRepository, DriverOperationsRepository>();
+        services.TryAddSingleton<IDriverAssignmentMaintenanceAuthority, DenyAllDriverAssignmentMaintenanceAuthority>();
+        services.AddScoped<DriverOperationsHandler>();
+        services.AddScoped<DriverAssignmentMaintenanceHandler>();
+        services.RemoveAll<IDriverJourneyAssignmentEvidence>();
+        services.AddScoped<IDriverJourneyAssignmentEvidence, PostgreSqlDriverJourneyAssignmentEvidence>();
+        services.RemoveAll<IDriverObservationVerifier>();
+        services.AddScoped<IDriverObservationVerifier, StoredDriverObservationVerifier>();
         return services;
     }
 }
