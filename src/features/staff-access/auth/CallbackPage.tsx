@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import { useAuth } from 'react-oidc-context'
 import { Link, useNavigate } from 'react-router'
-import { AccessState } from '../../../shared/ui/AccessState'
 import { safeSameOriginReturnPath } from './oidcConfig'
 import { clearOAuthResponseFromUrl } from './callbackUrl'
+import { AuthPageLayout } from './AuthPageLayout'
 
 function returnPath(value: unknown): string {
   return safeSameOriginReturnPath(value, window.location.origin)
@@ -35,13 +35,17 @@ export function CallbackPage() {
 
   if (failed) {
     return (
-      <main className="app-shell" aria-labelledby="callback-heading">
-        <h1 id="callback-heading">Sign-in could not be completed</h1>
-        <p role="alert">Your sign-in response could not be verified. No operational workspace was opened.</p>
-        <Link to="/">Return to sign in</Link>
-      </main>
+      <AuthPageLayout page="Sign-in recovery">
+        <h2 id="callback-heading">Sign-in could not be completed</h2>
+        <p className="auth-card__description" role="alert">Your sign-in response could not be verified. No operational workspace was opened.</p>
+        <Link className="auth-action" to="/">Return to staff sign in <span aria-hidden="true">→</span></Link>
+      </AuthPageLayout>
     )
   }
 
-  return <AccessState state="loading" />
+  return <AuthPageLayout page="Secure sign in">
+    <h2 id="callback-heading">Verifying your session</h2>
+    <p className="auth-card__description">Completing the secure sign-in handoff and checking your staff access.</p>
+    <div className="auth-progress" role="status"><span className="auth-progress__spinner" aria-hidden="true" />Verifying sign-in response…</div>
+  </AuthPageLayout>
 }

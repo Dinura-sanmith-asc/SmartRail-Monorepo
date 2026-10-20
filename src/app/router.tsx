@@ -4,6 +4,7 @@ import { SignInPage } from '../features/staff-access/auth/SignInPage'
 import { ProtectedRoute } from '../features/staff-access/routes/ProtectedRoute'
 import { ControllerWorkspace } from '../features/staff-access/workspaces/ControllerWorkspace'
 import { StationStaffWorkspace } from '../features/staff-access/workspaces/StationStaffWorkspace'
+import { DriverWorkspace } from '../features/driver/DriverWorkspace'
 
 const router = createBrowserRouter([
   { path: '/', element: <SignInPage /> },
@@ -21,6 +22,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute requiredRole="Station Staff">
         <StationStaffWorkspace />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/driver/*',
+    element: (
+      <ProtectedRoute requiredRole="Driver">
+        <DriverWorkspace />
       </ProtectedRoute>
     ),
   },

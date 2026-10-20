@@ -1,10 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { IdentityContext } from '../../../../src/features/staff-access/identity/identityContext'
 import type { StaffRole } from '../../../../src/features/staff-access/identity/currentIdentity'
 import { StationStaffWorkspace } from '../../../../src/features/staff-access/workspaces/StationStaffWorkspace'
+
+vi.mock('react-oidc-context', () => ({ useAuth: () => ({ user: null }) }))
+vi.mock('../../../../src/config/runtimeConfigContext', () => ({ useRuntimeConfig: () => ({ apiBaseUrl: 'https://api.test' }) }))
 
 function renderWorkspace(roles: StaffRole[]) {
   const router = createMemoryRouter([{ path: '/station-staff/*', element: <StationStaffWorkspace /> }], {
@@ -23,7 +26,7 @@ describe('Station Staff workspace', () => {
   it('shows the generic Station Staff workspace and its approved navigation', () => {
     renderWorkspace(['Station Staff'])
 
-    expect(screen.getByRole('heading', { name: 'Station Staff Workspace' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Station operations' })).toBeTruthy()
     expect(screen.getByRole('navigation', { name: /operations navigation/i })).toBeTruthy()
     expect(screen.getByRole('link', { name: /station staff workspace/i }).getAttribute('aria-current')).toBe('page')
     expect(screen.queryByRole('link', { name: /controller/i })).toBeNull()
@@ -41,8 +44,11 @@ describe('Station Staff workspace', () => {
     renderWorkspace(['Station Staff'])
 
     await user.tab()
-    expect(document.activeElement).toBe(screen.getByRole('link', { name: /station staff workspace/i }))
+    expect(document.activeElement).toBe(screen.getByRole('link', { name: /skip to operations content/i }))
+    await user.tab()
+    const overview = screen.getByRole('button', { name: /station overview/i })
+    expect(document.activeElement).toBe(overview)
     await user.keyboard('{Enter}')
-    expect(screen.getByRole('link', { name: /station staff workspace/i }).getAttribute('aria-current')).toBe('page')
+    expect(overview.getAttribute('aria-current')).toBe('page')
   })
 })

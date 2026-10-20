@@ -1,10 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { IdentityContext, type IdentityState } from '../../../../src/features/staff-access/identity/identityContext'
 import { stateForCurrentSession } from '../../../../src/features/staff-access/identity/identityState'
 import { ProtectedRoute } from '../../../../src/features/staff-access/routes/ProtectedRoute'
 import { StationStaffWorkspace } from '../../../../src/features/staff-access/workspaces/StationStaffWorkspace'
+
+vi.mock('react-oidc-context', () => ({ useAuth: () => ({ user: null }) }))
+vi.mock('../../../../src/config/runtimeConfigContext', () => ({ useRuntimeConfig: () => ({ apiBaseUrl: 'https://api.test' }) }))
 
 function renderStationStaffRoute(state: IdentityState, entry: string) {
   const router = createMemoryRouter(
@@ -38,7 +41,7 @@ describe('Station Staff resource-scope boundary', () => {
       '/station-staff?stationId=STA-02&resourceId=RESOURCE-14',
     )
 
-    expect(screen.getByRole('heading', { name: /station staff workspace/i })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /station operations/i })).toBeTruthy()
     expect(screen.queryByText(/STA-02|RESOURCE-14/i)).toBeNull()
     expect(screen.queryByText(/assigned station|station assignment|resource access granted/i)).toBeNull()
   })
@@ -52,7 +55,7 @@ describe('Station Staff resource-scope boundary', () => {
       '/station-staff/stations/STA-02/resources/RESOURCE-14',
     )
 
-    expect(screen.queryByRole('heading', { name: /station staff workspace/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /station operations/i })).toBeNull()
     expect(screen.getByRole('alert').textContent).toMatch(/no access|not authorized|no permission/i)
     expect(screen.queryByText(/STA-02|RESOURCE-14/i)).toBeNull()
   })
@@ -66,7 +69,7 @@ describe('Station Staff resource-scope boundary', () => {
       '/station-staff',
     )
 
-    expect(screen.queryByRole('heading', { name: /station staff workspace/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /station operations/i })).toBeNull()
     expect(screen.getByRole('alert').textContent).toMatch(/no access|not authorized|no permission/i)
   })
 
@@ -74,7 +77,7 @@ describe('Station Staff resource-scope boundary', () => {
     renderStationStaffRoute({ status: 'loading' }, '/station-staff')
 
     expect(screen.getByRole('status').textContent).toMatch(/loading/i)
-    expect(screen.queryByRole('heading', { name: /station staff workspace/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /station operations/i })).toBeNull()
   })
 
   it('does not restore an old identity while a replacement session is loading', () => {
@@ -91,7 +94,7 @@ describe('Station Staff resource-scope boundary', () => {
     renderStationStaffRoute(currentState, '/station-staff')
 
     expect(screen.getByRole('status').textContent).toMatch(/loading/i)
-    expect(screen.queryByRole('heading', { name: /station staff workspace/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /station operations/i })).toBeNull()
   })
 
   it('removes Station Staff presentation when the current role set changes', () => {
@@ -118,13 +121,13 @@ describe('Station Staff resource-scope boundary', () => {
       identity: { subject: 'station-staff-1', roles: ['Station Staff'] },
     }))
 
-    expect(screen.getByRole('heading', { name: /station staff workspace/i })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /station operations/i })).toBeTruthy()
     view.rerender(renderWithState({
       status: 'authenticated',
       identity: { subject: 'station-staff-1', roles: ['Controller'] },
     }))
 
-    expect(screen.queryByRole('heading', { name: /station staff workspace/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /station operations/i })).toBeNull()
     expect(screen.getByRole('alert').textContent).toMatch(/no access|not authorized|no permission/i)
   })
 })

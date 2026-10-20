@@ -11,6 +11,12 @@ const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 20
 const publicJwk = publicKey.export({ format: 'jwk' })
 const keyId = 'signout-history-fixture-key'
 
+async function confirmSignOut(page: Page) {
+  const dialog = page.getByRole('dialog', { name: /sign out of smartrail/i })
+  await expect(dialog).toBeVisible()
+  await dialog.getByRole('button', { name: 'Sign out' }).click()
+}
+
 function base64Url(value: string | Buffer) {
   return Buffer.from(value).toString('base64url')
 }
@@ -95,18 +101,18 @@ async function installSignInFixture(page: Page, roles: string[] = ['Controller']
 async function signInAsController(page: Page) {
   await page.goto('/')
   await page.getByRole('button', { name: /sign in/i }).click()
-  await expect(page.getByRole('heading', { name: /controller workspace/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /control room/i })).toBeVisible()
 }
 
 async function signInAsStationStaff(page: Page) {
   await page.goto('/')
   await page.getByRole('button', { name: /sign in/i }).click()
-  await expect(page.getByRole('heading', { name: /station staff workspace/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /station operations/i })).toBeVisible()
 }
 
 async function expectSignedOut(page: Page) {
-  await expect(page.getByRole('heading', { name: /controller workspace/i })).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: /station staff workspace/i })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: /control room/i })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: /station operations/i })).toHaveCount(0)
   await expect(page.getByText(/authorized controller access is active/i)).toHaveCount(0)
 }
 
@@ -125,6 +131,7 @@ test.describe('sign-out and browser history (mocked local fixtures)', () => {
     await expect(signOutButton).toBeVisible()
     await signOutButton.focus()
     await page.keyboard.press('Enter')
+    await confirmSignOut(page)
 
     await expect.poll(() => remoteLogoutUrl?.pathname).toBe('/logout')
     expect(remoteLogoutUrl?.searchParams.get('client_id')).toBe(clientId)
@@ -135,7 +142,8 @@ test.describe('sign-out and browser history (mocked local fixtures)', () => {
     await page.goBack()
     await expectSignedOut(page)
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible()
-    expect(await page.evaluate(() => localStorage.length)).toBe(0)
+    expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(['smartrail.uiLanguage'])
+    expect(await page.evaluate(() => localStorage.getItem('smartrail.uiLanguage'))).toMatch(/^(en|si|ta)$/)
     expect(await page.evaluate(() => sessionStorage.length)).toBe(0)
     expect(await page.evaluate(() => document.cookie)).toBe('')
     expect(await page.evaluate(() => caches.keys())).toEqual([])
@@ -154,6 +162,7 @@ test.describe('sign-out and browser history (mocked local fixtures)', () => {
     await signInAsController(page)
     const identityRequestsBeforeLogout = fixture.identityRequestCount
     await page.getByRole('button', { name: /sign out/i }).click()
+    await confirmSignOut(page)
 
     // A failed top-level cross-origin navigation is displayed by the browser;
     // returning to the replaced local entry must not restore the old session.
@@ -176,6 +185,7 @@ test.describe('sign-out and browser history (mocked local fixtures)', () => {
     await signInAsStationStaff(page)
     const identityRequestsBeforeLogout = fixture.identityRequestCount
     await page.getByRole('button', { name: /sign out/i }).click()
+    await confirmSignOut(page)
     await expect(page.getByText('Signed out')).toBeVisible()
     await page.goBack()
     await expect(page.getByRole('heading', { name: /staff sign in/i })).toBeVisible()
@@ -193,6 +203,7 @@ test.describe('sign-out and browser history (mocked local fixtures)', () => {
     await expect(page.getByRole('link', { name: /station staff workspace/i })).toBeVisible()
     const identityRequestsBeforeLogout = fixture.identityRequestCount
     await page.getByRole('button', { name: /sign out/i }).click()
+    await confirmSignOut(page)
     await expect(page.getByText('Signed out')).toBeVisible()
     await page.goBack()
     await expect(page.getByRole('heading', { name: /staff sign in/i })).toBeVisible()

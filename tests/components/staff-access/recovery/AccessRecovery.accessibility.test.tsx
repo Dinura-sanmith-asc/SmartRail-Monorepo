@@ -21,6 +21,7 @@ const auth = vi.hoisted(() => ({
 }))
 
 vi.mock('react-oidc-context', () => ({ useAuth: () => ({ ...auth, isAuthenticated: false, error: null }) }))
+vi.mock('../../../../src/config/runtimeConfigContext', () => ({ useRuntimeConfig: () => ({ apiBaseUrl: 'https://api.test' }) }))
 
 function renderSignIn(state: IdentityState = { status: 'unauthenticated' }) {
   const router = createMemoryRouter([
@@ -100,7 +101,11 @@ describe('staff access recovery accessibility', () => {
     const navigation = screen.getByRole('navigation', { name: 'Operations navigation' })
     const link = screen.getByRole('link', { name: 'Station Staff Workspace' })
     await user.tab()
-    expect(document.activeElement).toBe(link)
+    expect(document.activeElement).toBe(screen.getByRole('link', { name: /skip to operations content/i }))
+    await user.tab()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: /station overview/i }))
+    await user.tab()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: /incident reporting/i }))
     expect(navigation.contains(link)).toBe(true)
     expect(link.className).toContain('workspace-navigation__link')
     expect(stationStaffCss).toMatch(/\.workspace-navigation__link:focus-visible\s*\{[^}]*outline:\s*[^;]+/s)
@@ -122,7 +127,7 @@ describe('staff access recovery accessibility', () => {
       identity: { subject: 'station-staff-1', roles: ['Station Staff'] },
     })
 
-    expect(screen.getByRole('heading', { name: /station staff workspace/i })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /station operations/i })).toBeTruthy()
     expect(screen.queryByRole('link', { name: /controller workspace/i })).toBeNull()
   })
 })

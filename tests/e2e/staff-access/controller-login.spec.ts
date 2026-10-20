@@ -151,7 +151,7 @@ async function beginSignIn(page: Page) {
 }
 
 async function expectControllerWorkspaceHidden(page: Page) {
-  await expect(page.getByRole('heading', { name: /controller/i })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: /control room/i })).toHaveCount(0)
   await expect(page.getByText(/controller workspace/i)).toHaveCount(0)
 }
 
@@ -160,7 +160,7 @@ test.describe('Controller managed-login browser protocol (mocked local fixture)'
     const fixture = await installLocalOidcFixture(page, 'valid')
     await beginSignIn(page)
 
-    await expect(page.getByRole('heading', { name: /controller/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /control room/i })).toBeVisible()
     expect(fixture.authorizeCount).toBe(1)
     expect(fixture.tokenExchangeCount).toBe(1)
     expect(fixture.receivedCodeVerifier).toBeTruthy()
@@ -169,7 +169,8 @@ test.describe('Controller managed-login browser protocol (mocked local fixture)'
     )
 
     await expect.poll(() => page.evaluate(() => sessionStorage.length)).toBe(0)
-    expect(await page.evaluate(() => localStorage.length)).toBe(0)
+    expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(['smartrail.uiLanguage'])
+    expect(await page.evaluate(() => localStorage.getItem('smartrail.uiLanguage'))).toMatch(/^(en|si|ta)$/)
     expect(await page.evaluate(() => document.cookie)).toBe('')
 
     const landedUrl = new URL(page.url())
@@ -202,7 +203,7 @@ test.describe('Controller managed-login browser protocol (mocked local fixture)'
   test('a consumed OAuth state cannot be replayed after a fresh page load', async ({ page }) => {
     const fixture = await installLocalOidcFixture(page, 'valid')
     await beginSignIn(page)
-    await expect(page.getByRole('heading', { name: /controller/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /control room/i })).toBeVisible()
     expect(fixture.callbackUrl).toBeTruthy()
 
     // Reload drops the volatile OIDC user. The already-consumed transaction must not restore it.
@@ -218,7 +219,7 @@ test.describe('Controller managed-login browser protocol (mocked local fixture)'
   test('access-token expiry closes the Controller shell and returns to the sign-in entry', async ({ page }) => {
     await installLocalOidcFixture(page, 'valid', 2)
     await beginSignIn(page)
-    await expect(page.getByRole('heading', { name: /controller workspace/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /control room/i })).toBeVisible()
 
     await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible({ timeout: 10_000 })
     await expectControllerWorkspaceHidden(page)

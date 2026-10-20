@@ -1,10 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { IdentityContext, type IdentityState } from '../../../../src/features/staff-access/identity/identityContext'
 import { ProtectedRoute } from '../../../../src/features/staff-access/routes/ProtectedRoute'
 import { ControllerWorkspace } from '../../../../src/features/staff-access/workspaces/ControllerWorkspace'
 import type { StaffRole } from '../../../../src/features/staff-access/identity/currentIdentity'
+
+vi.mock('react-oidc-context', () => ({ useAuth: () => ({ user: null }) }))
+vi.mock('../../../../src/config/runtimeConfigContext', () => ({ useRuntimeConfig: () => ({ apiBaseUrl: 'https://api.test' }) }))
 
 function renderControllerRoute(state: IdentityState) {
   const router = createMemoryRouter(
@@ -35,13 +38,13 @@ describe('Controller protected route and workspace shell', () => {
       identity: { subject: 'controller-1', roles: ['Controller'] },
     })
 
-    expect(screen.getByRole('heading', { name: /controller workspace/i })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /control room/i })).toBeTruthy()
   })
 
   it('denies a direct protected-route visit when no operational role is returned', () => {
     renderControllerRoute({ status: 'no-operational-access' })
 
-    expect(screen.queryByRole('heading', { name: /controller workspace/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /control room/i })).toBeNull()
     expect(screen.getByRole('alert').textContent).toMatch(/no access|not authorized|no permission/i)
   })
 
@@ -53,7 +56,7 @@ describe('Controller protected route and workspace shell', () => {
         identity: { subject: 'non-controller-1', roles: [role] },
       })
 
-      expect(screen.queryByRole('heading', { name: /controller workspace/i })).toBeNull()
+      expect(screen.queryByRole('heading', { name: /control room/i })).toBeNull()
       expect(screen.getByRole('alert').textContent).toMatch(/no access|not authorized|no permission/i)
     },
   )
@@ -67,14 +70,14 @@ describe('Controller protected route and workspace shell', () => {
       },
     })
 
-    expect(screen.queryByRole('heading', { name: /controller workspace/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /control room/i })).toBeNull()
     expect(screen.getByRole('alert').textContent).toMatch(/no access|not authorized|no permission/i)
   })
 
   it('keeps a directly requested protected route closed while unauthenticated', () => {
     renderControllerRoute({ status: 'unauthenticated' })
 
-    expect(screen.queryByRole('heading', { name: /controller workspace/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /control room/i })).toBeNull()
     expect(screen.getByRole('alert').textContent).toMatch(/sign in|authentication|required/i)
   })
 })

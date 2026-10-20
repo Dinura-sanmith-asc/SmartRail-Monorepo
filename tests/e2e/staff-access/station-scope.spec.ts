@@ -7,7 +7,7 @@ test.describe('Station Staff route boundary (local browser, unauthenticated)', (
     await page.goto('/station-staff/operations?station=station-a&resource=platform-1')
 
     await expect(page.getByRole('alert').filter({ hasText: /authentication is required|sign in/i })).toBeVisible()
-    await expect(page.getByRole('heading', { name: /station staff workspace/i })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: /station operations/i })).toHaveCount(0)
     await expect(page.getByText(/station-a|platform-1/i)).toHaveCount(0)
     await expect(page).not.toHaveURL(/\/controller/)
   })
@@ -16,6 +16,6 @@ test.describe('Station Staff route boundary (local browser, unauthenticated)', (
     await page.goto('/controller/operations')
 
     await expect(page.getByRole('alert').filter({ hasText: /authentication is required|sign in/i })).toBeVisible()
-    await expect(page.getByRole('heading', { name: /controller workspace/i })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: /control room/i })).toHaveCount(0)
   })
 })

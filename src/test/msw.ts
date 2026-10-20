@@ -9,4 +9,6 @@ export const server = setupServer(
       roles: [],
     }),
   ),
+  http.get('https://api.test/api/stations', () => HttpResponse.json({ items: [] })),
+  http.get('https://api.test/api/incidents', () => HttpResponse.json({ items: [] })),
 )

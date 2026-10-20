@@ -254,7 +254,7 @@ describe('access recovery integration', () => {
 
     expect(await screen.findByRole('heading', { name: /sign-in could not be completed/i })).toBeTruthy()
     expect(screen.getByRole('alert').textContent).not.toContain('provider internals')
-    expect(screen.getByRole('link', { name: /return to sign in/i })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /return to staff sign in/i })).toBeTruthy()
     await waitFor(() => expect(window.location.search).not.toContain('state'))
   })
 })

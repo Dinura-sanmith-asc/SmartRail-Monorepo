@@ -10,7 +10,7 @@
 
 .access-state p { margin: 0; line-height: 1.5; }
 
-.access-state h2 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+.access-state h2 { margin: 0 0 0.5rem; color: #12263a; font-size: 1.25rem; font-weight: 700; }
 
 .access-state__retry {
   margin-top: 1rem;

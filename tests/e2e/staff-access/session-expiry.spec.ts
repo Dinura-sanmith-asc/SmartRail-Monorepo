@@ -132,7 +132,7 @@ async function signIn(page: Page) {
 }
 
 async function expectNoControllerContent(page: Page) {
-  await expect(page.getByRole('heading', { name: /controller workspace/i })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: /control room/i })).toHaveCount(0)
   await expect(page.getByText(/authorized controller access is active/i)).toHaveCount(0)
 }
 
@@ -143,7 +143,7 @@ test.describe('session expiry and browser storage (mocked local fixture)', () =>
     page.on('console', (message) => browserConsole.push(message.text()))
     await signIn(page)
 
-    await expect(page.getByRole('heading', { name: /controller workspace/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /control room/i })).toBeVisible()
     expect(fixture.tokenExchangeCount).toBe(1)
     expect(fixture.codeVerifier).toBeTruthy()
     const transaction = JSON.stringify(await fixture.readTransactions()).toLowerCase()
@@ -151,7 +151,8 @@ test.describe('session expiry and browser storage (mocked local fixture)', () =>
     expect(transaction).toMatch(/code_verifier/)
     expect(transaction).not.toMatch(/access_token|id_token|refresh_token/)
     await expect.poll(() => page.evaluate(() => sessionStorage.length)).toBe(0)
-    expect(await page.evaluate(() => localStorage.length)).toBe(0)
+    expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(['smartrail.uiLanguage'])
+    expect(await page.evaluate(() => localStorage.getItem('smartrail.uiLanguage'))).toMatch(/^(en|si|ta)$/)
     expect(await page.evaluate(() => document.cookie)).toBe('')
     expect(await page.evaluate(() => caches.keys())).toEqual([])
     expect(await page.evaluate(() => indexedDB.databases())).toEqual([])
@@ -170,7 +171,7 @@ test.describe('session expiry and browser storage (mocked local fixture)', () =>
   test('requires sign-in again after a full page reload with no in-memory session', async ({ page }) => {
     const fixture = await installSessionFixture(page)
     await signIn(page)
-    await expect(page.getByRole('heading', { name: /controller workspace/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /control room/i })).toBeVisible()
     await fixture.readTransactions()
 
     await page.reload()
@@ -184,7 +185,7 @@ test.describe('session expiry and browser storage (mocked local fixture)', () =>
   test('closes protected content on token expiry without replaying the identity request', async ({ page }) => {
     const fixture = await installSessionFixture(page, 2)
     await signIn(page)
-    await expect(page.getByRole('heading', { name: /controller workspace/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /control room/i })).toBeVisible()
 
     await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible({ timeout: 10_000 })
     await expectNoControllerContent(page)
