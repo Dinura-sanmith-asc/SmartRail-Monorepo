@@ -228,6 +228,34 @@ public sealed class DriverOperationsApiTests(PostgreSqlTestDatabaseFixture datab
         Assert.All(await db.Journeys.ToListAsync(), x => Assert.Equal(1, x.CurrentRevision));
     }
 
+    [Fact]
+    public async Task Current_central_publication_refreshes_driver_duty_and_controller_reads_all_current_assignments()
+    {
+        using var host = await IncidentOwnerIntegrationTestHost.CreateAsync(database, oidc);
+        using var client = host.CreateClient();
+        var journey = await IncidentOwnerIntegrationTestHost.InitializeJourneyAsync(host.Services, "duty-refresh");
+        var otherJourney = await IncidentOwnerIntegrationTestHost.InitializeJourneyAsync(host.Services, "second-duty");
+        await IdentityTestData.GrantRoleAsync(host.Services, Driver, RoleCode.Driver);
+        await IdentityTestData.GrantRoleAsync(host.Services, Controller, RoleCode.Controller);
+        await GrantAssignmentAsync(host.Services, Driver, journey);
+        await GrantAssignmentAsync(host.Services, "second-driver", otherJourney);
+        using var controllerDuties = await client.SendAsync(IdentityTestData.Bearer(HttpMethod.Get, "/api/driver/assignments", oidc.CreateToken(Controller)));
+        Assert.Equal(HttpStatusCode.OK, controllerDuties.StatusCode);
+        using var all = JsonDocument.Parse(await controllerDuties.Content.ReadAsStringAsync());
+        Assert.Equal(2, all.RootElement.GetProperty("items").GetArrayLength());
+        using var publication = IdentityTestData.Bearer(HttpMethod.Patch, $"/api/operations/journeys/{journey}/status", oidc.CreateToken(Controller));
+        publication.Content = JsonContent.Create(new { expectedJourneyRevision = 1, status = "Delayed" });
+        using var changed = await client.SendAsync(publication);
+        Assert.Equal(HttpStatusCode.OK, changed.StatusCode);
+        using var duty = await client.SendAsync(IdentityTestData.Bearer(HttpMethod.Get, "/api/driver/assignments", oidc.CreateToken(Driver)));
+        Assert.Equal(HttpStatusCode.OK, duty.StatusCode);
+        using var body = JsonDocument.Parse(await duty.Content.ReadAsStringAsync());
+        var context = Assert.Single(body.RootElement.GetProperty("items").EnumerateArray()).GetProperty("journey");
+        Assert.Equal(2, context.GetProperty("snapshot").GetProperty("revision").GetInt32());
+        Assert.Equal("Delayed", context.GetProperty("snapshot").GetProperty("status").GetString());
+        Assert.Equal(2, Assert.Single(context.GetProperty("updates").EnumerateArray()).GetProperty("revision").GetInt32());
+    }
+
     private async Task<HttpResponseMessage> SubmitAsync(HttpClient client, Guid journeyId, string subject, Guid requestId, string text)
     {
         using var request = IdentityTestData.Bearer(HttpMethod.Post, $"/api/driver/journeys/{journeyId}/observations", oidc.CreateToken(subject));
