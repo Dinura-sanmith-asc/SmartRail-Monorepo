@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('Check', 'Migrate', 'Seed')]
+    [ValidateSet('Check', 'Migrate', 'Seed', 'StationDisplayT030')]
     [string]$Action
 )
 
@@ -21,12 +21,16 @@ try {
     dotnet run --project tools/SmartRail.DevSeeder -- --check
     if ($LASTEXITCODE -ne 0) { throw 'Local target validation failed. No migration or seed was attempted.' }
     if ($Action -eq 'Migrate') {
-        dotnet ef database update 20261019203203_IncidentManagement --project src/SmartRail.Infrastructure --startup-project src/SmartRail.Api --context SmartRailDbContext
+        dotnet ef database update 20261020031244_DriverOperations --project src/SmartRail.Infrastructure --startup-project src/SmartRail.Api --context SmartRailDbContext
         if ($LASTEXITCODE -ne 0) { throw 'Reviewed local migration did not complete.' }
     }
     elseif ($Action -eq 'Seed') {
         dotnet run --project tools/SmartRail.DevSeeder -- --confirm-local-development --enable-development-sample-categories
         if ($LASTEXITCODE -ne 0) { throw 'Local seed did not complete. Review README; successful earlier steps are resumable.' }
+    }
+    elseif ($Action -eq 'StationDisplayT030') {
+        dotnet run --project tools/SmartRail.DevSeeder -- --station-display-t030 --confirm-local-development
+        if ($LASTEXITCODE -ne 0) { throw 'T030 local Station Display seed did not complete.' }
     }
 }
 finally {

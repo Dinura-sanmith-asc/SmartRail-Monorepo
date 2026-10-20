@@ -11,13 +11,26 @@ internal static class SeedEntryPoint
         {
             if (args.FirstOrDefault() == "--cognito-test-roles")
                 return await CognitoTestRoleBootstrap.RunCliAsync(args);
-            var allowed = new[] { "--manifest", "--check", "--confirm-local-development", "--enable-development-sample-categories" };
+            var allowed = new[] { "--manifest", "--check", "--confirm-local-development", "--enable-development-sample-categories", "--station-display-t030" };
             if (args.Distinct(StringComparer.Ordinal).Count() != args.Length || args.Any(arg => !allowed.Contains(arg, StringComparer.Ordinal)) ||
                 (args.Contains("--manifest") || args.Contains("--check")) && args.Length != 1)
                 throw new SeedRefusalException("Use --manifest, --check, or both explicit seed confirmations as separate modes.");
             if (args.Length == 1 && args[0] == "--manifest")
             {
                 Print(SeedManifest.Export());
+                return 0;
+            }
+            if (args.Contains("--station-display-t030", StringComparer.Ordinal))
+            {
+                if (args.Length != 2 || !args.Contains("--confirm-local-development", StringComparer.Ordinal))
+                    throw new SeedRefusalException("The T030 sample requires --station-display-t030 and --confirm-local-development only.");
+                SeedSafety.ValidateEnvironment(Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT"),
+                    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
+                await using var t030Configured = new SmartRailDbContextFactory().CreateDbContext([]);
+                var t030Connection = t030Configured.Database.GetConnectionString()!;
+                SeedSafety.ValidateTarget(t030Connection);
+                await using var t030Services = SeedComposition.Create(t030Connection);
+                Print(await new StationDisplaySeedRunner(t030Services).RunAsync());
                 return 0;
             }
             SeedSafety.ValidateEnvironment(Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT"),

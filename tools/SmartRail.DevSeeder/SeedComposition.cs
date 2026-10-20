@@ -43,10 +43,23 @@ internal static class SeedComposition
             ValueTask.FromResult(publisherIdentity == SeedManifest.Actor);
         public Task<MaintenanceAuthorityDecision> AuthorizeAsync(string actorSubject, MaintenanceAction action, CancellationToken cancellationToken = default) =>
             Task.FromResult(new MaintenanceAuthorityDecision(actorSubject == SeedManifest.Actor ? MaintenanceAuthorityOutcome.Allowed : MaintenanceAuthorityOutcome.Denied));
-        public Task<JourneyInitializationAuthorityResult> AuthorizeAsync(InitializeJourneyCommand command, CancellationToken cancellationToken) =>
-            Task.FromResult(command.SourceSystem == SeedManifest.Version && command.Provenance == SeedManifest.Version &&
-                command.JourneyInstanceId.HasValue && Enumerable.Range(0, 5).Any(i => command.JourneyInstanceId == SeedManifest.Id(5, i))
-                ? new JourneyInitializationAuthorityResult(JourneyInitializationAuthorityStatus.Authorized, SeedManifest.Actor, SeedManifest.Version)
+        public Task<JourneyInitializationAuthorityResult> AuthorizeAsync(InitializeJourneyCommand command, CancellationToken cancellationToken)
+        {
+            var existingDevelopmentSeed = command.SourceSystem == SeedManifest.Version &&
+                command.Provenance == SeedManifest.Version && command.JourneyInstanceId.HasValue &&
+                Enumerable.Range(0, 5).Any(i => command.JourneyInstanceId == SeedManifest.Id(5, i));
+            var stationDisplaySeed = command.SourceSystem == StationDisplaySeedManifest.SourceSystem &&
+                command.SourceInstanceKey == StationDisplaySeedManifest.SourceInstanceKey &&
+                command.Provenance == StationDisplaySeedManifest.Provenance &&
+                command.OperationDate == StationDisplaySeedManifest.OperationDate &&
+                command.JourneyInstanceId == StationDisplaySeedManifest.JourneyId &&
+                command.ServiceId == StationDisplaySeedManifest.ServiceId &&
+                command.ScheduleId == StationDisplaySeedManifest.ScheduleId &&
+                command.ScheduleRevision == 1 &&
+                command.FirstDepartureOccurrence == StationDisplaySeedManifest.ColomboDeparture;
+            return Task.FromResult(existingDevelopmentSeed || stationDisplaySeed
+                ? new JourneyInitializationAuthorityResult(JourneyInitializationAuthorityStatus.Authorized, SeedManifest.Actor, command.SourceSystem)
                 : new JourneyInitializationAuthorityResult(JourneyInitializationAuthorityStatus.Denied, null, null));
+        }
     }
 }
