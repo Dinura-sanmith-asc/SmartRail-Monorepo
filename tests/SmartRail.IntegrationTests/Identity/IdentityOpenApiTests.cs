@@ -19,7 +19,8 @@ public sealed class IdentityOpenApiTests(PostgreSqlTestDatabaseFixture database,
         var expectedPaths = new[] { "/api/me", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}", "/api/stations",
             "/api/journeys/{id}", "/api/journeys/{id}/updates", "/api/stations/{id}/departures",
             "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}",
-            "/api/incidents", "/api/incidents/{id}" };
+            "/api/incidents", "/api/incidents/{id}", "/api/driver/assignments",
+            "/api/driver/journeys/{id}/observations", "/api/operations/journeys/{id}/observations" };
         Assert.Equal(expectedPaths.Order(StringComparer.Ordinal), paths.EnumerateObject().Select(p => p.Name).Order(StringComparer.Ordinal).ToArray());
         Assert.Equal(new[] { "get", "post" }, paths.GetProperty("/api/incidents").EnumerateObject()
             .Select(operation => operation.Name).Order(StringComparer.Ordinal).ToArray());

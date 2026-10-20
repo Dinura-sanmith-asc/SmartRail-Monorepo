@@ -33,7 +33,7 @@ public sealed class JourneysStatusOpenApiTests(
         var paths = root.GetProperty("paths");
         var actualFeaturePaths = paths.EnumerateObject().Select(property => property.Name)
             .Where(path => path.StartsWith("/api/journeys/", StringComparison.Ordinal) ||
-                           path.StartsWith("/api/operations/journeys/", StringComparison.Ordinal) ||
+                           (path.StartsWith("/api/operations/journeys/", StringComparison.Ordinal) && !path.EndsWith("/observations", StringComparison.Ordinal)) ||
                            path == "/api/stations/{id}/departures")
             .Order(StringComparer.Ordinal).ToArray();
         Assert.Equal(ApprovedOperations.Keys.Order(StringComparer.Ordinal), actualFeaturePaths);

@@ -23,7 +23,8 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
         var expectedFeaturePaths = expectedRailwayPaths.Concat(new[] { "/api/me", "/api/journeys/{id}",
             "/api/journeys/{id}/updates", "/api/stations/{id}/departures",
             "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}",
-            "/api/incidents", "/api/incidents/{id}" }).ToArray();
+            "/api/incidents", "/api/incidents/{id}", "/api/driver/assignments",
+            "/api/driver/journeys/{id}/observations", "/api/operations/journeys/{id}/observations" }).ToArray();
         var generatedPaths = paths.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal).ToArray();
         Assert.Equal(expectedFeaturePaths.Order(StringComparer.Ordinal), generatedPaths);
         foreach (var path in expectedRailwayPaths)
