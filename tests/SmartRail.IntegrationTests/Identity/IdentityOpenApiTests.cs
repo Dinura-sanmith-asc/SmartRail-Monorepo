@@ -7,7 +7,7 @@ namespace SmartRail.IntegrationTests.Identity;
 public sealed class IdentityOpenApiTests(PostgreSqlTestDatabaseFixture database, LocalOidcFixture oidc) : IClassFixture<PostgreSqlTestDatabaseFixture>, IClassFixture<LocalOidcFixture>
 {
     [Fact]
-    public async Task Openapi_exposes_only_the_approved_identity_route_and_exact_identity_response_surface()
+    public async Task Openapi_exposes_approved_feature_routes_and_exact_identity_response_surface()
     {
         using var factory = await IdentityApiTestHost.CreateAsync(database, oidc, installProbe: false, environment: "Development");
         using var client = factory.CreateClient();
@@ -19,6 +19,7 @@ public sealed class IdentityOpenApiTests(PostgreSqlTestDatabaseFixture database,
         var expectedPaths = new[] { "/api/me", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}", "/api/stations",
             "/api/journeys/{id}", "/api/journeys/{id}/updates", "/api/stations/{id}/departures",
             "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}",
+            "/api/operations/overview",
             "/api/incidents", "/api/incidents/{id}", "/api/driver/assignments",
             "/api/driver/journeys/{id}/observations", "/api/operations/journeys/{id}/observations" };
         Assert.Equal(expectedPaths.Order(StringComparer.Ordinal), paths.EnumerateObject().Select(p => p.Name).Order(StringComparer.Ordinal).ToArray());

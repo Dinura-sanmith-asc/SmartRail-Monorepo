@@ -43,11 +43,13 @@ internal static class SeedComposition
             ValueTask.FromResult(publisherIdentity == SeedManifest.Actor);
         public Task<MaintenanceAuthorityDecision> AuthorizeAsync(string actorSubject, MaintenanceAction action, CancellationToken cancellationToken = default) =>
             Task.FromResult(new MaintenanceAuthorityDecision(actorSubject == SeedManifest.Actor ? MaintenanceAuthorityOutcome.Allowed : MaintenanceAuthorityOutcome.Denied));
+
         public Task<JourneyInitializationAuthorityResult> AuthorizeAsync(InitializeJourneyCommand command, CancellationToken cancellationToken)
         {
-            var existingDevelopmentSeed = command.SourceSystem == SeedManifest.Version &&
+            var developmentSeed = command.SourceSystem == SeedManifest.Version &&
                 command.Provenance == SeedManifest.Version && command.JourneyInstanceId.HasValue &&
-                Enumerable.Range(0, 5).Any(i => command.JourneyInstanceId == SeedManifest.Id(5, i));
+                (Enumerable.Range(0, 6).Any(i => command.JourneyInstanceId == SeedManifest.Id(5, i)) ||
+                 Enumerable.Range(0, 2).Any(i => command.JourneyInstanceId == SeedManifest.Id(13, i)));
             var stationDisplaySeed = command.SourceSystem == StationDisplaySeedManifest.SourceSystem &&
                 command.SourceInstanceKey == StationDisplaySeedManifest.SourceInstanceKey &&
                 command.Provenance == StationDisplaySeedManifest.Provenance &&
@@ -57,7 +59,8 @@ internal static class SeedComposition
                 command.ScheduleId == StationDisplaySeedManifest.ScheduleId &&
                 command.ScheduleRevision == 1 &&
                 command.FirstDepartureOccurrence == StationDisplaySeedManifest.ColomboDeparture;
-            return Task.FromResult(existingDevelopmentSeed || stationDisplaySeed
+
+            return Task.FromResult(developmentSeed || stationDisplaySeed
                 ? new JourneyInitializationAuthorityResult(JourneyInitializationAuthorityStatus.Authorized, SeedManifest.Actor, command.SourceSystem)
                 : new JourneyInitializationAuthorityResult(JourneyInitializationAuthorityStatus.Denied, null, null));
         }

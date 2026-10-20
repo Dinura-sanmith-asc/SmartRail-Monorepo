@@ -12,6 +12,8 @@ public sealed class TrainServiceConfiguration : IEntityTypeConfiguration<TrainSe
         builder.HasKey(service => service.ServiceId).HasName("pk_train_service");
         builder.Property(service => service.ServiceId).HasColumnName("service_id").ValueGeneratedNever();
         builder.Property(service => service.ServiceCode).HasColumnName("service_code").IsRequired();
+        builder.Property(service => service.DisplayName).HasColumnName("display_name").HasMaxLength(200);
+        builder.Property(service => service.PublicServiceNumber).HasColumnName("public_service_number").HasMaxLength(50);
         builder.Property(service => service.RouteId).HasColumnName("route_id").IsRequired();
         builder.Property(service => service.IsPublished).HasColumnName("is_published").IsRequired();
         builder.Property(service => service.Version).HasColumnName("version").IsConcurrencyToken().IsRequired();

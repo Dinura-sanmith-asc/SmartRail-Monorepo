@@ -21,7 +21,7 @@ try {
     dotnet run --project tools/SmartRail.DevSeeder -- --check
     if ($LASTEXITCODE -ne 0) { throw 'Local target validation failed. No migration or seed was attempted.' }
     if ($Action -eq 'Migrate') {
-        dotnet ef database update 20261020031244_DriverOperations --project src/SmartRail.Infrastructure --startup-project src/SmartRail.Api --context SmartRailDbContext
+        dotnet ef database update 20261020094644_ControllerOperationsData --project src/SmartRail.Infrastructure --startup-project src/SmartRail.Api --context SmartRailDbContext
         if ($LASTEXITCODE -ne 0) { throw 'Reviewed local migration did not complete.' }
     }
     elseif ($Action -eq 'Seed') {

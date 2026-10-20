@@ -1407,9 +1407,19 @@ namespace SmartRail.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("service_id");
 
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("display_name");
+
                     b.Property<bool>("IsPublished")
                         .HasColumnType("boolean")
                         .HasColumnName("is_published");
+
+                    b.Property<string>("PublicServiceNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("public_service_number");
 
                     b.Property<Guid>("RouteId")
                         .HasColumnType("uuid")

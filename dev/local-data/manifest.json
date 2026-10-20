@@ -8,6 +8,42 @@
     "2026-11-01",
     "2026-11-02"
   ],
+  "referenceStationDepartures": {
+    "operationDate": "2026-11-03",
+    "contentHash": "sha256:913F368A3D8AE27A6A3ACA488EE7B5A8C12863865E8B1019C29CD1A2389A614B",
+    "stations": [
+      {
+        "id": "10000000-0000-0000-0000-000000000001",
+        "name": "Colombo Fort",
+        "scheduledDepartureCount": 1
+      },
+      {
+        "id": "10000000-0000-0000-0000-000000000002",
+        "name": "Galle",
+        "scheduledDepartureCount": 1
+      }
+    ],
+    "services": [
+      {
+        "scenario": "Colombo Fort to Galle",
+        "routeId": "d0040000-0000-0000-0010-000000000000",
+        "serviceId": "d0040000-0000-0000-0011-000000000000",
+        "scheduleId": "d0040000-0000-0000-0012-000000000000",
+        "journeyInstanceId": "d0040000-0000-0000-0013-000000000000",
+        "departureAsiaColombo": "08:30",
+        "arrivalOffsetMinutes": 130
+      },
+      {
+        "scenario": "Galle to Colombo Fort",
+        "routeId": "d0040000-0000-0000-0010-000000000001",
+        "serviceId": "d0040000-0000-0000-0011-000000000001",
+        "scheduleId": "d0040000-0000-0000-0012-000000000001",
+        "journeyInstanceId": "d0040000-0000-0000-0013-000000000001",
+        "departureAsiaColombo": "15:10",
+        "arrivalOffsetMinutes": 130
+      }
+    ]
+  },
   "stations": [
     {
       "id": "d0040000-0000-0000-0001-000000000000",
@@ -83,6 +119,13 @@
       "operationDate": "2026-11-01"
     }
   ],
+  "additionalJourney": {
+    "scenario": "Completed",
+    "journeyInstanceId": "d0040000-0000-0000-0005-000000000005",
+    "serviceId": "d0040000-0000-0000-0003-000000000000",
+    "scheduleId": "d0040000-0000-0000-0004-000000000000",
+    "operationDate": "2026-11-02"
+  },
   "identities": [
     {
       "role": "Controller",
@@ -109,23 +152,23 @@
   "incidentIdentity": "Generated once by the approved create command; stable actor/operation/idempotency keys return the same IDs on reruns",
   "expectedNewRecords": {
     "stations": 3,
-    "routes": 1,
-    "routeStops": 3,
-    "services": 5,
-    "schedules": 5,
-    "callingPoints": 15,
-    "dateManifests": 2,
-    "operationDates": 10,
+    "routes": 3,
+    "routeStops": 7,
+    "services": 7,
+    "schedules": 7,
+    "callingPoints": 19,
+    "dateManifests": 3,
+    "operationDates": 17,
     "stationImportRuns": 1,
     "stationChanges": 3,
     "roles": 4,
     "roleAudits": 4,
     "stationScopes": 2,
     "scopeAudits": 2,
-    "journeys": 5,
-    "journeyRevisions": 9,
-    "journeyRevisionStops": 27,
-    "initializationAudits": 5,
+    "journeys": 8,
+    "journeyRevisions": 14,
+    "journeyRevisionStops": 40,
+    "initializationAudits": 8,
     "incidents": 4,
     "incidentRevisions": 10,
     "incidentAssociations": 15,

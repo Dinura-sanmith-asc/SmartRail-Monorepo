@@ -25,10 +25,10 @@ Stop local API/Aspire writers during migration/seeding; do not stop or reset Pos
 .\dev\local-data\Invoke-DevSeed.ps1 -Action Seed
 ```
 
-The migration wrapper runs this existing EF command only after the exact-target check:
+The migration wrapper runs this existing EF command only after the exact-target check. The additive Controller overview schema change is migration `20261020094644_ControllerOperationsData`; review the migration before running the wrapper:
 
 ```powershell
-dotnet ef database update 20261019203203_IncidentManagement --project src/SmartRail.Infrastructure --startup-project src/SmartRail.Api --context SmartRailDbContext
+dotnet ef database update 20261020094644_ControllerOperationsData --project src/SmartRail.Infrastructure --startup-project src/SmartRail.Api --context SmartRailDbContext
 ```
 
 The guarded seeding command is:
@@ -39,7 +39,7 @@ $env:ASPNETCORE_ENVIRONMENT = 'Development'
 dotnet run --project tools/SmartRail.DevSeeder -- --confirm-local-development --enable-development-sample-categories
 ```
 
-The executable refuses pending migrations and never applies them. Existing migrations remain: `20261017145843_InitialRailwayNetwork`, `20261018005918_IdentityPermissions`, `20261019065713_JourneysStatus`, and `20261019203203_IncidentManagement`.
+The executable refuses pending migrations and never applies them. Existing migrations remain unchanged, and `20261020094644_ControllerOperationsData` is additive: `20261017145843_InitialRailwayNetwork`, `20261018005918_IdentityPermissions`, `20261019065713_JourneysStatus`, `20261019203203_IncidentManagement`, and `20261020094644_ControllerOperationsData`.
 
 ## Dataset manifest and expected effects
 
@@ -54,12 +54,12 @@ Source naming/topology follows the existing coastal reference fixture (Colombo F
 | Record | Expected new count on a fresh dataset |
 |---|---:|
 | Stations / import runs / station-change audit | 3 / 1 / 3 |
-| Routes / ordered route stops | 1 / 3 |
-| Services / published schedule revisions / calling points | 5 / 5 / 15 |
-| Complete date manifests / service-operation-date rows | 2 / 10 |
+| Routes / ordered route stops | 3 / 7 |
+| Services / published schedule revisions / calling points | 7 / 7 / 19 |
+| Complete date manifests / service-operation-date rows | 3 / 17 |
 | Role assignments / role audit events | 4 / 4 |
 | Station-scope assignments / scope audit events | 2 / 2 |
-| Journeys / journey revisions / revision stops / initialization audits | 5 / 9 / 27 / 5 |
+| Journeys / journey revisions / revision stops / initialization audits | 8 / 14 / 40 / 8 |
 | Incidents / immutable revisions / associations / idempotency records | 4 / 10 / 15 / 10 |
 
 Counts describe additions without prior matching data. Existing active manual-auth role/scope mappings are reused, so fewer assignments may be added. Unrelated records are preserved. Both **2026-11-01 and 2026-11-02** have complete synthetic timetable evidence for all five seed schedules. Journeys use operation date 2026-11-01:
@@ -71,6 +71,8 @@ Counts describe additions without prior matching data. Existing active manual-au
 | DEV-SEED-003 | 12:00 | Delayed, platform DEV-2 and departure +15 minutes / 3 |
 | DEV-SEED-004 | 14:00 | Cancelled / 2 |
 | DEV-SEED-005 | 23:20 | Scheduled overnight / 1 |
+
+An additional completed journey (`d0040000-0000-0000-0005-000000000005`) reuses the published DEV-SEED-001 schedule on operation date 2026-11-02. These records and times are synthetic development examples. The seed does not assign official train names or official public numbers; optional service identity fields remain null unless verified data is deliberately supplied.
 
 Calling-point offsets from first departure are: Colombo departure 0; Galle arrival +120, departure +125; Matara arrival +180 minutes. For the overnight service, Galle departure and Matara arrival fall on November 2. Search travel date is departure date at the selected origin; the journey's operation date stays November 1. Searching Galle → Matara on November 2 also includes the November 1 overnight occurrence; station departures likewise filter by station-local departure date.
 
@@ -125,8 +127,12 @@ Invoke-RestMethod "$api/api/stations/$origin/departures?date=2026-11-01"
 $jwt = (Invoke-RestMethod 'http://127.0.0.1:5107/issue/Controller').access_token
 Invoke-RestMethod "$api/api/me" -Headers @{ Authorization = "Bearer $jwt" }
 Invoke-RestMethod "$api/api/incidents" -Headers @{ Authorization = "Bearer $jwt" }
+Invoke-RestMethod "$api/api/operations/overview?date=2026-11-01" -Headers @{ Authorization = "Bearer $jwt" }
+Invoke-RestMethod "$api/api/operations/overview?date=2026-11-02" -Headers @{ Authorization = "Bearer $jwt" }
 Remove-Variable jwt
 ```
+
+`GET /api/operations/overview` is Controller-global or Station Staff station-scoped (`&stationId=<current-assigned-station-uuid>`). The response fields, metric definitions, Asia/Colombo operation-date semantics and unavailable-value behavior are documented in [operations-overview-api.md](../../docs/operations-overview-api.md). Open incidents count current Reported and In Progress records regardless of selected journey date. The API never substitutes a GUID or synthetic value for an official public service number.
 
 Repeat with StationStaff: three seed incidents are visible; filtering by the Matara Closed incident yields no authorized match. Driver/Passenger incident reads are denied. Missing/expired credentials remain 401. Query additional records carefully: unrelated pre-existing data can legitimately appear alongside this dataset.
 
@@ -145,3 +151,23 @@ This tool does not close production category approval, Operations overview/incid
 - Both new PowerShell scripts parsed successfully; manifest export parsed as valid JSON; whitespace checks passed.
 - The configuration-only `Check` correctly refused the current host setting because it is not the literal `127.0.0.1`. Port, database, username and schema checks passed. No connection was opened. Update only the host in local configuration before requesting migration/seeding approval; no secret was edited automatically.
 - No migration or seed was executed against `smartrail_dev`; no AWS operation or change to prior migrations/API/business logic was made.
+
+## Colombo Fort and Galle departure examples
+
+The manifest now also includes two synthetic, development-only dated journeys attached to the existing published reference station records, not the separately named sample stations:
+
+- Colombo Fort (`10000000-0000-0000-0000-000000000001`): service `DEV-SEED-REF-001`, departure 08:30 Asia/Colombo on 2026-11-03.
+- Galle (`10000000-0000-0000-0000-000000000002`): service `DEV-SEED-REF-002`, departure 15:10 Asia/Colombo on 2026-11-03.
+
+These are synthetic test times, not a real railway timetable. The two services run in opposite directions and each has one verified published calling point at the other station 130 minutes later. The seeder refuses to continue if the exact published Colombo Fort/Galle reference stations are unavailable or their reserved date already contains unrelated data. No migration is run by the seed command.
+
+After seeding, check the existing read APIs anonymously:
+
+```powershell
+$api = 'http://localhost:5236'
+Invoke-RestMethod "$api/api/stations/10000000-0000-0000-0000-000000000001/departures?date=2026-11-03"
+Invoke-RestMethod "$api/api/stations/10000000-0000-0000-0000-000000000002/departures?date=2026-11-03"
+Invoke-RestMethod "$api/api/services?origin=10000000-0000-0000-0000-000000000001&destination=10000000-0000-0000-0000-000000000002&date=2026-11-03"
+```
+
+The station-departure response should include the synthetic service for that station and date. The service search should return the Colombo Fort to Galle instance. Existing rows are preserved; unrelated departures may also appear if already present in the local database.

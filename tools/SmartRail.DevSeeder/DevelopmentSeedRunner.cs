@@ -5,6 +5,8 @@ using SmartRail.Application.Incidents.References;
 using SmartRail.Application.Incidents.UseCases;
 using SmartRail.Application.JourneysStatus.Initialization;
 using SmartRail.Application.JourneysStatus.Publication;
+using SmartRail.Application.JourneysStatus.Queries.GetStationDepartures;
+using SmartRail.Application.JourneysStatus.Projections;
 using SmartRail.Application.RailwayNetwork.Services;
 using SmartRail.Application.RailwayNetwork.Stations;
 using SmartRail.Domain.Incidents;
@@ -36,16 +38,18 @@ internal sealed class DevelopmentSeedRunner(IServiceProvider services)
         {
             await PreflightAsync(db);
             await RailwayAsync(provider, db);
+            await ReferenceStationRailwayAsync(provider, db);
             db.ChangeTracker.Clear();
             await IdentityAsync(provider, db);
             db.ChangeTracker.Clear();
             await JourneysAsync(provider, db);
+            await ReferenceStationJourneysAsync(provider, db);
             db.ChangeTracker.Clear();
             var incidents = await IncidentsAsync(provider, db);
             return new(SeedManifest.Version, SeedManifest.Date.ToString("yyyy-MM-dd"),
-                Enumerable.Range(0, 3).Select(i => SeedManifest.Id(1, i)).ToArray(),
-                Enumerable.Range(0, 5).Select(i => SeedManifest.Id(3, i)).ToArray(),
-                Enumerable.Range(0, 5).Select(i => SeedManifest.Id(5, i)).ToArray(), incidents);
+                Enumerable.Range(0, 3).Select(i => SeedManifest.Id(1, i)).Concat([SeedManifest.ColomboFortReferenceId, SeedManifest.GalleReferenceId]).ToArray(),
+                Enumerable.Range(0, 5).Select(i => SeedManifest.Id(3, i)).Concat(Enumerable.Range(0, 2).Select(i => SeedManifest.Id(11, i))).ToArray(),
+                Enumerable.Range(0, 5).Select(i => SeedManifest.Id(5, i)).Concat([SeedManifest.Id(5, 5)]).Concat(Enumerable.Range(0, 2).Select(i => SeedManifest.Id(13, i))).ToArray(), incidents);
         }
         finally
         {
@@ -72,6 +76,25 @@ internal sealed class DevelopmentSeedRunner(IServiceProvider services)
                 Require(scheduleIds.Order().SequenceEqual(Enumerable.Range(0, 5).Select(i => SeedManifest.Id(4, i)).Order()),
                     "Existing reserved operation-date evidence was edited; no overwrite is permitted.");
             }
+        }
+        var sourceStations = await db.Stations.AsNoTracking().Where(x => x.StationId == SeedManifest.ColomboFortReferenceId || x.StationId == SeedManifest.GalleReferenceId)
+            .Select(x => new { x.StationId, x.Name, x.IsPublished }).ToArrayAsync();
+        Require(sourceStations.Length == 2 && sourceStations.Any(x => x.StationId == SeedManifest.ColomboFortReferenceId && x.Name == "Colombo Fort" && x.IsPublished) &&
+            sourceStations.Any(x => x.StationId == SeedManifest.GalleReferenceId && x.Name == "Galle" && x.IsPublished),
+            "Verified published Colombo Fort and Galle source stations are required for reference-station departures.");
+        var referenceManifest = await db.ServiceDateManifests.AsNoTracking().SingleOrDefaultAsync(x => x.OperationDate == SeedManifest.ReferenceStationDate);
+        if (referenceManifest is not null)
+        {
+            Require(referenceManifest.SourceRevision == SeedManifest.Version && referenceManifest.FixtureVersion == SeedManifest.Version &&
+                referenceManifest.IsComplete && referenceManifest.PublishedBy == SeedManifest.Actor &&
+                referenceManifest.ContentHash == SeedManifest.ReferenceContentHash,
+                "Reserved Colombo Fort/Galle departure date has unrelated publication evidence.");
+            var existingSchedules = await db.ServiceOperationDates.AsNoTracking().Where(x => x.OperationDate == SeedManifest.ReferenceStationDate)
+                .Select(x => x.ScheduleId).Order().ToArrayAsync();
+            var expectedSchedules = Enumerable.Range(0, 5).Select(i => SeedManifest.Id(4, i))
+                .Concat(Enumerable.Range(0, 2).Select(i => SeedManifest.Id(12, i))).Order().ToArray();
+            Require(existingSchedules.Length is >= 5 and <= 7 && existingSchedules.Take(5).SequenceEqual(Enumerable.Range(0, 5).Select(i => SeedManifest.Id(4, i)).Order()) &&
+                existingSchedules.All(expectedSchedules.Contains), "Reserved Colombo Fort/Galle date contains unrelated or edited service-operation rows.");
         }
         for (var i = 0; i < 3; i++)
         {
@@ -167,6 +190,117 @@ internal sealed class DevelopmentSeedRunner(IServiceProvider services)
         }
     }
 
+    private static async Task ReferenceStationRailwayAsync(IServiceProvider provider, SmartRailDbContext db)
+    {
+        var sourceStations = await db.Stations.AsNoTracking().Where(x => x.StationId == SeedManifest.ColomboFortReferenceId || x.StationId == SeedManifest.GalleReferenceId)
+            .Select(x => new { x.StationId, x.Name, x.IsPublished }).ToArrayAsync();
+        Require(sourceStations.Length == 2 && sourceStations.Any(x => x.StationId == SeedManifest.ColomboFortReferenceId && x.Name == "Colombo Fort" && x.IsPublished) &&
+            sourceStations.Any(x => x.StationId == SeedManifest.GalleReferenceId && x.Name == "Galle" && x.IsPublished),
+            "Verified published Colombo Fort and Galle source stations are required for reference-station departures.");
+
+        var routeIds = Enumerable.Range(0, 2).Select(i => SeedManifest.Id(10, i)).ToArray();
+        var existingRouteCount = await db.Routes.CountAsync(x => routeIds.Contains(x.RouteId));
+        var existingServiceCount = await db.TrainServices.CountAsync(x => Enumerable.Range(0, 2).Select(i => SeedManifest.Id(11, i)).Contains(x.ServiceId));
+        if (existingRouteCount == 0 && existingServiceCount == 0)
+        {
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            for (var i = 0; i < 2; i++)
+            {
+                var routeId = routeIds[i];
+                var first = i == 0 ? SeedManifest.ColomboFortReferenceId : SeedManifest.GalleReferenceId;
+                var second = i == 0 ? SeedManifest.GalleReferenceId : SeedManifest.ColomboFortReferenceId;
+                db.Routes.Add(new Route(routeId, $"DEV-SEED-REF-{i + 1:000}", $"Development sample: {SeedManifest.ReferenceStationServices[i]}", true));
+                db.RouteStops.AddRange(new RouteStop(SeedManifest.Id(10, 10 + i * 2), routeId, first, 1),
+                    new RouteStop(SeedManifest.Id(10, 11 + i * 2), routeId, second, 2));
+                var serviceId = SeedManifest.Id(11, i);
+                var scheduleId = SeedManifest.Id(12, i);
+                db.TrainServices.Add(new TrainService(serviceId, $"DEV-SEED-REF-{i + 1:000}", routeId, true));
+                db.ServiceScheduleRevisions.Add(new ServiceScheduleRevision(scheduleId, serviceId, 1,
+                    SeedManifest.ReferenceDeparture(i), SeedManifest.EvidenceTime));
+                db.ServiceCallingPoints.AddRange(
+                    new ServiceCallingPoint(scheduleId, SeedManifest.Id(10, 10 + i * 2), null, 0),
+                    new ServiceCallingPoint(scheduleId, SeedManifest.Id(10, 11 + i * 2), 130, null));
+            }
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        else Require(existingRouteCount == 2 && existingServiceCount == 2, "Partial reference-station seed graph; no repair or overwrite is permitted.");
+
+        for (var i = 0; i < 2; i++)
+        {
+            var routeId = SeedManifest.Id(10, i);
+            var serviceId = SeedManifest.Id(11, i);
+            var scheduleId = SeedManifest.Id(12, i);
+            var first = i == 0 ? SeedManifest.ColomboFortReferenceId : SeedManifest.GalleReferenceId;
+            var second = i == 0 ? SeedManifest.GalleReferenceId : SeedManifest.ColomboFortReferenceId;
+            var route = await db.Routes.SingleOrDefaultAsync(x => x.RouteId == routeId);
+            var service = await db.TrainServices.SingleOrDefaultAsync(x => x.ServiceId == serviceId);
+            var schedule = await db.ServiceScheduleRevisions.SingleOrDefaultAsync(x => x.ScheduleId == scheduleId);
+            Require(route is not null && route.RouteCode == $"DEV-SEED-REF-{i + 1:000}" && route.IsPublished &&
+                service is not null && service.RouteId == routeId && service.ServiceCode == $"DEV-SEED-REF-{i + 1:000}" &&
+                schedule is not null && schedule.ServiceId == serviceId && schedule.FirstDepartureLocalTime == SeedManifest.ReferenceDeparture(i),
+                "Reserved Colombo Fort/Galle route or schedule differs; no overwrite is permitted.");
+            var stops = await db.RouteStops.Where(x => x.RouteId == routeId).OrderBy(x => x.StopOrder).ToArrayAsync();
+            Require(stops.Length == 2 && stops[0].RouteStopId == SeedManifest.Id(10, 10 + i * 2) && stops[0].StationId == first &&
+                stops[1].RouteStopId == SeedManifest.Id(10, 11 + i * 2) && stops[1].StationId == second, "Reference route stop order differs.");
+            var calls = await db.ServiceCallingPoints.Where(x => x.ScheduleId == scheduleId).ToArrayAsync();
+            Require(calls.Length == 2 && calls.Any(x => x.RouteStopId == stops[0].RouteStopId && x.DepartureOffsetMinutes == 0 && x.ArrivalOffsetMinutes is null) &&
+                calls.Any(x => x.RouteStopId == stops[1].RouteStopId && x.ArrivalOffsetMinutes == 130 && x.DepartureOffsetMinutes is null), "Reference calling points differ.");
+        }
+
+        for (var i = 0; i < 2; i++)
+        {
+            var scheduleId = SeedManifest.Id(12, i);
+            var schedule = await db.ServiceScheduleRevisions.SingleAsync(x => x.ScheduleId == scheduleId);
+            if (schedule.IsCurrentPublished) continue;
+            var publishedBase = Enumerable.Range(0, 5).Select(j => SeedManifest.Id(4, j)).ToArray();
+            var referenceOperations = Enumerable.Range(0, i + 1).Select(j => new ServiceOperationDate(SeedManifest.Id(12, j), SeedManifest.ReferenceStationDate));
+            var operations = publishedBase.Select(id => new ServiceOperationDate(id, SeedManifest.ReferenceStationDate)).Concat(referenceOperations).ToArray();
+            var manifest = new ServiceDateManifest(SeedManifest.ReferenceStationDate, SeedManifest.Version, SeedManifest.Version,
+                true, SeedManifest.EvidenceTime, SeedManifest.Actor, SeedManifest.ReferenceContentHash);
+            var published = await provider.GetRequiredService<PublishTimetableHandler>().HandleAsync(new(
+                new(SeedManifest.Id(11, i), scheduleId, SeedManifest.EvidenceTime, SeedManifest.Actor,
+                    [new(manifest, operations)])));
+            Require(published.IsPublished, "Colombo Fort/Galle timetable publication failed.");
+        }
+
+        var manifestAtDate = await db.ServiceDateManifests.AsNoTracking().SingleOrDefaultAsync(x => x.OperationDate == SeedManifest.ReferenceStationDate);
+        var expectedScheduleIds = Enumerable.Range(0, 5).Select(i => SeedManifest.Id(4, i)).Concat(Enumerable.Range(0, 2).Select(i => SeedManifest.Id(12, i))).Order().ToArray();
+        var actualScheduleIds = await db.ServiceOperationDates.AsNoTracking().Where(x => x.OperationDate == SeedManifest.ReferenceStationDate).Select(x => x.ScheduleId).Order().ToArrayAsync();
+        Require(manifestAtDate is not null && manifestAtDate.IsComplete && manifestAtDate.SourceRevision == SeedManifest.Version &&
+            manifestAtDate.ContentHash == SeedManifest.ReferenceContentHash && actualScheduleIds.SequenceEqual(expectedScheduleIds),
+            "Reference-station date publication is incomplete or differs from its reserved manifest.");
+    }
+
+    private static async Task ReferenceStationJourneysAsync(IServiceProvider provider, SmartRailDbContext db)
+    {
+        for (var i = 0; i < 2; i++)
+        {
+            var journeyId = SeedManifest.Id(13, i);
+            var initialized = await provider.GetRequiredService<InitializeJourneyHandler>().HandleAsync(new(journeyId,
+                SeedManifest.Id(11, i), SeedManifest.Id(12, i), 1, SeedManifest.ReferenceStationDate,
+                SeedManifest.ReferenceDeparture(i), SeedManifest.Version, $"reference-station-journey-{i}", SeedManifest.Version));
+            Require(initialized.Outcome is JourneyInitializationOutcome.Created or JourneyInitializationOutcome.Replayed,
+                "Reference-station journey initialization failed.");
+        }
+
+        var departures = provider.GetRequiredService<GetStationDeparturesHandler>();
+        foreach (var stationId in new[] { SeedManifest.ColomboFortReferenceId, SeedManifest.GalleReferenceId })
+        {
+            var result = await departures.HandleAsync(new(stationId, SeedManifest.ReferenceStationDate.ToString("yyyy-MM-dd")));
+            Require(result.Outcome == StationDeparturesOutcome.Success && result.Departures is not null &&
+                result.Departures.Any(x => x.JourneyInstanceId == SeedManifest.Id(13, stationId == SeedManifest.ColomboFortReferenceId ? 0 : 1)),
+                "Expected departure was not available under the verified source station.");
+            AssertDepartureEvidence(result.Departures!, SeedManifest.Id(13, stationId == SeedManifest.ColomboFortReferenceId ? 0 : 1));
+        }
+    }
+    private static void AssertDepartureEvidence(IReadOnlyList<StationDepartureProjection> departures, Guid journeyId)
+    {
+        var departure = departures.Single(x => x.JourneyInstanceId == journeyId);
+        Require(departure.StationLocalDepartureDate == SeedManifest.ReferenceStationDate &&
+            departure.OperationDate == SeedManifest.ReferenceStationDate && departure.Status == "Scheduled" &&
+            departure.ScheduledDepartureAt.HasValue, "Reference-station departure projection lacks the expected date or schedule evidence.");
+    }
     private static async Task IdentityAsync(IServiceProvider provider, SmartRailDbContext db)
     {
         for (var i = 0; i < SeedManifest.Identities.Length; i++)
@@ -222,6 +356,33 @@ internal sealed class DevelopmentSeedRunner(IServiceProvider services)
                 }
             }
         }
+
+        // A second dated instance demonstrates a completed journey without altering the
+        // original scheduled sample or inventing a new service/schedule.
+        var completedId = SeedManifest.Id(5, 5);
+        var completedDate = SeedManifest.Date.AddDays(1);
+        var completed = await provider.GetRequiredService<InitializeJourneyHandler>().HandleAsync(new(completedId,
+            SeedManifest.Id(3, 0), SeedManifest.Id(4, 0), 1, completedDate, SeedManifest.Departure(0),
+            SeedManifest.Version, "journey-completed", SeedManifest.Version));
+        Require(completed.Outcome is JourneyInitializationOutcome.Created or JourneyInitializationOutcome.Replayed,
+            "Completed sample journey initialization failed.");
+        var completedJourney = await db.Journeys.AsNoTracking().SingleAsync(x => x.JourneyInstanceId == completedId);
+        if (completedJourney.CurrentRevision == 1)
+        {
+            var running = await provider.GetRequiredService<JourneyPublicationHandler>().PublishStatusAsync(new(
+                completedId, 1, SeedManifest.Controller, JourneyStatus.Running, null, null, null));
+            Require(running.Outcome == JourneyPublicationOutcome.Published, "Completed journey's running transition failed.");
+            db.ChangeTracker.Clear();
+            completedJourney = await db.Journeys.AsNoTracking().SingleAsync(x => x.JourneyInstanceId == completedId);
+        }
+        if (completedJourney.CurrentRevision == 2)
+        {
+            var result = await provider.GetRequiredService<JourneyPublicationHandler>().PublishStatusAsync(new(
+                completedId, 2, SeedManifest.Controller, JourneyStatus.Completed, null, null, null));
+            Require(result.Outcome == JourneyPublicationOutcome.Published, "Completed journey publication failed.");
+        }
+        Require(await db.JourneyRevisions.AsNoTracking().AnyAsync(x => x.JourneyInstanceId == completedId &&
+            x.Revision == 3 && x.Status == JourneyStatus.Completed), "Completed journey status evidence differs.");
     }
 
     private static async Task<Guid[]> IncidentsAsync(IServiceProvider provider, SmartRailDbContext db)

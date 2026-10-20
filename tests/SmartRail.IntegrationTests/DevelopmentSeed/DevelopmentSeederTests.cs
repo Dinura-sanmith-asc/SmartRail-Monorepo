@@ -10,6 +10,8 @@ using SmartRail.Infrastructure.Identity.Maintenance;
 using SmartRail.Infrastructure.JourneysStatus.Initialization;
 using SmartRail.Application.Identity.Maintenance;
 using SmartRail.Application.Incidents.Persistence;
+using SmartRail.Application.JourneysStatus.Queries.GetStationDepartures;
+using SmartRail.Application.JourneysStatus.Persistence;
 using SmartRail.Application.Incidents.UseCases;
 using SmartRail.DevSeeder;
 using SmartRail.Domain.Incidents;
@@ -46,6 +48,7 @@ public sealed class DevelopmentSeederTests(PostgreSqlTestDatabaseFixture databas
     public async Task Seed_and_rerun_preserve_existing_data_counts_relationships_and_audit()
     {
         await ResetAsync();
+        await LoadRailwayReferenceFixturesAsync();
         var unrelatedId = Guid.NewGuid();
         await using (var existing = Context())
         {
@@ -56,7 +59,7 @@ public sealed class DevelopmentSeederTests(PostgreSqlTestDatabaseFixture databas
         var first = await new DevelopmentSeedRunner(services).RunAsync();
         await using var db = Context();
         var counts = await CountsAsync(db);
-        Assert.Equal(new[] { 4, 1, 3, 5, 5, 15, 2, 10, 1, 3, 4, 4, 2, 2, 5, 9, 27, 5, 4, 10, 15, 10 }, counts);
+        Assert.Equal(new[] { 6, 4, 9, 8, 9, 23, 6, 18, 2, 5, 4, 4, 2, 2, 8, 14, 40, 8, 4, 10, 15, 10 }, counts);
         var second = await new DevelopmentSeedRunner(services).RunAsync();
         Assert.Equal(first.Incidents, second.Incidents);
         Assert.Equal(first.Journeys, second.Journeys);
@@ -69,10 +72,22 @@ public sealed class DevelopmentSeederTests(PostgreSqlTestDatabaseFixture databas
             var revisions = await db.IncidentRevisions.Where(x => x.IncidentId == incident.IncidentId).OrderBy(x => x.Revision).ToArrayAsync();
             Assert.Equal(Enumerable.Range(1, incident.Revision), revisions.Select(x => x.Revision));
         }
+        await using (var seedScope = services.CreateAsyncScope())
+        {
+            var departures = seedScope.ServiceProvider.GetRequiredService<GetStationDeparturesHandler>();
+            var colombo = await departures.HandleAsync(new(SeedManifest.ColomboFortReferenceId, SeedManifest.ReferenceStationDate.ToString("yyyy-MM-dd")));
+            var galle = await departures.HandleAsync(new(SeedManifest.GalleReferenceId, SeedManifest.ReferenceStationDate.ToString("yyyy-MM-dd")));
+            Assert.Equal(StationDeparturesOutcome.Success, colombo.Outcome);
+            Assert.Equal(StationDeparturesOutcome.Success, galle.Outcome);
+            Assert.Contains(colombo.Departures!, x => x.JourneyInstanceId == SeedManifest.Id(13, 0) && x.StationName == "Colombo Fort");
+            Assert.Contains(galle.Departures!, x => x.JourneyInstanceId == SeedManifest.Id(13, 1) && x.StationName == "Galle");
+        }
         var journeyStates = await db.JourneyRevisions.Where(x => x.Revision == 2).Select(x => x.Status).ToArrayAsync();
         Assert.Contains(JourneyStatus.Running, journeyStates);
         Assert.Contains(JourneyStatus.Delayed, journeyStates);
         Assert.Contains(JourneyStatus.Cancelled, journeyStates);
+        Assert.Contains(JourneyStatus.Completed, await db.JourneyRevisions.Where(x => x.JourneyInstanceId == SeedManifest.Id(5, 5))
+            .Select(x => x.Status).ToArrayAsync());
         var overnight = SeedManifest.Id(5, 4);
         var calls = await db.JourneyRevisionStops.Where(x => x.JourneyInstanceId == overnight).OrderBy(x => x.StopOrder).ToArrayAsync();
         Assert.Equal(SeedManifest.Date.AddDays(1), DateOnly.FromDateTime(calls[1].PlannedDepartureAt!.Value.ToOffset(TimeSpan.FromHours(5.5)).DateTime));
@@ -91,6 +106,7 @@ public sealed class DevelopmentSeederTests(PostgreSqlTestDatabaseFixture databas
     public async Task Failure_after_incident_mutation_rolls_back_whole_command_and_rerun_resumes()
     {
         await ResetAsync();
+        await LoadRailwayReferenceFixturesAsync();
         await using (var failing = SeedComposition.Create(database.ConnectionString, services =>
             services.Replace(ServiceDescriptor.Scoped<IIncidentUnitOfWork, FailingIncidentUnitOfWork>())))
             await Assert.ThrowsAnyAsync<InvalidOperationException>(() => new DevelopmentSeedRunner(failing).RunAsync());
@@ -99,11 +115,11 @@ public sealed class DevelopmentSeederTests(PostgreSqlTestDatabaseFixture databas
         Assert.Equal(0, await db.IncidentRevisions.CountAsync());
         Assert.Equal(0, await db.IncidentAssociations.CountAsync());
         Assert.Equal(0, await db.IncidentIdempotencyRecords.CountAsync());
-        Assert.Equal(5, await db.Journeys.CountAsync()); // Earlier atomic steps remain resumable.
+        Assert.Equal(8, await db.Journeys.CountAsync()); // Earlier atomic steps remain resumable.
         await using var recovered = SeedComposition.Create(database.ConnectionString);
         await new DevelopmentSeedRunner(recovered).RunAsync();
         Assert.Equal(4, await db.Incidents.CountAsync());
-        Assert.Equal(5, await db.Journeys.CountAsync());
+        Assert.Equal(8, await db.Journeys.CountAsync());
     }
 
     [Fact]
@@ -123,6 +139,7 @@ public sealed class DevelopmentSeederTests(PostgreSqlTestDatabaseFixture databas
     public async Task Rerun_does_not_restore_a_revoked_seed_role()
     {
         await ResetAsync();
+        await LoadRailwayReferenceFixturesAsync();
         await using var services = SeedComposition.Create(database.ConnectionString);
         await new DevelopmentSeedRunner(services).RunAsync();
         await using (var scope = services.CreateAsyncScope())
@@ -206,6 +223,12 @@ public sealed class DevelopmentSeederTests(PostgreSqlTestDatabaseFixture databas
     public void Executable_rejects_every_unapproved_target(string host, int port, string name, string user) =>
         Assert.ThrowsAny<InvalidOperationException>(() => SeedSafety.ValidateTarget($"Host={host};Port={port};Database={name};Username={user}"));
 
+    private async Task LoadRailwayReferenceFixturesAsync()
+    {
+        await using var db = Context();
+        var loader = new RailwayNetworkFixtureLoader(db);
+        await loader.LoadAsync("Testing", Path.Combine(AppContext.BaseDirectory, "Fixtures", "RailwayNetwork"));
+    }
     private static async Task<int[]> CountsAsync(SmartRailDbContext db) =>
     [
         await db.Stations.CountAsync(), await db.Routes.CountAsync(), await db.RouteStops.CountAsync(),
