@@ -1,7 +1,7 @@
 # Feature Specification: Driver Operations
 
-**Feature Branch**: `codex/f005-integration`  
-**Created**: 2026-10-20  
+**Feature Branch**: `codex/f005-integration`
+**Created**: 2026-10-20
 **Status**: Ready for implementation under the user's autonomous MVP authorization
 
 **Input**: Deliver authenticated assigned-journey access, driver observations and Controller review using the existing approved operations and authorization.

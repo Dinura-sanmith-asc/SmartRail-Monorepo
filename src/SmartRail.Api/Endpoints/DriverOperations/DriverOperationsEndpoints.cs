@@ -37,6 +37,7 @@ public static class DriverOperationsEndpoints
         CancellationToken cancellationToken)
     {
         if (!Guid.TryParse(id, out var journeyId) || journeyId == Guid.Empty) return Error(DriverOutcome.Invalid);
+        if (!context.Request.HasJsonContentType()) return Error(DriverOutcome.Invalid);
         SubmitDriverObservationRequest? input;
         try { input = await context.Request.ReadFromJsonAsync<SubmitDriverObservationRequest>(cancellationToken); }
         catch (JsonException) { return Error(DriverOutcome.Invalid); }

@@ -103,5 +103,3 @@ public sealed class DriverOwnerAdapterTests
         public Task<JourneyStationDeparturesReadResult> ReadStationDeparturesAsync(Guid id, CancellationToken cancellationToken) => throw new NotSupportedException();
     }
 }
-
-

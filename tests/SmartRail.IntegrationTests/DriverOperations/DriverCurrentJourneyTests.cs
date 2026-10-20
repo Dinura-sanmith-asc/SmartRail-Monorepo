@@ -125,4 +125,3 @@ public sealed class DriverCurrentJourneyTests(PostgreSqlTestDatabaseFixture data
             Task.FromResult(subject == "approved-test-operator" ? DriverAssignmentMaintenanceOutcome.Allowed : DriverAssignmentMaintenanceOutcome.Denied);
     }
 }
-
