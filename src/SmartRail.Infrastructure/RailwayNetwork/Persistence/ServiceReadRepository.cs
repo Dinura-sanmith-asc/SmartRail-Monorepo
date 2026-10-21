@@ -11,6 +11,6 @@ public sealed class ServiceReadRepository(SmartRailDbContext dbContext) : IServi
          join schedule in dbContext.ServiceScheduleRevisions.AsNoTracking() on service.ServiceId equals schedule.ServiceId
          where service.ServiceId == serviceId && service.IsPublished && route.IsPublished && schedule.IsPublished && schedule.SupersededAt == null
          select new ServiceDetailView(service.ServiceId, service.ServiceCode, route.RouteId, route.RouteCode,
-             route.Name, schedule.Revision, schedule.FirstDepartureLocalTime))
+             route.Name, schedule.Revision, schedule.FirstDepartureLocalTime, service.DisplayName, service.PublicServiceNumber))
         .SingleOrDefaultAsync(cancellationToken);
 }

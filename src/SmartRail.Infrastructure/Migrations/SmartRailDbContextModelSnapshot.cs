@@ -1444,6 +1444,11 @@ namespace SmartRail.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ux_train_service_service_code");
 
+                    b.HasIndex("PublicServiceNumber")
+                        .IsUnique()
+                        .HasFilter("public_service_number IS NOT NULL")
+                        .HasDatabaseName("ux_train_service_public_service_number");
+
                     b.ToTable("train_service", null, t =>
                         {
                             t.HasCheckConstraint("ck_train_service_version_positive", "version > 0");

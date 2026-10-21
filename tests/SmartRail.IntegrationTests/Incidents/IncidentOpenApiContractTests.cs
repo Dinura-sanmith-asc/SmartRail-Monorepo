@@ -28,13 +28,7 @@ public sealed class IncidentOpenApiContractTests(PostgreSqlTestDatabaseFixture d
         var root = document.RootElement;
         Assert.Equal("1.0.0", root.GetProperty("info").GetProperty("version").GetString());
 
-        var repository = new DirectoryInfo(AppContext.BaseDirectory);
-        while (repository is not null && !File.Exists(Path.Combine(repository.FullName,
-                   "specs", "004-incident-management", "contracts", "incident-management.openapi.yaml")))
-            repository = repository.Parent;
-        Assert.NotNull(repository);
-        var contract = await File.ReadAllTextAsync(Path.Combine(repository!.FullName,
-            "specs", "004-incident-management", "contracts", "incident-management.openapi.yaml"));
+        var contract = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "incident-management.openapi.yaml"));
         var normalizedContract = contract.Replace("\r\n", "\n", StringComparison.Ordinal);
         Assert.Contains("version: 1.0.0", normalizedContract, StringComparison.Ordinal);
         var contractPaths = Regex.Matches(normalizedContract, "(?m)^  (?<path>/api/incidents[^:]*):$")

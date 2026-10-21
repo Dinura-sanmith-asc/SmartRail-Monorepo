@@ -12,12 +12,7 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
         using var client = factory.CreateClient();
         using var document = JsonDocument.Parse(await client.GetStringAsync("/openapi/v1.json"));
         var paths = document.RootElement.GetProperty("paths");
-        var repository = new DirectoryInfo(AppContext.BaseDirectory);
-        while (repository is not null && !Directory.Exists(Path.Combine(repository.FullName, "specs", "001-railway-network-search")))
-            repository = repository.Parent;
-        Assert.NotNull(repository);
-        var approvedYaml = await File.ReadAllTextAsync(Path.Combine(repository!.FullName,
-            "specs", "001-railway-network-search", "contracts", "railway-network.openapi.yaml"));
+        var approvedYaml = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "railway-network.openapi.yaml"));
 
         var expectedRailwayPaths = new[] { "/api/stations", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}" };
         var expectedFeaturePaths = expectedRailwayPaths.Concat(new[] { "/api/me", "/api/journeys/{id}",
@@ -25,7 +20,10 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
             "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}",
             "/api/operations/overview",
             "/api/incidents", "/api/incidents/{id}", "/api/driver/assignments",
-            "/api/driver/journeys/{id}/observations", "/api/operations/journeys/{id}/observations" }).ToArray();
+            "/api/driver/journeys/{id}/observations", "/api/operations/journeys/{id}/observations",
+            "/api/services/management", "/api/services/{id}/schedules", "/api/services/{id}/schedules/{scheduleId}",
+            "/api/services/{id}/schedules/{scheduleId}/publish", "/api/services/{id}/schedules/{scheduleId}/operation-dates",
+            "/api/service-date-manifests/{date}", "/api/routes/management", "/api/stations/{id}" }).ToArray();
         var generatedPaths = paths.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal).ToArray();
         Assert.Equal(expectedFeaturePaths.Order(StringComparer.Ordinal), generatedPaths);
         foreach (var path in expectedRailwayPaths)
@@ -34,7 +32,13 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
             Assert.True(paths.GetProperty(path).TryGetProperty("get", out _));
         }
 
-        Assert.False(paths.GetProperty("/api/stations").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/stations").TryGetProperty("post", out _));
+        Assert.True(paths.GetProperty("/api/stations/{id}").TryGetProperty("patch", out _));
+        Assert.True(paths.GetProperty("/api/stations/{id}").TryGetProperty("delete", out _));
+        Assert.Contains(paths.GetProperty("/api/services").GetProperty("post").GetProperty("security").EnumerateArray(),
+            item => item.TryGetProperty("CognitoAccessToken", out _));
+        Assert.Contains(paths.GetProperty("/api/services/{id}/schedules/{scheduleId}/publish").GetProperty("post")
+            .GetProperty("security").EnumerateArray(), item => item.TryGetProperty("CognitoAccessToken", out _));
         var search = paths.GetProperty("/api/services").GetProperty("get");
         var parameters = search.GetProperty("parameters").EnumerateArray()
             .Select(item => item.GetProperty("name").GetString()!) .ToHashSet(StringComparer.Ordinal);
@@ -66,7 +70,7 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
             .GetProperty("content").GetProperty("application/json").GetProperty("schema"));
         Assert.Contains("services", searchSchema.GetProperty("properties").EnumerateObject().Select(item => item.Name));
         var choice = ResolveSchema(document.RootElement, searchSchema.GetProperty("properties").GetProperty("services").GetProperty("items"));
-        AssertContainsProperties(choice, "serviceId", "serviceCode", "routeId", "routeCode", "scheduleRevision", "origin", "destination");
+        AssertContainsProperties(choice, "serviceId", "serviceCode", "routeId", "routeCode", "scheduleRevision", "origin", "destination", "displayName", "publicServiceNumber");
         var scheduledCall = ResolveSchema(document.RootElement, choice.GetProperty("properties").GetProperty("origin"));
         AssertContainsProperties(scheduledCall, "stationId", "stationName", "stopOrder", "scheduledAt");
         var serviceOperation = paths.GetProperty("/api/services/{id}").GetProperty("get");
@@ -75,8 +79,8 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
         Assert.Contains("503", serviceOperation.GetProperty("responses").EnumerateObject().Select(item => item.Name));
         var serviceSchema = ResolveSchema(document.RootElement, serviceOperation
             .GetProperty("responses").GetProperty("200").GetProperty("content").GetProperty("application/json").GetProperty("schema"));
-        AssertContainsProperties(serviceSchema, "serviceId", "serviceCode", "route", "schedule");
-        foreach (var field in new[] { "stationId", "stationName", "stopOrder", "scheduledAt", "serviceId", "serviceCode", "scheduleRevision" })
+        AssertContainsProperties(serviceSchema, "serviceId", "serviceCode", "route", "schedule", "displayName", "publicServiceNumber");
+        foreach (var field in new[] { "stationId", "stationName", "stopOrder", "scheduledAt", "serviceId", "serviceCode", "displayName", "publicServiceNumber", "scheduleRevision" })
             Assert.Contains(field, approvedYaml, StringComparison.Ordinal);
         Assert.Contains("format: uuid", approvedYaml, StringComparison.Ordinal);
         Assert.Contains("format: date", approvedYaml, StringComparison.Ordinal);

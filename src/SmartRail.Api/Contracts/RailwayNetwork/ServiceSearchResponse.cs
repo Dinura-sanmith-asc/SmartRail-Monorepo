@@ -13,6 +13,8 @@ public sealed record ServiceChoiceResponse(
     string RouteCode,
     int ScheduleRevision,
     ScheduledCallResponse Origin,
-    ScheduledCallResponse Destination);
+    ScheduledCallResponse Destination,
+    string? DisplayName = null,
+    string? PublicServiceNumber = null);
 
 public sealed record ScheduledCallResponse(Guid StationId, string StationName, int StopOrder, DateTimeOffset ScheduledAt);

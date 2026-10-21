@@ -47,6 +47,16 @@ public sealed class TrainService
         Version++;
     }
 
+    public void UpdateDetails(string serviceCode, Guid routeId, string? displayName, string? publicServiceNumber)
+    {
+        if (routeId == Guid.Empty) throw new ArgumentException("Route ID must be a non-empty UUID.", nameof(routeId));
+        ServiceCode = Required(serviceCode, nameof(serviceCode));
+        DisplayName = Optional(displayName, nameof(displayName), 200);
+        PublicServiceNumber = Optional(publicServiceNumber, nameof(publicServiceNumber), 50);
+        RouteId = routeId;
+        Version++;
+    }
+
     public void Publish() => IsPublished = true;
     public void Unpublish() => IsPublished = false;
 

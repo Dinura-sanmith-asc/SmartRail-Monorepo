@@ -253,6 +253,12 @@ components:
           format: uuid
         serviceCode:
           type: string
+        displayName:
+          type: string
+          nullable: true
+        publicServiceNumber:
+          type: string
+          nullable: true
         routeId:
           type: string
           format: uuid
@@ -292,6 +298,12 @@ components:
           format: uuid
         serviceCode:
           type: string
+        displayName:
+          type: string
+          nullable: true
+        publicServiceNumber:
+          type: string
+          nullable: true
         route:
           type: object
           additionalProperties: false

@@ -19,5 +19,8 @@ public sealed class TrainServiceConfiguration : IEntityTypeConfiguration<TrainSe
         builder.Property(service => service.Version).HasColumnName("version").IsConcurrencyToken().IsRequired();
         builder.HasOne<Route>().WithMany().HasForeignKey(service => service.RouteId).OnDelete(DeleteBehavior.Restrict).HasConstraintName("fk_train_service_route");
         builder.HasIndex(service => service.ServiceCode).IsUnique().HasDatabaseName("ux_train_service_service_code");
+        builder.HasIndex(service => service.PublicServiceNumber).IsUnique()
+            .HasFilter("public_service_number IS NOT NULL")
+            .HasDatabaseName("ux_train_service_public_service_number");
     }
 }

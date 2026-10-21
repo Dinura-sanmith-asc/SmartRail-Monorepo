@@ -236,7 +236,7 @@ public static class RailwayNetworkEndpoints
                 DateOnly.ParseExact(date!, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
                 result.Services.Select(service => new ServiceChoiceResponse(service.ServiceId, service.ServiceCode,
                     service.RouteId, service.RouteCode, service.ScheduleRevision,
-                    ToResponse(service.Origin), ToResponse(service.Destination))).ToArray());
+                    ToResponse(service.Origin), ToResponse(service.Destination), service.DisplayName, service.PublicServiceNumber)).ToArray());
             return Results.Ok(response);
         });
 
@@ -255,7 +255,8 @@ public static class RailwayNetworkEndpoints
             var service = result.Service;
             return Results.Ok(new ServiceDetailResponse(service.ServiceId, service.ServiceCode,
                 new RouteReferenceResponse(service.RouteId, service.RouteCode, service.RouteName),
-                new ScheduleReferenceResponse(service.ScheduleRevision, service.FirstDepartureTimeLocal)));
+                new ScheduleReferenceResponse(service.ScheduleRevision, service.FirstDepartureTimeLocal),
+                service.DisplayName, service.PublicServiceNumber));
         });
 
     private static ScheduledCallResponse ToResponse(ScheduledCallView call) =>

@@ -38,13 +38,7 @@ public sealed class JourneysStatusOpenApiTests(
             .Order(StringComparer.Ordinal).ToArray();
         Assert.Equal(ApprovedOperations.Keys.Order(StringComparer.Ordinal), actualFeaturePaths);
 
-        var repository = new DirectoryInfo(AppContext.BaseDirectory);
-        while (repository is not null && !File.Exists(Path.Combine(repository.FullName,
-                   "specs", "003-journeys-status", "contracts", "journeys-status.openapi.yaml")))
-            repository = repository.Parent;
-        Assert.NotNull(repository);
-        var contract = await File.ReadAllTextAsync(Path.Combine(repository!.FullName,
-            "specs", "003-journeys-status", "contracts", "journeys-status.openapi.yaml"));
+        var contract = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "journeys-status.openapi.yaml"));
         var normalizedContract = contract.Replace("\r\n", "\n", StringComparison.Ordinal);
         var contractPaths = Regex.Matches(normalizedContract, "(?m)^  (?<path>/api/[^:]+):$")
             .Select(match => match.Groups["path"].Value).Order(StringComparer.Ordinal).ToArray();

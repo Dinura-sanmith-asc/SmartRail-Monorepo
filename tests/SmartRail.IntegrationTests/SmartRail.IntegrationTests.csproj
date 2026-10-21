@@ -31,5 +31,8 @@
 
   <ItemGroup>
     <None Update="Fixtures\RailwayNetwork\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\specs\001-railway-network-search\contracts\railway-network.openapi.yaml" Link="railway-network.openapi.yaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\specs\003-journeys-status\contracts\journeys-status.openapi.yaml" Link="journeys-status.openapi.yaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\specs\004-incident-management\contracts\incident-management.openapi.yaml" Link="incident-management.openapi.yaml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

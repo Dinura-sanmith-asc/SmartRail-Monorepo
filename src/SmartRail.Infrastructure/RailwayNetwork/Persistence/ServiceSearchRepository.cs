@@ -66,7 +66,7 @@ public sealed class ServiceSearchRepository(SmartRailDbContext dbContext) : ISer
                     originOffset),
                 ToScheduledCall(candidate.DestinationStation.StationId, candidate.DestinationStation.Name,
                     candidate.DestinationStop.StopOrder, operationDate, candidate.Schedule.FirstDepartureLocalTime,
-                    destinationOffset)));
+                    destinationOffset), candidate.Service.DisplayName, candidate.Service.PublicServiceNumber));
         }
 
         if (candidates.Count == 0)

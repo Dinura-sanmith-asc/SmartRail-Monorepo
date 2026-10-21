@@ -8,7 +8,7 @@ public sealed class ServiceScheduleRevision
     public Guid ScheduleId { get; }
     public Guid ServiceId { get; }
     public int Revision { get; }
-    public TimeOnly FirstDepartureLocalTime { get; }
+    public TimeOnly FirstDepartureLocalTime { get; private set; }
     public string TimeZoneId { get; private set; }
     public bool IsPublished { get; private set; }
     public DateTimeOffset CreatedAt { get; }
@@ -50,6 +50,12 @@ public sealed class ServiceScheduleRevision
         if (publishedAt < CreatedAt) throw new ArgumentOutOfRangeException(nameof(publishedAt), "Publication cannot precede creation.");
         IsPublished = true;
         PublishedAt = publishedAt;
+    }
+
+    public void ChangeDraftDepartureTime(TimeOnly firstDepartureLocalTime)
+    {
+        if (IsPublished || SupersededAt.HasValue) throw new InvalidOperationException("Published schedule revisions are immutable.");
+        FirstDepartureLocalTime = firstDepartureLocalTime;
     }
 
     public void Supersede(DateTimeOffset supersededAt)

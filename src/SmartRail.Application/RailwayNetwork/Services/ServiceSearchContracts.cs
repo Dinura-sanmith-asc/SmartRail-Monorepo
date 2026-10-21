@@ -13,7 +13,7 @@ public sealed record SearchCriteriaValidationResult(IReadOnlyDictionary<string, 
 public sealed record ScheduledCallView(Guid StationId, string StationName, int StopOrder, DateTimeOffset ScheduledAt);
 public sealed record ServiceChoiceView(
     Guid ServiceId, string ServiceCode, Guid RouteId, string RouteCode, int ScheduleRevision,
-    ScheduledCallView Origin, ScheduledCallView Destination);
+    ScheduledCallView Origin, ScheduledCallView Destination, string? DisplayName = null, string? PublicServiceNumber = null);
 public sealed record ServiceSearchRepositoryResult(bool IsAvailable, IReadOnlyList<ServiceChoiceView> Services);
 public enum ServiceSearchOutcome { Invalid, Available, Unavailable }
 public sealed record SearchServicesResult(

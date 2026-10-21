@@ -65,6 +65,7 @@ public static class DependencyInjection
         services.AddScoped<IStationManagementRepository, StationManagementRepository>();
         services.AddScoped<IRouteReadRepository, RouteReadRepository>();
         services.AddScoped<IServiceReadRepository, ServiceReadRepository>();
+        services.AddScoped<ITrainServiceManagementRepository, TrainServiceManagementRepository>();
         services.AddScoped<IServiceSearchRepository, ServiceSearchRepository>();
         services.AddScoped<IStationImportRepository, StationImportRepository>();
         services.AddScoped<ISchedulePublicationRepository, SchedulePublicationRepository>();
