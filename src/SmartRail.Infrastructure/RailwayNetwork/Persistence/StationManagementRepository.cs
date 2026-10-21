@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using SmartRail.Application.RailwayNetwork.Stations;
 using SmartRail.Domain.RailwayNetwork.Entities;
 
@@ -18,7 +19,10 @@ public sealed class StationManagementRepository(SmartRailDbContext dbContext) : 
 
     public async Task<StationManagementView> CreateAsync(CreateStationRequest request, CancellationToken cancellationToken = default)
     {
-        var stationId = Guid.NewGuid();
+        var number = await dbContext.Database.SqlQueryRaw<long>("SELECT nextval('station_id_number_seq')").SingleAsync(cancellationToken);
+        if (number is < 1 or > 999_999_999_999)
+            throw new InvalidOperationException("The sequential station ID range has been exhausted.");
+        var stationId = Guid.Parse($"10000000-0000-0000-0000-{number.ToString("D12", CultureInfo.InvariantCulture)}");
         var station = new Station(stationId, $"manual:{stationId:D}", request.Name, true, request.VerifiedDetails);
         dbContext.Stations.Add(station);
         await dbContext.SaveChangesAsync(cancellationToken);
