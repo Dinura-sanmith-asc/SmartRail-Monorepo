@@ -7,10 +7,11 @@ import { useIdentity } from '../staff-access/identity/identityContext'
 import { WorkspaceNavigation } from '../staff-access/workspaces/WorkspaceNavigation'
 import { apiErrorMessage, operationsApi, type Departure, type DriverObservation, type Incident, type Journey, type JourneyUpdate, type Station } from './operationsApi'
 import { ControllerOverview } from './ControllerOverview'
+import { TrainServiceManagement } from './TrainServiceManagement'
 import './operations.css'
 import { LanguageSelect, useLanguage } from '../../shared/i18n/language'
 
-type Tab = 'overview' | 'journeys' | 'incidents' | 'stations'
+type Tab = 'overview' | 'journeys' | 'incidents' | 'stations' | 'services'
 type Column<T> = { key: string; label: string; render: (row: T) => ReactNode }
 
 function colomboDate() {
@@ -30,6 +31,7 @@ const roleMenus: Record<'Controller' | 'Station Staff', { id: Tab; label: string
     { id: 'journeys', label: 'Journey control', description: 'Journey status and history' },
     { id: 'incidents', label: 'Incident management', description: 'Authorized incident actions' },
     { id: 'stations', label: 'Stations', description: 'Manage railway stations' },
+    { id: 'services', label: 'Train Services', description: 'Manage services and timetables' },
   ],
   'Station Staff': [
     { id: 'overview', label: 'Station overview', description: 'Local departures and station details' },
@@ -328,6 +330,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
 
         {tab === 'incidents' && <IncidentWorkspace role={role} stations={stations} incidents={visibleIncidents} loading={incidentsLoading} query={incidentQuery} onQuery={setIncidentQuery} state={incidentState} onState={setIncidentState} busy={mutating} onCreate={submitIncident} onTransition={(item) => void transitionIncident(item)} />}
         {tab === 'stations' && role === 'Controller' && <StationManagement stations={stations} loading={stationsLoading} options={options} onRefresh={loadStations} onUnauthorized={onOverviewUnauthorized} />}
+        {tab === 'services' && role === 'Controller' && <TrainServiceManagement options={options} onUnauthorized={onOverviewUnauthorized} />}
       </main>
     </div>
   )

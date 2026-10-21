@@ -33,3 +33,41 @@
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
 @media(max-width:1050px) { .control-centre__metrics { grid-template-columns:repeat(3,minmax(0,1fr)); }.control-centre__table { min-width:1250px; } }
 @media(max-width:760px) { .control-centre__heading { align-items:stretch; flex-direction:column; }.control-centre__refresh-tools { align-items:flex-end; justify-content:space-between; }.control-centre__refresh-tools .operations-control { flex:1; min-width:0; }.control-centre__metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }.control-centre__metric { min-height:88px; padding:11px; }.control-centre__metric strong { font-size:23px; }.control-centre__updated { align-self:flex-start; } }
+
+.train-service-panel { display:flex; flex-direction:column; gap:17px; }
+.train-service-panel>.operations__feedback { margin:0; }
+.train-service-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:16px; border:1px solid #dce6ea; border-radius:8px; background:#f7fafb; }
+.train-service-form .operations-station-form__actions { grid-column:1/-1; }
+.train-service-detail { display:flex; flex-direction:column; gap:14px; margin-top:12px; padding-top:20px; border-top:1px solid #e2e9ed; }
+.train-service-detail>.operations__panel-heading h3 { margin:6px 0; color:#1f3d53; font-size:17px; }
+.train-schedule-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:12px; }
+.train-schedule-card,.train-timetable-editor { display:flex; flex-direction:column; gap:12px; padding:14px; border:1px solid #dce6ea; border-radius:8px; background:#fbfcfc; }
+.train-schedule-card__heading,.train-timetable-editor__heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.train-schedule-card__heading>div:first-child { display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:0; }
+.train-schedule-card__heading small,.train-calling-points span,.train-operation-dates>span { color:#597184; font-size:10px; overflow-wrap:anywhere; }
+.train-status { border-radius:99px; padding:3px 8px; background:#edf2f4; color:#4a6071; font-size:9px; font-weight:750; }
+.train-status--published { background:#e8f5ef; color:#236447; }
+.train-status--draft { background:#fff3dc; color:#755519; }
+.train-calling-points { display:flex; flex-direction:column; gap:0; margin:0; padding-left:24px; }
+.train-calling-points li { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid #edf1f3; font-size:10px; }
+.train-operation-dates { display:flex; flex-direction:column; gap:5px; padding-top:9px; border-top:1px solid #e8edef; font-size:10px; }
+.train-timetable-editor { margin-top:5px; background:#f7fafb; }
+.train-timetable-editor__heading h4 { margin:0 0 4px; color:#28465b; font-size:13px; }
+.train-timetable-editor__heading p { margin:0; color:#5b7182; font-size:10px; }
+.train-timetable-editor .operations-table { min-width:570px; }
+.train-timetable-editor .operations-table input[type=number] { width:100px; min-height:30px; padding:4px 7px; }
+.train-timetable-editor .operations-table input[type=checkbox],.train-check input,.train-manifest-schedules input { width:15px; height:15px; accent-color:#208f91; }
+.train-timetable-editor .operations-control { max-width:360px; }
+.train-date-tools { display:grid; grid-template-columns:minmax(250px,.9fr) minmax(310px,1.1fr); gap:12px; align-items:start; }
+.train-date-add { display:flex; align-items:flex-end; gap:9px; }
+.train-date-add .operations-control { flex:1; }
+.train-date-list,.train-manifest-schedules { display:flex; flex-direction:column; gap:6px; margin:0; padding:0; list-style:none; }
+.train-date-list li { display:flex; align-items:center; justify-content:space-between; padding:6px 8px; border:1px solid #e5ecef; border-radius:6px; background:#fff; font-size:10px; }
+.train-check,.train-manifest-schedules label { display:flex; align-items:center; gap:8px; color:#40596d; font-size:10px; }
+.train-manifest-schedules { padding:9px; border:1px solid #e3eaee; border-radius:7px; background:#fff; }
+.train-manifest-schedules>b { margin-bottom:3px; font-size:10px; }
+.train-manifest-schedules label { padding:3px 0; }
+.train-manifest-schedules span { color:#64798a; font-size:10px; }
+.operations-empty { display:flex; flex-direction:column; gap:5px; padding:17px; border:1px dashed #cbd9df; border-radius:8px; color:#355167; font-size:11px; }
+.operations-empty span { color:#63798a; font-size:10px; }
+@media(max-width:760px) { .train-service-form,.train-date-tools { grid-template-columns:1fr; }.train-service-form .operations-station-form__actions { grid-column:auto; }.train-schedule-card__heading,.train-timetable-editor__heading { flex-direction:column; }.train-schedule-card__heading .operations-station-actions { flex-wrap:wrap; }.train-date-add { align-items:stretch; flex-direction:column; } }

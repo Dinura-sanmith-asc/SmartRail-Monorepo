@@ -21,6 +21,66 @@ function renderStationStaff() {
 }
 
 describe('operations workspace interactions', () => {
+  it('creates a train service and publishes its timetable through the management APIs', async () => {
+    const user = userEvent.setup()
+    const serviceId = 'service-generated-by-api'
+    const route = { routeId: 'route-1', routeCode: 'R-1', name: 'Central Line', isPublished: true, stops: [
+      { routeStopId: 'stop-1', stationId: 'station-1', stationName: 'Central', stopOrder: 1 },
+      { routeStopId: 'stop-2', stationId: 'station-2', stationName: 'Harbor', stopOrder: 2 },
+    ] }
+    let services: Record<string, unknown>[] = []
+    let revisions: Record<string, unknown>[] = []
+    let serviceBody: unknown
+    let timetableBody: unknown
+    const published: string[] = []
+    server.use(
+      http.get('https://api.test/api/stations', () => HttpResponse.json({ items: [] })),
+      http.get('https://api.test/api/incidents', () => HttpResponse.json({ items: [] })),
+      http.get('https://api.test/api/services/management', () => HttpResponse.json(services)),
+      http.get('https://api.test/api/routes/management', () => HttpResponse.json([route])),
+      http.get('https://api.test/api/services/:id/schedules', () => HttpResponse.json(revisions)),
+      http.post('https://api.test/api/services', async ({ request }) => {
+        serviceBody = await request.json()
+        const created = { serviceId, serviceCode: 'SRL-TEST', displayName: 'Harbor Express', publicServiceNumber: '804', routeId: route.routeId, routeCode: route.routeCode, routeName: route.name, isPublished: false }
+        services = [created]
+        return HttpResponse.json(created, { status: 201 })
+      }),
+      http.post('https://api.test/api/services/:id/schedules', async ({ request }) => {
+        timetableBody = await request.json()
+        const created = { scheduleId: 'schedule-1', revision: 1, firstDepartureLocalTime: '06:30:00', isPublished: false, publishedAt: null, supersededAt: null, callingPoints: [
+          { ...route.stops[0], arrivalOffsetMinutes: null, departureOffsetMinutes: 0 },
+          { ...route.stops[1], arrivalOffsetMinutes: 45, departureOffsetMinutes: null },
+        ], operationDates: [] }
+        revisions = [created]
+        return HttpResponse.json(created, { status: 201 })
+      }),
+      http.post('https://api.test/api/services/:id/schedules/:scheduleId/publish', ({ params }) => {
+        published.push(`${String(params.id)}:${String(params.scheduleId)}`)
+        return new HttpResponse(null, { status: 204 })
+      }),
+    )
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    renderController()
+    await user.click(screen.getByRole('button', { name: /Train Services/i }))
+    await user.click(await screen.findByRole('button', { name: 'Add Train Service' }))
+    await user.type(screen.getByLabelText('Service code'), 'SRL-TEST')
+    await user.selectOptions(screen.getByLabelText('Route'), route.routeId)
+    await user.type(screen.getByLabelText('Display name'), 'Harbor Express')
+    await user.type(screen.getByLabelText('Public service number'), '804')
+    await user.click(screen.getByRole('button', { name: 'Add service' }))
+    expect(await screen.findByText('Harbor Express')).toBeTruthy()
+    expect(serviceBody).toEqual({ serviceCode: 'SRL-TEST', routeId: route.routeId, displayName: 'Harbor Express', publicServiceNumber: '804' })
+
+    await user.click(screen.getByRole('button', { name: 'Create timetable revision' }))
+    await user.clear(screen.getByLabelText('First departure (Asia/Colombo)'))
+    await user.type(screen.getByLabelText('First departure (Asia/Colombo)'), '06:30')
+    await user.click(screen.getByRole('button', { name: 'Save draft revision' }))
+    expect(await screen.findByText('Revision 1')).toBeTruthy()
+    expect(timetableBody).toMatchObject({ firstDepartureLocalTime: '06:30:00', callingPoints: [{ routeStopId: 'stop-1' }, { routeStopId: 'stop-2' }] })
+    await user.click(screen.getByRole('button', { name: 'Publish' }))
+    await waitFor(() => expect(published).toEqual([`${serviceId}:schedule-1`]))
+  })
+
   it('supports station create, edit, delete, and refreshes the list after each change', async () => {
     const user = userEvent.setup()
     let stations = [{ stationId: 'station-1', name: 'Central' }]
