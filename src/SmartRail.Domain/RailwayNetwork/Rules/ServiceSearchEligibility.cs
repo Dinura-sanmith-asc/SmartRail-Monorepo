@@ -46,8 +46,10 @@ public static class ServiceSearchEligibility
             return new(ServiceSearchEligibilityStatus.NotEligible, null, "Calling points do not belong to the current schedule revision.");
         if (originCall.RouteStopId != originStop.RouteStopId || destinationCall.RouteStopId != destinationStop.RouteStopId)
             return new(ServiceSearchEligibilityStatus.NotEligible, null, "Calling points do not match the selected route stops.");
-        if (originStop.RouteId != destinationStop.RouteId || originStop.StopOrder >= destinationStop.StopOrder)
-            return new(ServiceSearchEligibilityStatus.NotEligible, null, "Origin must precede destination on the route.");
+        var originOrder = originCall.StopOrder > 0 ? originCall.StopOrder : originStop.StopOrder;
+        var destinationOrder = destinationCall.StopOrder > 0 ? destinationCall.StopOrder : destinationStop.StopOrder;
+        if (originStop.RouteId != destinationStop.RouteId || originOrder >= destinationOrder)
+            return new(ServiceSearchEligibilityStatus.NotEligible, null, "Origin must precede destination in the service calling sequence.");
         if (!originCall.DepartureOffsetMinutes.HasValue || !destinationCall.ArrivalOffsetMinutes.HasValue)
             return new(ServiceSearchEligibilityStatus.Unavailable, null, "Required origin departure or destination arrival time is unavailable.");
 

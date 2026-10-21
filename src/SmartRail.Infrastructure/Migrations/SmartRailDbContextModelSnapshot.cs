@@ -1050,6 +1050,10 @@ namespace SmartRail.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("route_stop_id");
 
+                    b.Property<int>("StopOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("stop_order");
+
                     b.Property<Guid>("RouteId")
                         .HasColumnType("uuid")
                         .HasColumnName("route_id");
@@ -1088,6 +1092,10 @@ namespace SmartRail.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("route_stop_id");
 
+                    b.Property<int>("StopOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("stop_order");
+
                     b.Property<int?>("ArrivalOffsetMinutes")
                         .HasColumnType("integer")
                         .HasColumnName("arrival_offset_minutes");
@@ -1102,6 +1110,10 @@ namespace SmartRail.Infrastructure.Migrations
                     b.HasIndex("RouteStopId")
                         .HasDatabaseName("ix_calling_point_origin_destination");
 
+                    b.HasIndex("ScheduleId", "StopOrder")
+                        .IsUnique()
+                        .HasDatabaseName("ux_calling_point_schedule_order");
+
                     b.ToTable("service_calling_point", null, t =>
                         {
                             t.HasCheckConstraint("ck_calling_point_arrival_before_departure", "arrival_offset_minutes IS NULL OR departure_offset_minutes IS NULL OR arrival_offset_minutes <= departure_offset_minutes");
@@ -1109,6 +1121,8 @@ namespace SmartRail.Infrastructure.Migrations
                             t.HasCheckConstraint("ck_calling_point_arrival_nonnegative", "arrival_offset_minutes IS NULL OR arrival_offset_minutes >= 0");
 
                             t.HasCheckConstraint("ck_calling_point_departure_nonnegative", "departure_offset_minutes IS NULL OR departure_offset_minutes >= 0");
+
+                            t.HasCheckConstraint("ck_calling_point_order_positive", "stop_order > 0");
                         });
                 });
 

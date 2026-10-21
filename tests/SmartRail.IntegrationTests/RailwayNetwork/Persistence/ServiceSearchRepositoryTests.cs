@@ -63,8 +63,8 @@ public sealed class ServiceSearchRepositoryTests(PostgreSqlTestDatabaseFixture f
         db.TrainServices.Add(service);
         db.ServiceScheduleRevisions.Add(schedule);
         db.ServiceCallingPoints.AddRange(
-            new ServiceCallingPoint(scheduleId, stops[0].RouteStopId, null, 0),
-            new ServiceCallingPoint(scheduleId, stops[2].RouteStopId, 100, null));
+            new ServiceCallingPoint(scheduleId, stops[0].RouteStopId, null, 0, 1),
+            new ServiceCallingPoint(scheduleId, stops[2].RouteStopId, 100, null, 2));
         await db.SaveChangesAsync();
         await new SchedulePublicationRepository(db).PublishAsync(serviceId, scheduleId, now);
         await new ServiceDateManifestRepository(db).PublishAsync(

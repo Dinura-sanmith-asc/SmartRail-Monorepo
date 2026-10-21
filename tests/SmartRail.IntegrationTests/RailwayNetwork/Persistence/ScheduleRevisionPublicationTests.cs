@@ -21,8 +21,8 @@ public sealed class ScheduleRevisionPublicationTests(PostgreSqlTestDatabaseFixtu
         var replacement = new ServiceScheduleRevision(Guid.NewGuid(), serviceId, 3, new TimeOnly(23, 20), now.AddMinutes(-2));
         db.ServiceScheduleRevisions.Add(replacement);
         db.ServiceCallingPoints.AddRange(
-            new ServiceCallingPoint(replacement.ScheduleId, routeStops[0].RouteStopId, null, 0),
-            new ServiceCallingPoint(replacement.ScheduleId, routeStops[^1].RouteStopId, 125, null));
+            new ServiceCallingPoint(replacement.ScheduleId, routeStops[0].RouteStopId, null, 0, 1),
+            new ServiceCallingPoint(replacement.ScheduleId, routeStops[^1].RouteStopId, 125, null, 2));
         await db.SaveChangesAsync();
 
         var repository = new SchedulePublicationRepository(db);
@@ -40,7 +40,7 @@ public sealed class ScheduleRevisionPublicationTests(PostgreSqlTestDatabaseFixtu
 
         var invalid = new ServiceScheduleRevision(Guid.NewGuid(), serviceId, 4, new TimeOnly(23, 20), now.AddMinutes(-1));
         db.ServiceScheduleRevisions.Add(invalid);
-        db.ServiceCallingPoints.Add(new ServiceCallingPoint(invalid.ScheduleId, routeStops[0].RouteStopId, null, 0));
+        db.ServiceCallingPoints.Add(new ServiceCallingPoint(invalid.ScheduleId, routeStops[0].RouteStopId, null, 0, 1));
         await db.SaveChangesAsync();
         await Assert.ThrowsAsync<SchedulePublicationRejectedException>(() => repository.PublishTimetableAsync(
             new TimetablePublicationRequest(serviceId, invalid.ScheduleId, now.AddSeconds(1), "fixture-test-publisher",

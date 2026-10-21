@@ -23,7 +23,7 @@ public sealed class ServiceSearchRepository(SmartRailDbContext dbContext) : ISer
                 && originStation.IsPublished && destinationStation.IsPublished
                 && originStation.StationId == query.OriginStationId
                 && destinationStation.StationId == query.DestinationStationId
-                && originStop.StopOrder < destinationStop.StopOrder
+                && originCall.StopOrder < destinationCall.StopOrder
             select new { Service = service, Route = route, Schedule = schedule, OriginCall = originCall,
                 OriginStop = originStop, OriginStation = originStation, DestinationCall = destinationCall,
                 DestinationStop = destinationStop, DestinationStation = destinationStation }
@@ -62,10 +62,10 @@ public sealed class ServiceSearchRepository(SmartRailDbContext dbContext) : ISer
             results.Add(new(candidate.Service.ServiceId, candidate.Service.ServiceCode, candidate.Route.RouteId,
                 candidate.Route.RouteCode, candidate.Schedule.Revision,
                 ToScheduledCall(candidate.OriginStation.StationId, candidate.OriginStation.Name,
-                    candidate.OriginStop.StopOrder, operationDate, candidate.Schedule.FirstDepartureLocalTime,
+                    candidate.OriginCall.StopOrder, operationDate, candidate.Schedule.FirstDepartureLocalTime,
                     originOffset),
                 ToScheduledCall(candidate.DestinationStation.StationId, candidate.DestinationStation.Name,
-                    candidate.DestinationStop.StopOrder, operationDate, candidate.Schedule.FirstDepartureLocalTime,
+                    candidate.DestinationCall.StopOrder, operationDate, candidate.Schedule.FirstDepartureLocalTime,
                     destinationOffset), candidate.Service.DisplayName, candidate.Service.PublicServiceNumber));
         }
 

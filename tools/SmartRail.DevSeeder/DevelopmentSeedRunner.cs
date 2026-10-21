@@ -135,9 +135,9 @@ internal sealed class DevelopmentSeedRunner(IServiceProvider services)
                 db.ServiceScheduleRevisions.Add(new(SeedManifest.Id(4, i), SeedManifest.Id(3, i), 1,
                     SeedManifest.Departure(i), SeedManifest.EvidenceTime));
                 db.ServiceCallingPoints.AddRange(
-                    new ServiceCallingPoint(SeedManifest.Id(4, i), SeedManifest.Id(2, 1), null, 0),
-                    new ServiceCallingPoint(SeedManifest.Id(4, i), SeedManifest.Id(2, 2), 120, 125),
-                    new ServiceCallingPoint(SeedManifest.Id(4, i), SeedManifest.Id(2, 3), 180, null));
+                    new ServiceCallingPoint(SeedManifest.Id(4, i), SeedManifest.Id(2, 1), null, 0, 1),
+                    new ServiceCallingPoint(SeedManifest.Id(4, i), SeedManifest.Id(2, 2), 120, 125, 2),
+                    new ServiceCallingPoint(SeedManifest.Id(4, i), SeedManifest.Id(2, 3), 180, null, 3));
             }
             await db.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -218,8 +218,8 @@ internal sealed class DevelopmentSeedRunner(IServiceProvider services)
                 db.ServiceScheduleRevisions.Add(new ServiceScheduleRevision(scheduleId, serviceId, 1,
                     SeedManifest.ReferenceDeparture(i), SeedManifest.EvidenceTime));
                 db.ServiceCallingPoints.AddRange(
-                    new ServiceCallingPoint(scheduleId, SeedManifest.Id(10, 10 + i * 2), null, 0),
-                    new ServiceCallingPoint(scheduleId, SeedManifest.Id(10, 11 + i * 2), 130, null));
+                    new ServiceCallingPoint(scheduleId, SeedManifest.Id(10, 10 + i * 2), null, 0, 1),
+                    new ServiceCallingPoint(scheduleId, SeedManifest.Id(10, 11 + i * 2), 130, null, 2));
             }
             await db.SaveChangesAsync();
             await transaction.CommitAsync();

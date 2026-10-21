@@ -45,14 +45,16 @@ public sealed class TrainServiceManagementRepositoryTests(PostgreSqlTestDatabase
         var stops = await db.RouteStops.Where(item => item.RouteId == routeId).OrderBy(item => item.StopOrder).ToArrayAsync();
         var created = await repository.CreateScheduleAsync(serviceId, new ScheduleRevisionInput(new TimeOnly(8, 15),
         [
-            new CallingPointInput(stops[0].RouteStopId, null, 0),
-            new CallingPointInput(stops[^1].RouteStopId, 125, null)
+            new CallingPointInput(stops[^1].RouteStopId, null, 0),
+            new CallingPointInput(stops[0].RouteStopId, 125, null)
         ]));
         Assert.Equal(3, created.Revision);
+        Assert.Equal(new[] { stops[^1].RouteStopId, stops[0].RouteStopId }, created.CallingPoints.Select(item => item.RouteStopId));
+        Assert.Equal(new[] { 1, 2 }, created.CallingPoints.Select(item => item.StopOrder));
         var edited = await repository.UpdateScheduleAsync(serviceId, created.ScheduleId, new ScheduleRevisionInput(new TimeOnly(8, 20),
         [
-            new CallingPointInput(stops[0].RouteStopId, null, 0),
-            new CallingPointInput(stops[^1].RouteStopId, 130, null)
+            new CallingPointInput(stops[^1].RouteStopId, null, 0),
+            new CallingPointInput(stops[0].RouteStopId, 130, null)
         ]));
         Assert.Equal(new TimeOnly(8, 20), edited!.FirstDepartureLocalTime);
         Assert.Equal(130, edited.CallingPoints[^1].ArrivalOffsetMinutes);

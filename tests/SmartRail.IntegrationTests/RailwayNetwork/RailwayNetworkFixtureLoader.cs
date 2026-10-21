@@ -35,8 +35,10 @@ public sealed class RailwayNetworkFixtureLoader(SmartRailDbContext dbContext)
         var revisions = timetableDocument.Services.SelectMany(service => service.Revisions.Select(revision =>
             new ServiceScheduleRevision(revision.ScheduleId, service.ServiceId, revision.Revision,
                 TimeOnly.Parse(revision.FirstDepartureLocalTime), revision.CreatedAt.ToUniversalTime()))).ToArray();
+        var stopOrders = stops.ToDictionary(stop => stop.RouteStopId, stop => stop.StopOrder);
         var calls = timetableDocument.Services.SelectMany(service => service.Revisions.SelectMany(revision => revision.Calls.Select(call =>
-            new ServiceCallingPoint(revision.ScheduleId, call.RouteStopId, call.ArrivalOffsetMinutes, call.DepartureOffsetMinutes)))).ToArray();
+            new ServiceCallingPoint(revision.ScheduleId, call.RouteStopId, call.ArrivalOffsetMinutes, call.DepartureOffsetMinutes,
+                stopOrders[call.RouteStopId])))).ToArray();
 
         dbContext.Routes.AddRange(routes);
         dbContext.RouteStops.AddRange(stops);

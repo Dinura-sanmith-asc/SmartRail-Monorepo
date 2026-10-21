@@ -69,9 +69,9 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
                            join stop in db.RouteStops.AsNoTracking() on call.RouteStopId equals stop.RouteStopId
                            join station in db.Stations.AsNoTracking() on stop.StationId equals station.StationId
                            where ids.Contains(call.ScheduleId)
-                           orderby stop.StopOrder
+                           orderby call.StopOrder
                            select new { call.ScheduleId, View = new ScheduleCallingPointView(stop.RouteStopId, station.StationId,
-                               station.Name, stop.StopOrder, call.ArrivalOffsetMinutes, call.DepartureOffsetMinutes) })
+                               station.Name, call.StopOrder, call.ArrivalOffsetMinutes, call.DepartureOffsetMinutes) })
             .ToListAsync(cancellationToken);
         var operations = await db.ServiceOperationDates.AsNoTracking().Where(item => ids.Contains(item.ScheduleId)).ToListAsync(cancellationToken);
         var dates = operations.Select(item => item.OperationDate).Distinct().ToArray();
@@ -222,20 +222,18 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
             throw new ArgumentException("A route stop may appear only once in a schedule.", nameof(inputs));
         var byId = routeStops.ToDictionary(item => item.RouteStopId);
         var calls = new List<ServiceCallingPoint>(inputs.Count);
-        var previousOrder = 0;
         var previousOffset = -1;
-        foreach (var input in inputs)
+        for (var index = 0; index < inputs.Count; index++)
         {
+            var input = inputs[index];
             if (!byId.TryGetValue(input.RouteStopId, out var stop))
                 throw new ArgumentException("Every calling point must reference a stop on the service route.", nameof(inputs));
-            if (stop.StopOrder <= previousOrder) throw new ArgumentException("Calling points must follow the route's stop order.", nameof(inputs));
-            previousOrder = stop.StopOrder;
             foreach (var offset in new[] { input.ArrivalOffsetMinutes, input.DepartureOffsetMinutes }.Where(value => value.HasValue).Select(value => value!.Value))
             {
                 if (offset < previousOffset) throw new ArgumentException("Scheduled offsets must not move backwards along the route.", nameof(inputs));
                 previousOffset = offset;
             }
-            calls.Add(new ServiceCallingPoint(scheduleId, input.RouteStopId, input.ArrivalOffsetMinutes, input.DepartureOffsetMinutes));
+            calls.Add(new ServiceCallingPoint(scheduleId, input.RouteStopId, input.ArrivalOffsetMinutes, input.DepartureOffsetMinutes, index + 1));
         }
         return Task.FromResult(calls);
     }

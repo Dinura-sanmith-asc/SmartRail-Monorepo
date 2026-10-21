@@ -52,7 +52,9 @@ public static class SchedulePublicationValidator
                 linked.Add((call, stop));
             }
 
-            var ordered = linked.OrderBy(item => item.Stop.StopOrder).ToArray();
+            var ordered = linked.OrderBy(item => item.Call.StopOrder > 0 ? item.Call.StopOrder : item.Stop.StopOrder).ToArray();
+            if (ordered.Any(item => item.Call.StopOrder < 0) || ordered.Select(item => item.Call.StopOrder > 0 ? item.Call.StopOrder : item.Stop.StopOrder).Distinct().Count() != ordered.Length)
+                errors.Add("Calling point order must be positive and unique.");
             if (ordered.Length != revisionCalls.Length) errors.Add("Every calling point must resolve to a route stop.");
             if (ordered.Select(item => item.Stop.StationId).Distinct().Count() != ordered.Length)
                 errors.Add("A schedule with repeated station calls cannot be published until occurrence semantics are approved.");

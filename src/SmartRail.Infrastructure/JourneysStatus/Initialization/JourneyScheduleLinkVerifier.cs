@@ -33,7 +33,7 @@ public sealed class JourneyScheduleLinkVerifier(SmartRailDbContext dbContext) : 
         var stops = await (from call in dbContext.ServiceCallingPoints.AsNoTracking()
                            join routeStop in dbContext.RouteStops.AsNoTracking() on call.RouteStopId equals routeStop.RouteStopId
                            where call.ScheduleId == request.ScheduleId && routeStop.RouteId == service.RouteId
-                           orderby routeStop.StopOrder
+                           orderby call.StopOrder
                            select new { Call = call, RouteStop = routeStop })
             .ToListAsync(cancellationToken);
         if (stops.Count == 0 || stops[0].Call.DepartureOffsetMinutes != 0)
@@ -42,7 +42,7 @@ public sealed class JourneyScheduleLinkVerifier(SmartRailDbContext dbContext) : 
         var localStart = request.OperationDate.ToDateTime(schedule.FirstDepartureLocalTime);
         var utcOffset = TimeSpan.FromHours(5.5);
         var planned = stops.Select(row => new JourneyScheduleStop(Guid.NewGuid(), row.RouteStop.StationId,
-            row.RouteStop.RouteStopId, row.RouteStop.StopOrder,
+            row.RouteStop.RouteStopId, row.Call.StopOrder,
             row.Call.ArrivalOffsetMinutes.HasValue ? new DateTimeOffset(localStart.AddMinutes(row.Call.ArrivalOffsetMinutes.Value), utcOffset).ToUniversalTime() : null,
             row.Call.DepartureOffsetMinutes.HasValue ? new DateTimeOffset(localStart.AddMinutes(row.Call.DepartureOffsetMinutes.Value), utcOffset).ToUniversalTime() : null)).ToArray();
             return new(ScheduleLinkVerificationStatus.Verified, new JourneyScheduleLink(planned, DateTimeOffset.UtcNow));

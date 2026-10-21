@@ -193,8 +193,8 @@ public sealed class OperationsOverviewApiTests(PostgreSqlTestDatabaseFixture dat
             isPublished: true, displayName: "Udarata Menike", publicServiceNumber: "TEST-01"));
         db.ServiceScheduleRevisions.Add(new ServiceScheduleRevision(scheduleId, serviceId, 1, new TimeOnly(8, 0), now,
             isPublished: true, publishedAt: now));
-        db.ServiceCallingPoints.AddRange(new ServiceCallingPoint(scheduleId, originRouteStop, null, 0),
-            new ServiceCallingPoint(scheduleId, destinationRouteStop, 125, null));
+        db.ServiceCallingPoints.AddRange(new ServiceCallingPoint(scheduleId, originRouteStop, null, 0, 1),
+            new ServiceCallingPoint(scheduleId, destinationRouteStop, 125, null, 2));
         await db.SaveChangesAsync();
 
         var journeyIds = Enumerable.Range(0, 6).Select(_ => Guid.NewGuid()).ToArray();

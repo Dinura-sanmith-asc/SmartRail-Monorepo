@@ -123,9 +123,9 @@ internal sealed class StationDisplaySeedRunner(IServiceProvider services)
         {
             db.ServiceScheduleRevisions.Add(new ServiceScheduleRevision(StationDisplaySeedManifest.ScheduleId,
                 StationDisplaySeedManifest.ServiceId, 1, StationDisplaySeedManifest.ColomboDeparture, SeedManifest.EvidenceTime));
-            db.ServiceCallingPoints.AddRange(StationDisplaySeedManifest.CallingPoints.Select(x =>
+            db.ServiceCallingPoints.AddRange(StationDisplaySeedManifest.CallingPoints.Select((x, index) =>
                 new ServiceCallingPoint(StationDisplaySeedManifest.ScheduleId, x.RouteStopId,
-                    x.ArrivalOffsetMinutes, x.DepartureOffsetMinutes)));
+                    x.ArrivalOffsetMinutes, x.DepartureOffsetMinutes, index + 1)));
         }
         else
         {
@@ -133,7 +133,8 @@ internal sealed class StationDisplaySeedRunner(IServiceProvider services)
                 .Where(x => x.ScheduleId == StationDisplaySeedManifest.ScheduleId).ToArrayAsync();
             if (calls.Length != StationDisplaySeedManifest.CallingPoints.Length ||
                 StationDisplaySeedManifest.CallingPoints.Any(expected => !calls.Any(actual => actual.RouteStopId == expected.RouteStopId &&
-                    actual.ArrivalOffsetMinutes == expected.ArrivalOffsetMinutes && actual.DepartureOffsetMinutes == expected.DepartureOffsetMinutes)))
+                    actual.ArrivalOffsetMinutes == expected.ArrivalOffsetMinutes && actual.DepartureOffsetMinutes == expected.DepartureOffsetMinutes &&
+                    actual.StopOrder == Array.IndexOf(StationDisplaySeedManifest.CallingPoints, expected) + 1)))
                 throw new SeedRefusalException("The reserved T030 calling points differ from the seed manifest.");
         }
         await db.SaveChangesAsync();
