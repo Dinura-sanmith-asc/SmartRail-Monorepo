@@ -6,7 +6,7 @@ namespace SmartRail.IntegrationTests.RailwayNetwork.Api;
 public sealed class RailwayNetworkEndpointTests(PostgreSqlTestDatabaseFixture fixture) : IClassFixture<PostgreSqlTestDatabaseFixture>
 {
     [Fact]
-    public async Task Four_approved_get_routes_are_anonymous_and_station_write_route_is_absent()
+    public async Task Four_approved_get_routes_are_anonymous_and_station_writes_require_authentication()
     {
         using var factory = await RailwayNetworkApiTestHost.CreateAsync(fixture);
         using var client = factory.CreateClient();
@@ -18,8 +18,6 @@ public sealed class RailwayNetworkEndpointTests(PostgreSqlTestDatabaseFixture fi
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/services/30000000-0000-0000-0000-000000000001")).StatusCode);
 
         var stationWrite = await client.PostAsync("/api/stations", new StringContent("{}"));
-        Assert.NotEqual(HttpStatusCode.OK, stationWrite.StatusCode);
-        Assert.NotEqual(HttpStatusCode.Created, stationWrite.StatusCode);
-        Assert.NotEqual(HttpStatusCode.NoContent, stationWrite.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, stationWrite.StatusCode);
     }
 }

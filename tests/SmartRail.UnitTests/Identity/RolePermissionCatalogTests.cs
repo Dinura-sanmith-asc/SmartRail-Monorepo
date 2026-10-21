@@ -38,6 +38,7 @@ public sealed class RolePermissionCatalogTests
         (RoleCode.Controller, PermissionAction.CreateIncident),
         (RoleCode.Controller, PermissionAction.ViewIncidents),
         (RoleCode.Controller, PermissionAction.UpdateIncidentLifecycle),
+        (RoleCode.Controller, PermissionAction.ManageStations),
         (RoleCode.Controller, PermissionAction.DiscoverCateringOptions)
     ];
 

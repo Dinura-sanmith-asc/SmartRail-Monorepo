@@ -62,6 +62,7 @@ public static class DependencyInjection
         services.AddScoped<GrantStationScopeHandler>();
         services.AddScoped<RevokeStationScopeHandler>();
         services.AddScoped<IStationRepository, StationReadRepository>();
+        services.AddScoped<IStationManagementRepository, StationManagementRepository>();
         services.AddScoped<IRouteReadRepository, RouteReadRepository>();
         services.AddScoped<IServiceReadRepository, ServiceReadRepository>();
         services.AddScoped<IServiceSearchRepository, ServiceSearchRepository>();

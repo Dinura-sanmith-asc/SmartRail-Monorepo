@@ -20,7 +20,8 @@ public enum PermissionAction
     UpdateIncidentLifecycle = 13,
     DiscoverCateringOptions = 14,
     CreateCateringOrder = 15,
-    ViewOwnCateringOrder = 16
+    ViewOwnCateringOrder = 16,
+    ManageStations = 17
 }
 
 /// <summary>
@@ -84,6 +85,7 @@ public static class RolePermissionCatalog
                 PermissionAction.CreateIncident,
                 PermissionAction.ViewIncidents,
                 PermissionAction.UpdateIncidentLifecycle,
+                PermissionAction.ManageStations,
                 PermissionAction.DiscoverCateringOptions
             }.ToFrozenSet()
         }.ToFrozenDictionary();

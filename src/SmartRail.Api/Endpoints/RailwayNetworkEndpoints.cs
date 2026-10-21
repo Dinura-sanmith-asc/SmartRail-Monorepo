@@ -1,11 +1,17 @@
 using System.Data.Common;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using SmartRail.Api.Contracts.RailwayNetwork;
 using SmartRail.Api.Errors;
 using SmartRail.Application.RailwayNetwork.Routes;
 using SmartRail.Application.RailwayNetwork.Services;
 using SmartRail.Application.RailwayNetwork.Stations;
+using SmartRail.Api.Authorization;
+using SmartRail.Domain.Identity;
+using SmartRail.Application.Identity.Authorization;
 
 namespace SmartRail.Api.Endpoints;
 
@@ -21,6 +27,17 @@ public static class RailwayNetworkEndpoints
             .Produces<ProblemResponse>(StatusCodes.Status503ServiceUnavailable, contentType: "application/problem+json")
             .Produces<ProblemResponse>(StatusCodes.Status500InternalServerError, contentType: "application/problem+json")
             .AllowAnonymous();
+
+        endpoints.MapPost("/api/stations", CreateStationAsync).WithName("CreateStation").WithTags("Railway Network")
+            .RequireAuthorization().Produces<StationResponse>(StatusCodes.Status201Created)
+            .Produces<ProblemResponse>(StatusCodes.Status400BadRequest, contentType: "application/problem+json");
+        endpoints.MapPatch("/api/stations/{id}", UpdateStationAsync).WithName("UpdateStation").WithTags("Railway Network")
+            .RequireAuthorization().Produces<StationResponse>(StatusCodes.Status200OK)
+            .Produces<ProblemResponse>(StatusCodes.Status400BadRequest, contentType: "application/problem+json")
+            .Produces<ProblemResponse>(StatusCodes.Status404NotFound, contentType: "application/problem+json");
+        endpoints.MapDelete("/api/stations/{id}", DeleteStationAsync).WithName("DeleteStation").WithTags("Railway Network")
+            .RequireAuthorization().Produces(StatusCodes.Status204NoContent)
+            .Produces<ProblemResponse>(StatusCodes.Status409Conflict, contentType: "application/problem+json");
 
         endpoints.MapGet("/api/routes/{id}/stops", GetRouteStopsAsync)
             .WithName("GetRouteStops").WithTags("Railway Network")
@@ -86,6 +103,94 @@ public static class RailwayNetworkEndpoints
                 new StationResponse(station.StationId, station.Name)).ToArray());
             return Results.Ok(response);
         });
+
+    private static async Task<IResult> CreateStationAsync(CreateStationRequest? request, IStationManagementRepository repository,
+        IAuthorizationService authorization, HttpContext context, CancellationToken cancellationToken)
+    {
+        var denied = await AuthorizeStationManagement(authorization, context);
+        if (denied is not null) return denied;
+        var validation = ValidateStation(request?.Name, request?.VerifiedDetails);
+        if (validation is not null) return validation;
+        try
+        {
+            var stations = await repository.ListAsync(cancellationToken);
+            if (stations.Any(item => string.Equals(item.Name, request!.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
+                return ProblemDetailsConfiguration.Create(409, "A station with this name already exists.", "duplicate_station");
+            var created = await repository.CreateAsync(request!, cancellationToken);
+            return Results.Created($"/api/stations/{created.StationId:D}", new StationResponse(created.StationId, created.Name));
+        }
+        catch (DbUpdateException ex) { return MapStationWriteConflict(ex); }
+        catch (ArgumentException ex) { return ProblemDetailsConfiguration.Create(400, "Station data is invalid.", "invalid_station", new Dictionary<string, string[]> { ["station"] = [ex.Message] }); }
+    }
+
+    private static async Task<IResult> UpdateStationAsync(string? id, UpdateStationRequest? request, IStationManagementRepository repository,
+        IAuthorizationService authorization, HttpContext context, CancellationToken cancellationToken)
+    {
+        var denied = await AuthorizeStationManagement(authorization, context);
+        if (denied is not null) return denied;
+        if (!Guid.TryParse(id, out var stationId) || stationId == Guid.Empty)
+            return ProblemDetailsConfiguration.Create(400, "Station identifier is invalid.", "invalid_station_id");
+        var validation = ValidateStation(request?.Name, request?.VerifiedDetails);
+        if (validation is not null) return validation;
+        try
+        {
+            var stations = await repository.ListAsync(cancellationToken);
+            if (stations.Any(item => item.StationId != stationId && string.Equals(item.Name, request!.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
+                return ProblemDetailsConfiguration.Create(409, "A station with this name already exists.", "duplicate_station");
+            var updated = await repository.UpdateAsync(stationId, request!, cancellationToken);
+            return updated is null ? ProblemDetailsConfiguration.Create(404, "Station not found.", "station_not_found")
+                : Results.Ok(new StationResponse(updated.StationId, updated.Name));
+        }
+        catch (DbUpdateException ex) { return MapStationWriteConflict(ex); }
+        catch (ArgumentException ex) { return ProblemDetailsConfiguration.Create(400, "Station data is invalid.", "invalid_station", new Dictionary<string, string[]> { ["station"] = [ex.Message] }); }
+    }
+
+    private static async Task<IResult> DeleteStationAsync(string? id, IStationManagementRepository repository,
+        IAuthorizationService authorization, HttpContext context, CancellationToken cancellationToken)
+    {
+        var denied = await AuthorizeStationManagement(authorization, context);
+        if (denied is not null) return denied;
+        if (!Guid.TryParse(id, out var stationId) || stationId == Guid.Empty)
+            return ProblemDetailsConfiguration.Create(400, "Station identifier is invalid.", "invalid_station_id");
+        try
+        {
+            return await repository.DeleteAsync(stationId, cancellationToken) ? Results.NoContent()
+                : ProblemDetailsConfiguration.Create(404, "Station not found.", "station_not_found");
+        }
+        catch (DbUpdateException ex) { return MapStationWriteConflict(ex); }
+    }
+
+    private static async Task<IResult?> AuthorizeStationManagement(IAuthorizationService authorization, HttpContext context)
+    {
+        var result = await authorization.AuthorizeAsync(context.User, null,
+            new SmartRailAuthorizationRequirement(PermissionAction.ManageStations, ProtectedResource.None));
+        if (result.Succeeded) return null;
+        var unavailable = result.Failure?.FailureReasons.Any(reason => reason.Message == "smartrail_authorization_unavailable") == true;
+        return ProblemDetailsConfiguration.Create(unavailable ? 503 : 403,
+            unavailable ? "Authorization is temporarily unavailable." : "Permission is denied.",
+            unavailable ? "authorization_unavailable" : "permission_denied");
+    }
+
+    private static IResult? ValidateStation(string? name, IReadOnlyDictionary<string, string>? details)
+    {
+        var errors = new Dictionary<string, string[]>(StringComparer.Ordinal);
+        if (string.IsNullOrWhiteSpace(name)) errors["name"] = ["Station name is required."];
+        else if (name.Trim().Length > 200) errors["name"] = ["Station name must be 200 characters or fewer."];
+        if (details is not null && details.Any(item => string.IsNullOrWhiteSpace(item.Key) || string.IsNullOrWhiteSpace(item.Value) || item.Key.Length > 100 || item.Value.Length > 500))
+            errors["verifiedDetails"] = ["Detail keys and values are required and must not exceed 100 and 500 characters respectively."];
+        return errors.Count == 0 ? null : ProblemDetailsConfiguration.Create(400, "Station data is invalid.", "invalid_station", errors);
+    }
+
+    private static IResult MapStationWriteConflict(DbUpdateException exception)
+    {
+        if (exception is DbUpdateConcurrencyException)
+            return ProblemDetailsConfiguration.Create(409, "Station was changed by another request. Reload and retry.", "station_concurrency_conflict");
+        if (exception.InnerException is PostgresException postgres && postgres.SqlState == PostgresErrorCodes.ForeignKeyViolation)
+            return ProblemDetailsConfiguration.Create(409, "Station is referenced by railway or operational data and cannot be deleted.", "station_in_use");
+        if (exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+            return ProblemDetailsConfiguration.Create(409, "A station with this identity already exists.", "duplicate_station");
+        return ProblemDetailsConfiguration.Create(503, "Station data is temporarily unavailable.", "station_data_unavailable");
+    }
 
     private static Task<IResult> GetRouteStopsAsync(string? id, GetRouteStopsHandler handler, CancellationToken cancellationToken) =>
         Safe(async () =>
