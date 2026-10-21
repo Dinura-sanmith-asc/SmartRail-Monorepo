@@ -46,16 +46,30 @@ export function TrainServiceManagement({ options, onUnauthorized }: Props) {
     setLoading(true)
     setError('')
     try {
-      const [serviceItems, routeItems] = await Promise.all([operationsApi.managedServices(options), operationsApi.managedRoutes(options)])
-      const serviceSchedules = await Promise.all(serviceItems.map(async (service) => ({ service, schedules: await operationsApi.serviceSchedules(service.serviceId, options) })))
-      setServices(serviceItems)
-      setRoutes(routeItems)
+      const [serviceResult, routeResult] = await Promise.allSettled([
+        operationsApi.managedServices(options),
+        operationsApi.managedRoutes(options),
+      ])
+      const failures: string[] = []
+      const serviceItems = serviceResult.status === 'fulfilled' ? serviceResult.value : []
+      if (serviceResult.status === 'fulfilled') setServices(serviceItems)
+      else failures.push(problem(serviceResult.reason, onUnauthorized))
+      if (routeResult.status === 'fulfilled') setRoutes(routeResult.value)
+      else failures.push(problem(routeResult.reason, onUnauthorized))
+      const scheduleResults = serviceResult.status === 'fulfilled'
+        ? await Promise.allSettled(serviceItems.map(async (service) => ({ service, schedules: await operationsApi.serviceSchedules(service.serviceId, options) })))
+        : []
+      const serviceSchedules = scheduleResults.flatMap((result) => {
+        if (result.status === 'rejected') { failures.push(problem(result.reason, onUnauthorized)); return [] }
+        return [result.value]
+      })
       setManifestSchedules(serviceSchedules.flatMap(({ service, schedules: items }) => items.map((schedule) => ({
         serviceId: service.serviceId,
         label: `${schedule.revision} · ${service.publicServiceNumber ? `${service.publicServiceNumber} · ` : ''}${service.displayName || service.serviceCode}`,
         schedule,
       }))))
       setSelectedId((current) => current && serviceItems.some((item) => item.serviceId === current) ? current : '')
+      if (failures.length) setError([...new Set(failures)].join(' '))
     } catch (failure) {
       setError(problem(failure, onUnauthorized))
     } finally { setLoading(false) }
