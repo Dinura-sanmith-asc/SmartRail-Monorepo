@@ -19,7 +19,7 @@ public sealed class StationManagementRepository(SmartRailDbContext dbContext) : 
 
     public async Task<StationManagementView> CreateAsync(CreateStationRequest request, CancellationToken cancellationToken = default)
     {
-        var number = await dbContext.Database.SqlQueryRaw<long>("SELECT nextval('station_id_number_seq')").SingleAsync(cancellationToken);
+        var number = await dbContext.Database.SqlQueryRaw<long>("SELECT nextval('station_id_number_seq') AS \"Value\"").SingleAsync(cancellationToken);
         if (number is < 1 or > 999_999_999_999)
             throw new InvalidOperationException("The sequential station ID range has been exhausted.");
         var stationId = Guid.Parse($"10000000-0000-0000-0000-{number.ToString("D12", CultureInfo.InvariantCulture)}");
