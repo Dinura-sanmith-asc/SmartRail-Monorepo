@@ -3,12 +3,14 @@ import { classifyApiFailure, type ApiFailure, type SafeFailureKind } from './saf
 export class ApiRequestError extends Error {
   readonly failure: SafeFailureKind
   readonly status?: number
+  readonly backendMessage?: string
 
-  constructor(failure: SafeFailureKind, status?: number) {
+  constructor(failure: SafeFailureKind, status?: number, backendMessage?: string) {
     super(failure)
     this.name = 'ApiRequestError'
     this.failure = failure
     this.status = status
+    this.backendMessage = backendMessage
   }
 }
 
@@ -24,8 +26,20 @@ export async function fetchJson<T>(url: string, init: RequestInit = {}, timeoutM
     const response = await fetch(url, { ...init, signal: controller.signal })
     if (!response.ok) {
       const failure: ApiFailure = { kind: 'http', status: response.status }
-      throw new ApiRequestError(classifyApiFailure(failure), response.status)
+      let backendMessage: string | undefined
+      try {
+        const body: unknown = await response.json()
+        if (typeof body === 'object' && body !== null && 'title' in body && typeof body.title === 'string') {
+          backendMessage = body.title
+          if ('errors' in body && typeof body.errors === 'object' && body.errors !== null) {
+            const details = Object.values(body.errors).flatMap((messages) => Array.isArray(messages) ? messages.filter((message): message is string => typeof message === 'string') : [])
+            if (details.length) backendMessage = `${backendMessage} ${details.join(' ')}`
+          }
+        }
+      } catch { /* An empty or non-JSON problem body still uses the safe generic message. */ }
+      throw new ApiRequestError(classifyApiFailure(failure), response.status, backendMessage)
     }
+    if (response.status === 204) return undefined as T
     try {
       return (await response.json()) as T
     } catch {

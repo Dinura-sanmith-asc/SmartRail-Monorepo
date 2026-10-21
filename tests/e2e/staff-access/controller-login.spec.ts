@@ -53,6 +53,7 @@ async function installLocalOidcFixture(page: Page, callbackCase: CallbackCase, a
   let receivedCodeVerifier: string | null = null
   let receivedCodeChallenge: string | null = null
   let receivedNonce: string | null = null
+  let overviewUrl: string | undefined
 
   await page.route('**/.well-known/openid-configuration', async (route: Route) => {
     await route.fulfill({
@@ -136,10 +137,35 @@ async function installLocalOidcFixture(page: Page, callbackCase: CallbackCase, a
     })
   })
 
+  await page.route(`${apiBaseUrl}/api/operations/overview**`, async (route: Route) => {
+    overviewUrl = route.request().url()
+    const requestedDate = new URL(overviewUrl).searchParams.get('date')
+    await route.fulfill({
+      status: 200,
+      headers: corsHeaders(),
+      body: JSON.stringify({
+        operationalDate: requestedDate,
+        metrics: { totalScheduled: 4, running: 1, delayed: 1, openIncidents: 2, cancelled: 1, completed: 1 },
+        journeys: [{ journeyId: 'fixture-journey', serviceId: 'internal-service-id', serviceCode: 'TEST-CODE',
+          serviceDisplayName: 'Fixture Service', publicServiceNumber: 'TEST-100', routeCode: 'R-1', routeName: 'Fixture Route',
+          operationDate: requestedDate, origin: 'Fixture Origin', destination: 'Fixture Destination',
+          scheduledDeparture: '2026-11-02T08:00:00+05:30', scheduledArrival: null, status: 'Running',
+          recordedDelayMinutes: 12, lastReportedStation: 'Fixture Station', lastUpdateAt: '2026-11-02T03:00:00Z', assignedDriver: null }],
+      }),
+    })
+  })
+  await page.route(`${apiBaseUrl}/api/stations`, async (route: Route) => {
+    await route.fulfill({ status: 200, headers: corsHeaders(), body: JSON.stringify({ items: [] }) })
+  })
+  await page.route(`${apiBaseUrl}/api/incidents`, async (route: Route) => {
+    await route.fulfill({ status: 200, headers: corsHeaders(), body: JSON.stringify({ items: [] }) })
+  })
+
   return {
     get authorizeCount() { return authorizeCount },
     get tokenExchangeCount() { return tokenExchangeCount },
     get callbackUrl() { return callbackUrl },
+    get overviewUrl() { return overviewUrl },
     get receivedCodeVerifier() { return receivedCodeVerifier },
     get receivedCodeChallenge() { return receivedCodeChallenge },
   }
@@ -161,6 +187,12 @@ test.describe('Controller managed-login browser protocol (mocked local fixture)'
     await beginSignIn(page)
 
     await expect(page.getByRole('heading', { name: /control room/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Live Journey Board' })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Scheduled Journeys Today: 4/ })).toBeVisible()
+    await expect(page.getByText('Fixture Service')).toBeVisible()
+    await expect(page.getByText('Train No: TEST-100')).toBeVisible()
+    expect(fixture.overviewUrl).toContain('/api/operations/overview?date=')
+    expect(new URL(fixture.overviewUrl!).searchParams.has('stationId')).toBe(false)
     expect(fixture.authorizeCount).toBe(1)
     expect(fixture.tokenExchangeCount).toBe(1)
     expect(fixture.receivedCodeVerifier).toBeTruthy()

@@ -9,7 +9,94 @@ export type DriverObservation = { observationId: string; journeyInstanceId: stri
 export type DriverAssignment = { assignmentId: string; driverSubject: string; journey: { snapshot: Journey; updates: JourneyUpdate[] } }
 export type IncidentAssociation = { associationId: string; kind: string; resourceId: string }
 export type Incident = { incidentId: string; categoryCode: string; description: string; state: string; revision: number; reportedAt: string; occurredAt: string | null; associations: IncidentAssociation[] }
-type Options = { apiBaseUrl: string; accessToken: string | null; signal?: AbortSignal }
+export type OperationsApiOptions = { apiBaseUrl: string; accessToken: string | null; signal?: AbortSignal }
+
+type Options = OperationsApiOptions
+
+export type OperationsOverviewMetrics = {
+  totalScheduled: number
+  running: number
+  delayed: number
+  openIncidents: number
+  cancelled: number
+  completed: number
+}
+
+export type OperationsOverviewJourney = {
+  journeyId: string
+  serviceId: string
+  serviceCode: string
+  serviceDisplayName: string | null
+  publicServiceNumber: string | null
+  routeCode: string
+  routeName: string
+  operationDate: string
+  origin: string
+  destination: string
+  scheduledDeparture: string | null
+  scheduledArrival: string | null
+  status: 'Scheduled' | 'Running' | 'Delayed' | 'Interrupted' | 'Cancelled' | 'Terminated' | 'Completed'
+  recordedDelayMinutes: number | null
+  lastReportedStation: string | null
+  lastUpdateAt: string
+  assignedDriver: string | null
+}
+
+export type OperationsOverview = {
+  operationalDate: string
+  metrics: OperationsOverviewMetrics
+  journeys: OperationsOverviewJourney[]
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isDate(value: unknown): value is string {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const parsed = new Date(`${value}T00:00:00Z`)
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+}
+
+function isTimestampOrNull(value: unknown): value is string | null {
+  return value === null || (typeof value === 'string' && Number.isFinite(Date.parse(value)))
+}
+
+function isStringOrNull(value: unknown): value is string | null {
+  return value === null || typeof value === 'string'
+}
+
+const journeyStatuses = ['Scheduled', 'Running', 'Delayed', 'Interrupted', 'Cancelled', 'Terminated', 'Completed'] as const
+
+/** Validate the exact public response shape before it reaches dashboard state. */
+export function parseOperationsOverview(value: unknown): OperationsOverview {
+  if (!isRecord(value) || !isDate(value.operationalDate) || !isRecord(value.metrics) || !Array.isArray(value.journeys)) {
+    throw new TypeError('Invalid Operations Overview response')
+  }
+  const metricKeys = ['totalScheduled', 'running', 'delayed', 'openIncidents', 'cancelled', 'completed'] as const
+  const metrics = {} as OperationsOverviewMetrics
+  for (const key of metricKeys) {
+    const count = value.metrics[key]
+    if (typeof count !== 'number' || !Number.isInteger(count) || count < 0) throw new TypeError('Invalid Operations Overview metrics')
+    metrics[key] = count
+  }
+  const journeys = value.journeys.map((item): OperationsOverviewJourney => {
+    if (!isRecord(item) || typeof item.journeyId !== 'string' || typeof item.serviceId !== 'string' ||
+      typeof item.serviceCode !== 'string' || !isStringOrNull(item.serviceDisplayName) ||
+      !isStringOrNull(item.publicServiceNumber) || typeof item.routeCode !== 'string' ||
+      typeof item.routeName !== 'string' || !isDate(item.operationDate) || typeof item.origin !== 'string' ||
+      typeof item.destination !== 'string' || !isTimestampOrNull(item.scheduledDeparture) ||
+      !isTimestampOrNull(item.scheduledArrival) || typeof item.status !== 'string' ||
+      !journeyStatuses.includes(item.status as OperationsOverviewJourney['status']) ||
+      !(item.recordedDelayMinutes === null || (typeof item.recordedDelayMinutes === 'number' && Number.isFinite(item.recordedDelayMinutes) && item.recordedDelayMinutes >= 0)) ||
+      !isStringOrNull(item.lastReportedStation) || !isTimestampOrNull(item.lastUpdateAt) || item.lastUpdateAt === null ||
+      !isStringOrNull(item.assignedDriver)) {
+      throw new TypeError('Invalid Operations Overview journey')
+    }
+    return item as OperationsOverviewJourney
+  })
+  return { operationalDate: value.operationalDate, metrics, journeys }
+}
 
 async function request<T>(path: string, options: Options, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
@@ -20,7 +107,15 @@ async function request<T>(path: string, options: Options, init: RequestInit = {}
 }
 
 export const operationsApi = {
+  operationsOverview: async (date: string, o: Options) => {
+    const response = await request<unknown>(`/api/operations/overview?date=${encodeURIComponent(date)}`, o)
+    try { return parseOperationsOverview(response) }
+    catch { throw new ApiRequestError('malformed-response') }
+  },
   stations: (o: Options) => request<{ items: Station[] }>('/api/stations', o),
+  createStation: (name: string, o: Options) => request<Station>('/api/stations', o, { method: 'POST', body: JSON.stringify({ name }) }),
+  updateStation: (id: string, name: string, o: Options) => request<Station>(`/api/stations/${encodeURIComponent(id)}`, o, { method: 'PATCH', body: JSON.stringify({ name }) }),
+  deleteStation: (id: string, o: Options) => request<void>(`/api/stations/${encodeURIComponent(id)}`, o, { method: 'DELETE' }),
   departures: (stationId: string, date: string, o: Options) => request<Departure[]>(`/api/stations/${encodeURIComponent(stationId)}/departures?date=${encodeURIComponent(date)}`, o),
   journey: (id: string, o: Options) => request<Journey>(`/api/journeys/${encodeURIComponent(id)}`, o),
   journeyUpdates: (id: string, o: Options) => request<JourneyUpdate[]>(`/api/journeys/${encodeURIComponent(id)}/updates`, o),
@@ -35,6 +130,7 @@ export const operationsApi = {
 }
 
 export function apiErrorMessage(error: unknown): string {
+  if (error instanceof ApiRequestError && error.backendMessage) return error.backendMessage
   if (!(error instanceof ApiRequestError)) return 'The request could not be completed. Try again later.'
   const labels = { unauthenticated: 'Your session has expired. Sign in again to continue.', forbidden: 'The server denied this operation for your role or resource scope.', 'authority-unavailable': 'An authorization or operational data source is temporarily unavailable. Try again shortly.', 'service-error': 'The request could not be completed. Try again later.', timeout: 'The request took too long. Try again.', offline: 'A network connection is unavailable. Check your connection and try again.', 'malformed-response': 'The service returned an unexpected response.' }
   return labels[error.failure]

@@ -6,10 +6,11 @@ import { useLocalSession } from '../staff-access/auth/localSessionContext'
 import { useIdentity } from '../staff-access/identity/identityContext'
 import { WorkspaceNavigation } from '../staff-access/workspaces/WorkspaceNavigation'
 import { apiErrorMessage, operationsApi, type Departure, type DriverObservation, type Incident, type Journey, type JourneyUpdate, type Station } from './operationsApi'
+import { ControllerOverview } from './ControllerOverview'
 import './operations.css'
 import { LanguageSelect, useLanguage } from '../../shared/i18n/language'
 
-type Tab = 'overview' | 'journeys' | 'incidents'
+type Tab = 'overview' | 'journeys' | 'incidents' | 'stations'
 type Column<T> = { key: string; label: string; render: (row: T) => ReactNode }
 
 function colomboDate() {
@@ -28,6 +29,7 @@ const roleMenus: Record<'Controller' | 'Station Staff', { id: Tab; label: string
     { id: 'overview', label: 'Operations overview', description: 'Stations and departure status' },
     { id: 'journeys', label: 'Journey control', description: 'Journey status and history' },
     { id: 'incidents', label: 'Incident management', description: 'Authorized incident actions' },
+    { id: 'stations', label: 'Stations', description: 'Manage railway stations' },
   ],
   'Station Staff': [
     { id: 'overview', label: 'Station overview', description: 'Local departures and station details' },
@@ -67,6 +69,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
     setError(apiErrorMessage(failure))
     if (failure instanceof ApiRequestError && failure.status === 401) session.invalidateLocalSession()
   }, [session])
+  const onOverviewUnauthorized = useCallback(() => session.invalidateLocalSession(), [session])
 
   const loadStations = useCallback(async () => {
     setStationsLoading(true)
@@ -283,6 +286,12 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
 
         {tab === 'overview' && (
           <>
+            {role === 'Controller' && <ControllerOverview
+              options={options}
+              onOpenJourney={(journeyId) => void openJourney(journeyId)}
+              onOpenIncidents={() => setTab('incidents')}
+              onUnauthorized={onOverviewUnauthorized}
+            />}
             <section className="operations__stats" aria-label={t('Operational summary')}>
               <SummaryCard title={t('Published stations')} value={stations.length} loading={stationsLoading} hint={t('From the published railway network')} />
               <SummaryCard title={t('Station departures')} value={departures.length} loading={departuresLoading} hint={t('For the selected date and station')} />
@@ -318,6 +327,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
         )}
 
         {tab === 'incidents' && <IncidentWorkspace role={role} stations={stations} incidents={visibleIncidents} loading={incidentsLoading} query={incidentQuery} onQuery={setIncidentQuery} state={incidentState} onState={setIncidentState} busy={mutating} onCreate={submitIncident} onTransition={(item) => void transitionIncident(item)} />}
+        {tab === 'stations' && role === 'Controller' && <StationManagement stations={stations} loading={stationsLoading} options={options} onRefresh={loadStations} onUnauthorized={onOverviewUnauthorized} />}
       </main>
     </div>
   )
@@ -393,6 +403,59 @@ function JourneyDetail({ journey, updates, observations, busy, onRefresh, onPubl
     <div className="operations__action-box"><div><span className="operations__section-kicker">{t('CONTROLLER ACTION')}</span><h3>{t('Publish official status')}</h3><p>{t('This updates the public operational journey record.')}</p></div><form className="operations__status-form" onSubmit={onPublishStatus}><label className="operations-control"><span>{t('New status')}</span><select name="status" value={statusDraft} onChange={(event) => setStatusDraft(event.target.value)}>{['Scheduled', 'Running', 'Delayed', 'Interrupted', 'Cancelled', 'Completed', 'Terminated'].map((status) => <option key={status} value={status}>{t(status)}</option>)}</select></label><button className="button button--primary" disabled={busy || statusDraft === journey.status}>{t(busy ? 'Publishing…' : 'Publish status')}</button></form></div>
     <div className="operations__detail-columns"><div><h3>Official update history</h3>{updates.length ? <ol className="operations-timeline">{updates.map((item) => <li key={item.updateId}><span className="operations-timeline__dot" /><div><b>{item.kind} · {item.status}</b><small>Revision {item.revision} · {timestamp(item.publishedAt)}</small></div></li>)}</ol> : <EmptyState title="No published updates" text="No official operational updates are recorded for this journey." />}</div>
       <div><h3>Driver observations</h3><p className="operations__muted">Protected evidence. It does not change official journey status.</p>{observations.length ? <ul className="operations-observations">{observations.map((item) => <li key={item.observationId}><p>{item.text}</p><small>{timestamp(item.reportedAtUtc)} · journey revision {item.journeyRevision}</small></li>)}</ul> : <EmptyState title="No observations" text="No driver observations are available for this journey." />}</div></div>
+  </section>
+}
+
+function StationManagement({ stations, loading, options, onRefresh, onUnauthorized }: { stations: Station[]; loading: boolean; options: { apiBaseUrl: string; accessToken: string | null }; onRefresh: () => Promise<void>; onUnauthorized: () => void }) {
+  const [editing, setEditing] = useState<Station | null>(null)
+  const [adding, setAdding] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+
+  async function saveStation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = event.currentTarget
+    const name = String(new FormData(form).get('name') ?? '').trim()
+    if (!name) return
+    setBusy(true); setError('')
+    try {
+      if (editing) await operationsApi.updateStation(editing.stationId, name, options)
+      else await operationsApi.createStation(name, options)
+      setAdding(false); setEditing(null); setNotice(editing ? 'Station updated.' : 'Station added.')
+      await onRefresh()
+    } catch (failure) {
+      setError(apiErrorMessage(failure))
+      if (failure instanceof ApiRequestError && failure.status === 401) onUnauthorized()
+    } finally { setBusy(false) }
+  }
+
+  async function deleteStation(station: Station) {
+    if (!window.confirm(`Delete ${station.name}? Stations used by routes, services, or operational records cannot be deleted.`)) return
+    setBusy(true); setError('')
+    try {
+      await operationsApi.deleteStation(station.stationId, options)
+      setNotice('Station deleted.')
+      await onRefresh()
+    } catch (failure) {
+      setError(apiErrorMessage(failure))
+      if (failure instanceof ApiRequestError && failure.status === 401) onUnauthorized()
+    } finally { setBusy(false) }
+  }
+
+  return <section className="operations__panel" aria-label="Station management">
+    <div className="operations__panel-heading"><div><span className="operations__section-kicker">RAILWAY NETWORK</span><h2>Stations</h2><p>Create, update, and remove railway stations.</p></div><button className="button button--primary" type="button" onClick={() => { setEditing(null); setAdding(true); setError('') }}>Add Station</button></div>
+    {error && <div className="operations__feedback operations__feedback--error" role="alert">{error}</div>}
+    {notice && <div className="operations__feedback" role="status">{notice}</div>}
+    {(adding || editing) && <form className="operations-station-form" onSubmit={(event) => void saveStation(event)}>
+      <label className="operations-control"><span>Station name</span><input autoFocus name="name" required maxLength={200} defaultValue={editing?.name ?? ''} placeholder="Enter station name" /></label>
+      <div className="operations-station-form__actions"><button className="button button--primary" type="submit" disabled={busy}>{busy ? 'Saving…' : editing ? 'Save changes' : 'Add station'}</button><button className="button button--secondary" type="button" disabled={busy} onClick={() => { setAdding(false); setEditing(null); setError('') }}>Cancel</button></div>
+    </form>}
+    {loading ? <TableSkeleton /> : stations.length === 0 ? <EmptyState title="No stations found" text="Add a station to begin managing the railway network." /> : <DataTable label="Stations" columns={[
+      { key: 'name', label: 'Station', render: (station: Station) => <><b>{station.name}</b><small className="operations-table__note">{station.stationId}</small></> },
+      { key: 'details', label: 'Details', render: (station: Station) => station.locationDetails?.join(' · ') || '—' },
+      { key: 'actions', label: 'Actions', render: (station: Station) => <div className="operations-station-actions"><button className="button button--secondary button--small" type="button" disabled={busy} onClick={() => { setAdding(false); setEditing(station); setError('') }}>Edit</button><button className="button button--secondary button--small" type="button" disabled={busy} onClick={() => void deleteStation(station)}>Delete</button></div> },
+    ]} rows={stations} rowKey={(station: Station) => station.stationId} />}
   </section>
 }
 
