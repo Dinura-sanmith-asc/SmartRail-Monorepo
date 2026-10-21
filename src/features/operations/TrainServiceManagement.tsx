@@ -115,10 +115,21 @@ export function TrainServiceManagement({ options, onUnauthorized }: Props) {
   function toggleStop(routeStopId: string, enabled: boolean) {
     if (!enabled) { setCalls((current) => current.filter((call) => call.routeStopId !== routeStopId)); return }
     if (!selectedRoute) return
-    const stop = selectedRoute.stops.find((item) => item.routeStopId === routeStopId)
-    if (!stop) return
-    setCalls((current) => [...current, { routeStopId, arrivalOffsetMinutes: stop.stopOrder * 30, departureOffsetMinutes: stop.stopOrder * 30 + 2 }]
-      .sort((left, right) => selectedRoute.stops.findIndex((item) => item.routeStopId === left.routeStopId) - selectedRoute.stops.findIndex((item) => item.routeStopId === right.routeStopId)))
+    if (!selectedRoute.stops.some((item) => item.routeStopId === routeStopId)) return
+    setCalls((current) => {
+      const nextOffset = Math.max(0, ...current.flatMap((call) => [call.arrivalOffsetMinutes, call.departureOffsetMinutes].filter((offset): offset is number => offset !== null))) + 30
+      return [...current, { routeStopId, arrivalOffsetMinutes: nextOffset, departureOffsetMinutes: nextOffset + 2 }]
+    })
+  }
+
+  function moveCall(index: number, delta: number) {
+    setCalls((current) => {
+      const target = index + delta
+      if (target < 0 || target >= current.length) return current
+      const reordered = [...current]
+      ;[reordered[index], reordered[target]] = [reordered[target], reordered[index]]
+      return reordered
+    })
   }
 
   function updateCall(routeStopId: string, key: 'arrivalOffsetMinutes' | 'departureOffsetMinutes', value: string) {
@@ -220,7 +231,8 @@ export function TrainServiceManagement({ options, onUnauthorized }: Props) {
 
       {editingSchedule && selectedRoute && <form className="train-timetable-editor" onSubmit={(event) => void saveSchedule(event)}><div className="train-timetable-editor__heading"><div><h4>{scheduleId ? 'Edit draft timetable' : 'New timetable revision'}</h4><p>Arrival and departure values are minute offsets from the first departure time.</p></div><button type="button" className="button button--secondary button--small" onClick={() => setEditingSchedule(false)}>Close</button></div>
         <label className="operations-control"><span>First departure (Asia/Colombo)</span><input type="time" required value={departureTime} onChange={(event) => setDepartureTime(event.target.value)} /></label>
-        <div className="operations__table-wrap"><table className="operations-table"><thead><tr><th>Call order / station</th><th>Include</th><th>Arrival offset (min)</th><th>Departure offset (min)</th></tr></thead><tbody>{selectedRoute.stops.map((stop) => { const call = calls.find((item) => item.routeStopId === stop.routeStopId); return <tr key={stop.routeStopId}><td><b>{stop.stopOrder}. {stop.stationName}</b></td><td><input aria-label={`Include ${stop.stationName}`} type="checkbox" checked={Boolean(call)} onChange={(event) => toggleStop(stop.routeStopId, event.target.checked)} /></td><td><input aria-label={`Arrival offset at ${stop.stationName}`} type="number" min={0} value={call?.arrivalOffsetMinutes ?? ''} disabled={!call} onChange={(event) => updateCall(stop.routeStopId, 'arrivalOffsetMinutes', event.target.value)} /></td><td><input aria-label={`Departure offset at ${stop.stationName}`} type="number" min={0} value={call?.departureOffsetMinutes ?? ''} disabled={!call} onChange={(event) => updateCall(stop.routeStopId, 'departureOffsetMinutes', event.target.value)} /></td></tr>})}</tbody></table></div>
+        <ol className="train-calling-points train-calling-points--editor">{calls.map((call, index) => { const stop = selectedRoute.stops.find((item) => item.routeStopId === call.routeStopId); if (!stop) return null; return <li key={call.routeStopId}><b>{index + 1}. {stop.stationName}</b><div className="operations-station-actions"><button className="button button--secondary button--small" type="button" aria-label={`Move ${stop.stationName} earlier`} disabled={index === 0} onClick={() => moveCall(index, -1)}>↑</button><button className="button button--secondary button--small" type="button" aria-label={`Move ${stop.stationName} later`} disabled={index === calls.length - 1} onClick={() => moveCall(index, 1)}>↓</button></div></li>})}</ol>
+        <div className="operations__table-wrap"><table className="operations-table"><thead><tr><th>Route order / station</th><th>Include</th><th>Arrival offset (min)</th><th>Departure offset (min)</th></tr></thead><tbody>{selectedRoute.stops.map((stop) => { const call = calls.find((item) => item.routeStopId === stop.routeStopId); return <tr key={stop.routeStopId}><td><b>{stop.stopOrder}. {stop.stationName}</b></td><td><input aria-label={`Include ${stop.stationName}`} type="checkbox" checked={Boolean(call)} onChange={(event) => toggleStop(stop.routeStopId, event.target.checked)} /></td><td><input aria-label={`Arrival offset at ${stop.stationName}`} type="number" min={0} value={call?.arrivalOffsetMinutes ?? ''} disabled={!call} onChange={(event) => updateCall(stop.routeStopId, 'arrivalOffsetMinutes', event.target.value)} /></td><td><input aria-label={`Departure offset at ${stop.stationName}`} type="number" min={0} value={call?.departureOffsetMinutes ?? ''} disabled={!call} onChange={(event) => updateCall(stop.routeStopId, 'departureOffsetMinutes', event.target.value)} /></td></tr>})}</tbody></table></div>
         <p className="operations__muted">Calling points use the route’s sequence. Published revisions cannot be edited; create a replacement revision to update a published timetable.</p><div className="operations-station-form__actions"><button className="button button--primary" type="submit" disabled={busy || calls.length < 2}>{busy ? 'Saving…' : 'Save draft revision'}</button><button className="button button--secondary" type="button" onClick={() => setEditingSchedule(false)}>Cancel</button></div>
       </form>}
 
