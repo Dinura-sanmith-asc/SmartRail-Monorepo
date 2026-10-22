@@ -1,0 +1,202 @@
+openapi: 3.1.0
+info:
+  title: SmartRail Controller Operations Overview
+  version: 1.0.0
+  description: >-
+    Read-only, PostgreSQL-backed operational overview for a requested
+    Asia/Colombo journey operation date. Authorization uses current Feature 002
+    role mappings and existing grants. Controllers may read globally; Station
+    Staff require a current station-scoped request; Drivers are denied.
+servers:
+  - url: /
+paths:
+  /api/operations/overview:
+    get:
+      operationId: GetOperationsOverview
+      tags: [Operations]
+      summary: Get the authorized daily operational overview
+      description: >-
+        `totalScheduled` counts all journey instances planned for the requested
+        operation date, including those now cancelled or completed. `running`
+        counts journeys currently in Running. `delayed` counts journeys in
+        Delayed or having a positive delay from the latest verified Controller
+        or approved railway-feed timing evidence; a journey may be both running
+        and delayed. `openIncidents` counts current Reported and In Progress
+        incidents independently of the requested journey date. Optional values
+        unavailable from authoritative records are null. No location, ETA or
+        driver assignment is inferred.
+      security:
+        - CognitoAccessToken: []
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: Journey operation date in Asia/Colombo, formatted yyyy-MM-dd.
+          schema:
+            type: string
+            format: date
+        - name: stationId
+          in: query
+          required: false
+          description: >-
+            Optional station filter. Required for Station Staff and checked
+            against current station scope. Controllers may omit it for a global view.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Authorized overview; an empty date returns zero metrics and no journeys.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationsOverview'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+components:
+  securitySchemes:
+    CognitoAccessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >-
+        Cognito access token validated by SmartRail. JWT group claims do not
+        confer SmartRail roles; current PostgreSQL role and scope evidence is used.
+  schemas:
+    OperationsOverview:
+      type: object
+      additionalProperties: false
+      required: [operationalDate, metrics, journeys]
+      properties:
+        operationalDate:
+          type: string
+          format: date
+        metrics:
+          $ref: '#/components/schemas/OperationsOverviewMetrics'
+        journeys:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperationsJourney'
+    OperationsOverviewMetrics:
+      type: object
+      additionalProperties: false
+      required: [totalScheduled, running, delayed, openIncidents, cancelled, completed]
+      properties:
+        totalScheduled:
+          type: integer
+          minimum: 0
+        running:
+          type: integer
+          minimum: 0
+        delayed:
+          type: integer
+          minimum: 0
+        openIncidents:
+          type: integer
+          minimum: 0
+        cancelled:
+          type: integer
+          minimum: 0
+        completed:
+          type: integer
+          minimum: 0
+    OperationsJourney:
+      type: object
+      additionalProperties: false
+      required:
+        - journeyId
+        - serviceId
+        - serviceCode
+        - serviceDisplayName
+        - publicServiceNumber
+        - routeCode
+        - routeName
+        - operationDate
+        - origin
+        - destination
+        - scheduledDeparture
+        - scheduledArrival
+        - status
+        - recordedDelayMinutes
+        - lastReportedStation
+        - lastUpdateAt
+        - assignedDriver
+      properties:
+        journeyId:
+          type: string
+          format: uuid
+        serviceId:
+          type: string
+          format: uuid
+          description: Internal scheduled-service identifier, distinct from publicServiceNumber.
+        serviceCode:
+          type: string
+        serviceDisplayName:
+          type: [string, 'null']
+        publicServiceNumber:
+          type: [string, 'null']
+        routeCode:
+          type: string
+        routeName:
+          type: string
+        operationDate:
+          type: string
+          format: date
+        origin:
+          type: string
+        destination:
+          type: string
+        scheduledDeparture:
+          type: [string, 'null']
+          format: date-time
+        scheduledArrival:
+          type: [string, 'null']
+          format: date-time
+        status:
+          type: string
+          enum: [Scheduled, Running, Delayed, Interrupted, Cancelled, Terminated, Completed]
+        recordedDelayMinutes:
+          type: [number, 'null']
+        lastReportedStation:
+          type: [string, 'null']
+        lastUpdateAt:
+          type: string
+          format: date-time
+        assignedDriver:
+          type: [string, 'null']
+          description: Null until an approved safe display projection is available.
+    Problem:
+      type: object
+      properties:
+        type: { type: string, format: uri-reference }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string, format: uri-reference }
+  responses:
+    BadRequest:
+      description: Invalid or missing date or invalid stationId.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unauthorized:
+      description: Missing, invalid or expired authentication token.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: Authenticated role grant or current station scope is insufficient.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unavailable:
+      description: Required authorization or operational source data is unavailable.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }

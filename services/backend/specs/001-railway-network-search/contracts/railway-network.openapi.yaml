@@ -1,0 +1,358 @@
+openapi: 3.1.0
+info:
+  title: SmartRail Railway Network API
+  version: 1.0.0
+  description: >-
+    Public read contracts for stations, ordered routes, published scheduled services,
+    and date-eligible service search. These responses describe planned railway
+    information and never assert dated operational journey state or live status.
+servers:
+  - url: /
+    description: Relative to the approved environment API base URL.
+paths:
+  /api/stations:
+    get:
+      operationId: listStations
+      summary: List published railway stations
+      description: Returns public station identity and verified essential details.
+      security: []
+      responses:
+        '200':
+          description: Published stations; an empty items array means there are no published station records.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationList'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/routes/{id}/stops:
+    get:
+      operationId: getRouteStops
+      summary: Get the ordered stops of a published route
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Stable route identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '200':
+          description: Route and its stops in canonical journey order.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteStops'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/services:
+    get:
+      operationId: searchServices
+      summary: Search published services for an origin, destination and travel date
+      description: >-
+        A result is returned only when authoritative published data establishes
+        operation on the requested date and calls at both stations in origin-first
+        order. Travel date is the scheduled departure date at the selected origin.
+        For an overnight service this may differ from the schedule's first-call
+        operation date. The result contains planned schedule times only; it is not
+        a dated operational journey, live status, reservation or ticket.
+      security: []
+      parameters:
+        - name: origin
+          in: query
+          required: true
+          description: Stable origin station identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: destination
+          in: query
+          required: true
+          description: Stable destination station identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: date
+          in: query
+          required: true
+          description: ISO 8601 full date on which the service departs the selected origin.
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Matching choices. A valid query with no eligible service returns an empty services array.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceSearchResponse'
+        '400':
+          description: Missing or malformed criteria, identical stations, or an unknown/unpublished station ID.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: Search data is unavailable or required authoritative date eligibility is incomplete.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/services/{id}:
+    get:
+      operationId: getService
+      summary: Get a published train service
+      description: Returns the planned service identity, route and schedule reference, without live journey state.
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Stable service identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '200':
+          description: Published service details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+components:
+  responses:
+    InvalidRequest:
+      description: A path identifier or request value is malformed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: The requested route or published service does not exist or is not publicly available.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unavailable:
+      description: The required railway reference source could not be read.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnexpectedError:
+      description: Unexpected failure; internal exception details are never exposed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    StationList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Station'
+    Station:
+      type: object
+      additionalProperties: false
+      required: [stationId, name]
+      properties:
+        stationId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+        locationDetails:
+          type: array
+          description: Only location details present in and approved from the authoritative railway source; no invented fields.
+          items:
+            type: string
+        serviceDetails:
+          type: array
+          description: Only essential service details present in and approved from the authoritative railway source; no invented fields.
+          items:
+            type: string
+    RouteStops:
+      type: object
+      additionalProperties: false
+      required: [routeId, routeCode, name, stops]
+      properties:
+        routeId:
+          type: string
+          format: uuid
+        routeCode:
+          type: string
+        name:
+          type: string
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteStop'
+    RouteStop:
+      type: object
+      additionalProperties: false
+      required: [stopOrder, stationId, stationName]
+      properties:
+        stopOrder:
+          type: integer
+          minimum: 1
+        stationId:
+          type: string
+          format: uuid
+        stationName:
+          type: string
+    ServiceSearchResponse:
+      type: object
+      additionalProperties: false
+      required: [originStationId, destinationStationId, travelDate, services]
+      properties:
+        originStationId:
+          type: string
+          format: uuid
+        destinationStationId:
+          type: string
+          format: uuid
+        travelDate:
+          type: string
+          format: date
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceChoice'
+    ServiceChoice:
+      type: object
+      additionalProperties: false
+      required: [serviceId, serviceCode, routeId, routeCode, scheduleRevision, origin, destination]
+      properties:
+        serviceId:
+          type: string
+          format: uuid
+        serviceCode:
+          type: string
+        displayName:
+          type: string
+          nullable: true
+        publicServiceNumber:
+          type: string
+          nullable: true
+        routeId:
+          type: string
+          format: uuid
+        routeCode:
+          type: string
+        scheduleRevision:
+          type: integer
+          minimum: 1
+        origin:
+          $ref: '#/components/schemas/ScheduledCall'
+        destination:
+          $ref: '#/components/schemas/ScheduledCall'
+    ScheduledCall:
+      type: object
+      additionalProperties: false
+      required: [stationId, stationName, stopOrder, scheduledAt]
+      properties:
+        stationId:
+          type: string
+          format: uuid
+        stationName:
+          type: string
+        stopOrder:
+          type: integer
+          minimum: 1
+        scheduledAt:
+          type: string
+          format: date-time
+          description: Offset-bearing local schedule timestamp for this call; not an observed or live time.
+    ServiceDetail:
+      type: object
+      additionalProperties: false
+      required: [serviceId, serviceCode, route, schedule]
+      properties:
+        serviceId:
+          type: string
+          format: uuid
+        serviceCode:
+          type: string
+        displayName:
+          type: string
+          nullable: true
+        publicServiceNumber:
+          type: string
+          nullable: true
+        route:
+          type: object
+          additionalProperties: false
+          required: [routeId, routeCode, name]
+          properties:
+            routeId:
+              type: string
+              format: uuid
+            routeCode:
+              type: string
+            name:
+              type: string
+        schedule:
+          type: object
+          additionalProperties: false
+          required: [revision, firstDepartureTimeLocal]
+          properties:
+            revision:
+              type: integer
+              minimum: 1
+            firstDepartureTimeLocal:
+              type: string
+              format: time
+              description: Planned first-call departure time; no date-specific or live status is implied.
+    Problem:
+      type: object
+      description: RFC 9457 Problem Details with stable SmartRail error extensions.
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
+        code:
+          type: string
+          description: Stable machine-readable SmartRail error code.
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        traceId:
+          type: string
+      required: [type, title, status]

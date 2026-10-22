@@ -1,0 +1,177 @@
+{
+  "version": "smartrail-dev-v1",
+  "developmentOnly": true,
+  "syntheticTimetable": true,
+  "contentHash": "sha256:BA62EF4A63C3A642CEB20CCF03F8D82932FFE71928CD8EEE840DE826A684426A",
+  "sourceReference": "Existing Feature 001 coastal fixture station names/topology; isolated reserved IDs and synthetic extensions/times, not an authoritative railway timetable",
+  "dates": [
+    "2026-11-01",
+    "2026-11-02"
+  ],
+  "referenceStationDepartures": {
+    "operationDate": "2026-11-03",
+    "contentHash": "sha256:913F368A3D8AE27A6A3ACA488EE7B5A8C12863865E8B1019C29CD1A2389A614B",
+    "stations": [
+      {
+        "id": "10000000-0000-0000-0000-000000000001",
+        "name": "Colombo Fort",
+        "scheduledDepartureCount": 1
+      },
+      {
+        "id": "10000000-0000-0000-0000-000000000002",
+        "name": "Galle",
+        "scheduledDepartureCount": 1
+      }
+    ],
+    "services": [
+      {
+        "scenario": "Colombo Fort to Galle",
+        "routeId": "d0040000-0000-0000-0010-000000000000",
+        "serviceId": "d0040000-0000-0000-0011-000000000000",
+        "scheduleId": "d0040000-0000-0000-0012-000000000000",
+        "journeyInstanceId": "d0040000-0000-0000-0013-000000000000",
+        "departureAsiaColombo": "08:30",
+        "arrivalOffsetMinutes": 130
+      },
+      {
+        "scenario": "Galle to Colombo Fort",
+        "routeId": "d0040000-0000-0000-0010-000000000001",
+        "serviceId": "d0040000-0000-0000-0011-000000000001",
+        "scheduleId": "d0040000-0000-0000-0012-000000000001",
+        "journeyInstanceId": "d0040000-0000-0000-0013-000000000001",
+        "departureAsiaColombo": "15:10",
+        "arrivalOffsetMinutes": 130
+      }
+    ]
+  },
+  "stations": [
+    {
+      "id": "d0040000-0000-0000-0001-000000000000",
+      "name": "Colombo Fort (development sample)"
+    },
+    {
+      "id": "d0040000-0000-0000-0001-000000000001",
+      "name": "Galle (development sample)"
+    },
+    {
+      "id": "d0040000-0000-0000-0001-000000000002",
+      "name": "Matara (development sample)"
+    }
+  ],
+  "route": {
+    "id": "d0040000-0000-0000-0002-000000000000",
+    "code": "DEV-SEED-COAST",
+    "orderedStopIds": [
+      "d0040000-0000-0000-0002-000000000001",
+      "d0040000-0000-0000-0002-000000000002",
+      "d0040000-0000-0000-0002-000000000003"
+    ]
+  },
+  "services": [
+    {
+      "scenario": "Scheduled",
+      "serviceId": "d0040000-0000-0000-0003-000000000000",
+      "code": "DEV-SEED-001",
+      "scheduleId": "d0040000-0000-0000-0004-000000000000",
+      "scheduleRevision": 1,
+      "departureAsiaColombo": "08:00",
+      "journeyInstanceId": "d0040000-0000-0000-0005-000000000000",
+      "operationDate": "2026-11-01"
+    },
+    {
+      "scenario": "Running",
+      "serviceId": "d0040000-0000-0000-0003-000000000001",
+      "code": "DEV-SEED-002",
+      "scheduleId": "d0040000-0000-0000-0004-000000000001",
+      "scheduleRevision": 1,
+      "departureAsiaColombo": "10:00",
+      "journeyInstanceId": "d0040000-0000-0000-0005-000000000001",
+      "operationDate": "2026-11-01"
+    },
+    {
+      "scenario": "Delayed",
+      "serviceId": "d0040000-0000-0000-0003-000000000002",
+      "code": "DEV-SEED-003",
+      "scheduleId": "d0040000-0000-0000-0004-000000000002",
+      "scheduleRevision": 1,
+      "departureAsiaColombo": "12:00",
+      "journeyInstanceId": "d0040000-0000-0000-0005-000000000002",
+      "operationDate": "2026-11-01"
+    },
+    {
+      "scenario": "Cancelled",
+      "serviceId": "d0040000-0000-0000-0003-000000000003",
+      "code": "DEV-SEED-004",
+      "scheduleId": "d0040000-0000-0000-0004-000000000003",
+      "scheduleRevision": 1,
+      "departureAsiaColombo": "14:00",
+      "journeyInstanceId": "d0040000-0000-0000-0005-000000000003",
+      "operationDate": "2026-11-01"
+    },
+    {
+      "scenario": "Overnight",
+      "serviceId": "d0040000-0000-0000-0003-000000000004",
+      "code": "DEV-SEED-005",
+      "scheduleId": "d0040000-0000-0000-0004-000000000004",
+      "scheduleRevision": 1,
+      "departureAsiaColombo": "23:20",
+      "journeyInstanceId": "d0040000-0000-0000-0005-000000000004",
+      "operationDate": "2026-11-01"
+    }
+  ],
+  "additionalJourney": {
+    "scenario": "Completed",
+    "journeyInstanceId": "d0040000-0000-0000-0005-000000000005",
+    "serviceId": "d0040000-0000-0000-0003-000000000000",
+    "scheduleId": "d0040000-0000-0000-0004-000000000000",
+    "operationDate": "2026-11-02"
+  },
+  "identities": [
+    {
+      "role": "Controller",
+      "subject": "smartrail-manual-controller"
+    },
+    {
+      "role": "StationStaff",
+      "subject": "smartrail-manual-station-staff"
+    },
+    {
+      "role": "Driver",
+      "subject": "smartrail-manual-driver"
+    },
+    {
+      "role": "Passenger",
+      "subject": "smartrail-manual-passenger"
+    }
+  ],
+  "stationStaffScope": [
+    "d0040000-0000-0000-0001-000000000000",
+    "d0040000-0000-0000-0001-000000000001"
+  ],
+  "sampleCategoryCode": "DEV-SAMPLE-OPERATIONAL",
+  "incidentIdentity": "Generated once by the approved create command; stable actor/operation/idempotency keys return the same IDs on reruns",
+  "expectedNewRecords": {
+    "stations": 3,
+    "routes": 3,
+    "routeStops": 7,
+    "services": 7,
+    "schedules": 7,
+    "callingPoints": 19,
+    "dateManifests": 3,
+    "operationDates": 17,
+    "stationImportRuns": 1,
+    "stationChanges": 3,
+    "roles": 4,
+    "roleAudits": 4,
+    "stationScopes": 2,
+    "scopeAudits": 2,
+    "journeys": 8,
+    "journeyRevisions": 14,
+    "journeyRevisionStops": 40,
+    "initializationAudits": 8,
+    "incidents": 4,
+    "incidentRevisions": 10,
+    "incidentAssociations": 15,
+    "incidentIdempotencyRecords": 10
+  }
+}

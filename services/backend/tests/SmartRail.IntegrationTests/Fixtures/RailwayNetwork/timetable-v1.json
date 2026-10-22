@@ -1,0 +1,75 @@
+{
+  "sourceRevision": "fixture-timetable-1",
+  "routes": [
+    {
+      "routeId": "20000000-0000-0000-0000-000000000001",
+      "routeCode": "CMB-GAL",
+      "name": "Colombo Fort to Galle",
+      "stops": [
+        { "routeStopId": "21000000-0000-0000-0000-000000000001", "stationId": "10000000-0000-0000-0000-000000000001", "stopOrder": 1 },
+        { "routeStopId": "21000000-0000-0000-0000-000000000002", "stationId": "10000000-0000-0000-0000-000000000002", "stopOrder": 2 }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "serviceId": "30000000-0000-0000-0000-000000000001",
+      "serviceCode": "FTR-001",
+      "routeId": "20000000-0000-0000-0000-000000000001",
+      "revisions": [
+        {
+          "scheduleId": "31000000-0000-0000-0000-000000000001",
+          "revision": 1,
+          "createdAt": "2026-01-01T08:00:00+05:30",
+          "firstDepartureLocalTime": "23:20:00",
+          "calls": [
+            { "routeStopId": "21000000-0000-0000-0000-000000000001", "arrivalOffsetMinutes": null, "departureOffsetMinutes": 0 },
+            { "routeStopId": "21000000-0000-0000-0000-000000000002", "arrivalOffsetMinutes": 120, "departureOffsetMinutes": null }
+          ]
+        },
+        {
+          "scheduleId": "31000000-0000-0000-0000-000000000002",
+          "revision": 2,
+          "createdAt": "2026-02-01T08:00:00+05:30",
+          "firstDepartureLocalTime": "23:20:00",
+          "calls": [
+            { "routeStopId": "21000000-0000-0000-0000-000000000001", "arrivalOffsetMinutes": null, "departureOffsetMinutes": 0 },
+            { "routeStopId": "21000000-0000-0000-0000-000000000002", "arrivalOffsetMinutes": 125, "departureOffsetMinutes": null }
+          ]
+        }
+      ]
+    }
+  ],
+  "dateManifests": [
+    {
+      "operationDate": "2026-10-17",
+      "sourceRevision": "fixture-timetable-1",
+      "fixtureVersion": "timetable-v1",
+      "isComplete": true,
+      "publishedAt": "2026-10-16T12:00:00+05:30",
+      "publishedBy": "controlled-fixture",
+      "contentHash": "sha256:fixture-date-17",
+      "scheduleIds": [ "31000000-0000-0000-0000-000000000002" ]
+    },
+    {
+      "operationDate": "2026-10-18",
+      "sourceRevision": "fixture-timetable-1",
+      "fixtureVersion": "timetable-v1",
+      "isComplete": true,
+      "publishedAt": "2026-10-16T12:00:00+05:30",
+      "publishedBy": "controlled-fixture",
+      "contentHash": "sha256:fixture-date-18-empty",
+      "scheduleIds": []
+    },
+    {
+      "operationDate": "2026-10-19",
+      "sourceRevision": "fixture-timetable-1",
+      "fixtureVersion": "timetable-v1",
+      "isComplete": false,
+      "publishedAt": null,
+      "publishedBy": null,
+      "contentHash": "sha256:fixture-date-19-incomplete",
+      "scheduleIds": []
+    }
+  ]
+}

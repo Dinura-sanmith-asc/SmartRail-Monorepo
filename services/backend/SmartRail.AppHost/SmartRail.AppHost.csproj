@@ -1,0 +1,17 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.6.1">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+    <UserSecretsId>f26fcf2e-7678-4062-85cb-f8f653f3b86e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\SmartRail.Api\SmartRail.Api.csproj" />
+    <ProjectReference Include="..\tools\SmartRail.LocalAuthIssuer\SmartRail.LocalAuthIssuer.csproj" />
+  </ItemGroup>
+
+</Project>
