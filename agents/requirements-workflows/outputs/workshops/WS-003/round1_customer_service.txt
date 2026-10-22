@@ -1,0 +1,31 @@
+As a Customer Service Representative Stakeholder Agent for SmartRail, here is my independent position for Round 1 of the workshop:
+
+### 1. What matters from my stakeholder perspective
+*   **Trust and Accuracy:** When a passenger is standing on a freezing platform after a cancellation, giving them wrong or conflicting information destroys whatever trust they have left in SmartRail. We need absolute consistency between what the passenger sees on their app, what I see on my CSR screen, and what the station displays show.
+*   **Clarity During Chaos:** During major disruptions, I need immediate, unambiguous answers regarding which alternative routes passengers can take and whether their tickets are valid on other train operators. 
+*   **Practical Recovery Support:** Stranded passengers don't just want apologies; they want to know how to get home, where to sleep, or how to claim for expenses when things go completely wrong.
+
+### 2. What responsibility my role has
+*   Listening empathetically to confused, delayed, or angry passengers and diagnosing their immediate travel problems quickly.
+*   Accessing authoritative, real-time journey information to advise passengers on delays, cancellations, missed connections, and platform changes.
+*   Explaining disruption impacts and alternative travel options clearly and honestly.
+*   Guiding passengers through accessibility-related problems, lost property, and on-board issues (such as food-order failures).
+*   Escalating severe operational incidents, safety hazards, or crowd-control issues to operational and station staff.
+
+### 3. What responsibility my role should NOT have
+*   **Controlling Train Operations:** I do not control signal boxes, dispatch trains, or decide when a delayed service will depart. I can only relay the status provided by the operational data feed.
+*   **Absorbing Financial Liability:** I should not personally authorize or guarantee high-value financial payouts, hotel bookings, or taxi contracts without a clear, automated policy framework backing me up. 
+*   **Writing Inter-Operator Agreements:** I cannot negotiate or invent ticket-acceptance rules on the fly with other rail companies; I must be handed clear, pre-negotiated rules by management.
+
+### 4. What risks or failure cases concern you
+*   **The "Conflicting Screen" Nightmare:** A passenger tells me their app says the train is on Time, but my CSR system shows it cancelled, while the public PA system announces a platform change. This leads to immediate customer hostility and operational paralysis.
+*   **Orphaned Passengers in Disrupted Zones:** Major line closures happen late at night, and customer service staff have no clear tool, budget, or policy to arrange emergency taxis or hotels, leaving vulnerable passengers stranded.
+*   **Vague Ticket Validity:** Cross-industry disruption occurs, but because inter-operator agreements are buried in PDFs or uncommunicated, I mistakenly turn away a passenger holding a valid ticket for an alternative operator's relief service, or conversely, tell them they can travel and they get fined later.
+
+### 5. What decision you believe needs clarification
+*   We urgently need to formally designate a **Single Source of Truth (SSOT)** for live train data so that public displays, mobile apps, and CSR dashboards never disagree.
+*   We must decide whether SmartRail software encompasses **extended support workflows** (like recording compensation claims, logging hotel/taxi vouchers, and processing refunds) or if SmartRail is strictly an information/journey support layer while financial recovery remains an external operator process.
+*   We need a standardized, real-time repository for **inter-operator ticket validity rules** that populates directly onto my CSR interface the moment a disruption is declared.
+
+### 6. Any assumption you disagree with
+*   *Assumption to challenge:* That ticketing support, refunds, and compensation management are automatically "out of scope" or minor add-ons just because they are complex. From a customer service perspective, a disruption is never truly resolved for a passenger until their financial and logistical recovery is addressed. If SmartRail treats disruption support purely as "telling people their train is late" without any bridge to compensation or alternative transport, the system will fail the passenger at the exact moment they need it most. Whether SmartRail *performs* the refund or merely *facilitates* the workflow, the customer service layer cannot pretend financial recovery doesn't exist.

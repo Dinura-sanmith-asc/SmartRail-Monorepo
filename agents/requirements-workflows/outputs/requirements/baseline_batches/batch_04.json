@@ -1,0 +1,65 @@
+[
+  {
+    "source_ref": "BRIEF-10",
+    "title": "Disruption Handling and Communication",
+    "statement": "The system must provide an appropriate mechanism for handling disruptions and communicating relevant information to affected users.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The system should provide an appropriate mechanism for handling disruptions and communicating relevant information to affected users.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-10",
+    "title": "Disruption Information Propagation",
+    "statement": "Determine how disruption information propagates through the different applications.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should determine how disruption information propagates through the different applications.",
+    "clarification_question": "How should disruption information propagate through the different applications?"
+  },
+  {
+    "source_ref": "BRIEF-11",
+    "title": "External Catering Platform Integration",
+    "statement": "SmartRail must integrate with the external catering platform.",
+    "classification": "PRODUCT_INTEGRATION",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "SmartRail must integrate with this external platform.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-11",
+    "title": "Catering Integration Data Provision",
+    "statement": "Provide railway information such as train services, routes, station information, arrival times, and service changes to the catering provider.",
+    "classification": "PRODUCT_DATA",
+    "source_strength": "ILLUSTRATIVE",
+    "evidence_excerpt": "The catering provider may require railway information such as: Train services. Train routes. Station information. Scheduled arrival times. Actual or estimated arrival times. Service changes.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-12",
+    "title": "Food Options Discovery",
+    "statement": "Passengers using SmartRail must be able to discover available food options associated with their journey.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Passengers using SmartRail should be able to discover available food options associated with their journey.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-12",
+    "title": "Food Ordering and Collection Arrangement",
+    "statement": "Passengers must be able to select food and arrange to receive or collect the order at an appropriate point during the journey.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "A passenger should be able to select food and arrange to receive or collect the order at an appropriate point during the journey.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-12",
+    "title": "Investigate Catering Ordering and Fulfillment Workflow",
+    "statement": "Investigate questions regarding the ordering and fulfillment workflow, including station support, order placement timing, modification rules, delay handling, missed collections, cancellations, payment processing ownership, menu ownership, availability changes, order association, and collection confirmation.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should investigate questions such as: Which stations support catering? When can an order be placed? How close to arrival can an order be modified? What happens if a train is delayed? What happens if the passenger misses the collection station? Can an order be cancelled? Who owns payment processing? Who owns the authoritative food menu? How are food availability changes communicated? How are orders associated with passengers and journeys? How is successful collection confirmed?",
+    "clarification_question": "What are the specific operational rules and ownership boundaries for the catering ordering and fulfillment workflow?"
+  }
+]

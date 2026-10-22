@@ -1,0 +1,24 @@
+**1. What matters from your stakeholder perspective**
+For customer service, passenger trust and clarity are paramount. When a passenger orders food through the app to their seat and the meal fails to arrive—or the order is lost due to a network glitch—the passenger turns to us (or onboard crew) demanding an immediate answer and a resolution. It matters greatly that we are not left guessing whether an order was placed, paid for (if ticketing/payments are integrated), or received by the catering provider. 
+
+**2. What responsibility you believe your role has**
+- Listening empathetically to frustrated passengers experiencing catering disruptions.
+- Checking real-time journey and order status information provided by SmartRail to understand what went wrong.
+- Providing clear, honest explanations to the passenger (e.g., explaining that a network failure interrupted the kitchen's printer/tablet).
+- De-escalating customer complaints and helping the passenger find a practical immediate recovery option (e.g., offering alternative onboard refreshment options or coordinating with onboard staff).
+- Initiating standard support escalation paths to the catering provider when disputes require investigation or resolution beyond frontline authority.
+
+**3. What responsibility your role should NOT have**
+- Customer service agents should *not* be held financially or operationally liable for the catering provider's inventory, kitchen capacity, or fulfillment failures.
+- We should *not* be processing direct cash refunds or issuing financial compensations for catering disputes unless a clearly defined, authorized refund/compensation policy and tooling framework is formally established for SmartRail (which we currently must not assume exists).
+- We should *not* be expected to manually troubleshoot backend network messaging failures or reconcile database logs between SmartRail and third-party vendor systems.
+
+**4. What risks or failure cases concern me**
+- **The "Blame Game" / Information Silo:** Network downtime causes an order message to drop. The passenger is told by the onboard crew, *"We never got your order,"* while the passenger insists, *"I have a confirmation on my phone!"* Without a reliable message reconciliation mechanism, the customer service agent is caught in the middle with no source of truth.
+- **Unmanaged Escalations:** If there is no clear SLA or direct communication channel between customer service and the catering provider, disputed charges or unfulfilled high-value orders will languish, leading to formal passenger complaints and reputational damage.
+
+**5. What decision you believe needs clarification**
+We urgently need a defined Service Level Agreement (SLA) and operational workflow defining who owns the resolution of a catering dispute. Specifically: When a passenger demands a remedy for a failed order, does frontline customer service handle the immediate service recovery (and bill back the vendor), or must we route the passenger entirely to the catering provider’s customer support? Furthermore, we need a clear operational policy on whether catering failures warrant compensation, and who funds it.
+
+**6. Any assumption you disagree with**
+I disagree with any implicit assumption that frontline customer service staff can act as an effective mediator for technical reconciliation failures. Expecting customer service representatives to manually verify whether a dropped API payload or network timeout occurred between SmartRail and the catering provider is completely unrealistic and shifts technical/operational burdens onto staff who have no visibility into backend system logs.

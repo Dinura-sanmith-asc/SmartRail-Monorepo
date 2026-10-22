@@ -1,0 +1,31 @@
+As a Train Driver operating a train in active service, my primary focus is the safe control of the train, adherence to the route and schedule, and absolute clarity on my operational permissions. I cannot be distracted by complex troubleshooting or ambiguous system states while the train is in motion. 
+
+Here is my independent stakeholder position regarding the discussion topics for Round 1:
+
+### 1. What matters from my stakeholder perspective
+* **Unambiguous Safety Rules:** I must never be allowed to start a shift or a journey without explicitly acknowledging mandatory safety notices (e.g., temporary speed restrictions, line blockages). That acknowledgement must be auditable and leave no room for doubt.
+* **Reliable Information at the Controls:** My Driver Machine Interface (DMI) is my lifeline for schedule, speed authority, and signaling information. If it fails, I am effectively "blind" to system-level guidance.
+* **Clear Operational Boundaries:** I need to know instantly whether a train defect allows me to proceed cautiously to the next maintenance location or requires an immediate stop and protection of the line.
+
+### 2. What responsibility my role has
+* To perform pre-departure checks and verify my shift assignments against official documentation or verbal authorities.
+* To explicitly review and acknowledge critical safety notices before moving the train.
+* To report journey events (departures, arrivals, delays) accurately, and to operate within defined speed and signaling constraints.
+* To immediately halt the train and contact Railway Control via voice radio if critical systems fail or safety is compromised.
+
+### 3. What responsibility my role should NOT have
+* **I must NOT be responsible for diagnosing system software or hardware faults.** If the DMI fails completely, my job is to stop safely and follow rulebook fallback procedures—not to troubleshoot software, reboot servers, or debug network connections.
+* **I must NOT invent manual schedules or route authorities** if digital assignment systems fail. I require verbal or written authority from Signallers / Railway Control.
+* **I must NOT make unilateral safety judgements on major defects.** Determining whether a defect permits cautious operation must be governed by strict rulebook criteria, in consultation with maintenance controllers or control, not guessed by the driver under pressure.
+
+### 4. What risks or failure cases concern me
+* **DMI Total Failure In-Tunnel or at Speed:** If the DMI goes dark while I am moving at line speed, and there is no clear immediate fallback or secondary display, panic or hesitation can lead to a safety incident. 
+* **"Silent" Connectivity Loss:** If the system loses connection to control and silently stops receiving updated movement authorities or speed restrictions while relying on stale cached data past safe temporal limits, I could enter an unprotected section of track.
+* **Assignment System Outage Confusion:** Arriving at a depot during a system outage with no digital assignment could lead to boarding the wrong train or operating without proper rostering clearance unless a rigid manual fallback (e.g., paper warrant/verbal sign-off via Control) is strictly enforced.
+
+### 5. What decision needs clarification
+* **Exact DMI Failure Protocol (CF-028):** We need a definitive rule from safety authorities. Can a train *ever* be operated under manual fallback information if the DMI fails completely, or does a complete DMI failure mandate an immediate stop and rescue/pilotman operation? 
+* **Offline Buffering Limits (CF-032):** Exactly how many hours or miles can SmartRail rely on cached data before safety integrity is breached and a mandatory stop-and-communicate rule is triggered? 
+
+### 6. Any assumption I disagree with
+* **Assumption that drivers can act as IT fallback administrators:** Any requirement that implies the driver can "work around" a complete DMI failure using secondary personal devices or complex manual UI overrides while operating a moving train is unsafe and unacceptable. Human-factors principles dictate that a total DMI failure must result in a fail-safe stop or strict voice-commanded restriction, not DIY troubleshooting.

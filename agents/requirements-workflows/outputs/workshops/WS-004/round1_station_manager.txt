@@ -1,0 +1,30 @@
+As a Railway Station Manager, my position and perspective for this workshop are focused strictly on operational realities on the ground, crowd management, staff safety, and practical execution during both normal operations and disruptions. 
+
+Here is my independent stance:
+
+### 1. What matters from my stakeholder perspective
+* **Operational Reality on the Ground:** When a lift breaks, replacement buses need to be called, or a vulnerable passenger is stranded, station staff are the ones dealing with the angry or distressed crowd. Information must reach us *first* or *simultaneously* with the public, not after complaints roll in.
+* **Clarity of Instructions:** During a disruption, ambiguity kills station flow. Staff need unambiguous orders on what alternative transport is running, exactly where it is loading outside the station, and who is managing it.
+* **Platform and Facility Integrity:** Knowing the exact status of accessibility equipment (lifts, ramps, tactile paving areas) is critical because a broken lift completely changes how we route passengers with reduced mobility (PRMs) across our platforms.
+
+### 2. What responsibility my role has
+* **Execution and Local Management:** My station team is responsible for executing local assistance protocols, deploying station staff to guide vulnerable passengers or manage queues, updating local station displays/terminals where possible, and physically managing the station environment.
+* **Reporting Local Failures:** My staff are responsible for logging local facility faults (e.g., a broken ticket gate, a stuck lift) into reporting channels the moment they are discovered or reported by passengers.
+* **Local Handover Coordination:** Ensuring that station staff physically assist pre-booked or spontaneous mobility passengers, or coordinate handovers to train crew or replacement transport drivers.
+
+### 3. What responsibility my role should NOT have
+* **Central Authority for Replacement Transport:** I should **not** have the sole financial or operational responsibility for ordering fleet-wide replacement buses (e.g., ordering 30 buses for a line-wide closure). That requires central control coordination and operator-level commercial contracts. 
+* **Writing Commercial Multi-Operator Policies:** While I manage the station floor, I cannot dictate the unified booking rules across different railway operators; that must be set at a network/regulatory level.
+* **Being the Sole Maintenance Fault Detector:** While my staff report broken facilities, my station team cannot be expected to continuously inspect every technical asset (like internal lift machinery) proactively without automated diagnostic feeds.
+
+### 4. What risks or failure cases concern me
+* **The "Communication Black Hole" (Unreliable Connectivity):** If station Wi-Fi or cellular connectivity drops during a power surge or local incident, and SmartRail relies entirely on cloud-based real-time apps to notify us of lift failures or bus deployments, station staff will be flying blind while passengers demand answers.
+* **Conflicting Information:** Central control announces a platform change or replacement bus via automated public address, but the information on local station displays or given out by staff contradicts it, leading to panic and crowd surges.
+* **Abandoned Vulnerable Passengers:** In the chaos of a major cancellation, vulnerable passengers slipping through the cracks because staff are overwhelmed managing crowds, and there is no clear tracking of who has been handed over to whom.
+* **"Passing the Buck" on Replacement Transport:** A major disruption occurs, central control assumes the Station Manager has ordered buses, and the Station Manager assumes central control has ordered them, resulting in a prolonged delay before transport is even dispatched.
+
+### 5. What decision needs clarification
+* **Decision Ownership for Replacement Transport (CF-016):** We need a hard, unambiguous rule: *At what exact threshold (e.g., duration of line blockage, number of cancelled trains) does the authority to trigger replacement transport shift from Central Control to the Station Manager, and vice versa?* Right now, in a fast-moving crisis, waiting for someone else to decide wastes precious minutes.
+
+### 6. Assumptions I disagree with
+* **Assumption that Station Staff have time to log and track complex digital workflows during a crisis:** Some findings imply station staff can act as data-entry clerks managing complex multi-operator assistance tracking apps (CF-018) while a platform is overcrowded and alarms are sounding. During an active local incident or severe disruption, manual, clunky digital processes fail. Systems must be frictionless, or staff will abandon them to manage the physical crowd.

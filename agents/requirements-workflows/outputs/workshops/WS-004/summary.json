@@ -1,0 +1,65 @@
+{
+  "agreements": [
+    "Both stakeholders agree that an explicit, unambiguous decision matrix and threshold for triggering replacement transport (CF-016) is urgently needed to eliminate the 'passing the buck' failure between Central Control and station management.",
+    "Both stakeholders agree that expecting frontline and station staff to act as data-entry clerks or manually manage complex digital workflows and multi-operator apps during an active crisis or severe disruption is unrealistic and will lead to tool abandonment.",
+    "Both stakeholders recognize the severe risk of 'phantom replacement transport' and the danger of giving passengers unverified or contradictory information during disruptions."
+  ],
+  "disagreements": [
+    "Customer Service emphasizes that remote customer channels, phone agents, and passengers on incoming trains must receive timely updates simultaneously with or ahead of the physical station floor, whereas the Station Manager insists that information and operational updates must hit the station floor first or concurrently to maintain physical safety and crowd control.",
+    "There is friction regarding where operational priority lies during an emergency: Customer Service highlights remote and counter-based passenger communication blindspots, while the Station Manager prioritizes physical station flow, crowd safety, and immediate on-the-ground management."
+  ],
+  "ownership_questions": [
+    "Who owns the physical handover and custody of stranded or vulnerable passengers during major disruptions (i.e., whether frontline desk agents or station operational safety staff are responsible for physical escort)?",
+    "Who has ultimate operational ownership of physical platform accessibility assets when a fault occurs in shared or multi-operator transport hubs (the host station manager or the operating train company)?",
+    "Does SmartRail officially encompass ticketing, refunds, and compensation disbursement, or does the scope strictly stop at journey recovery and physical passenger assistance?"
+  ],
+  "scope_questions": [
+    "Does the scope of SmartRail include end-to-end multi-operator ticketing and financial compensation handling, or is it strictly limited to operational assistance and journey recovery?",
+    "To what extent must digital tracking and multi-operator coordination tools function during high-stress operational crises versus relying solely on local station triage?"
+  ],
+  "assumptions_to_validate": [
+    "The assumption that frontline staff can naturally absorb the management of spontaneous accessibility requests and vulnerable passenger handovers during a major crisis without dedicated support staff.",
+    "The assumption that station staff and customer service agents have continuous, reliable cloud connectivity and time to log complex digital workflows during active disruptions."
+  ],
+  "decision_points": [
+    {
+      "question": "What is the exact automated or procedural threshold (such as duration of line blockage or number of cancelled trains) that mandates the triggering of replacement transport?",
+      "options": [
+        "Threshold triggered automatically by Central Control based on network telemetry",
+        "Threshold triggered manually by the Station Manager based on local station capacity and queue size",
+        "A hybrid model with pre-defined SLA triggers removing individual discretion"
+      ],
+      "affected_findings": [
+        "CF-016"
+      ]
+    },
+    {
+      "question": "How should information regarding facility faults and alternative transport be prioritized and distributed across channels during a crisis?",
+      "options": [
+        "Broadcast simultaneously as a single source of truth to Central Control, Station Managers, Customer Service, and passenger apps",
+        "Prioritize the physical station floor and Station Manager first, followed by remote Customer Service and apps"
+      ],
+      "affected_findings": [
+        "CF-013",
+        "CF-016"
+      ]
+    },
+    {
+      "question": "What level of interaction is required for logging vulnerability and accessibility assistance in high-stress environments?",
+      "options": [
+        "Mandatory multi-field digital logging for all assistance events across operators",
+        "Frictionless, passive, or one-tap logging mechanisms designed for emergency use",
+        "Analog/low-tech fallback protocols during active incidents"
+      ],
+      "affected_findings": [
+        "CF-017",
+        "CF-018",
+        "CF-022"
+      ]
+    }
+  ],
+  "unresolved_questions": [
+    "What is the mandatory analog or low-tech fallback protocol when local station Wi-Fi or cellular connectivity fails during a crisis?",
+    "How will multi-operator assistance tracking be unified without placing an administrative burden on frontline staff?"
+  ]
+}

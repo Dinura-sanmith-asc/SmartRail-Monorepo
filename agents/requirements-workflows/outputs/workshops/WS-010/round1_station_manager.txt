@@ -1,0 +1,32 @@
+As a Station Manager, my focus is entirely on the safe, orderly, and efficient operation of my station environment—specifically managing platforms, passenger flows, accessibility, local incidents, and station staff on the ground. 
+
+Here is my independent position for Round 1:
+
+### 1. What matters from my stakeholder perspective
+* **Platform safety and crowding:** When a platform change happens, my staff and I must deal with the immediate physical reality: hundreds of passengers rushing across footbridges, lifts overloaded, accessibility ramps blocked, and potential overcrowding hazards. 
+* **Reliable station displays and PA systems:** If information on concourse screens or audio announcements lags behind operational changes, my staff are overwhelmed by confused and angry passengers.
+* **Local situational awareness:** Knowing what is happening *inside* the station building and on my platforms takes precedence over remote spreadsheet logic from a control centre.
+* **Clear emergency access:** When emergency services arrive, my station staff need to know immediately so they can unlock gates, guide responders to lifts/platforms, and coordinate evacuations if necessary.
+
+### 2. What responsibility my role has
+* Managing passenger flows, local crowd safety, and station facilities (lifts, escalators, ticket barriers).
+* Operating station displays and audio systems to keep passengers informed based on verified operational data.
+* Executing local station evacuations, closures, or partial restrictions during local incidents.
+* Raising warnings or vetoes against controller-initiated platform changes if there is a clear physical hazard on the ground (e.g., severe overcrowding, lift failure, or an ongoing medical incident on that platform).
+
+### 3. What responsibility my role should NOT have
+* I should **not** have the authority to override signaling systems, dictate train routing across the network, or veto cancellations driven by broader network regulation or safety emergencies.
+* I am **not** a train operating company (TOC) manager; I should not be held responsible for confirming crew or rolling stock availability.
+* I should **not** be burdened with manually tracking or verifying driver route competence or infrastructure engineering access logs—that belongs to TOCs, signallers, and infrastructure managers.
+
+### 4. What risks or failure cases concern you
+* **The "Controller Dictat" Platform Change (CF-070):** If a central controller forces a platform change with 2 minutes' notice without checking local station conditions, my staff may be physically unable to manage the crowd shift, leading to crush risks, stranded passengers with accessibility needs, or safety incidents on stairs.
+* **Connectivity and Display Desync (CF-073):** If station displays rely on fragile cloud connections or faulty automated predictions, my staff will be left showing incorrect departure information while passengers demand answers from them directly.
+* **Undeclared Emergency Access (CF-064):** If emergency services arrive at the station gates and SmartRail hasn't logged or communicated their access requirements to station staff, precious minutes are lost opening secure access points.
+
+### 5. What decision you believe needs clarification
+* **The Platform Veto Protocol (CF-070):** We need a strict, unambiguous rule: *What happens mechanically when a Station Manager issues a veto or safety warning against a controller's platform change?* Does it automatically block the change until acknowledged, or is it merely an advisory warning that the controller can legally override? If the controller can override it, they must bear the operational liability for any resulting station safety incident.
+
+### 6. Any assumption you disagree with
+* **I strongly disagree with any assumption that station staff platform change "resistance" is merely bureaucratic complaining.** (Implied in CF-070). When station staff object to a platform change, it is almost always due to physical, on-the-ground constraints—such as a broken lift trapping wheelchair users, extreme platform congestion, or an unresolvable conflict with an arriving train. Treating this as a friction to be bypassed by automation creates severe safety risks. 
+* **I also disagree with assuming automated systems can predict visual reality on platforms.** Algorithms do not see crowd density, panic, or localized slips, trips, and falls. Human station staff assessment must hold weight.

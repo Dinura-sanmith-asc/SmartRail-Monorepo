@@ -1,0 +1,22 @@
+As the external Catering Provider, here is our response to Customer Service's position for Round 2 of the workshop:
+
+### 1. Points we agree with
+* **The "Blame Game" Hazard:** We strongly agree that information silos and dropped network messages create an unacceptable frontline experience. When a passenger claims they ordered, but our kitchen system has no record, the crew is left exposed without a single source of truth.
+* **No Manual Technical Troubleshooting:** We agree completely that frontline customer service agents should *not* be expected to troubleshoot backend network messaging failures, database logs, or API payloads. That is an operational burden neither of us should handle.
+* **Clear Customer Interface:** We are fully aligned with the principle that SmartRail/Customer Service must act as the primary interface for the passenger. Passengers booked through SmartRail's ecosystem should not be redirected to our independent kitchen customer service desks for travel or booking-related disputes.
+
+### 2. Points we challenge
+* **The "Bill Back" Suggestion for Service Recovery:** Customer Service mentions frontline staff handling immediate service recovery "and billing back the vendor." We challenge this. We cannot accept an automated or unverified "bill-back" mechanism for service recovery unless there is objective, system-level proof that the failure originated strictly from our catering side (e.g., our kitchen accepted the order and then failed to prepare it). If a failure is caused by a railway disruption (e.g., a train cancellation or sudden platform change that prevents handoff), we will not accept financial liability or arbitrary billing-backs.
+
+### 3. Responsibilities that appear unclear
+* **Who Handles Immediate Onboard Remediation Costs:** While Customer Service wants to de-escalate complaints and find practical recovery options (like alternative onboard refreshments), it remains unclear who funds these alternative items. If a passenger's meal couldn't be handed off due to a railway delay, who pays for the substitute snack provided by the onboard crew? 
+
+### 4. Risks another stakeholder may have overlooked
+* **Frontline Promises Without Inventory Control:** Customer Service agents, eager to de-escalate a frustrated passenger, might promise remakes, refunds, or alternative high-value items out of our independent menu inventory without checking our system availability. If frontline staff start authorizing "comp meals" that pull from our stock or require our kitchen to execute unscheduled mid-journey remakes, it will severely disrupt our kitchen workflow and create unbudgeted inventory shrink for us.
+
+### 5. Any proposal that would create problems for our role
+* Any workflow that permits SmartRail customer service to unilaterally issue financial chargebacks or refunds against our vendor account without an automated reconciliation trail or a mutually agreed-upon fault-determination protocol will create severe accounting and financial protection issues for our independent business.
+
+### 6. Questions that still require an architect or business decision
+* **What is the definitive automated Source of Truth for order state?** We need the system architects to establish a definitive, real-time transaction state API (e.g., *Confirmed*, *Kitchen Prepping*, *Ready for Handoff*, *Cancelled*) so that both SmartRail's customer service interface and our kitchen dashboard read the exact same status, eliminating ambiguity during disruptions.
+* **What is the exact financial clearinghouse policy for disputed failures?** Business management must decide: When an order fails due to a mixed fault (e.g., SmartRail train delay intersecting with our kitchen prep window), how are costs automatically apportioned without requiring manual dispute negotiations between our finance team and SmartRail?

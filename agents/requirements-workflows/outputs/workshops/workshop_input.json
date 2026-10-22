@@ -1,0 +1,910 @@
+[
+  {
+    "finding_ref": "CF-001",
+    "finding_type": "OVERLAP",
+    "title": "Catering System Integration, Menus, and Catalog Management",
+    "summary": "The catering provider's system integrates with SmartRail by providing structured catalogs containing menus, pricing, allergen information, preparation instructions, availability rules, station identifiers, and collection deadlines.",
+    "stakeholders": [
+      "catering_provider"
+    ],
+    "categories": [
+      "FUNCTIONAL",
+      "INTEGRATION",
+      "BUSINESS_PROCESS"
+    ],
+    "source_refs": [
+      "CATERING_PROVIDER-001",
+      "CATERING_PROVIDER-002",
+      "CATERING_PROVIDER-003"
+    ],
+    "unresolved_question": "How often must menu data be refreshed if SmartRail caches the data?"
+  },
+  {
+    "finding_ref": "CF-002",
+    "finding_type": "OWNERSHIP_AMBIGUITY",
+    "title": "Payment Responsibility, Refunds, and Financial Liabilities",
+    "summary": "Ambiguity regarding whether SmartRail handles transactions directly or passes payment details to the catering provider, how refunds are processed, and who bears financial liability for wasted food due to delays or missed collections.",
+    "stakeholders": [
+      "catering_provider"
+    ],
+    "categories": [
+      "AMBIGUITY",
+      "CONFLICT"
+    ],
+    "source_refs": [
+      "CATERING_PROVIDER-004",
+      "CATERING_PROVIDER-008"
+    ],
+    "unresolved_question": "Who handles the actual financial transaction with the passenger and processes refunds, and who covers the cost of wasted food due to severe train delays or missed collections?"
+  },
+  {
+    "finding_ref": "CF-003",
+    "finding_type": "AGREEMENT",
+    "title": "Real-time Order Lifecycle and Status Tracking",
+    "summary": "Both SmartRail and the catering provider require robust real-time tracking, including idempotent order creation, asynchronous status updates from the kitchen, and dynamic adjustments based on train status and delay notifications.",
+    "stakeholders": [
+      "catering_provider"
+    ],
+    "categories": [
+      "FUNCTIONAL",
+      "STATE",
+      "OPERATIONAL"
+    ],
+    "source_refs": [
+      "CATERING_PROVIDER-005",
+      "CATERING_PROVIDER-006",
+      "CATERING_PROVIDER-007"
+    ],
+    "unresolved_question": "Does SmartRail provide a new estimated arrival time or just a delayed flag to the catering provider?"
+  },
+  {
+    "finding_ref": "CF-005",
+    "finding_type": "OPEN_QUESTION",
+    "title": "Catering Cancellation Cut-off Enforcement and Arbitration",
+    "summary": "Unclear whether SmartRail's UI should fully enforce cancellation cut-offs or if the catering system should act as the final arbiter.",
+    "stakeholders": [
+      "catering_provider"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "CATERING_PROVIDER-010"
+    ],
+    "unresolved_question": "Should SmartRail enforce cut-offs in the UI or act purely informatively while letting the catering system enforce rules?"
+  },
+  {
+    "finding_ref": "CF-006",
+    "finding_type": "AGREEMENT",
+    "title": "System Downtime, Resiliency, and Guaranteed Messaging",
+    "summary": "Both catering and customer service contexts highlight risks associated with system slowdowns, downtime, and the need for robust recovery mechanisms or fallback options.",
+    "stakeholders": [
+      "catering_provider",
+      "customer_service"
+    ],
+    "categories": [
+      "FAILURE_SCENARIO"
+    ],
+    "source_refs": [
+      "CATERING_PROVIDER-011",
+      "CUSTOMER_SERVICE-006"
+    ],
+    "unresolved_question": "How do SmartRail and the catering provider reconcile lost order creation messages or achieve eventual consistency during network failures?"
+  },
+  {
+    "finding_ref": "CF-007",
+    "finding_type": "SCOPE_TENSION",
+    "title": "Advanced Catering Features and Partial Cancellations",
+    "summary": "Potential extension scope to support complex order operations such as partial item cancellations and passenger-specific preference management.",
+    "stakeholders": [
+      "catering_provider"
+    ],
+    "categories": [
+      "SCOPE_CANDIDATE"
+    ],
+    "source_refs": [
+      "CATERING_PROVIDER-012"
+    ],
+    "unresolved_question": "Should the system support partial cancellations of individual order items?"
+  },
+  {
+    "finding_ref": "CF-008",
+    "finding_type": "OWNERSHIP_AMBIGUITY",
+    "title": "Customer Support Escalation, Dispute Resolution, and Support Ownership",
+    "summary": "Lack of clarity on who serves as the primary point of contact for passengers during order disputes and how support inquiries are handled.",
+    "stakeholders": [
+      "catering_provider",
+      "customer_service"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "CATERING_PROVIDER-013"
+    ],
+    "unresolved_question": "Who is the primary contact point for the passenger when resolving order disputes, and how are issues escalated?"
+  },
+  {
+    "finding_ref": "CF-010",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Single Source of Truth and Data Consistency Across Channels",
+    "summary": "Inconsistencies between CSR systems, public screens, and mobile apps erode trust, necessitating a definitive authoritative source for real-time information.",
+    "stakeholders": [
+      "customer_service"
+    ],
+    "categories": [
+      "INTEGRATION"
+    ],
+    "source_refs": [
+      "CUSTOMER_SERVICE-003"
+    ],
+    "unresolved_question": "What is the definitive authoritative source for real-time journey information?"
+  },
+  {
+    "finding_ref": "CF-011",
+    "finding_type": "SCOPE_TENSION",
+    "title": "Extended Passenger Services: Ticketing, Compensation, and Travel Disruptions",
+    "summary": "Potential inclusion of advanced support scope such as ticketing support, refunds, compensation management, hotel accommodations, and private taxi arrangements for stranded passengers.",
+    "stakeholders": [
+      "customer_service"
+    ],
+    "categories": [
+      "SCOPE_CANDIDATE"
+    ],
+    "source_refs": [
+      "CUSTOMER_SERVICE-004",
+      "CUSTOMER_SERVICE-005"
+    ],
+    "unresolved_question": "Should SmartRail include ticketing support, refunds, and compensation management, and are hotel/taxi arrangements part of system or operator policy scope?"
+  },
+  {
+    "finding_ref": "CF-013",
+    "finding_type": "OPEN_QUESTION",
+    "title": "Real-time Facility Status and Accessibility Equipment Updates",
+    "summary": "There is a lack of clarity on how quickly customer service representatives are informed about out-of-order station facilities and accessibility equipment such as lifts and ramps in real time.",
+    "stakeholders": [
+      "customer_service"
+    ],
+    "categories": [
+      "BUSINESS_PROCESS",
+      "ACCESSIBILITY"
+    ],
+    "source_refs": [
+      "CUSTOMER_SERVICE-008",
+      "CUSTOMER_SERVICE-012"
+    ],
+    "unresolved_question": "How are broken or out-of-order station facilities and accessibility equipment reported in real time to customer service?"
+  },
+  {
+    "finding_ref": "CF-016",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Alternative Transport Activation Process",
+    "summary": "A defined process is missing for deciding when and how replacement transport like buses or taxis is activated and communicated during significant service disruptions.",
+    "stakeholders": [
+      "customer_service"
+    ],
+    "categories": [
+      "BUSINESS_PROCESS"
+    ],
+    "source_refs": [
+      "CUSTOMER_SERVICE-011"
+    ],
+    "unresolved_question": "Who decides on and arranges replacement transport, and how is it communicated?"
+  },
+  {
+    "finding_ref": "CF-017",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Spontaneous and Pre-booked Assistance Protocols",
+    "summary": "Clear operational protocols are required to handle both pre-booked and spontaneous mobility assistance, including management of assistance no-shows.",
+    "stakeholders": [
+      "customer_service"
+    ],
+    "categories": [
+      "ACCESSIBILITY"
+    ],
+    "source_refs": [
+      "CUSTOMER_SERVICE-013"
+    ],
+    "unresolved_question": null
+  },
+  {
+    "finding_ref": "CF-018",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Unified Booking and Tracking Assistance System",
+    "summary": "An integrated system is desired for booking and tracking mobility assistance requests across multi-operator journeys.",
+    "stakeholders": [
+      "customer_service"
+    ],
+    "categories": [
+      "INTEGRATION"
+    ],
+    "source_refs": [
+      "CUSTOMER_SERVICE-014"
+    ],
+    "unresolved_question": null
+  },
+  {
+    "finding_ref": "CF-019",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Inter-Operator Ticket Acceptance and Rules",
+    "summary": "Rules for ticket validity and acceptance across alternative routes or different operators during disruptions are unclear and require easy visibility and communication.",
+    "stakeholders": [
+      "customer_service"
+    ],
+    "categories": [
+      "INTEGRATION"
+    ],
+    "source_refs": [
+      "CUSTOMER_SERVICE-015"
+    ],
+    "unresolved_question": "How can inter-operator ticket validity rules be easily viewed and communicated during disruptions?"
+  },
+  {
+    "finding_ref": "CF-022",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Vulnerable Passenger Support Protocol",
+    "summary": "A defined procedure and handover protocol is needed to proactively support vulnerable passengers, children, the elderly, or those with cognitive disabilities during major cancellations or platform changes.",
+    "stakeholders": [
+      "customer_service"
+    ],
+    "categories": [
+      "BUSINESS_PROCESS"
+    ],
+    "source_refs": [
+      "CUSTOMER_SERVICE-018"
+    ],
+    "unresolved_question": "What are the specific handover and support protocols for vulnerable passengers?"
+  },
+  {
+    "finding_ref": "CF-023",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Critical Safety Notices Delivery and Acknowledgement",
+    "summary": "The mechanism for delivering and receiving mandatory auditable acknowledgements for critical safety notices prior to shift start is currently unclear.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "DRIVER-001"
+    ],
+    "unresolved_question": "How are critical safety notices delivered and acknowledged before proceeding?"
+  },
+  {
+    "finding_ref": "CF-024",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "System Assignment Provider Downtime and Manual Fallback",
+    "summary": "A robust and reliable manual fallback process must be established for shift assignments in the event of provider system downtime.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "FAILURE_SCENARIO"
+    ],
+    "source_refs": [
+      "DRIVER-002"
+    ],
+    "unresolved_question": "What is the exact manual fallback process if the assignment system is down?"
+  },
+  {
+    "finding_ref": "CF-026",
+    "finding_type": "CONFLICT",
+    "title": "Single Source of Truth Precedence for Journey Information",
+    "summary": "Discrepancies can occur between on-board systems, Control, and paper documents, requiring a clearly defined order of precedence.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "CONFLICT"
+    ],
+    "source_refs": [
+      "DRIVER-004"
+    ],
+    "unresolved_question": "Which source takes precedence if on-board system data differs from Control or paper documents?"
+  },
+  {
+    "finding_ref": "CF-028",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "DMI Complete Failure Protocol and Manual Operation Fallback",
+    "summary": "Protocols and fallback guidelines are unclear in the event of a complete DMI failure during pre-departure checks, specifically regarding manual train operation capability.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "DRIVER-006"
+    ],
+    "unresolved_question": "Can the train be operated manually with fallback information if the DMI fails completely?"
+  },
+  {
+    "finding_ref": "CF-029",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Distinction Between Minor and Major Train Defects",
+    "summary": "Clear operational criteria are missing to distinguish between minor defects that permit cautious operation and major defects requiring immediate attention.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "DRIVER-007"
+    ],
+    "unresolved_question": "What criteria define a minor defect versus a major defect?"
+  },
+  {
+    "finding_ref": "CF-032",
+    "finding_type": "OVERLAP",
+    "title": "System Behavior and Data Buffering During Connectivity Loss",
+    "summary": "Both discoveries address how the system should handle connectivity drops during operations by gracefully degrading, holding or caching valid instructions, buffering reports locally, and indicating status clearly.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "FAILURE_SCENARIO",
+      "OPERATIONAL"
+    ],
+    "source_refs": [
+      "DRIVER-010",
+      "DRIVER-019"
+    ],
+    "unresolved_question": "How long can the system operate on cached data during connectivity loss?"
+  },
+  {
+    "finding_ref": "CF-035",
+    "finding_type": "SCOPE_TENSION",
+    "title": "Precision Stopping Guidance Support",
+    "summary": "Potential system capability to support precision stopping via dynamic braking guides.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "SCOPE_CANDIDATE"
+    ],
+    "source_refs": [
+      "DRIVER-013"
+    ],
+    "unresolved_question": "Should the system provide dynamic braking guides for precision stopping?"
+  },
+  {
+    "finding_ref": "CF-037",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Post-Journey Checklist Enforcement on DMI",
+    "summary": "The system needs to ensure proper train securing procedures are followed through a mandatory DMI checklist.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "BUSINESS_PROCESS"
+    ],
+    "source_refs": [
+      "DRIVER-016"
+    ],
+    "unresolved_question": "Should train securing procedures be enforced via a mandatory DMI checklist?"
+  },
+  {
+    "finding_ref": "CF-038",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Integration Between DMI and Post-Journey Reporting Systems",
+    "summary": "Integration is required between DMI real-time data and post-journey reporting systems regarding auto-population and driver validation roles.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "INTEGRATION"
+    ],
+    "source_refs": [
+      "DRIVER-017"
+    ],
+    "unresolved_question": "How much auto-population happens from the DMI to reporting systems, and what is the driver's validation role?"
+  },
+  {
+    "finding_ref": "CF-040",
+    "finding_type": "OWNERSHIP_AMBIGUITY",
+    "title": "External Operational Roles Interaction",
+    "summary": "The workflow relies on interactions with external operational roles such as Control, Signallers, Duty Managers, Shunters, Maintenance staff, and Medical personnel who provide authority, clearances, or briefs.",
+    "stakeholders": [
+      "driver"
+    ],
+    "categories": [
+      "MISSING_ACTOR"
+    ],
+    "source_refs": [
+      "DRIVER-020"
+    ],
+    "unresolved_question": "Are these external operational roles direct users of SmartRail or interfacing via separate systems?"
+  },
+  {
+    "finding_ref": "CF-042",
+    "finding_type": "AGREEMENT",
+    "title": "Transparent Fares and Multi-Operator Handling",
+    "summary": "Display all ticket types, terms, total cost upfront, and railcard discounts, while resolving how SmartRail handles non-integrated multi-operator ticketing and best value options.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "FUNCTIONAL",
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "PASSENGER-002",
+      "PASSENGER-007"
+    ],
+    "unresolved_question": "How will SmartRail handle scenarios where an optimal journey involves travel with multiple operators that don't traditionally integrate their ticketing?"
+  },
+  {
+    "finding_ref": "CF-043",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Detailed Accessibility Information and Filtering",
+    "summary": "Integrate comprehensive, verified accessibility information for every station and rolling stock type, enabling passengers to filter by specific needs.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "FUNCTIONAL"
+    ],
+    "source_refs": [
+      "PASSENGER-003"
+    ],
+    "unresolved_question": "What level of granular detail will accessibility information provide (e.g., specific measurements vs. general tags)?"
+  },
+  {
+    "finding_ref": "CF-049",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Direct Retailer vs. Redirect Role",
+    "summary": "It is unclear whether SmartRail will act as a direct retailer for all train tickets or redirect users to individual operator sites.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "PASSENGER-010"
+    ],
+    "unresolved_question": "Will SmartRail act as a direct retailer for all train tickets, or will it redirect to individual operator sites for final purchase?"
+  },
+  {
+    "finding_ref": "CF-050",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Data Security and Privacy Protocols",
+    "summary": "Protocols must be defined for data security and privacy when storing passenger payment details and personal information.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "SECURITY"
+    ],
+    "source_refs": [
+      "PASSENGER-011"
+    ],
+    "unresolved_question": "What protocols will be in place for data security and privacy when storing payment details and personal information?"
+  },
+  {
+    "finding_ref": "CF-051",
+    "finding_type": "OVERLAP",
+    "title": "Day of Travel Proactive Notifications and Disruption Updates",
+    "summary": "Send push notifications for significant delays, cancellations, platform changes, live train tracking updates, and disruption explanations.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "FUNCTIONAL"
+    ],
+    "source_refs": [
+      "PASSENGER-012",
+      "PASSENGER-016"
+    ],
+    "unresolved_question": "What threshold constitutes a significant delay for a push notification and what level of detail will be provided in disruption explanations?"
+  },
+  {
+    "finding_ref": "CF-052",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Signal Loss and Device Failure",
+    "summary": "Passengers facing phone battery failure, missing tickets, or signal loss at the station when trying to present mobile tickets.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "FAILURE_SCENARIO"
+    ],
+    "source_refs": [
+      "PASSENGER-013"
+    ],
+    "unresolved_question": "Will SmartRail have an offline mode for displaying mobile tickets in case of signal loss at the station?"
+  },
+  {
+    "finding_ref": "CF-053",
+    "finding_type": "AGREEMENT",
+    "title": "Station Navigation, Maps, and Facility Status",
+    "summary": "Provide interactive GPS-enabled station maps with facilities, accessible routes, coach stopping positions, and real-time out-of-order alerts for lifts, escalators, and accessible toilets.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "FUNCTIONAL"
+    ],
+    "source_refs": [
+      "PASSENGER-014",
+      "PASSENGER-015"
+    ],
+    "unresolved_question": "What is the accuracy level of coach stopping position predictions and how will real-time lift status be consistently reported from all stations?"
+  },
+  {
+    "finding_ref": "CF-055",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Missed Connections and Connection Risks",
+    "summary": "Delays on initial trains putting connections at risk or causing missed connections without clear alternative guidance or protected status.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "FAILURE_SCENARIO"
+    ],
+    "source_refs": [
+      "PASSENGER-018"
+    ],
+    "unresolved_question": "Will SmartRail clearly indicate if a connection is protected and what level of automatic re-booking will be facilitated?"
+  },
+  {
+    "finding_ref": "CF-056",
+    "finding_type": "OVERLAP",
+    "title": "Centralized Compensation and Support Services",
+    "summary": "Centralized and simplified processes for claiming Delay Repay, auto-populating journey details, and consolidated lost property searches.",
+    "stakeholders": [
+      "passenger"
+    ],
+    "categories": [
+      "BUSINESS_PROCESS",
+      "SCOPE_CANDIDATE"
+    ],
+    "source_refs": [
+      "PASSENGER-019",
+      "PASSENGER-020"
+    ],
+    "unresolved_question": "Will SmartRail directly manage compensation claims or redirect to operators, and will the lost property portal require real-time updates from all operators?"
+  },
+  {
+    "finding_ref": "CF-057",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Assumed Initial Business Problem",
+    "summary": "The railway currently suffers from inefficient and siloed incident management processes, leading to delayed responses, poor real-time communication with passengers, increased operational costs, and diminished customer satisfaction during disruptions.",
+    "stakeholders": [
+      "product_owner"
+    ],
+    "categories": [
+      "BUSINESS_PROCESS"
+    ],
+    "source_refs": [
+      "PRODUCT_OWNER-001"
+    ],
+    "unresolved_question": "What is the official baseline business problem description for SmartRail?"
+  },
+  {
+    "finding_ref": "CF-058",
+    "finding_type": "AGREEMENT",
+    "title": "Core Incident Management and Operational Capabilities",
+    "summary": "Authorized personnel can log incidents with details, track their lifecycle from reported to resolved, automatically alert operational teams, allocate basic resources, and view operational dashboards.",
+    "stakeholders": [
+      "product_owner"
+    ],
+    "categories": [
+      "FUNCTIONAL",
+      "STATE"
+    ],
+    "source_refs": [
+      "PRODUCT_OWNER-002",
+      "PRODUCT_OWNER-003",
+      "PRODUCT_OWNER-004",
+      "PRODUCT_OWNER-006",
+      "PRODUCT_OWNER-007"
+    ],
+    "unresolved_question": "What are the precise triggers, recipients, and escalation paths for different incident types and severities?"
+  },
+  {
+    "finding_ref": "CF-060",
+    "finding_type": "AGREEMENT",
+    "title": "Additional Operational Actors and Governance Processes",
+    "summary": "Identification of additional essential actors (train drivers, station staff, emergency services, etc.) and vital governance processes (emergency response, training, system integrations).",
+    "stakeholders": [
+      "product_owner"
+    ],
+    "categories": [
+      "MISSING_ACTOR",
+      "BUSINESS_PROCESS"
+    ],
+    "source_refs": [
+      "PRODUCT_OWNER-008",
+      "PRODUCT_OWNER-009"
+    ],
+    "unresolved_question": null
+  },
+  {
+    "finding_ref": "CF-061",
+    "finding_type": "SCOPE_TENSION",
+    "title": "Advanced Post-MVP Feature Scope Candidates",
+    "summary": "Multiple discoveries identify complex, resource-intensive features such as full AI-powered predictive maintenance, personalized journey planning, passenger CRM, dynamic pricing, automated compensation, and end-to-end asset management that should be excluded from core incident response scope and deferred to later phases.",
+    "stakeholders": [
+      "product_owner",
+      "railway_controller"
+    ],
+    "categories": [
+      "SCOPE_CANDIDATE",
+      "OPERATIONAL"
+    ],
+    "source_refs": [
+      "PRODUCT_OWNER-012",
+      "PRODUCT_OWNER-013",
+      "PRODUCT_OWNER-014",
+      "PRODUCT_OWNER-015",
+      "PRODUCT_OWNER-016",
+      "PRODUCT_OWNER-018",
+      "RAILWAY_CONTROLLER-001"
+    ],
+    "unresolved_question": "Should passenger compensation workflows be tracked or integrated at a later phase?"
+  },
+  {
+    "finding_ref": "CF-062",
+    "finding_type": "OPEN_QUESTION",
+    "title": "Unresolved Implementation, Latency, and Integration Requirements",
+    "summary": "Critical uncertainties remain concerning the precise definition of real-time latency, legacy system integration extent and capabilities, primary KPIs, budget, timeline, and regulatory compliance constraints.",
+    "stakeholders": [
+      "product_owner"
+    ],
+    "categories": [
+      "AMBIGUITY",
+      "INTEGRATION",
+      "ASSUMPTION"
+    ],
+    "source_refs": [
+      "PRODUCT_OWNER-010",
+      "PRODUCT_OWNER-011",
+      "PRODUCT_OWNER-019"
+    ],
+    "unresolved_question": "What are the exact latency thresholds, legacy integration requirements, KPIs, and regulatory constraints?"
+  },
+  {
+    "finding_ref": "CF-064",
+    "finding_type": "OWNERSHIP_AMBIGUITY",
+    "title": "Integration of External Actors: Emergency Services and Infrastructure Engineers",
+    "summary": "External entities such as emergency services (life safety command) and infrastructure engineers (track access and repairs) play critical operational roles, but their required system access levels, integration protocols, and communication workflows are currently undefined.",
+    "stakeholders": [
+      "railway_controller"
+    ],
+    "categories": [
+      "MISSING_ACTOR",
+      "FUNCTIONAL"
+    ],
+    "source_refs": [
+      "RAILWAY_CONTROLLER-005",
+      "RAILWAY_CONTROLLER-006",
+      "RAILWAY_CONTROLLER-009"
+    ],
+    "unresolved_question": "What direct system access, communication protocols, and track access logging mechanisms do emergency services and infrastructure engineers require?"
+  },
+  {
+    "finding_ref": "CF-070",
+    "finding_type": "CONFLICT",
+    "title": "Platform Changes and Station Staff Resistance",
+    "summary": "Controller-initiated platform changes can conflict with station staff concerns regarding accessibility, overcrowding, and insufficient notification time, posing safety and passenger experience issues.",
+    "stakeholders": [
+      "railway_controller"
+    ],
+    "categories": [
+      "CONFLICT",
+      "ACCESSIBILITY"
+    ],
+    "source_refs": [
+      "RAILWAY_CONTROLLER-015",
+      "RAILWAY_CONTROLLER-020"
+    ],
+    "unresolved_question": "How should the system handle a veto or warning raised by station staff against a controller-initiated platform change?"
+  },
+  {
+    "finding_ref": "CF-071",
+    "finding_type": "CONFLICT",
+    "title": "Operational vs Commercial and Priority Trade-Offs",
+    "summary": "Competing priorities exist between TOC service maintenance, infrastructure safety, freight service priorities versus passenger diversions, and commercial versus operational cancellation boundaries.",
+    "stakeholders": [
+      "railway_controller"
+    ],
+    "categories": [
+      "CONFLICT",
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "RAILWAY_CONTROLLER-016",
+      "RAILWAY_CONTROLLER-017",
+      "RAILWAY_CONTROLLER-024"
+    ],
+    "unresolved_question": "Can an operational cancellation be triggered automatically if a TOC fails to confirm resource availability by a specific threshold time?"
+  },
+  {
+    "finding_ref": "CF-072",
+    "finding_type": "OPEN_QUESTION",
+    "title": "Late Cancellation Notifications and Passenger Impact",
+    "summary": "Late notification of cancellations leads to passengers waiting unnecessarily, raising questions on automated alerts to reduce the notification window.",
+    "stakeholders": [
+      "railway_controller"
+    ],
+    "categories": [
+      "FAILURE_SCENARIO"
+    ],
+    "source_refs": [
+      "RAILWAY_CONTROLLER-013"
+    ],
+    "unresolved_question": "What automated alerts can reduce the window between a cancellation decision and passenger notification?"
+  },
+  {
+    "finding_ref": "CF-073",
+    "finding_type": "OWNERSHIP_AMBIGUITY",
+    "title": "Unclear Authority and Manual Override Procedures",
+    "summary": "Unclear authority during cancellations, data discrepancies between system predictions and visual reality, and the lack of a defined manual override procedure create ambiguity in operational decision-making.",
+    "stakeholders": [
+      "railway_controller",
+      "station_manager"
+    ],
+    "categories": [
+      "FAILURE_SCENARIO",
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "RAILWAY_CONTROLLER-014",
+      "STATION_MANAGER-006"
+    ],
+    "unresolved_question": "What is the formal procedure and audit trail for overriding incorrect automated system predictions?"
+  },
+  {
+    "finding_ref": "CF-076",
+    "finding_type": "SCOPE_TENSION",
+    "title": "Automated Driver Route Competence Verification",
+    "summary": "Assumption that drivers are verified for route competence prior to authorization raises scope questions regarding whether route competence should be tracked automatically within the system.",
+    "stakeholders": [
+      "railway_controller"
+    ],
+    "categories": [
+      "ASSUMPTION"
+    ],
+    "source_refs": [
+      "RAILWAY_CONTROLLER-023"
+    ],
+    "unresolved_question": "Is driver route competence tracked automatically within the system or verified manually?"
+  },
+  {
+    "finding_ref": "CF-078",
+    "finding_type": "OPEN_QUESTION",
+    "title": "Input Mechanism for Locally Discovered Station Issues",
+    "summary": "It is currently ambiguous how station staff can input unprompted local incidents or infrastructure failures (e.g., broken ticket machine) into SmartRail for network-wide visibility.",
+    "stakeholders": [
+      "station_manager"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "STATION_MANAGER-005"
+    ],
+    "unresolved_question": "Is there a dedicated local station status module for staff to input unprompted local incidents or infrastructure failures?"
+  },
+  {
+    "finding_ref": "CF-079",
+    "finding_type": "CONFLICT",
+    "title": "Platform Allocation and Network Flow vs Local Safety",
+    "summary": "SmartRail may propose network optimization platform changes that conflict with local safety, capacity constraints, or blocked platforms, requiring station managers to have veto or challenge authority.",
+    "stakeholders": [
+      "station_manager"
+    ],
+    "categories": [
+      "CONFLICT",
+      "OPERATIONAL"
+    ],
+    "source_refs": [
+      "STATION_MANAGER-007",
+      "STATION_MANAGER-017"
+    ],
+    "unresolved_question": "Who has ultimate authority to override platform allocation disputes between local safety constraints and network optimization algorithms?"
+  },
+  {
+    "finding_ref": "CF-081",
+    "finding_type": "OPEN_QUESTION",
+    "title": "Automated PA Announcement Capabilities and Error Handling",
+    "summary": "Uncertainty surrounds whether the automated PA system supports ad-hoc typing or pre-recorded messages, and how the system prevents or corrects panic-inducing announcement inaccuracies.",
+    "stakeholders": [
+      "station_manager"
+    ],
+    "categories": [
+      "AMBIGUITY",
+      "FAILURE_SCENARIO"
+    ],
+    "source_refs": [
+      "STATION_MANAGER-009",
+      "STATION_MANAGER-010"
+    ],
+    "unresolved_question": "Can staff broadcast ad-hoc or pre-recorded messages, and does the system feature automated verification for announcements?"
+  },
+  {
+    "finding_ref": "CF-082",
+    "finding_type": "OPEN_QUESTION",
+    "title": "Local Control of Station Displays and Messaging",
+    "summary": "It is unclear if station displays are entirely network-controlled or if local staff can utilize portions of displays for local operational or informational messages.",
+    "stakeholders": [
+      "station_manager"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "STATION_MANAGER-011"
+    ],
+    "unresolved_question": "Can local staff override sections of network-controlled station displays to publish local operational messages?"
+  },
+  {
+    "finding_ref": "CF-083",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Direct Incident Entry and Infrastructure Repair Loop Closure",
+    "summary": "Staff require capabilities to directly log facility outages and incidents into SmartRail, alongside a defined workflow to ensure maintenance issues are resolved and status is updated.",
+    "stakeholders": [
+      "station_manager"
+    ],
+    "categories": [
+      "FUNCTIONAL",
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "STATION_MANAGER-012",
+      "STATION_MANAGER-013"
+    ],
+    "unresolved_question": "What is the formal workflow to close the loop on reported infrastructure failures and update their operational status?"
+  },
+  {
+    "finding_ref": "CF-084",
+    "finding_type": "OPEN_QUESTION",
+    "title": "Tiered Incident Management Workflows",
+    "summary": "It is unspecified how SmartRail manages and distinguishes between varying levels of local incidents, such as minor platform spills versus major security alerts.",
+    "stakeholders": [
+      "station_manager"
+    ],
+    "categories": [
+      "AMBIGUITY"
+    ],
+    "source_refs": [
+      "STATION_MANAGER-014"
+    ],
+    "unresolved_question": "Does SmartRail contain distinct tiered incident management workflows for varying levels of local severity?"
+  },
+  {
+    "finding_ref": "CF-085",
+    "finding_type": "UNIQUE_IMPORTANT_FINDING",
+    "title": "Local Offline Resilience and Connectivity Continuity",
+    "summary": "The system must provide a robust offline mode with backup power support to maintain core local functionality if network connections or power fail during major disruptions.",
+    "stakeholders": [
+      "station_manager"
+    ],
+    "categories": [
+      "FAILURE_SCENARIO"
+    ],
+    "source_refs": [
+      "STATION_MANAGER-015"
+    ],
+    "unresolved_question": "What core functionality can be maintained locally via backup power and offline cache if network connectivity is completely severed?"
+  },
+  {
+    "finding_ref": "CF-088",
+    "finding_type": "SCOPE_TENSION",
+    "title": "Automatic Ingestion of Local Context in Network Algorithms",
+    "summary": "There is an implicit assumption that network-wide optimization solutions must automatically incorporate local station context, density, and safety metrics without requiring manual intervention.",
+    "stakeholders": [
+      "station_manager"
+    ],
+    "categories": [
+      "ASSUMPTION"
+    ],
+    "source_refs": [
+      "STATION_MANAGER-020"
+    ],
+    "unresolved_question": "To what extent can network optimization algorithms ingest real-time local station density metrics automatically?"
+  }
+]

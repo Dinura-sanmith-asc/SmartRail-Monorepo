@@ -1,0 +1,67 @@
+# WS-010 — Railway Control, External Integrations, and Platform Allocation Conflicts
+
+## Participants
+
+- railway_controller
+- station_manager
+
+## Agreements
+
+- Both stakeholders recognize that last-minute, uncoordinated platform changes create severe operational and safety hazards, ranging from network gridlock to platform crowding risks.
+- Both agree that real-time synchronization between operational decisions and passenger-information displays is essential to prevent passenger confusion.
+- Both acknowledge that emergency service access requires formal logging, visibility, and coordinated execution across control and station environments.
+
+## Disagreements
+
+- Railway Controller views uncalibrated station vetos as a risk to network throughput and cascading punctuality, whereas the Station Manager views physical safety hazards on platforms (such as overcrowding or accessibility failures) as non-negotiable physical limits that must override network schedules.
+- Railway Controller challenges the transfer of operational liability for local station incidents to the control center, while the Station Manager argues that controllers cannot bypass local safety ground-truth.
+
+## Ownership Questions
+
+- Who holds accountability for passenger confusion and crowd management when a platform change is issued centrally, but station displays or audio systems suffer from connectivity desync?
+- How is liability distributed when a network-level routing decision conflicts with local station safety conditions?
+
+## Scope Questions
+
+- Should driver route competence be tracked and enforced automatically within the SmartRail system, or maintained solely as an external TOC organizational/HR responsibility?
+- Should the system account for variable station staffing levels and physical infrastructure constraints (such as narrow footbridges and stairwells) when calculating platform allocation feasibility?
+
+## Assumptions to Validate
+
+- The assumption that station staff platform change resistance is a manageable administrative friction rather than a symptom of physical safety constraints.
+- The assumption that automated system predictions accurately reflect visual reality on platforms without human verification.
+- The assumption that station connectivity and display synchronization are technically guaranteed during live disruptions.
+
+## Decision Points
+
+### Decision 1
+
+What is the exact hierarchical rule of precedence and tie-breaking mechanism for CF-070 when a network-critical routing requirement conflicts with a local station safety or crowding objection?
+
+**Options:**
+
+- Network regulation and controller authority take precedence automatically unless specific interlocking or physical platform safety sensors (e.g., lift failure trip, track intruder) are actively engaged.
+- Station Manager safety vetoes are absolute and non-negotiable under all conditions, requiring the controller to resolve pathing elsewhere.
+- A mandatory dual-authorization override or time-bound voice-channel handshake is required before execution.
+
+**Affected findings:** CF-070, CF-073
+
+### Decision 2
+
+What is the mandatory minimum lead time and authorization workflow for a controller-initiated platform change?
+
+**Options:**
+
+- Allow instant controller execution with automated display updates, regardless of lead time.
+- Enforce a mandatory minimum lead time (e.g., 3 to 5 minutes) paired with a required automated safety acknowledgment from the local station.
+- Require explicit manual station sign-off for any platform change occurring within peak operational windows.
+
+**Affected findings:** CF-070, CF-072
+
+
+## Unresolved Questions
+
+- What specific direct system access, communication protocols, and track access logging mechanisms do emergency services and infrastructure engineers require (CF-064)?
+- Can an operational cancellation be triggered automatically if a TOC fails to confirm resource availability by a specific threshold time, or is explicit controller sign-off required (CF-071)?
+- What is the formal procedure and audit trail for overriding incorrect automated system predictions (CF-073)?
+- How does SmartRail handle station connectivity dropouts during a live platform change or partial station closure?

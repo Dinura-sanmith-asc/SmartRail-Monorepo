@@ -1,0 +1,176 @@
+{
+  "stakeholder": "product_owner",
+  "discoveries": [
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Assumed Initial Business Problem",
+      "discovery": "The railway currently suffers from inefficient and siloed incident management processes, leading to delayed responses, poor real-time communication with passengers, increased operational costs, and diminished customer satisfaction during disruptions.",
+      "source_basis": "The Product Owner inferred this core business problem based on the product name and common railway challenges since no initial business problem description was provided.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": "What is the official baseline business problem description for SmartRail?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Real-time Incident Reporting and Logging",
+      "discovery": "Authorised personnel such as train drivers, station staff, and the control centre need the ability to log incidents with location, type, severity, and initial observations.",
+      "source_basis": "Listed under essential capabilities for solving the assumed problem.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "STATE",
+      "title": "Incident Status and Lifecycle Management",
+      "discovery": "The system must track incidents from reported to resolved, including stages like investigation, action taken, and resolution.",
+      "source_basis": "Mentioned as an essential capability to track incident progress.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Internal Notification and Alerting System",
+      "discovery": "Automatically alert relevant operational teams such as control, maintenance, customer service, and train crew based on incident type and severity.",
+      "source_basis": "Identified as a core essential capability.",
+      "origin": "EXPLICIT",
+      "open_question": "What are the precise triggers, recipients, and escalation paths for different incident types and severities?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Basic Passenger Information Dissemination",
+      "discovery": "Broadcast standardised, accurate delay and cancellation messages to passengers via multiple channels like station displays, app notifications, and website updates.",
+      "source_basis": "Listed as an essential capability for passenger communication.",
+      "origin": "EXPLICIT",
+      "open_question": "What specific channels are included and what level of detail is provided?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Basic Resource Allocation for Operational Staff",
+      "discovery": "Provide a simple mechanism to assign immediate tasks or personnel to an ongoing incident, such as sending a maintenance crew to a specific location.",
+      "source_basis": "Described as an essential capability for managing operational staff during incidents.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Operational Dashboard and Reporting",
+      "discovery": "A high-level view of active incidents, their status, and basic performance metrics for operational managers.",
+      "source_basis": "Listed as an essential operational capability.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "MISSING_ACTOR",
+      "title": "Additional Operational and Support Actors",
+      "discovery": "Potential missing actors include Train Drivers/Onboard Staff, Station Staff/Ground Crew, Maintenance & Engineering Teams, Customer Service/Call Centre Agents, Regulatory Authorities, Emergency Services, and Public Relations/Corporate Communications.",
+      "source_basis": "Identified by the Product Owner as important missing actors.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Emergency Response and Governance Processes",
+      "discovery": "Processes concerning emergency response protocols, data validation, post-incident analysis, staff training, and integration with ticketing, scheduling, and asset management systems need to be established.",
+      "source_basis": "Listed under important missing processes.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Definition of Real-time Latency",
+      "discovery": "The exact acceptable latency for incident reporting and updates (whether seconds or minutes) is unspecified.",
+      "source_basis": "Highlighted in the ambiguous requirements section.",
+      "origin": "EXPLICIT",
+      "open_question": "What is the acceptable latency for incident reporting and updates?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Legacy System Integration Scope",
+      "discovery": "It is unclear which existing railway systems SmartRail must integrate with initially and whether the integration should be read-only or read-write.",
+      "source_basis": "Highlighted as a major architectural ambiguity.",
+      "origin": "EXPLICIT",
+      "open_question": "Which existing railway systems must SmartRail integrate with initially and to what extent?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Full AI-Powered Predictive Maintenance",
+      "discovery": "Building sophisticated AI models for predictive maintenance from scratch requires vast data and time, and is considered too large for an initial release focused on response.",
+      "source_basis": "Identified as a stakeholder request that may unnecessarily expand scope and should be challenged.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Personalised Passenger Journey Planning and Re-routing",
+      "discovery": "Real-time journey planning, alternative transport options, and individual passenger profile integration are highly complex tasks going beyond core incident response.",
+      "source_basis": "Listed as a scope candidate to challenge for the initial release.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Comprehensive CRM for Passenger Loyalty Programs",
+      "discovery": "Building a full customer relationship management system is an entirely separate product initiative from incident management.",
+      "source_basis": "Identified as a scope expansion candidate.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "Dynamic Pricing and Automated Compensation Calculations",
+      "discovery": "Automated compensation and dynamic pricing involve complex financial systems with significant regulatory and audit implications.",
+      "source_basis": "Listed as a feature that should be excluded from core incident response scope.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "SCOPE_CANDIDATE",
+      "title": "End-to-End Asset Management System",
+      "discovery": "SmartRail should interface with asset management for context, but building a brand new full asset management system is out of scope.",
+      "source_basis": "Highlighted as a scope candidate to be deferred or excluded from core product.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "MVP Capabilities Definition",
+      "discovery": "The MVP should include core incident reporting, status tracking, internal communication module, standardised passenger alerts, basic user roles, and a centralised dashboard with basic read-only integration points.",
+      "source_basis": "Described as capabilities that belong strictly in the MVP.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "OPERATIONAL",
+      "title": "Deferred Capabilities for Post-MVP Phases",
+      "discovery": "Advanced analytics, comprehensive resource optimisation, personalised passenger communication, emergency service integration, automated compensation processing, mobile apps for all roles, and two-way feedback can be deferred.",
+      "source_basis": "Listed as features that could reasonably be deferred to subsequent phases.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "ASSUMPTION",
+      "title": "Unanswered Implementation Questions",
+      "discovery": "Several critical questions regarding KPIs, definition of an incident, legacy integration requirements, target users, budget, timeline, regulatory compliance, change management, and data ownership remain unanswered.",
+      "source_basis": "Highlighted as important questions that must be answered before implementation.",
+      "origin": "EXPLICIT",
+      "open_question": "What are the primary KPIs, definition of an incident, legacy system dependencies, budget, timeline, and regulatory constraints?",
+      "scope_signal": "REVIEW_NEEDED"
+    }
+  ]
+}

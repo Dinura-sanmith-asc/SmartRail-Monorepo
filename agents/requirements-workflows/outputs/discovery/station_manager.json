@@ -1,0 +1,185 @@
+{
+  "stakeholder": "station_manager",
+  "discoveries": [
+    {
+      "category": "BUSINESS_PROCESS",
+      "title": "Pre-opening physical walk-through",
+      "discovery": "The station team performs a physical walk-through before the first train to check platforms, ticket gates, lifts, escalators, PA systems, and information boards, while printing out schedules.",
+      "source_basis": "My team does a physical walk-through: checking platforms for debris, ensuring ticket gates are operational, checking the status of lifts and escalators, testing PA systems, and making sure the information boards are displaying the initial scheduled services correctly.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Real-time manifest of train arrivals and departures",
+      "discovery": "SmartRail is expected to provide a real-time manifest of early trains including predicted tracks and pre-planned cancellations or significant delays.",
+      "source_basis": "I'd expect SmartRail to provide a real-time manifest of the first few hours' trains, including their predicted arrival/departure tracks and any pre-planned cancellations.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Accessibility facilities operational status monitoring",
+      "discovery": "SmartRail should display the operational status of all lifts, escalators, and accessible toilets to immediately put up signs and update accessible route information.",
+      "source_basis": "SmartRail should show me the current operational status of all our lifts, escalators, and accessible toilets.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Station Health Dashboard",
+      "discovery": "Information staff require a terminal providing a clear, immediate dashboard of Station Health showing all critical infrastructure status at a glance.",
+      "source_basis": "I need a SmartRail terminal that gives me a clear, immediate dashboard of Station Health: all critical infrastructure status at a glance.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Input mechanism for newly discovered local issues",
+      "discovery": "It is unclear how staff can input the status of a newly discovered issue like a broken ticket machine or power outage into SmartRail for others to see, and whether a local station status module exists.",
+      "source_basis": "How do I input the status of a newly discovered issue into SmartRail for others to see? Is there a local station status module I can update?",
+      "origin": "EXPLICIT",
+      "open_question": "Is there a dedicated local station status module for staff to input unprompted local incidents or infrastructure failures?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Data discrepancy between system prediction and visual reality",
+      "discovery": "SmartRail might predict an arrival time while the train is physically stuck outside the signal box, raising the question of who corrects this and whether manual display overrides are permitted.",
+      "source_basis": "What if SmartRail predicts an arrival at 07:15, but I can see with my own eyes the train is stuck outside the signal box? Who corrects this?",
+      "origin": "EXPLICIT",
+      "open_question": "What is the formal procedure and audit trail for overriding incorrect automated system predictions?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "CONFLICT",
+      "title": "Platform allocation versus local conditions and safety",
+      "discovery": "SmartRail might propose a platform change to optimize network flow, but station managers need the ability to veto it if the platform is blocked, requires cleaning, or is over-capacity.",
+      "source_basis": "If SmartRail proposes a platform change to optimize network flow, but that platform is currently blocked... I need the ability to challenge or veto that allocation immediately.",
+      "origin": "EXPLICIT",
+      "open_question": "Who has ultimate authority to override platform allocation disputes between local safety constraints and network optimization algorithms?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "OPERATIONAL",
+      "title": "Division of authority for platform changes and actions",
+      "discovery": "Major platform re-shuffles for an entire line require central authorization, whereas single train changes due to a local issue can be handled locally if they do not impact the wider network.",
+      "source_basis": "A major platform re-shuffle for an entire line, yes, central can decide. But for a single train due to a local issue... I need the flexibility to make a local call.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Capabilities of automated PA announcement system",
+      "discovery": "It is ambiguous whether SmartRail only handles arrival/departure specific announcements or if staff can pre-record standard messages and trigger them, or type ad-hoc text for broadcasting.",
+      "source_basis": "Can I pre-record standard announcements... or does it only do arrival/departure specific ones? What about unscheduled announcements, like for a lost child?",
+      "origin": "EXPLICIT",
+      "open_question": "Can staff broadcast ad-hoc, typed, or pre-recorded text messages using the automated PA system via SmartRail?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Automated announcement inaccuracies causing confusion",
+      "discovery": "An automated announcement might state incorrect platform details, causing panic and confusion, requiring quick manual intervention or system correction.",
+      "source_basis": "An automated announcement goes out stating Train 1234 to City Centre on Platform 3 when it's actually on Platform 5. Panic. Confusion.",
+      "origin": "EXPLICIT",
+      "open_question": "Does the system feature automated verification for announcements, or is full reliance placed on manual staff corrections during errors?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Local-only messaging capabilities on station displays",
+      "discovery": "It is unclear whether station displays are entirely controlled by network data or if part of a display can be used to show local-only messages like cafe opening times or temporary information point closures.",
+      "source_basis": "Can I use part of a display to show local-only messages... Or are they entirely controlled by network data?",
+      "origin": "EXPLICIT",
+      "open_question": "Can local staff override sections of network-controlled station displays to publish local operational messages?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Direct incident and facility status entry",
+      "discovery": "Staff need to directly log broken lifts, facility outages, passenger illnesses, broken windows, or power flickers into SmartRail, including type, location, time, and actions taken.",
+      "source_basis": "If a lift breaks down, I need to input that directly into SmartRail... I should be able to input incident type, location, time, and actions taken.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Responsibility loop closure for maintenance and repairs",
+      "discovery": "It is unclear who is responsible for ensuring an engineer actually fixes a reported issue and marking it back in service within SmartRail.",
+      "source_basis": "Who is responsible for ensuring the engineer actually fixes it and then marking it back in service in SmartRail? Is it the engineer, or do I have to chase it up?",
+      "origin": "EXPLICIT",
+      "open_question": "What is the formal workflow to close the loop on reported infrastructure failures and update their operational status?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "AMBIGUITY",
+      "title": "Different severity workflows for local incidents",
+      "discovery": "It is not specified how SmartRail manages different levels of local incidents, such as distinguishing a minor platform spill from a security alert with distinct workflows.",
+      "source_basis": "How does SmartRail manage different levels of local incidents? A spill on the platform is different from a security alert. Does it have workflows for each?",
+      "origin": "EXPLICIT",
+      "open_question": "Does SmartRail contain distinct tiered incident management workflows for varying levels of local severity?",
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FAILURE_SCENARIO",
+      "title": "Local internet or power connectivity loss during disruptions",
+      "discovery": "During major disruptions, local internet or power could fail, rendering terminals, displays, and central communication inoperable and requiring a robust offline mode.",
+      "source_basis": "What if our local internet connection or power goes down during a major disruption? All our SmartRail terminals, displays, and communication with central are gone. We need a robust offline mode.",
+      "origin": "EXPLICIT",
+      "open_question": "What core functionality can be maintained locally via backup power and offline cache if network connectivity is completely severed?",
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "OPERATIONAL",
+      "title": "Actions requiring central authorization during disruptions",
+      "discovery": "Station closures, significant changes to services affecting multiple stations, and declaring major incidents requiring emergency services coordination require central authorization.",
+      "source_basis": "Station closure, significant changes to services affecting multiple stations, declaring a major incident requiring emergency services coordination beyond local first response.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "CONFLICT",
+      "title": "Network clearing versus local passenger overcrowding",
+      "discovery": "Central control might want to clear a platform to alleviate network congestion, stranding hundreds of local passengers and creating a local safety hazard that staff must negotiate.",
+      "source_basis": "Central might want to clear a platform to alleviate network congestion, but that means hundreds of our passengers are now stranded, creating a local safety issue.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "REVIEW_NEEDED"
+    },
+    {
+      "category": "FUNCTIONAL",
+      "title": "Disruption information requirements for staff",
+      "discovery": "During disruptions, staff require precise clarity on affected trains, new plans, alternative transport locations, and estimated resolution times rather than generic delayed statuses.",
+      "source_basis": "During a disruption, I need clarity on which trains are affected, what the new plan is, where alternative transport is, and estimated resolution times. Not just delayed.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "CORE_CANDIDATE"
+    },
+    {
+      "category": "INTEGRATION",
+      "title": "Integration with local security systems",
+      "discovery": "The system needs integration with local security systems such as CCTV and access control for effective incident response.",
+      "source_basis": "Integration with local security systems (CCTV, access control) for incident response.",
+      "origin": "EXPLICIT",
+      "open_question": null,
+      "scope_signal": "EXTENSION_CANDIDATE"
+    },
+    {
+      "category": "ASSUMPTION",
+      "title": "SmartRail providing local context automatically",
+      "discovery": "It is assumed by staff that automated network solutions should inherently factor in local station context, passenger volume, and safety constraints without needing manual local intervention.",
+      "source_basis": "It cannot simply be a dictatorial system pushing network-wide decisions without local context or recourse.",
+      "origin": "CLEAR_INFERENCE",
+      "open_question": "To what extent can network optimization algorithms ingest real-time local station density metrics automatically?",
+      "scope_signal": "REVIEW_NEEDED"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+As the external Catering Provider integrating with SmartRail, here is our independent position for Round 1 regarding **Catering Disruption Resilience and Support Escalation**:
+
+### 1. What matters from our stakeholder perspective
+* **Order Integrity & Verification:** We must receive definitive, uncorrupted food orders, accurate passenger seat/coach details, and real-time train schedule adjustments (delays or cancellations) to ensure food is prepared fresh and available at the correct station.
+* **Financial Protection:** We own the menu, food preparation, and inventory. If an order is prepared, we must be paid for it, regardless of whether a passenger misses their train due to railway operations. Conversely, if we fail to deliver due to our own internal kitchen failure, we own the refund or remake.
+* **Clear Customer Boundaries:** Passengers purchase tickets and interact with SmartRail, but they purchase food from *our* catalog. Clear boundaries prevent us from absorbing customer service liability for railway-induced failures.
+
+### 2. What responsibility our role has
+* Maintaining our independent catering system, menu availability, pricing, and kitchen preparation workflows.
+* Honoring valid food orders received via the integration within the designated order deadlines for supported stations.
+* Notifying SmartRail immediately of any kitchen capacity issues, preparation bottlenecks, or localized fulfillment failures on our end.
+* Processing refunds or remakes strictly for food quality issues, item unavailability, or catering-side errors.
+
+### 3. What responsibility our role should NOT have
+* **No Railway Operations Responsibility:** We do not manage train schedules, platform assignments, track closures, or railway signals. We react to SmartRail's schedule data; we do not validate or correct it.
+* **No Primary Passenger Support for Travel Disruptions:** We are not responsible for handling passenger complaints regarding missed connections, train delays, seat changes, or ticket refunds. 
+* **No SmartRail System Recovery:** We are not responsible for debugging SmartRail’s network infrastructure or managing the passenger-facing booking app interface.
+
+### 4. What risks or failure cases concern us
+* **Lost Order Messages During Outages:** If network communication drops *during* order transmission, a passenger might believe their meal is ordered, but our kitchen never received it. Without a reconciliation protocol, this leads to an unfulfilled order upon train arrival and an angry customer at the station platform.
+* **Duplicate Messages / Idempotency Failures:** Network retries causing duplicate order creation messages, leading to double-prep of meals and inventory waste unless strict transaction IDs are enforced.
+* **Last-Minute Train Cancellations / Platform Changes:** If a train is cancelled or rerouted at the exact moment food is being handed off to the station staff, determining who bears the cost of the wasted meal.
+
+### 5. What decision needs clarification
+* **Reconciliation and Eventual Consistency Protocol:** We need a formal agreement on how our systems sync state after a network partition (e.g., periodic batch reconciliation, webhook retries with idempotency keys, or a status-polling endpoint managed by SmartRail).
+* **Primary Dispute Ownership:** We need a definitive rule: SmartRail is the primary point of contact for *all* passenger interactions (including billing, app issues, and travel-related order disputes). If a passenger contacts SmartRail about a food issue, SmartRail must use a standardized escalation API to query our system rather than directing passengers to our independent customer service desks.
+
+### 6. Any assumption we disagree with
+* **Assumption to Challenge:** That the Catering Provider should act as a frontline support agent for passengers experiencing order disputes. 
+* **Why:** Passengers book through SmartRail's ecosystem and hold a digital receipt tied to their SmartRail account. Directing passengers to the external catering provider for dispute resolution fragments the user experience and blurs the operational boundary between railway ticketing and third-party merchant services. SmartRail must own the primary interface for customer support, escalating backend disputes to us via our support integration channels.

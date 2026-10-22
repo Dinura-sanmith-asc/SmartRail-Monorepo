@@ -1,0 +1,308 @@
+[
+  {
+    "source_ref": "BRIEF-25",
+    "title": "Explore Broader Problem",
+    "statement": "The engineer must explore the broader railway problem space.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "1. Explore the broader problem.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-25",
+    "title": "Identify Important Capabilities",
+    "statement": "The engineer must identify the important capabilities of the system.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "2. Identify the important capabilities.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-25",
+    "title": "Define Achievable Assessment Scope",
+    "statement": "The engineer must define an achievable assessment scope.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "3. Define an achievable assessment scope.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-25",
+    "title": "Prioritize Requirements",
+    "statement": "The engineer must prioritize requirements.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "4. Prioritize requirements.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-25",
+    "title": "Identify MVP Scope",
+    "statement": "The engineer must identify what belongs in the MVP.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "5. Identify what belongs in your MVP.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-25",
+    "title": "Document Deferred Items",
+    "statement": "The engineer must clearly document what has been deferred.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "6. Clearly document what has been deferred.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-25",
+    "title": "Explain Prioritization Rationale",
+    "statement": "The engineer must explain why particular capabilities were prioritized.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "7. Explain why particular capabilities were prioritized.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-25",
+    "title": "Build Selected Scope to Quality",
+    "statement": "The engineer must build the selected scope to an appropriate level of quality.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "8. Build the selected scope to an appropriate level of quality.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Transform Incomplete Problem into Requirements",
+    "statement": "The engineer must demonstrate the ability to transform an incomplete problem into meaningful requirements.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Requirement Discovery | Ability to transform an incomplete problem into meaningful requirements",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "AI-Assisted Engineering Usage",
+    "statement": "The engineer must effectively use, orchestrate, and validate AI assistants or agents.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "AI-Assisted Engineering | Effective use, orchestration, and validation of AI assistants or agents",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Product Thinking Demonstration",
+    "statement": "The engineer must demonstrate an understanding of users, priorities, workflows, and business value.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Product Thinking | Understanding users, priorities, workflows, and business value",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "UI/UX Implementation",
+    "statement": "The solution must incorporate usability, consistency, accessibility, and design-system thinking.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "UI/UX | Usability, consistency, accessibility, and design-system thinking",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Architecture Boundaries and Decisions",
+    "statement": "The solution must establish appropriate boundaries, responsibility separation, and technical decisions.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Architecture | Appropriate boundaries, responsibility separation, and technical decisions",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Backend Engineering Standards",
+    "statement": "The backend must ensure maintainability, correctness, APIs, data design, and business logic.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Backend Engineering | Maintainability, correctness, APIs, data design, and business logic",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Frontend Engineering Standards",
+    "statement": "The frontend application must be usable, maintainable, and responsive.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Frontend Engineering | Usable, maintainable, responsive application development",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Mobile Engineering Experience",
+    "statement": "The system must provide an appropriate mobile experience and consider platform-specific needs.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Mobile Engineering | Appropriate mobile experience and platform considerations",
+    "clarification_question": "What specific mobile platforms or devices must be targeted by the mobile experience?"
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Integration with Catering Platform",
+    "statement": "The system must communicate robustly with the external catering platform.",
+    "classification": "PRODUCT_INTEGRATION",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Integration | Robust communication with the external catering platform",
+    "clarification_question": "What are the exact technical protocols, APIs, and authentication mechanisms required for the external catering platform?"
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "QA and Testing Strategy",
+    "statement": "The engineer must implement a meaningful testing strategy and provide evidence of quality.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "QA | Meaningful testing strategy and evidence of quality",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Secure-by-Design Engineering",
+    "statement": "The system must be built using secure-by-design engineering practices.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Security | Secure-by-design engineering practices",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Operations and Observability",
+    "statement": "The engineering design must address observability, reliability, and production-readiness.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Operations | Observability, reliability, and production-readiness thinking",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Technical Judgment and Decision Justification",
+    "statement": "The engineer must make and justify technical decisions instead of blindly following AI suggestions.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Technical Judgment | Ability to make and justify decisions instead of blindly following AI suggestions",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-26",
+    "title": "Communication of Requirements and Trade-offs",
+    "statement": "The engineer must be able to explain requirements, decisions, trade-offs, and outcomes.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Communication | Ability to explain requirements, decisions, trade-offs, and outcomes",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Final Stakeholder Presentation Delivery",
+    "statement": "The engineer must present the solution to stakeholders from the railway organization as a narrative rather than isolated screens.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "At the end of the assessment, you should present the solution as if demonstrating it to stakeholders from the railway organization. The presentation should tell a story rather than simply demonstrate individual screens.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of Discovered Requirements",
+    "statement": "The final presentation must explain what requirements were discovered.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- What requirements you discovered.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of Assumptions",
+    "statement": "The final presentation must explain what assumptions were made.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- What assumptions you made.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of Intentional Exclusions",
+    "statement": "The final presentation must explain what was intentionally excluded.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- What you intentionally excluded.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of Scope Prioritization",
+    "statement": "The final presentation must explain how the scope was prioritized.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- How you prioritized the scope.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of Architecture Decisions",
+    "statement": "The final presentation must explain important architecture decisions.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- Important architecture decisions.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of UX Decisions",
+    "statement": "The final presentation must explain important UX decisions.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- Important UX decisions.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of Security Considerations",
+    "statement": "The final presentation must explain security considerations.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- Security considerations.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of QA Strategy",
+    "statement": "The final presentation must explain the QA strategy.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- QA strategy.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of AI Contribution",
+    "statement": "The final presentation must explain how AI contributed to the development process.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- How AI contributed to the development process.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of AI Challenge and Rejection Rationale",
+    "statement": "The final presentation must explain where AI-generated suggestions were challenged or rejected.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- Where AI-generated suggestions were challenged or rejected.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-27",
+    "title": "Presentation of Future System Improvements",
+    "statement": "The final presentation must explain what would be improved if the system were continued beyond the assessment.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "- What you would improve if the system were continued beyond the assessment.",
+    "clarification_question": null
+  }
+]

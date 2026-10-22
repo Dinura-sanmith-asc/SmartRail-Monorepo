@@ -1,0 +1,26 @@
+As a Customer Service Representative stakeholder for SmartRail, here is my independent perspective for Round 1 regarding Station Accessibility, Facility Updates, and Vulnerable Passenger Protocols:
+
+### 1. What matters from my stakeholder perspective
+My primary concern is having **truthful, immediate, and actionable information** when talking directly to a passenger standing in front of me or on the phone. If a station lift is out of order, or if replacement buses have been ordered, I need to know *immediately*. When passengers with accessibility needs or vulnerable passengers (such as unaccompanied elderly travelers, children, or those with cognitive disabilities) face disruption, they rely on us for immediate physical guidance, reassurance, and accurate routing. 
+
+### 2. What responsibility I believe my role has
+* To inform passengers quickly and accurately about broken equipment, platform changes, or disrupted journeys.
+* To coordinate spontaneous and pre-booked mobility assistance locally at the station.
+* To proactively identify vulnerable passengers during major disruptions and initiate support or care protocols.
+* To escalate operational bottlenecks (like unfulfilled assistance or missing replacement transport) to operational staff and station management.
+
+### 3. What responsibility my role should NOT have
+* **I should not be the decision-maker for activating replacement transport (buses/taxis).** That is an operational/control room decision based on network-wide capacity and fleet availability. Customer service can only request or flag the need; we do not hold the authority or logistics to dispatch fleets.
+* **I should not be held solely responsible for tracking multi-operator assistance manually.** If SmartRail spans multiple operators, customer service cannot be expected to chase external companies for missing staff without a unified backend tracking mechanism.
+
+### 4. What risks or failure cases concern you
+* **The "Information Silo" Failure:** Finding out a lift is broken via an angry passenger who is already trapped or stuck at the barrier line, rather than through an automated system alert.
+* **The "Stranded Vulnerable Passenger" Failure:** Major cancellations occur, platform changes happen rapidly, and vulnerable passengers are left behind in the crowd because there is no clear handover protocol or dedicated staff member to assist them to a safe waiting area.
+* **The "Phantom Replacement Transport" Failure:** Telling passengers outside a closed station that replacement buses are "on the way" when no one has actually dispatched them, leading to severe customer frustration and safety hazards.
+
+### 5. What decision you need clarification on
+* **Decision Ownership for Alternative Transport (CF-016):** We need an explicit, documented SLA and decision matrix stating *who* triggers replacement transport, *how fast* customer service is notified once triggered, and *how* the exact pickup location is communicated to frontline staff.
+* **Real-Time Fault Reporting (CF-013):** We need to clarify the exact data pipeline between station maintenance/facilities management and the frontline customer service information screens/terminals.
+
+### 6. Any assumption you disagree with
+* **Assumption to challenge:** That customer service can naturally "absorb" the management of spontaneous accessibility requests and vulnerable passenger handovers during a major crisis without dedicated support staff. During major cancellations, frontline staff are overwhelmed with general crowd management; expecting us to simultaneously execute complex vulnerable passenger care protocols without extra operational support or clear triggers is a recipe for failure. Additionally, we must clarify whether SmartRail inherently includes a *ticketing/compensation* capability, or if our scope strictly stops at journey recovery and passenger assistance.

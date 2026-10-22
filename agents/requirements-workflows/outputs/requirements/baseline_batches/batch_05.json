@@ -1,0 +1,92 @@
+[
+  {
+    "source_ref": "BRIEF-13",
+    "title": "User Event Notifications",
+    "statement": "The system must provide capabilities to deliver information to different users when important events occur.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Different users may need to receive information when important events occur.",
+    "clarification_question": "What specific events trigger notifications, and through which channels must they be delivered?"
+  },
+  {
+    "source_ref": "BRIEF-14",
+    "title": "Publicly Accessible Railway Information",
+    "statement": "The system must allow public access to certain railway information without authentication.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Some railway information may be publicly accessible.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-14",
+    "title": "Passenger Account Authentication",
+    "statement": "The system must support user accounts for passenger functionality.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Some passenger functionality may require an account.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-14",
+    "title": "Driver Application Authentication",
+    "statement": "Driver applications must require authentication for operational users.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Driver applications require authenticated operational users.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-14",
+    "title": "Railway Management Organizational Access",
+    "statement": "Railway management functionality must require organizational access.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Railway management functionality requires organizational access.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-14",
+    "title": "Role-Based Permissions",
+    "statement": "Different organizational roles must be supported with different permissions.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Different organizational roles may require different permissions.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-14",
+    "title": "Identity and Authorization Model Definition",
+    "statement": "Define an appropriate identity and authorization model covering the authentication and permission requirements.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should define an appropriate identity and authorization model.",
+    "clarification_question": "What are the specific identity provider integrations and compliance requirements for the authorization model?"
+  },
+  {
+    "source_ref": "BRIEF-15",
+    "title": "Application Suite Identification",
+    "statement": "The solution must accommodate five distinct application types including Passenger Mobile, Driver / Operator, Station Terminal, Station Information Displays, and Railway Operations Web Application.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "ILLUSTRATIVE",
+    "evidence_excerpt": "These may include: 1. Passenger Mobile Application 2. Driver / Operator Application 3. Station Terminal Application 4. Station Information Displays 5. Railway Operations Web Application",
+    "clarification_question": "Are there any mandatory applications out of this list that must be delivered in the initial scope?"
+  },
+  {
+    "source_ref": "BRIEF-15",
+    "title": "Design System and Language Strategy",
+    "statement": "Determine whether and how the multiple applications share a common design language.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should determine whether and how these applications share a common design language.",
+    "clarification_question": "What are the technical constraints or target platforms for establishing a shared design system?"
+  },
+  {
+    "source_ref": "BRIEF-15",
+    "title": "Passenger Experience in Busy Stations",
+    "statement": "Design experiences that passengers can understand quickly while moving through a busy railway station.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Special attention should be paid to designing experiences that passengers can understand quickly while moving through a busy railway station.",
+    "clarification_question": "Are there specific accessibility or cognitive load guidelines that must be met for station environments?"
+  }
+]

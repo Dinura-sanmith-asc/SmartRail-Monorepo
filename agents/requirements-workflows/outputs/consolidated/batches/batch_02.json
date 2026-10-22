@@ -1,0 +1,333 @@
+{
+  "batch_number": 2,
+  "input_count": 20,
+  "ai_missing_refs": [],
+  "invalid_refs": [],
+  "findings": [
+    {
+      "finding_type": "OPEN_QUESTION",
+      "title": "Real-time Facility Status and Accessibility Equipment Updates",
+      "summary": "There is a lack of clarity on how quickly customer service representatives are informed about out-of-order station facilities and accessibility equipment such as lifts and ramps in real time.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-008",
+        "CUSTOMER_SERVICE-012"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS",
+        "ACCESSIBILITY"
+      ],
+      "unresolved_question": "How are broken or out-of-order station facilities and accessibility equipment reported in real time to customer service?",
+      "workshop_required": true,
+      "rationale": "Both discoveries concern real-time tracking and visibility of station facility and accessibility equipment statuses."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Dedicated Ticketing Agent Escalation",
+      "summary": "Complex ticketing and routing issues require escalation paths to a dedicated ticketing agent if SmartRail does not cover ticketing support directly.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-009"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "MISSING_ACTOR"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Addresses a specific missing actor escalation path for complex ticketing that does not overlap with other findings."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "External Handoffs for Medical, Security, and Lost Children",
+      "summary": "Medical issues, security concerns, lost children, and unruly passengers require clear handoff and escalation protocols to Station Management, First Aid, or British Transport Police.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-010"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "MISSING_ACTOR"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Defines vital emergency and safety handoff actors that must be preserved independently."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Alternative Transport Activation Process",
+      "summary": "A defined process is missing for deciding when and how replacement transport like buses or taxis is activated and communicated during significant service disruptions.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-011"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "Who decides on and arranges replacement transport, and how is it communicated?",
+      "workshop_required": true,
+      "rationale": "Focuses specifically on the operational business process for replacement transport during major delays."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Spontaneous and Pre-booked Assistance Protocols",
+      "summary": "Clear operational protocols are required to handle both pre-booked and spontaneous mobility assistance, including management of assistance no-shows.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-013"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "ACCESSIBILITY"
+      ],
+      "unresolved_question": null,
+      "workshop_required": true,
+      "rationale": "Distinctly targets assistance handling workflows and failure scenarios rather than equipment status tracking."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Unified Booking and Tracking Assistance System",
+      "summary": "An integrated system is desired for booking and tracking mobility assistance requests across multi-operator journeys.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-014"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": null,
+      "workshop_required": true,
+      "rationale": "Represents an extension candidate scope item for cross-operator assistance integration."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Inter-Operator Ticket Acceptance and Rules",
+      "summary": "Rules for ticket validity and acceptance across alternative routes or different operators during disruptions are unclear and require easy visibility and communication.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-015"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": "How can inter-operator ticket validity rules be easily viewed and communicated during disruptions?",
+      "workshop_required": true,
+      "rationale": "Deals with inter-operator ticketing rules during disruptions, distinct from assistance bookings."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Complaint Logging System",
+      "summary": "Customer service representatives need access to a designated system to accurately log complaints and track escalations.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-016"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Specifies core functional tooling requirements for complaint handling."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Dynamic and Constantly Changing Estimates",
+      "summary": "Constantly shifting arrival and departure time estimates erode passenger trust and diminish customer service credibility during delays.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-017"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "STATE"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Captures a state stability issue affecting passenger trust and CSR communications."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Vulnerable Passenger Support Protocol",
+      "summary": "A defined procedure and handover protocol is needed to proactively support vulnerable passengers, children, the elderly, or those with cognitive disabilities during major cancellations or platform changes.",
+      "source_refs": [
+        "CUSTOMER_SERVICE-018"
+      ],
+      "stakeholders": [
+        "customer_service"
+      ],
+      "categories": [
+        "BUSINESS_PROCESS"
+      ],
+      "unresolved_question": "What are the specific handover and support protocols for vulnerable passengers?",
+      "workshop_required": true,
+      "rationale": "Focuses on specialized care processes for vulnerable groups distinct from general alternative transport."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Critical Safety Notices Delivery and Acknowledgement",
+      "summary": "The mechanism for delivering and receiving mandatory auditable acknowledgements for critical safety notices prior to shift start is currently unclear.",
+      "source_refs": [
+        "DRIVER-001"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "How are critical safety notices delivered and acknowledged before proceeding?",
+      "workshop_required": true,
+      "rationale": "Identifies critical pre-shift safety notice requirements for drivers."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "System Assignment Provider Downtime and Manual Fallback",
+      "summary": "A robust and reliable manual fallback process must be established for shift assignments in the event of provider system downtime.",
+      "source_refs": [
+        "DRIVER-002"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FAILURE_SCENARIO"
+      ],
+      "unresolved_question": "What is the exact manual fallback process if the assignment system is down?",
+      "workshop_required": true,
+      "rationale": "Highlights system resilience and fallback needs during assignment outages."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Journey Assignment Acknowledgement Mechanism",
+      "summary": "It is ambiguous whether journey assignment acknowledgement should be a basic button press or require an active review and confirmation of key details.",
+      "source_refs": [
+        "DRIVER-003"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Is acknowledgement a simple button press or an active confirmation of key details?",
+      "workshop_required": false,
+      "rationale": "Addresses the specific interaction design ambiguity for journey assignments."
+    },
+    {
+      "finding_type": "CONFLICT",
+      "title": "Single Source of Truth Precedence for Journey Information",
+      "summary": "Discrepancies can occur between on-board systems, Control, and paper documents, requiring a clearly defined order of precedence.",
+      "source_refs": [
+        "DRIVER-004"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "CONFLICT"
+      ],
+      "unresolved_question": "Which source takes precedence if on-board system data differs from Control or paper documents?",
+      "workshop_required": true,
+      "rationale": "Directly represents a conflicting information source scenario requiring governance decisions."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "DMI Journey Data Loading and Error Handling",
+      "summary": "The Driver Machine Interface must support loading journey details during pre-departure checks and provide proper error handling for display or loading failures.",
+      "source_refs": [
+        "DRIVER-005"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": null,
+      "workshop_required": false,
+      "rationale": "Outlines core functional expectations for DMI journey initialization."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "DMI Complete Failure Protocol and Manual Operation Fallback",
+      "summary": "Protocols and fallback guidelines are unclear in the event of a complete DMI failure during pre-departure checks, specifically regarding manual train operation capability.",
+      "source_refs": [
+        "DRIVER-006"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "Can the train be operated manually with fallback information if the DMI fails completely?",
+      "workshop_required": true,
+      "rationale": "Presents a critical safety-related operational ambiguity during total system failure."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Distinction Between Minor and Major Train Defects",
+      "summary": "Clear operational criteria are missing to distinguish between minor defects that permit cautious operation and major defects requiring immediate attention.",
+      "source_refs": [
+        "DRIVER-007"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "AMBIGUITY"
+      ],
+      "unresolved_question": "What criteria define a minor defect versus a major defect?",
+      "workshop_required": true,
+      "rationale": "Clarifies definitions needed for fault management and safe train dispatch."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "System Role in Preventing Early Departures",
+      "summary": "The extent of automated system enforcement or active prevention regarding early departures, beyond displaying scheduled times, is undefined.",
+      "source_refs": [
+        "DRIVER-008"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "FUNCTIONAL"
+      ],
+      "unresolved_question": "What role does the system play in actively preventing early departures?",
+      "workshop_required": false,
+      "rationale": "Explores the functional boundaries of system enforcement versus advisory displays."
+    },
+    {
+      "finding_type": "UNIQUE_IMPORTANT_FINDING",
+      "title": "Platform Clear Verification Integration",
+      "summary": "Platform clear verification is primarily visual, but potential integration options with platform edge detection systems need clarification.",
+      "source_refs": [
+        "DRIVER-009"
+      ],
+      "stakeholders": [
+        "driver"
+      ],
+      "categories": [
+        "INTEGRATION"
+      ],
+      "unresolved_question": "Is there any integration with platform edge detection systems for verifying platform clear status?",
+      "workshop_required": false,
+      "rationale": "Investigates potential safety system integrations for platform departure checks."
+    }
+  ]
+}

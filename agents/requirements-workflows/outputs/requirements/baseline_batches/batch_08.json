@@ -1,0 +1,146 @@
+[
+  {
+    "source_ref": "BRIEF-22",
+    "title": "Discover Missing Requirements and Gaps",
+    "statement": "Identify missing actors, business processes, failure scenarios, states, security, operational, accessibility requirements, integration cases, conflicts, ambiguities, and important assumptions.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "You should identify: - Missing actors. - Missing business processes. - Missing failure scenarios. - Missing states. - Missing security requirements. - Missing operational requirements. - Missing accessibility requirements. - Missing integration cases. - Conflicting requirements. - Ambiguous requirements. - Important assumptions.",
+    "clarification_question": "What formal criteria will be used to measure the completeness of the discovered requirements?"
+  },
+  {
+    "source_ref": "BRIEF-22",
+    "title": "Simulate Stakeholder Discussions Using AI Agents",
+    "statement": "Use AI agents to simulate discussions with various railway roles such as passenger, driver, station manager, railway controller, customer-service representative, catering provider, security engineer, QA engineer, accessibility specialist, and product owner.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "ILLUSTRATIVE",
+    "evidence_excerpt": "You may use AI agents to simulate discussions with roles such as: - Passenger. - Driver. - Station manager. - Railway controller. - Customer-service representative. - Catering provider. - Security engineer. - QA engineer. - Accessibility specialist. - Product owner.",
+    "clarification_question": "Are specific AI agent frameworks or prompt logs required for submission?"
+  },
+  {
+    "source_ref": "BRIEF-22",
+    "title": "Consolidate Discoveries into Refined Requirements",
+    "statement": "Consolidate the discoveries from the requirement discovery challenge into refined requirements.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "You should consolidate these discoveries into your own refined requirements.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Provide Requirements Documentation Artifacts",
+    "statement": "Provide refined requirements, identified assumptions, user personas or actors, user journeys, user stories or equivalent requirements, acceptance criteria, and identified edge cases.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Refined requirements. - Identified assumptions. - User personas or actors. - User journeys. - User stories or equivalent requirements. - Acceptance criteria. - Identified edge cases.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Provide Product and UX Artifacts",
+    "statement": "Provide user flows, wireframes, high-fidelity designs where appropriate, design-system definition, and accessibility considerations.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "User flows. - Wireframes. - High-fidelity designs where appropriate. - Design-system definition. - Accessibility considerations.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Provide Architecture Documentation Artifacts",
+    "statement": "Provide high-level solution architecture, application boundaries, major system components, data ownership, integration architecture, authentication and authorization approach, and important architecture decisions and trade-offs.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "High-level solution architecture. - Application boundaries. - Major system components. - Data ownership. - Integration architecture. - Authentication and authorization approach. - Important architecture decisions and trade-offs.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Implement a Working Backend",
+    "statement": "Implement a working backend demonstrating appropriate domain modeling, APIs, data persistence, validation, authorization, integration, error handling, and observability.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "A working backend demonstrating appropriate: - Domain modeling. - APIs. - Data persistence. - Validation. - Authorization. - Integration. - Error handling. - Observability.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Implement a Web Application",
+    "statement": "Implement a web-based operational experience demonstrating meaningful railway-management functionality.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "A web-based operational experience demonstrating meaningful railway-management functionality.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Implement a Passenger Mobile Application",
+    "statement": "Implement a mobile experience supporting important passenger journeys.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "A mobile experience supporting important passenger journeys.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Implement an Operational Mobile Application",
+    "statement": "Implement a mobile application or equivalent experience for train drivers or operational personnel.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "A mobile application or equivalent experience for train drivers or operational personnel.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Implement a Station Experience Prototype",
+    "statement": "Implement a functional prototype representing station passenger-information displays, interactive station terminals, or both.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "A functional prototype representing either or both: - Station passenger-information displays. - Interactive station terminals.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Implement External Catering Integration",
+    "statement": "Implement a working integration with a simulated external catering platform, which may be mocked, simulated, or implemented as a small independent application.",
+    "classification": "PRODUCT_INTEGRATION",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "A working integration with a simulated external catering platform. The external platform may be mocked, simulated, or implemented as a small independent application where appropriate.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Provide Quality Assurance Artifacts and Testing Evidence",
+    "statement": "Provide a test strategy covering the full spectrum of quality, functional test scenarios, automated tests for selected 5 end-to-end flows, identified defects, evidence of testing, and a quality assessment of the final product.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Test strategy covering full spectrum of quality - Functional test scenarios. - Automated tests - Automating selected 5 end to end flows as they feel like most critical - Identified defects. - Evidence of testing. - Quality assessment of the final product.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Provide Security Artifacts and Testing Evidence",
+    "statement": "Provide a basic threat model, important security decisions, identified risks, security controls implemented, and evidence of relevant security testing.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Basic threat model. - Important security decisions. - Identified risks. - Security controls implemented. - Evidence of relevant security testing.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-23",
+    "title": "Document AI Tool Usage and Workflows",
+    "statement": "Document which AI tools or agents were used, assigned responsibilities, important prompts or workflows, output validation methods, examples of incorrect or insufficient AI outputs, examples of human judgment improving results, and significantly modified AI-generated implementations with reasons.",
+    "classification": "ASSESSMENT_DELIVERABLE",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Document: - Which AI tools or agents you used. - What responsibilities were assigned to them. - Important prompts or workflows. - How their output was validated. - Examples where AI output was incorrect or insufficient. - Examples where your own judgment improved the result. - Any AI-generated implementation you significantly modified and why.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-24",
+    "title": "Select and Justify Technology Stack",
+    "statement": "Select appropriate technologies for the proposed solution and explain why they are appropriate for the problem being solved.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "You may select technologies appropriate to your proposed solution unless additional constraints are provided by the assessors. Choosing a technology is not sufficient by itself. You should be able to explain why it is appropriate for the problem being solved.",
+    "clarification_question": null
+  }
+]

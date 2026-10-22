@@ -1,0 +1,29 @@
+As a Railway Station Manager participating in this workshop, I am providing my independent position on **Station Local Incident Management, Displays, and Resilience**.
+
+### 1. What Matters From My Stakeholder Perspective
+My primary focus is the safe, orderly, and continuous operation of physical station grounds, platforms, passenger flows, and local facilities. When things go wrong on the ground—whether it's an overcrowding bottleneck on Platform 3, a broken ticket barrier, a medical emergency, or a localized power dip—station staff need immediate situational awareness and the tools to act. 
+
+SmartRail cannot just be a top-down network optimizer that views our station as a node on a computer screen. It must serve as an effective operational tool for the people physically managing the station environment.
+
+### 2. What Responsibility My Role Has
+* **Local Operational Control & Veto:** I must retain the absolute right to override automated platform allocations or scheduling directives if local safety, overcrowding, accessibility constraints, or physical obstructions (e.g., a stalled train or an unattended package) make the network’s plan hazardous.
+* **Incident & Infrastructure Reporting:** My staff and I are responsible for identifying, logging, and escalating local incidents and facility failures (lifts, ticket machines, lighting) into the system so that maintenance loops can be closed.
+* **Crowd & Passenger Information Management:** We are responsible for managing passenger expectations during disruptions through local PA announcements and display overrides, keeping passengers safe and informed.
+
+### 3. What Responsibility My Role Should NOT Have
+* **Central Network Scheduling:** I am not responsible for balancing the wider regional timetable, rerouting trains miles outside my station’s jurisdiction, or managing macro-level network optimization. That belongs to the central control centre.
+* **Writing Software Code or Configuring System Architecture:** I will not dictate how SmartRail’s database handles offline syncing or UI code structures; I only specify the *operational outcomes* required on the ground.
+
+### 4. What Risks or Failure Cases Concern Me
+* **The "Computer Says No" Override Conflict:** If SmartRail's network optimization algorithm insists on routing a train into a platform my staff know is unsafe or overcrowded, and local staff lack a fast, frictionless veto, lives could be put at risk.
+* **Connectivity Severance During a Crisis:** If network connectivity drops or local power fails during a major incident, and SmartRail’s local displays, PA systems, or ticketing validation go completely dark without a robust offline fallback and backup power, station operations will descend into chaos.
+* **Announcement Errors & Panic:** Unrestricted ad-hoc text-to-speech or poorly verified automated PA broadcasts could trigger severe passenger panic or disseminate conflicting platform change instructions.
+* **The "Black Hole" Maintenance Loop:** Staff log a broken escalator or lift, but the ticket sits indefinitely in a digital queue without feedback, leaving station staff to face angry passengers with zero visibility on when (or if) repair crews are coming.
+
+### 5. What Decision Needs Clarification
+We urgently need a binding operational policy on **Override Authority**: When a dispute arises between a network-optimized platform schedule and a local station safety restriction, *who or what* has ultimate authority, and how fast can local staff execute that override without waiting for central authorization? 
+
+Additionally, we need a clear definition of what core local functions (displays, PA, local incident logging) will remain operational under complete wide-area network failure and backup power.
+
+### 6. Any Assumption I Disagree With
+I strongly disagree with any assumption (such as **CF-088**) that network optimization algorithms can seamlessly and automatically ingest "real-time local station density metrics" without accounting for human context and local staff judgment. Algorithms do not see a crowd surging toward a blocked staircase or a platform edge crowding hazard until it becomes a catastrophic metric. Local staff must be able to inject contextual modifiers directly into the system, and the system must respect those inputs as hard constraints, not mere suggestions.

@@ -1,0 +1,24 @@
+As the external Catering Provider, here is our formal response to the Product Owner's Round 1 position for **Catering Integration, Operations, and Financial Liability**:
+
+### 1. Points We Agree With
+* **Atomic Order Handling (CF-007):** We strongly agree with the Product Owner’s stance that partial item-level cancellations are out of scope for the MVP. In a fast-paced station kitchen working against tight train-departure windows, processing piecemeal item adjustments creates severe operational friction and human error. Orders must be treated as atomic units—either fully prepared or fully canceled before our cut-off time.
+* **Separation of Kitchen Management:** We agree that SmartRail should have no involvement in kitchen preparation workflows, food safety compliance, or internal culinary execution.
+
+### 2. Points We Challenge
+* **Affiliate Discovery vs. Merchant of Record Hand-Waving:** The Product Owner suggests that SmartRail cannot absorb merchant-of-record liabilities and wishes to avoid complex commercial arrangements. However, *someone* must collect passenger funds, and from the passenger’s perspective, they are buying food inside the SmartRail app. If SmartRail acts purely as an external link-out/affiliate portal passing payment details to our proprietary system, it drastically degrades the user experience and breaks our API-driven order lifecycle. If SmartRail collects the money from the passenger, SmartRail *is* the merchant of record for that transaction, and financial settlement terms with us must be defined—they cannot simply be wished away to avoid "commercial disputes."
+
+### 3. Responsibilities That Appear Unclear
+* **Who Handles Passenger-Facing Refund UI?** If an order is successfully canceled before our cut-off time, or if an order must be canceled due to a catastrophic railway disruption, it remains ambiguous whether SmartRail’s app handles the refund execution and UI messaging, or if our catering system is expected to push financial ledger updates back to SmartRail. 
+* **Disruption Communication Ownership:** When a train is delayed or canceled, it is unclear whether SmartRail's system will automatically broadcast an explicit, event-driven disruption payload to our API (including revised timestamps), or if our system is expected to poll SmartRail's operational feeds.
+
+### 4. Risks Another Stakeholder May Have Overlooked
+* **Brand Damage and Accountability Mismatch:** The Product Owner is rightly concerned about passenger trust erosion. However, they overlook the reality that *to the passenger*, SmartRail and the food are one single product. If a train is delayed by SmartRail's operations, our kitchen throws away fresh food, and the passenger gets neither food nor a refund because of a blame-shifting dispute, the passenger will direct their fury entirely at SmartRail's app. Pushing merchant-of-record risk entirely onto third-party vendors without a clear financial safety net will discourage quality caterers from integrating with SmartRail in the first place.
+* **Silent Discard Failures:** The Product Owner warns against the catering system "silently discarding an order" during a train delay. To prevent this, SmartRail must recognize that our kitchen systems cannot guess train statuses; we rely entirely on timely, accurate operational webhooks from SmartRail to know whether to pause, hold, or scrap an order.
+
+### 5. Any Proposal That Would Create Problems for Our Role
+* **Refusing Financial Settlement/Liability Frameworks:** Any proposal where SmartRail treats the integration as a "fire-and-forget" ordering widget—where SmartRail collects passenger revenue but disclaims all responsibility for financial adjustments when their own railway operations fail—is a complete non-starter for our independent business. We cannot inject capital and fresh food into a closed loop where we absorb 100% of the downside risk for railway-induced failures.
+
+### 6. Questions That Still Require an Architect or Business Decision
+* **What is the exact financial reconciliation and settlement model?** (Is SmartRail the Merchant of Record, and how are agreed-upon compensation payouts for railway-disrupted food handled?)
+* **What is the definitive API event contract for railway disruptions?** (Will SmartRail provide dynamic, real-time Estimated Times of Arrival via webhook, or will delays be communicated via binary flags?)
+* **Where does the cancellation cut-off arbiter live?** (Does SmartRail's UI query our API for cut-off validation in real-time, or does SmartRail rely on static rules configured in their own app?)

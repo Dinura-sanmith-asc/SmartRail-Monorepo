@@ -1,0 +1,28 @@
+### 1. What matters from your stakeholder perspective
+From a network-wide operational perspective, my primary concern is maintaining the safe, fluid, and predictable movement of all active train journeys across the entire railway network. I need real-time visibility into active journeys, service delays, route changes, platform allocations, and unexpected infrastructure constraints. 
+
+When disruptions occur—whether due to operational incidents, infrastructure failures, or emergency interventions—I need the authority and the tools to make rapid network-level trade-offs (e.g., freight vs. passenger priorities, rerouting, or service curtailment) without getting bogged down in localized commercial or operational friction.
+
+### 2. What responsibility you believe your role has
+* **Network-Wide Regulation & Safety:** Authorizing overarching route changes, managing active train paths, and coordinating emergency response or infrastructure work windows.
+* **Operational Disruption Management:** Deciding when a service must be delayed, diverted, or terminated unexpectedly to maintain network flow and safety.
+* **Cross-Stakeholder Coordination:** Issuing binding operational instructions to drivers and coordinating with station managers and Train Operating Companies (TOCs) regarding service modifications.
+* **Information Authoring & Dissemination:** Ensuring that operational status changes (platform reallocations, cancellations, route adjustments) are instantaneously synchronized with passenger-information updates to prevent public misinformation.
+
+### 3. What responsibility your role should NOT have
+* **Local Crowding & Accessibility Vetoes:** I should *not* be responsible for managing local station accessibility flows, step-free access compliance, or real-time platform crowding densities. While I can mandate a platform change for network throughput, local station staff hold ground-truth visibility into crowd dynamics and platform safety.
+* **Commercial Contract Enforcement:** I should *not* be the entity deciding whether a commercial cancellation fee applies or negotiating resource availability directly with TOC commercial departments. My focus is operational feasibility, not commercial penalties.
+* **Direct Ground Safety Enforcement:** I am not on the ground; therefore, I should not be verifying physical track clearances or issuing localized protection details to engineers without explicit, logged handshakes from the field commanders.
+
+### 4. What risks or failure cases concern you
+* **Platform Change Gridlock (CF-070):** If station staff are given an absolute "veto" over controller-initiated platform changes without a formal override framework, a local station concern could block a network-critical routing decision, leading to cascading system-wide gridlock. Conversely, ignoring station staff warnings risks passenger crush incidents or stranding accessibility-impaired passengers.
+* **Communication Latency & Passenger Confusion (CF-072):** A disconnect between my operational cancellation decisions and passenger-information displays leaves passengers waiting unnecessarily and erodes trust.
+* **Unauthorized Infrastructure / Emergency Access (CF-064):** Unclear protocols or lack of audit trails for external emergency services and infrastructure engineers accessing the track could lead to conflicting movements and catastrophic safety breaches.
+* **Automated Data Discrepancies (CF-073):** Blindly trusting automated system predictions over visual reality—or lacking a clean, auditable manual override procedure—can force controllers into making incorrect tactical decisions.
+
+### 5. What decision you need clarification on
+* **Platform Veto Resolution Authority (CF-070):** Exactly how is a deadlock resolved if a controller initiates a critical platform change for network flow, but station staff raise an accessibility or overcrowding veto? Who holds the ultimate tie-breaking authority under strict time constraints?
+* **Automated vs. Manual Cancellation Thresholds (CF-071 & CF-073):** Can an operational cancellation be automatically triggered if a TOC fails to confirm resources by a strict threshold, or does this require explicit controller sign-off to prevent premature commercial cancellations?
+
+### 6. Any assumption you disagree with
+* **Assumption of System-Tracked Driver Route Competence (CF-076):** I disagree with any assumption that SmartRail should automatically block or authorize train movements based solely on an automated database of "driver route competence." While competence must be verified, verifying and maintaining driver certification records is an organizational and TOC HR/operations responsibility, not a real-time network controller decision point. The system should flag warnings, but the operational authority to authorize a driver on a route must remain anchored to established safety management protocols, not unverified database assumptions.

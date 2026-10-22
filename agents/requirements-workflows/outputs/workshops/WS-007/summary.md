@@ -1,0 +1,64 @@
+# WS-007 — Passenger Ticketing, Multi-Operator Fares, and Retail Roles
+
+## Participants
+
+- passenger
+- product_owner
+
+## Agreements
+
+- Both stakeholders agree that SmartRail should avoid acting merely as a redirection tool or directory that bounces users to external operator websites, as this creates a poor user experience and low conversion rates.
+- Both stakeholders agree that achieving a unified retailing strategy and resolving the direct retailer versus redirection question is urgent.
+- Both stakeholders agree that passengers desire a single, frictionless transaction experience where possible.
+
+## Disagreements
+
+- The Passenger Agent demands guaranteed connections, protection, and single-ticket liability for all recommended multi-operator journeys, whereas the Product Owner argues that SmartRail cannot legally or financially underwrite commercial risks for uncooperative, non-integrated third-party operators.
+- The Passenger Agent views excluding multi-operator protection from the MVP as an unacceptable cop-out that shifts risk onto vulnerable travelers, while the Product Owner argues that attempting to solve decades of fragmented industry commercial structures at launch risks stalling the project.
+
+## Ownership Questions
+
+- Who is responsible for frontline customer support, refunds, and ticket amendments when disruptions occur on a multi-operator journey booked through SmartRail?
+- Who owns the commercial and financial settlement clearing processes between competing, non-integrated operators if SmartRail collects a single fare?
+
+## Scope Questions
+
+- Should non-integrated multi-operator ticketing and commercial liability guarantees be included in the SmartRail MVP, or should the MVP focus strictly on standard, supported integration paths?
+- If certain independent operators cannot be supported via direct retail at launch, should SmartRail refuse to display their routes or display them with clear warning labels?
+
+## Assumptions to Validate
+
+- The assumption that SmartRail can operate as a direct merchant of record for all routes without incurring prohibitive financial, regulatory, and PCI-DSS compliance burdens at launch.
+- The assumption that legacy operator reservation systems can reliably integrate with a single SmartRail checkout engine to prevent booking failures or double-allocations.
+
+## Decision Points
+
+### Decision 1
+
+What is SmartRail's core retailing model for launch?
+
+**Options:**
+
+- Act as a direct merchant of record handling all checkouts and payments in-app for all routes.
+- Adopt a phased approach starting with agency ticketing for integrated routes and expanding later.
+- Act as an aggregator or redirection platform linking to operator websites.
+
+**Affected findings:** CF-042, CF-049
+
+### Decision 2
+
+How should SmartRail handle routes combining non-integrated operators where connection protections do not exist?
+
+**Options:**
+
+- Exclude them entirely from the journey planner until commercial agreements are established.
+- Display them clearly labeled as unprotected, self-transfer journeys.
+- Display them as standard journeys while attempting to enforce minimum transfer times.
+
+**Affected findings:** CF-042
+
+
+## Unresolved Questions
+
+- What specific data security and privacy protocols will be implemented for storing passenger payment details and personal information (CF-050)?
+- What is the minimum acceptable transfer time built into SmartRail’s journey planner for vulnerable passengers across operator boundaries, and who enforces it?

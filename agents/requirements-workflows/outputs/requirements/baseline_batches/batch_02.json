@@ -1,0 +1,56 @@
+[
+  {
+    "source_ref": "BRIEF-4",
+    "title": "Domain Model Representation",
+    "statement": "Determine an appropriate domain model for representing the railway network and its operations.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "You should determine an appropriate domain model for representing the railway network and its operations.",
+    "clarification_question": "What are the specific bounds and persistence expectations for the railway network domain model?"
+  },
+  {
+    "source_ref": "BRIEF-5",
+    "title": "Live Train Journey Information",
+    "statement": "Provide passengers with information about active train journeys including current progress.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "An important part of the system is providing passengers with information about active train journeys.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-5",
+    "title": "Live Information Mechanism",
+    "statement": "Investigate and design the mechanism used to obtain, calculate, communicate, and update live information.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "The mechanism used to obtain, calculate, communicate, and update live information should be investigated and designed by you.",
+    "clarification_question": "What are the source data feeds and latency requirements for live train information updates?"
+  },
+  {
+    "source_ref": "BRIEF-6",
+    "title": "Digital Passenger-Information Displays",
+    "statement": "Railway stations must contain digital passenger-information displays.",
+    "classification": "PRODUCT_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "Railway stations should contain digital passenger-information displays.",
+    "clarification_question": null
+  },
+  {
+    "source_ref": "BRIEF-6",
+    "title": "Display Information Prioritization",
+    "statement": "Investigate what information is most important for digital displays in different locations.",
+    "classification": "ENGINEERING_PROCESS",
+    "source_strength": "TO_BE_DEFINED",
+    "evidence_excerpt": "However, you should investigate what information is most important in different locations.",
+    "clarification_question": "What stakeholder requirements define the specific information needs for each display location type?"
+  },
+  {
+    "source_ref": "BRIEF-6",
+    "title": "Display Connectivity and Resiliency",
+    "statement": "Consider how displays receive updated information and how they behave when connectivity is unreliable.",
+    "classification": "PRODUCT_NON_FUNCTIONAL",
+    "source_strength": "EXPLICIT",
+    "evidence_excerpt": "The solution should consider how these displays receive updated information and how they behave when connectivity is unreliable.",
+    "clarification_question": "What fallback behavior or cached information must displays show during network outages?"
+  }
+]
