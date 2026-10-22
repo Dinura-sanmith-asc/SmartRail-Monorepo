@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: [main]
@@ -81,3 +82,4 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter analyze
+
