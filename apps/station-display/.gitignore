@@ -1,0 +1,71 @@
+
+# ==========================
+# Dependencies
+# ==========================
+node_modules/
+
+# ==========================
+# Environment Variables
+# ==========================
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# ==========================
+# Build Output
+# ==========================
+dist/
+dist-ssr/
+build/
+coverage/
+*.tsbuildinfo
+
+# ==========================
+# Logs
+# ==========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==========================
+# Local Files
+# ==========================
+*.local
+*.tmp
+*.temp
+.cache/
+temp/
+tmp/
+
+# ==========================
+# Testing (Playwright)
+# ==========================
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# ==========================
+# Editor and IDE
+# ==========================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ==========================
+# OS Files
+# ==========================
+Desktop.ini
+$RECYCLE.BIN/
