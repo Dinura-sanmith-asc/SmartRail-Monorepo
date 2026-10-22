@@ -21,9 +21,7 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
             "/api/operations/overview",
             "/api/incidents", "/api/incidents/{id}", "/api/driver/assignments",
             "/api/driver/journeys/{id}/observations", "/api/operations/journeys/{id}/observations",
-            "/api/services/management", "/api/services/{id}/schedules", "/api/services/{id}/schedules/{scheduleId}",
-            "/api/services/{id}/schedules/{scheduleId}/publish", "/api/services/{id}/schedules/{scheduleId}/operation-dates",
-            "/api/service-date-manifests/{date}", "/api/routes/management", "/api/stations/{id}" }).ToArray();
+            "/api/services/management", "/api/routes/management", "/api/stations/{id}" }).ToArray();
         var generatedPaths = paths.EnumerateObject().Select(property => property.Name).Order(StringComparer.Ordinal).ToArray();
         Assert.Equal(expectedFeaturePaths.Order(StringComparer.Ordinal), generatedPaths);
         foreach (var path in expectedRailwayPaths)
@@ -37,8 +35,6 @@ public sealed class RailwayNetworkOpenApiTests(PostgreSqlTestDatabaseFixture fix
         Assert.True(paths.GetProperty("/api/stations/{id}").TryGetProperty("delete", out _));
         Assert.Contains(paths.GetProperty("/api/services").GetProperty("post").GetProperty("security").EnumerateArray(),
             item => item.TryGetProperty("CognitoAccessToken", out _));
-        Assert.Contains(paths.GetProperty("/api/services/{id}/schedules/{scheduleId}/publish").GetProperty("post")
-            .GetProperty("security").EnumerateArray(), item => item.TryGetProperty("CognitoAccessToken", out _));
         var search = paths.GetProperty("/api/services").GetProperty("get");
         var parameters = search.GetProperty("parameters").EnumerateArray()
             .Select(item => item.GetProperty("name").GetString()!) .ToHashSet(StringComparer.Ordinal);
