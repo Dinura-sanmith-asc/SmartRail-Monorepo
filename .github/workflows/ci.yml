@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore SmartRail.slnx
+      - run: dotnet build SmartRail.slnx --no-restore --configuration Release
+
+  operations-web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/operations-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/operations-web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  station-display:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/station-display
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/station-display/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  passenger-mobile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/passenger-mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+
+  driver-mobile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/driver-mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze

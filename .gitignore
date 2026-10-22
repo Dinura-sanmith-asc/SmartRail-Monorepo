@@ -1,0 +1,18 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+**/token.txt
+**/secrets.json
+
+# Dependencies and build outputs
+**/node_modules/
+**/.dart_tool/
+**/bin/
+**/obj/
+**/build/
+**/dist/
+
+# Copies of the old workspace
+worktrees/
+*.zip
