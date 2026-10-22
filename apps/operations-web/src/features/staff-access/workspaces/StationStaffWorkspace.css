@@ -1,0 +1,47 @@
+.station-staff-shell {
+  padding: 32px clamp(20px, 5vw, 64px);
+  text-align: start;
+}
+
+.station-staff-shell__header h1 {
+  margin-block: 16px;
+}
+
+.station-staff-shell__description,
+.station-staff-shell__content {
+  max-width: 70ch;
+}
+
+.workspace-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block: 24px;
+}
+
+.workspace-navigation__link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.workspace-navigation__link:hover,
+.workspace-navigation__link[aria-current='page'] {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.workspace-navigation__link:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.station-staff-shell__content {
+  padding-block: 20px;
+  border-top: 1px solid var(--border);
+}

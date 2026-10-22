@@ -1,0 +1,50 @@
+[
+  {
+    "original_name": "SmartRail_MoSCoW_Approved_Requirements(1).xlsx",
+    "packaged_path": "evidence/requirements.xlsx",
+    "bytes": 99453,
+    "sha256": "291370fac9f50f97c160ad5c2ba04973da657270df8a8c0cd6d02c913e9a4382"
+  },
+  {
+    "original_name": "RBAC & API Contracts.pdf",
+    "packaged_path": "evidence/rbac-api-contracts.pdf",
+    "bytes": 50929,
+    "sha256": "27b38a105a22be2fe35c3e9a4f92132ab462677d3aa816dab8bce4c4d91aa598"
+  },
+  {
+    "original_name": "SmartRail_Architecture.drawio.png",
+    "packaged_path": "assets/container.png",
+    "bytes": 219317,
+    "sha256": "b33a694c61d942b0a7f69b4c99b8225d00f160dbf8f72c2abfba74b766d5fbf9"
+  },
+  {
+    "original_name": "railway context diagram.png",
+    "packaged_path": "assets/system-context.png",
+    "bytes": 177406,
+    "sha256": "0d010fea39079f31a4042319fe3f01c1a86dad8e42035b4fdb07b7219089c0b5"
+  },
+  {
+    "original_name": "techstack.png",
+    "packaged_path": "assets/technology-stack.png",
+    "bytes": 45844,
+    "sha256": "bd003d6e541337e7114612c6ee796f6701e1bcae4f62a9af84d4b6a5c5ee81fc"
+  },
+  {
+    "original_name": "backend architecture.drawio.png",
+    "packaged_path": "assets/backend-components.png",
+    "bytes": 284447,
+    "sha256": "64ae2eca9c31db1f3e097efd543fdde50c8c7528b49b047e32832d69ea622293"
+  },
+  {
+    "original_name": "SmartRail-AWS-Deployment-final.png",
+    "packaged_path": "assets/aws-deployment.png",
+    "bytes": 632654,
+    "sha256": "72a9f029e9c640c9ed34e5ad8b69bc3e24966214d682fb5fcd8d204806713b56"
+  },
+  {
+    "original_name": "er diagarm.drawio(1).png",
+    "packaged_path": "assets/erd.png",
+    "bytes": 495869,
+    "sha256": "48a862be0974681a66750e87530700a1d7ce82a13df66928aeb4a0373cc5ab31"
+  }
+]
