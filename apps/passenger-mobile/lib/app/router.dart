@@ -13,6 +13,7 @@ import 'package:smartrail_passenger/features/railway_search/presentation/service
 abstract final class AppRoutes {
   static const String home = '/home';
   static const String explore = '/railway/search';
+  static const String search = explore;
   static const String myJourney = '/my-journey';
   static const String services = '/services';
   static const String results = '/railway/results';
