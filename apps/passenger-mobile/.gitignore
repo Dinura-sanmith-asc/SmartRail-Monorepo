@@ -1,0 +1,136 @@
+
+# ==========================================
+# SmartRail Passenger - Flutter Git Ignore
+# ==========================================
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+Thumbs.db
+.atom/
+.build/
+.buildlog/
+.history/
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# ==========================================
+# IDE and Editor Settings
+# ==========================================
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code local configuration
+.vscode/
+
+# ==========================================
+# Flutter / Dart / Pub
+# ==========================================
+
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+build/
+coverage/
+
+# Flutter widget previews
+.widget_preview/
+
+# ==========================================
+# Generated Files
+# ==========================================
+
+*.g.dart
+*.freezed.dart
+*.gr.dart
+
+# Note:
+# Remove the three rules above if generated
+# Dart files are intended to be committed.
+
+# Symbolication
+app.*.symbols
+
+# Obfuscation
+app.*.map.json
+
+# ==========================================
+# Android
+# ==========================================
+
+android/local.properties
+android/key.properties
+android/.gradle/
+android/captures/
+android/.cxx/
+
+# Signing files
+*.keystore
+*.jks
+
+# Android build output
+android/app/debug/
+android/app/profile/
+android/app/release/
+
+# ==========================================
+# iOS / Xcode
+# ==========================================
+
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+
+*.xcuserstate
+*.xcuserdata/
+DerivedData/
+
+# ==========================================
+# Environment and Secrets
+# ==========================================
+
+.env
+.env.*
+!.env.example
+!.env.sample
+
+*.pem
+*.p12
+*.p8
+
+# Firebase configuration containing
+# sensitive values should be reviewed
+# before committing.
+# Ignore local secret copies if needed.
+
+# ==========================================
+# Temporary Files
+# ==========================================
+
+*.tmp
+*.temp
+*.bak
+*.orig
+*~
+
+# ==========================================
+# Operating System
+# ==========================================
+
+.Trashes
+.Spotlight-V100

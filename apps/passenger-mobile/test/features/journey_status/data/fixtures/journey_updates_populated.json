@@ -1,0 +1,71 @@
+[
+  {
+    "updateId": "ffffffff-ffff-4fff-8fff-fffffffffff1",
+    "journeyInstanceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
+    "revision": 4,
+    "kind": "status",
+    "status": "Running",
+    "source": "ControllerManual",
+    "publishedAt": "2026-10-19T09:00:00+05:30",
+    "correctionOfUpdateId": null,
+    "publicChange": {"changeType": "status", "status": "Running"}
+  },
+  {
+    "updateId": "ffffffff-ffff-4fff-8fff-fffffffffff2",
+    "journeyInstanceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
+    "revision": 5,
+    "kind": "stopChange",
+    "status": "Running",
+    "source": "ApprovedRailwayFeed",
+    "publishedAt": "2026-10-19T09:05:00+05:30",
+    "correctionOfUpdateId": null,
+    "publicChange": {
+      "changeType": "stopChange",
+      "journeyStopId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2",
+      "platform": "4"
+    }
+  },
+  {
+    "updateId": "ffffffff-ffff-4fff-8fff-fffffffffff3",
+    "journeyInstanceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
+    "revision": 6,
+    "kind": "routeDiversion",
+    "status": "Delayed",
+    "source": "ControllerManual",
+    "publishedAt": "2026-10-19T09:10:00+05:30",
+    "correctionOfUpdateId": null,
+    "publicChange": {
+      "changeType": "routeDiversion",
+      "divertedStops": [
+        {
+          "journeyStopId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3",
+          "stationId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+          "stopOrder": 2,
+          "scheduledArrivalAt": "2026-10-19T10:00:00+05:30",
+          "scheduledDepartureAt": null,
+          "operationalArrivalAt": "2026-10-19T10:10:00+05:30",
+          "operationalDepartureAt": null,
+          "platform": null
+        }
+      ]
+    }
+  },
+  {
+    "updateId": "ffffffff-ffff-4fff-8fff-fffffffffff4",
+    "journeyInstanceId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
+    "revision": 7,
+    "kind": "correction",
+    "status": "Delayed",
+    "source": "ApprovedRailwayFeed",
+    "publishedAt": "2026-10-19T09:20:00+05:30",
+    "correctionOfUpdateId": "ffffffff-ffff-4fff-8fff-fffffffffff2",
+    "publicChange": {
+      "changeType": "correction",
+      "correctedChange": {
+        "changeType": "stopChange",
+        "journeyStopId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2",
+        "operationalArrivalAt": "2026-10-19T11:45:00+05:30"
+      }
+    }
+  }
+]
