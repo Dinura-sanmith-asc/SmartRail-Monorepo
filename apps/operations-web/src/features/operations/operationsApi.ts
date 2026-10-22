@@ -1,7 +1,7 @@
 import { ApiRequestError, fetchJson } from '../../shared/api/fetchJson'
 
 export type Station = { stationId: string; name: string; locationDetails?: string[]; serviceDetails?: string[] }
-export type ManagedTrainService = { serviceId: string; serviceCode: string; displayName: string | null; publicServiceNumber: string | null; routeId: string; routeCode: string; routeName: string; isPublished: boolean }
+export type ManagedTrainService = { serviceId: string; serviceCode: string; displayName: string | null; publicServiceNumber: string | null; routeId: string; routeCode: string; routeName: string; isPublished: boolean; routeStopIds: string[] }
 export type ManagedRouteStop = { routeStopId: string; stationId: string; stationName: string; stopOrder: number }
 export type ManagedRoute = { routeId: string; routeCode: string; name: string; isPublished: boolean; stops: ManagedRouteStop[] }
 export type Departure = { journeyInstanceId: string; serviceId: string; operationDate: string; stationLocalDepartureDate: string; revision: number; status: string; stationId: string; stationName: string; stopOrder: number; scheduledDepartureAt: string | null; operationalDepartureAt: string | null; platform: string | null; source: string; updatedAt: string; ambiguity: string }
@@ -121,8 +121,8 @@ export const operationsApi = {
   createRoute: (body: { routeCode: string; name: string; stationIds: string[] }, o: Options) => request<ManagedRoute>('/api/routes/management', o, { method: 'POST', body: JSON.stringify(body) }),
   updateRoute: (id: string, body: { routeCode: string; name: string; stationIds: string[] }, o: Options) => request<ManagedRoute>(`/api/routes/management/${encodeURIComponent(id)}`, o, { method: 'PATCH', body: JSON.stringify(body) }),
   deleteRoute: (id: string, o: Options) => request<void>(`/api/routes/management/${encodeURIComponent(id)}`, o, { method: 'DELETE' }),
-  createTrainService: (body: Pick<ManagedTrainService, 'serviceCode' | 'routeId' | 'displayName' | 'publicServiceNumber'>, o: Options) => request<ManagedTrainService>('/api/services', o, { method: 'POST', body: JSON.stringify(body) }),
-  updateTrainService: (id: string, body: Pick<ManagedTrainService, 'serviceCode' | 'routeId' | 'displayName' | 'publicServiceNumber'>, o: Options) => request<ManagedTrainService>(`/api/services/${encodeURIComponent(id)}`, o, { method: 'PATCH', body: JSON.stringify(body) }),
+  createTrainService: (body: Pick<ManagedTrainService, 'serviceCode' | 'routeId' | 'displayName' | 'publicServiceNumber' | 'routeStopIds'>, o: Options) => request<ManagedTrainService>('/api/services', o, { method: 'POST', body: JSON.stringify(body) }),
+  updateTrainService: (id: string, body: Pick<ManagedTrainService, 'serviceCode' | 'routeId' | 'displayName' | 'publicServiceNumber' | 'routeStopIds'>, o: Options) => request<ManagedTrainService>(`/api/services/${encodeURIComponent(id)}`, o, { method: 'PATCH', body: JSON.stringify(body) }),
   deleteTrainService: (id: string, o: Options) => request<void>(`/api/services/${encodeURIComponent(id)}`, o, { method: 'DELETE' }),
   createStation: (name: string, o: Options) => request<Station>('/api/stations', o, { method: 'POST', body: JSON.stringify({ name }) }),
   updateStation: (id: string, name: string, o: Options) => request<Station>(`/api/stations/${encodeURIComponent(id)}`, o, { method: 'PATCH', body: JSON.stringify({ name }) }),

@@ -2,10 +2,10 @@ using SmartRail.Domain.RailwayNetwork.Entities;
 
 namespace SmartRail.Application.RailwayNetwork.Services;
 
-public sealed record CreateTrainServiceRequest(string ServiceCode, Guid RouteId, string? DisplayName, string? PublicServiceNumber);
-public sealed record UpdateTrainServiceRequest(string ServiceCode, Guid RouteId, string? DisplayName, string? PublicServiceNumber);
+public sealed record CreateTrainServiceRequest(string ServiceCode, Guid RouteId, string? DisplayName, string? PublicServiceNumber, IReadOnlyList<Guid>? RouteStopIds = null);
+public sealed record UpdateTrainServiceRequest(string ServiceCode, Guid RouteId, string? DisplayName, string? PublicServiceNumber, IReadOnlyList<Guid>? RouteStopIds = null);
 public sealed record TrainServiceManagementView(Guid ServiceId, string ServiceCode, string? DisplayName,
-    string? PublicServiceNumber, Guid RouteId, string RouteCode, string RouteName, bool IsPublished);
+    string? PublicServiceNumber, Guid RouteId, string RouteCode, string RouteName, bool IsPublished, IReadOnlyList<Guid> RouteStopIds);
 public sealed record CallingPointInput(Guid RouteStopId, int? ArrivalOffsetMinutes, int? DepartureOffsetMinutes);
 public sealed record ScheduleRevisionInput(TimeOnly FirstDepartureLocalTime, IReadOnlyList<CallingPointInput> CallingPoints);
 public sealed record ScheduleCallingPointView(Guid RouteStopId, Guid StationId, string StationName, int StopOrder,

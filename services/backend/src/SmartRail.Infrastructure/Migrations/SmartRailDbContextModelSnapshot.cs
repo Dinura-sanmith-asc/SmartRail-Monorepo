@@ -1469,6 +1469,36 @@ namespace SmartRail.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.TrainServiceRouteStop", b =>
+                {
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("service_id");
+
+                    b.Property<Guid>("RouteStopId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("route_stop_id");
+
+                    b.Property<int>("StopOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("stop_order");
+
+                    b.HasKey("ServiceId", "RouteStopId")
+                        .HasName("pk_train_service_route_stop");
+
+                    b.HasIndex("RouteStopId")
+                        .HasDatabaseName("ix_train_service_route_stop_route_stop_id");
+
+                    b.HasIndex("ServiceId", "StopOrder")
+                        .IsUnique()
+                        .HasDatabaseName("ux_train_service_route_stop_order");
+
+                    b.ToTable("train_service_route_stop", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_train_service_route_stop_order_positive", "stop_order > 0");
+                        });
+                });
+
             modelBuilder.Entity("SmartRail.Domain.DriverOperations.Entities.DriverAssignmentAudit", b =>
                 {
                     b.HasOne("SmartRail.Domain.DriverOperations.Entities.DriverJourneyAssignment", null)
@@ -1711,6 +1741,23 @@ namespace SmartRail.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_train_service_route");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.TrainServiceRouteStop", b =>
+                {
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.RouteStop", null)
+                        .WithMany()
+                        .HasForeignKey("RouteStopId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_train_service_route_stop_route_stop");
+
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.TrainService", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_train_service_route_stop_service");
                 });
 
             modelBuilder.Entity("SmartRail.Domain.Incidents.Entities.Incident", b =>

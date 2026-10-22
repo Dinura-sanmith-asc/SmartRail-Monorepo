@@ -63,6 +63,10 @@
 .route-stop-editor__list { display:flex; flex-direction:column; gap:6px; margin:0 0 12px; padding:0; list-style:none; }
 .route-stop-editor__list li { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 9px; border:1px solid #e5ecef; border-radius:6px; background:#fff; color:#344d60; font-size:11px; }
 .route-stop-editor__list li b { color:#597184; }
+.train-service-stop-editor>p { margin:0 0 10px; color:#63798a; font-size:10px; }
+.train-service-stop-editor .route-stop-editor__list li label { display:flex; align-items:center; gap:9px; width:100%; cursor:pointer; }
+.train-service-stop-editor .route-stop-editor__list input { accent-color:#10767d; }
+.train-service-stop-editor .route-stop-editor__list small { margin-left:auto; color:#718596; font-size:9px; }
 .route-stop-editor__add { display:flex; align-items:flex-end; gap:9px; }
 .route-stop-editor__add .operations-control { flex:1; }
 .route-code-button { display:inline-flex; align-items:center; gap:8px; border:0; padding:4px 0; background:transparent; color:#116c72; font:700 12px var(--sans); cursor:pointer; }

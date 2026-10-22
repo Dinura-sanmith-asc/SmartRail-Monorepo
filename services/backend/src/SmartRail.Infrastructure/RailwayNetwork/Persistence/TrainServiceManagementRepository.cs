@@ -13,18 +13,25 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
                join route in db.Routes.AsNoTracking() on service.RouteId equals route.RouteId
                orderby service.ServiceCode
                select new { Service = service, route.RouteCode, route.Name }).ToListAsync(cancellationToken);
-        return rows.Select(item => ToView(item.Service, item.RouteCode, item.Name)).ToArray();
+        var serviceIds = rows.Select(item => item.Service.ServiceId).ToArray();
+        var selectedStops = await db.TrainServiceRouteStops.AsNoTracking().Where(item => serviceIds.Contains(item.ServiceId))
+            .OrderBy(item => item.StopOrder).ToListAsync(cancellationToken);
+        return rows.Select(item => ToView(item.Service, item.RouteCode, item.Name,
+            selectedStops.Where(stop => stop.ServiceId == item.Service.ServiceId).Select(stop => stop.RouteStopId).ToArray())).ToArray();
     }
 
     public async Task<TrainServiceManagementView?> CreateAsync(CreateTrainServiceRequest request, CancellationToken cancellationToken = default)
     {
         if (!await db.Routes.AnyAsync(route => route.RouteId == request.RouteId, cancellationToken)) return null;
+        var routeStops = await db.RouteStops.Where(item => item.RouteId == request.RouteId).OrderBy(item => item.StopOrder).ToListAsync(cancellationToken);
+        var selectedStops = ResolveServiceStops(routeStops, request.RouteStopIds);
         var service = new TrainService(Guid.NewGuid(), request.ServiceCode, request.RouteId,
             displayName: request.DisplayName, publicServiceNumber: request.PublicServiceNumber);
         db.TrainServices.Add(service);
+        db.TrainServiceRouteStops.AddRange(selectedStops.Select((stop, index) => new TrainServiceRouteStop(service.ServiceId, stop.RouteStopId, index + 1)));
         await db.SaveChangesAsync(cancellationToken);
         var route = await db.Routes.AsNoTracking().SingleAsync(item => item.RouteId == service.RouteId, cancellationToken);
-        return ToView(service, route.RouteCode, route.Name);
+        return ToView(service, route.RouteCode, route.Name, selectedStops.Select(item => item.RouteStopId).ToArray());
     }
 
     public async Task<TrainServiceManagementView?> UpdateAsync(Guid serviceId, UpdateTrainServiceRequest request, CancellationToken cancellationToken = default)
@@ -32,10 +39,21 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         var service = await db.TrainServices.SingleOrDefaultAsync(item => item.ServiceId == serviceId, cancellationToken);
         if (service is null) return null;
         if (!await db.Routes.AnyAsync(route => route.RouteId == request.RouteId, cancellationToken)) throw new KeyNotFoundException("The selected route does not exist.");
+        var routeStops = await db.RouteStops.Where(item => item.RouteId == request.RouteId).OrderBy(item => item.StopOrder).ToListAsync(cancellationToken);
+        var existingStops = await db.TrainServiceRouteStops.Where(item => item.ServiceId == serviceId).ToListAsync(cancellationToken);
+        var requestedIds = request.RouteStopIds ?? (service.RouteId == request.RouteId && existingStops.Count > 0
+            ? existingStops.OrderBy(item => item.StopOrder).Select(item => item.RouteStopId).ToArray()
+            : null);
+        var selectedStops = ResolveServiceStops(routeStops, requestedIds);
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         service.UpdateDetails(request.ServiceCode, request.RouteId, request.DisplayName, request.PublicServiceNumber);
+        db.TrainServiceRouteStops.RemoveRange(existingStops);
         await db.SaveChangesAsync(cancellationToken);
+        db.TrainServiceRouteStops.AddRange(selectedStops.Select((stop, index) => new TrainServiceRouteStop(serviceId, stop.RouteStopId, index + 1)));
+        await db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
         var route = await db.Routes.AsNoTracking().SingleAsync(item => item.RouteId == service.RouteId, cancellationToken);
-        return ToView(service, route.RouteCode, route.Name);
+        return ToView(service, route.RouteCode, route.Name, selectedStops.Select(item => item.RouteStopId).ToArray());
     }
 
     public async Task<bool> DeleteAsync(Guid serviceId, CancellationToken cancellationToken = default)
@@ -226,9 +244,28 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         return Task.FromResult(calls);
     }
 
-    private static TrainServiceManagementView ToView(TrainService service, string routeCode, string routeName) =>
+    private static IReadOnlyList<RouteStop> ResolveServiceStops(IReadOnlyList<RouteStop> routeStops, IReadOnlyList<Guid>? requestedIds)
+    {
+        if (routeStops.Count < 2) throw new ArgumentException("The selected route must contain at least two stations.");
+        var ids = requestedIds ?? routeStops.Select(item => item.RouteStopId).ToArray();
+        if (ids.Count < 2) throw new ArgumentException("A train service must include a start station and an end station.");
+        if (ids.Distinct().Count() != ids.Count) throw new ArgumentException("A station may appear only once in a train service.");
+        var byId = routeStops.Select((stop, index) => (stop, index)).ToDictionary(item => item.stop.RouteStopId);
+        var result = new List<RouteStop>(ids.Count);
+        var previousIndex = -1;
+        foreach (var id in ids)
+        {
+            if (!byId.TryGetValue(id, out var item)) throw new ArgumentException("Every service station must be on the selected route.");
+            if (item.index <= previousIndex) throw new ArgumentException("Service stations must follow the route stop order.");
+            result.Add(item.stop);
+            previousIndex = item.index;
+        }
+        return result;
+    }
+
+    private static TrainServiceManagementView ToView(TrainService service, string routeCode, string routeName, IReadOnlyList<Guid> routeStopIds) =>
         new(service.ServiceId, service.ServiceCode, service.DisplayName, service.PublicServiceNumber,
-            service.RouteId, routeCode, routeName, service.IsPublished);
+            service.RouteId, routeCode, routeName, service.IsPublished, routeStopIds);
 
     private static ServiceDateManifestView ToManifestView(ServiceDateManifest manifest, IReadOnlyList<Guid> scheduleIds) =>
         new(manifest.OperationDate, manifest.SourceRevision, manifest.FixtureVersion, manifest.IsComplete,
