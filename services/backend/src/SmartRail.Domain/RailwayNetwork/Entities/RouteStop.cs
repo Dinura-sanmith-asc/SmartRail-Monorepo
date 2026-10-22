@@ -5,7 +5,7 @@ public sealed class RouteStop
     public Guid RouteStopId { get; }
     public Guid RouteId { get; }
     public Guid StationId { get; }
-    public int StopOrder { get; }
+    public int StopOrder { get; private set; }
 
     public RouteStop(Guid routeStopId, Guid routeId, Guid stationId, int stopOrder)
     {
@@ -16,6 +16,12 @@ public sealed class RouteStop
         RouteStopId = routeStopId;
         RouteId = routeId;
         StationId = stationId;
+        StopOrder = stopOrder;
+    }
+
+    public void Reorder(int stopOrder)
+    {
+        if (stopOrder <= 0) throw new ArgumentOutOfRangeException(nameof(stopOrder), "Stop order must be positive.");
         StopOrder = stopOrder;
     }
 }

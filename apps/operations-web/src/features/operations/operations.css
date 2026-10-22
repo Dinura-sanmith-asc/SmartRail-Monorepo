@@ -53,8 +53,28 @@
 .train-service-panel>.operations__feedback { margin:0; }
 .train-service-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:16px; border:1px solid #dce6ea; border-radius:8px; background:#f7fafb; }
 .train-service-form .operations-station-form__actions { grid-column:1/-1; }
+.route-management-panel { display:flex; flex-direction:column; gap:17px; }
+.route-management-panel>.operations__feedback { margin:0; }
+.route-management-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:16px; border:1px solid #dce6ea; border-radius:8px; background:#f7fafb; }
+.route-management-form .operations-station-form__actions { grid-column:1/-1; }
+.route-stop-editor { grid-column:1/-1; min-width:0; margin:0; padding:14px; border:1px solid #dce6ea; border-radius:8px; }
+.route-stop-editor legend { padding:0 5px; color:#344d61; font-size:10px; font-weight:750; }
+.route-stop-editor__empty { margin:0 0 11px; color:#63798a; font-size:10px; }
+.route-stop-editor__list { display:flex; flex-direction:column; gap:6px; margin:0 0 12px; padding:0; list-style:none; }
+.route-stop-editor__list li { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 9px; border:1px solid #e5ecef; border-radius:6px; background:#fff; color:#344d60; font-size:11px; }
+.route-stop-editor__list li b { color:#597184; }
+.route-stop-editor__add { display:flex; align-items:flex-end; gap:9px; }
+.route-stop-editor__add .operations-control { flex:1; }
+.route-code-button { display:inline-flex; align-items:center; gap:8px; border:0; padding:4px 0; background:transparent; color:#116c72; font:700 12px var(--sans); cursor:pointer; }
+.route-code-button:hover { color:#0a5257; text-decoration:underline; }
+.route-code-button span { display:inline-block; color:#607789; font-size:16px; line-height:1; }
+.route-stops-detail { display:flex; flex-direction:column; gap:7px; padding:3px 4px; color:#40596d; font-size:10px; }
+.route-stops-detail ol { display:flex; flex-wrap:wrap; gap:7px; margin:0; padding:0; list-style:none; }
+.route-stops-detail li { padding:5px 8px; border:1px solid #dce7e9; border-radius:20px; background:#f4f8f8; }
+.route-stops-detail>span { color:#63798a; }
 .operations-empty { display:flex; flex-direction:column; gap:5px; padding:17px; border:1px dashed #cbd9df; border-radius:8px; color:#355167; font-size:11px; }
 .operations-empty span { color:#63798a; font-size:10px; }
 @media(max-width:760px) { .train-service-form { grid-template-columns:1fr; }.train-service-form .operations-station-form__actions { grid-column:auto; } }
+@media(max-width:760px) { .route-management-form { grid-template-columns:1fr; }.route-stop-editor { grid-column:auto; }.route-stop-editor__add { align-items:stretch; flex-direction:column; }.route-management-panel .operations-table { min-width:420px; } }
 .operations-menu { min-width:0; }
 @media(max-width:760px) { .operations-menu { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); flex-direction:initial; gap:6px; margin:10px 0 0; overflow:visible; }.operations-menu__group { min-width:0; }.operations-menu .operations-menu__group-toggle { min-height:38px; padding:8px 9px; font-size:10px; }.operations-menu .operations-menu__item { min-height:38px; padding:7px 8px; }.operations-menu__icon { width:14px; height:14px; }.operations-menu .operations-menu__item b { font-size:10px; } }

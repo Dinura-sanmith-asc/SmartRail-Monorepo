@@ -6,8 +6,6 @@ public sealed record CreateTrainServiceRequest(string ServiceCode, Guid RouteId,
 public sealed record UpdateTrainServiceRequest(string ServiceCode, Guid RouteId, string? DisplayName, string? PublicServiceNumber);
 public sealed record TrainServiceManagementView(Guid ServiceId, string ServiceCode, string? DisplayName,
     string? PublicServiceNumber, Guid RouteId, string RouteCode, string RouteName, bool IsPublished);
-public sealed record RouteManagementStopView(Guid RouteStopId, Guid StationId, string StationName, int StopOrder);
-public sealed record RouteManagementView(Guid RouteId, string RouteCode, string Name, bool IsPublished, IReadOnlyList<RouteManagementStopView> Stops);
 public sealed record CallingPointInput(Guid RouteStopId, int? ArrivalOffsetMinutes, int? DepartureOffsetMinutes);
 public sealed record ScheduleRevisionInput(TimeOnly FirstDepartureLocalTime, IReadOnlyList<CallingPointInput> CallingPoints);
 public sealed record ScheduleCallingPointView(Guid RouteStopId, Guid StationId, string StationName, int StopOrder,
@@ -21,7 +19,6 @@ public sealed record ScheduleRevisionView(Guid ScheduleId, int Revision, TimeOnl
 
 public interface ITrainServiceManagementRepository
 {
-    Task<IReadOnlyList<RouteManagementView>> ListRoutesAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<TrainServiceManagementView>> ListAsync(CancellationToken cancellationToken = default);
     Task<TrainServiceManagementView?> CreateAsync(CreateTrainServiceRequest request, CancellationToken cancellationToken = default);
     Task<TrainServiceManagementView?> UpdateAsync(Guid serviceId, UpdateTrainServiceRequest request, CancellationToken cancellationToken = default);

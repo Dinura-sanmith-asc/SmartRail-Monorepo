@@ -7,18 +7,6 @@ namespace SmartRail.Infrastructure.RailwayNetwork.Persistence;
 
 public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : ITrainServiceManagementRepository
 {
-    public async Task<IReadOnlyList<RouteManagementView>> ListRoutesAsync(CancellationToken cancellationToken = default)
-    {
-        var routes = await db.Routes.AsNoTracking().OrderBy(item => item.RouteCode).ToListAsync(cancellationToken);
-        var stops = await (from stop in db.RouteStops.AsNoTracking()
-                           join station in db.Stations.AsNoTracking() on stop.StationId equals station.StationId
-                           orderby stop.RouteId, stop.StopOrder
-                           select new { stop.RouteId, View = new RouteManagementStopView(stop.RouteStopId, stop.StationId, station.Name, stop.StopOrder) })
-            .ToListAsync(cancellationToken);
-        return routes.Select(route => new RouteManagementView(route.RouteId, route.RouteCode, route.Name, route.IsPublished,
-            stops.Where(item => item.RouteId == route.RouteId).Select(item => item.View).ToArray())).ToArray();
-    }
-
     public async Task<IReadOnlyList<TrainServiceManagementView>> ListAsync(CancellationToken cancellationToken = default)
     {
         var rows = await (from service in db.TrainServices.AsNoTracking()

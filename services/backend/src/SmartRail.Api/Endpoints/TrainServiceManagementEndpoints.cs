@@ -17,7 +17,6 @@ public static class TrainServiceManagementEndpoints
     {
         var group = endpoints.MapGroup("/api/services").WithTags("Train Service Management").RequireAuthorization();
         Secure(group.MapGet("/management", ListAsync).WithName("ListManagedTrainServices"));
-        Secure(endpoints.MapGet("/api/routes/management", ListRoutesAsync).WithTags("Train Service Management").RequireAuthorization());
         Secure(endpoints.MapPost("/api/services", CreateAsync).WithName("CreateTrainService").WithTags("Train Service Management").RequireAuthorization());
         Secure(group.MapPatch("/{id}", UpdateAsync).WithName("UpdateTrainService"));
         Secure(group.MapDelete("/{id}", DeleteAsync).WithName("DeleteTrainService"));
@@ -28,12 +27,6 @@ public static class TrainServiceManagementEndpoints
     {
         var denied = await AuthorizeAsync(authorization, context);
         return denied ?? Results.Ok(await repository.ListAsync(token));
-    }
-
-    private static async Task<IResult> ListRoutesAsync(ITrainServiceManagementRepository repository, IAuthorizationService authorization, HttpContext context, CancellationToken token)
-    {
-        var denied = await AuthorizeAsync(authorization, context);
-        return denied ?? Results.Ok(await repository.ListRoutesAsync(token));
     }
 
     private static async Task<IResult> CreateAsync(CreateTrainServiceRequest? request, ITrainServiceManagementRepository repository,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { useAuth } from 'react-oidc-context'
 import { useRuntimeConfig } from '../../config/runtimeConfigContext'
 import { ApiRequestError } from '../../shared/api/fetchJson'
@@ -8,10 +8,11 @@ import { WorkspaceNavigation } from '../staff-access/workspaces/WorkspaceNavigat
 import { apiErrorMessage, operationsApi, type Departure, type DriverObservation, type Incident, type Journey, type JourneyUpdate, type Station } from './operationsApi'
 import { ControllerOverview } from './ControllerOverview'
 import { TrainServiceManagement } from './TrainServiceManagement'
+import { RouteManagement } from './RouteManagement'
 import './operations.css'
 import { LanguageSelect, useLanguage } from '../../shared/i18n/language'
 
-type Tab = 'overview' | 'journeys' | 'incidents' | 'stations' | 'services'
+type Tab = 'overview' | 'journeys' | 'incidents' | 'stations' | 'routes' | 'services'
 type Column<T> = { key: string; label: string; render: (row: T) => ReactNode }
 
 function colomboDate() {
@@ -31,6 +32,7 @@ const roleMenuItems: Record<'Controller' | 'Station Staff', Record<Tab, { label:
     journeys: { label: 'Journey control', description: 'Journey status and history' },
     incidents: { label: 'Incident management', description: 'Authorized incident actions' },
     stations: { label: 'Stations', description: 'Manage railway stations' },
+    routes: { label: 'Routes', description: 'Railway routes and ordered stops' },
     services: { label: 'Train Services', description: 'Manage train services' },
   },
   'Station Staff': {
@@ -38,6 +40,7 @@ const roleMenuItems: Record<'Controller' | 'Station Staff', Record<Tab, { label:
     journeys: null,
     incidents: { label: 'Incident reporting', description: 'Scoped station incidents' },
     stations: null,
+    routes: null,
     services: null,
   },
 }
@@ -58,7 +61,7 @@ const sidebarGroups: { id: SidebarGroupId; label: string; items: SidebarItem[] }
   ] },
   { id: 'railway', label: 'Railway Network', items: [
     { id: 'stations', label: 'Stations', description: 'Add, edit and manage stations', icon: 'pin', target: 'stations' },
-    { id: 'routes', label: 'Routes', description: 'Railway routes and ordered stops', icon: 'route' },
+    { id: 'routes', label: 'Routes', description: 'Railway routes and ordered stops', icon: 'route', target: 'routes' },
     { id: 'train-services', label: 'Train Services', description: 'Service numbers and names', icon: 'train', target: 'services' },
     { id: 'timetables', label: 'Timetables & Schedules', description: 'Calling points, revisions and operating dates', icon: 'calendar' },
   ] },
@@ -109,7 +112,8 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
     setActiveMenuItem(itemId ?? (nextTab === 'incidents' ? 'incident-management'
       : nextTab === 'journeys' ? 'journey-status'
         : nextTab === 'stations' ? 'stations'
-          : nextTab === 'services' ? 'train-services' : 'dashboard'))
+          : nextTab === 'routes' ? 'routes'
+            : nextTab === 'services' ? 'train-services' : 'dashboard'))
   }
 
   const loadStations = useCallback(async () => {
@@ -383,6 +387,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
 
         {tab === 'incidents' && <IncidentWorkspace role={role} stations={stations} incidents={visibleIncidents} loading={incidentsLoading} query={incidentQuery} onQuery={setIncidentQuery} state={incidentState} onState={setIncidentState} busy={mutating} onCreate={submitIncident} onTransition={(item) => void transitionIncident(item)} />}
         {tab === 'stations' && role === 'Controller' && <StationManagement stations={stations} loading={stationsLoading} options={options} onRefresh={loadStations} onUnauthorized={onOverviewUnauthorized} />}
+        {tab === 'routes' && role === 'Controller' && <RouteManagement options={options} onUnauthorized={onOverviewUnauthorized} />}
         {tab === 'services' && role === 'Controller' && <TrainServiceManagement options={options} onUnauthorized={onOverviewUnauthorized} />}
       </main>
     </div>

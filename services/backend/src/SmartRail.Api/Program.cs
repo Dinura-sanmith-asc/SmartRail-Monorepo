@@ -198,6 +198,7 @@ app.UseAuthorization();
 
 app.MapHealthChecks("/health").AllowAnonymous();
 app.MapRailwayNetworkEndpoints();
+app.MapRouteManagementEndpoints();
 app.MapTrainServiceManagementEndpoints();
 app.MapIdentityEndpoints();
 app.MapJourneysStatusReadEndpoints();
