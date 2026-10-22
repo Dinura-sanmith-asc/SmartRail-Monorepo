@@ -25,19 +25,47 @@ function timestamp(value?: string | null) {
   return value ? new Intl.DateTimeFormat(`${language}-LK`, { timeZone: 'Asia/Colombo', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Unknown'
 }
 
-const roleMenus: Record<'Controller' | 'Station Staff', { id: Tab; label: string; description: string }[]> = {
-  Controller: [
-    { id: 'overview', label: 'Operations overview', description: 'Stations and departure status' },
-    { id: 'journeys', label: 'Journey control', description: 'Journey status and history' },
-    { id: 'incidents', label: 'Incident management', description: 'Authorized incident actions' },
-    { id: 'stations', label: 'Stations', description: 'Manage railway stations' },
-    { id: 'services', label: 'Train Services', description: 'Manage services and timetables' },
-  ],
-  'Station Staff': [
-    { id: 'overview', label: 'Station overview', description: 'Local departures and station details' },
-    { id: 'incidents', label: 'Incident reporting', description: 'Scoped station incidents' },
-  ],
+const roleMenuItems: Record<'Controller' | 'Station Staff', Record<Tab, { label: string; description: string } | null>> = {
+  Controller: {
+    overview: { label: 'Operations overview', description: 'Stations and departure status' },
+    journeys: { label: 'Journey control', description: 'Journey status and history' },
+    incidents: { label: 'Incident management', description: 'Authorized incident actions' },
+    stations: { label: 'Stations', description: 'Manage railway stations' },
+    services: { label: 'Train Services', description: 'Manage train services' },
+  },
+  'Station Staff': {
+    overview: { label: 'Station overview', description: 'Local departures and station details' },
+    journeys: null,
+    incidents: { label: 'Incident reporting', description: 'Scoped station incidents' },
+    stations: null,
+    services: null,
+  },
 }
+
+type SidebarGroupId = 'main' | 'operations' | 'railway' | 'system'
+type SidebarItem = { id: string; label: string; description: string; icon: string; target?: Tab }
+
+const sidebarGroups: { id: SidebarGroupId; label: string; items: SidebarItem[] }[] = [
+  { id: 'main', label: 'Main', items: [
+    { id: 'dashboard', label: 'Dashboard', description: 'Overall railway operations', icon: 'dashboard', target: 'overview' },
+    { id: 'live-journeys', label: 'Live Journeys', description: "Today's trains and official status", icon: 'train', target: 'journeys' },
+    { id: 'station-departures', label: 'Station Departures', description: 'Departure boards and platforms', icon: 'clock' },
+  ] },
+  { id: 'operations', label: 'Operations', items: [
+    { id: 'journey-status', label: 'Journey Status Control', description: 'Delays, cancellations and platform changes', icon: 'signal', target: 'journeys' },
+    { id: 'incident-management', label: 'Incident Management', description: 'Report, track and close incidents', icon: 'alert', target: 'incidents' },
+    { id: 'driver-operations', label: 'Driver Operations', description: 'Assignments and observations', icon: 'people' },
+  ] },
+  { id: 'railway', label: 'Railway Network', items: [
+    { id: 'stations', label: 'Stations', description: 'Add, edit and manage stations', icon: 'pin', target: 'stations' },
+    { id: 'routes', label: 'Routes', description: 'Railway routes and ordered stops', icon: 'route' },
+    { id: 'train-services', label: 'Train Services', description: 'Service numbers and names', icon: 'train', target: 'services' },
+    { id: 'timetables', label: 'Timetables & Schedules', description: 'Calling points, revisions and operating dates', icon: 'calendar' },
+  ] },
+  { id: 'system', label: 'System', items: [
+    { id: 'my-profile', label: 'My Profile', description: '', icon: 'profile' },
+  ] },
+]
 
 export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station Staff' }) {
   const { t } = useLanguage()
@@ -48,6 +76,8 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
   const token = auth.user?.access_token ?? null
   const options = useMemo(() => ({ apiBaseUrl, accessToken: token }), [apiBaseUrl, token])
   const [tab, setTab] = useState<Tab>('overview')
+  const [openGroup, setOpenGroup] = useState<SidebarGroupId | null>('main')
+  const [activeMenuItem, setActiveMenuItem] = useState('dashboard')
   const [stations, setStations] = useState<Station[]>([])
   const [stationId, setStationId] = useState('')
   const [date, setDate] = useState(colomboDate)
@@ -72,6 +102,15 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
     if (failure instanceof ApiRequestError && failure.status === 401) session.invalidateLocalSession()
   }, [session])
   const onOverviewUnauthorized = useCallback(() => session.invalidateLocalSession(), [session])
+
+  function selectTab(nextTab: Tab, group: SidebarGroupId, itemId?: string) {
+    setTab(nextTab)
+    setOpenGroup(group)
+    setActiveMenuItem(itemId ?? (nextTab === 'incidents' ? 'incident-management'
+      : nextTab === 'journeys' ? 'journey-status'
+        : nextTab === 'stations' ? 'stations'
+          : nextTab === 'services' ? 'train-services' : 'dashboard'))
+  }
 
   const loadStations = useCallback(async () => {
     setStationsLoading(true)
@@ -139,7 +178,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
       ])
       setJourney(snapshot)
       setUpdates(history)
-      setTab('journeys')
+      selectTab('journeys', 'operations')
       if (role === 'Controller') {
         const evidence = await operationsApi.driverObservations(id, options)
         setObservations(evidence.items)
@@ -256,13 +295,27 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
         <div className="operations-brand"><span className="operations-brand__mark" aria-hidden="true">SR</span><span><b>SmartRail</b><small>{t('Operations control')}</small></span></div>
         <div className="operations-sidebar__role"><small>{t('ACTIVE WORKSPACE')}</small><strong>{t(role)}</strong></div>
         <nav className="operations-menu" aria-label={t('Workspace sections')}>
-          {roleMenus[role].map((item) => (
-            <button key={item.id} type="button" className={tab === item.id ? 'is-active' : ''}
-              aria-current={tab === item.id ? 'page' : undefined} onClick={() => setTab(item.id)}>
-              <span className="operations-menu__indicator" aria-hidden="true" />
-              <span><b>{t(item.label)}</b><small>{t(item.description)}</small></span>
-            </button>
-          ))}
+          {sidebarGroups.map((group) => {
+            const expanded = openGroup === group.id
+            return <section className="operations-menu__group" key={group.id}>
+              <button className={`operations-menu__group-toggle${expanded ? ' is-expanded' : ''}`} type="button"
+                aria-expanded={expanded} aria-controls={`operations-menu-${group.id}`} onClick={() => setOpenGroup(expanded ? null : group.id)}>
+                <b>{t(group.label)}</b><span className="operations-menu__chevron" aria-hidden="true" />
+              </button>
+              <div className="operations-menu__items" id={`operations-menu-${group.id}`} hidden={!expanded}>
+                {group.items.map((item) => {
+                  const available = item.target ? roleMenuItems[role][item.target] !== null : false
+                  const active = available && activeMenuItem === item.id
+                  return <button key={item.id} type="button" aria-label={t(item.label)} aria-disabled={!available}
+                    className={`operations-menu__item${active ? ' is-active' : ''}${available ? '' : ' is-placeholder'}`}
+                    aria-current={active ? 'page' : undefined} onClick={() => { if (available && item.target) selectTab(item.target, group.id, item.id) }}>
+                    <SidebarIcon name={item.icon} />
+                    <span><b>{t(item.label)}</b>{item.description && <small>{t(item.description)}</small>}</span>
+                  </button>
+                })}
+              </div>
+            </section>
+          })}
         </nav>
         <div className="operations-sidebar__footer"><WorkspaceNavigation /></div>
       </aside>
@@ -291,7 +344,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
             {role === 'Controller' && <ControllerOverview
               options={options}
               onOpenJourney={(journeyId) => void openJourney(journeyId)}
-              onOpenIncidents={() => setTab('incidents')}
+              onOpenIncidents={() => selectTab('incidents', 'operations')}
               onUnauthorized={onOverviewUnauthorized}
             />}
             <section className="operations__stats" aria-label={t('Operational summary')}>
@@ -481,3 +534,18 @@ function RefreshIcon() { return <svg aria-hidden="true" viewBox="0 0 20 20"><pat
 function SearchIcon() { return <svg aria-hidden="true" viewBox="0 0 20 20"><circle cx="8.7" cy="8.7" r="5.5" /><path d="m13 13 4 4" /></svg> }
 function CalendarIcon() { return <svg aria-hidden="true" viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="13" rx="2" /><path d="M6 2.5v3M14 2.5v3M3 8h14" /></svg> }
 function StationIcon() { return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20V6l7-3 7 3v14M8 20v-5h8v5M8 8h2m4 0h2M8 11h2m4 0h2M3 21h18" /></svg> }
+function SidebarIcon({ name }: { name: string }) {
+  const paths: Record<string, ReactNode> = {
+    dashboard: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></>,
+    train: <><path d="M7 18h10M8 21l2-3m6 3-2-3M7 15l-2 3m12-3 2 3" /><rect x="6" y="3" width="12" height="14" rx="5" /><path d="M9 7h6M9 11h.01M15 11h.01" /></>,
+    clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+    signal: <><path d="M12 21v-5m-4 5h8M8 12a5.7 5.7 0 0 1 0-8m8 0a5.7 5.7 0 0 1 0 8M5 15a9 9 0 0 1 0-13m14 0a9 9 0 0 1 0 13M12 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" /></>,
+    alert: <><path d="m12 3 9 16H3L12 3Z" /><path d="M12 9v4m0 3h.01" /></>,
+    people: <><path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20m4-9a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm9-6a3.5 3.5 0 0 1 0 6m1 3.5a4 4 0 0 1 4 4V20" /></>,
+    pin: <><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></>,
+    route: <><circle cx="6" cy="6" r="2.5" /><circle cx="18" cy="18" r="2.5" /><path d="M8.5 6H13a5 5 0 0 1 0 10h-2a3.5 3.5 0 0 0-3.5 3.5" /></>,
+    calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 3v4m10-4v4M3 10h18m-9 3v4l3 1" /><circle cx="12" cy="16" r="4" /></>,
+    profile: <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="9" r="3" /><path d="M6.5 19a6 6 0 0 1 11 0" /></>,
+  }
+  return <svg className="operations-menu__icon" aria-hidden="true" viewBox="0 0 24 24">{paths[name]}</svg>
+}
