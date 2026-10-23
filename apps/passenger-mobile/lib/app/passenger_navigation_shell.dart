@@ -17,7 +17,7 @@ class PassengerNavigationShell extends StatelessWidget {
     if (location == '/my-journey' || location.startsWith('/journeys/')) {
       return 2;
     }
-    if (location == '/services') return 3;
+    if (location == '/services' || location.startsWith('/catering/')) return 3;
     return 1;
   }
 

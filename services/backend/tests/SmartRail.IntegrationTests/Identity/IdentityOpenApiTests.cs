@@ -18,13 +18,14 @@ public sealed class IdentityOpenApiTests(PostgreSqlTestDatabaseFixture database,
         var paths = root.GetProperty("paths");
         var expectedPaths = new[] { "/api/me", "/api/routes/{id}/stops", "/api/services", "/api/services/{id}", "/api/services/management",
             "/api/services/{id}/schedules", "/api/services/{id}/schedules/{scheduleId}",
-            "/api/services/{id}/schedules/{scheduleId}/publish", "/api/services/{id}/schedules/{scheduleId}/operation-dates",
-            "/api/service-date-manifests/{date}", "/api/routes/management", "/api/stations", "/api/stations/{id}",
+            "/api/services/{id}/schedules/{scheduleId}/publish",
+            "/api/routes/management", "/api/routes/management/{id}", "/api/stations", "/api/stations/{id}",
             "/api/journeys/{id}", "/api/journeys/{id}/updates", "/api/stations/{id}/departures",
             "/api/operations/journeys/{id}/status", "/api/operations/journeys/{id}/stops/{stopId}",
             "/api/operations/overview",
             "/api/incidents", "/api/incidents/{id}", "/api/driver/assignments",
-            "/api/driver/journeys/{id}/observations", "/api/operations/journeys/{id}/observations" };
+            "/api/driver/journeys/{id}/observations", "/api/operations/journeys/{id}/observations",
+            "/api/catering/options", "/api/catering/orders", "/api/catering/orders/{id}" };
         Assert.Equal(expectedPaths.Order(StringComparer.Ordinal), paths.EnumerateObject().Select(p => p.Name).Order(StringComparer.Ordinal).ToArray());
         Assert.Equal(new[] { "get", "post" }, paths.GetProperty("/api/incidents").EnumerateObject()
             .Select(operation => operation.Name).Order(StringComparer.Ordinal).ToArray());

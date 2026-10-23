@@ -5,6 +5,8 @@ import 'package:smartrail_passenger/core/network/http_api_client.dart';
 import 'package:smartrail_passenger/features/railway_search/data/railway_network_api.dart';
 import 'package:smartrail_passenger/features/railway_search/data/railway_search_repository_impl.dart';
 import 'package:smartrail_passenger/features/railway_search/domain/railway_search_repository.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:smartrail_passenger/features/catering/data/catering_api.dart';
 
 typedef HttpClientFactory = http.Client Function();
 
@@ -42,3 +44,20 @@ final railwayApiClientProvider = Provider<RailwayNetworkApi>((ref) {
 final railwaySearchRepositoryProvider = Provider<RailwaySearchRepository>(
   (ref) => RailwaySearchRepositoryImpl(ref.watch(railwayApiClientProvider)),
 );
+
+final cateringApiProvider = Provider<CateringApi>((ref) {
+  final config = ref.watch(appConfigProvider);
+  if (config.apiBaseUri == null) {
+    throw StateError(config.configurationError ?? 'API URL is not configured.');
+  }
+  const storage = FlutterSecureStorage();
+  return CateringApi(
+    HttpApiClient(
+      baseUri: config.apiBaseUri!,
+      client: ref.watch(sharedHttpClientProvider),
+    ),
+    ref.watch(sharedHttpClientProvider),
+    CateringAuth(storage),
+    storage,
+  );
+});

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.OpenApi;
 using System.Text.Json.Nodes;
 using SmartRail.Api.Authentication;
+using SmartRail.Api.Catering;
 using SmartRail.Api.Authorization;
 using SmartRail.Api.Contracts.Identity;
 using SmartRail.Api.Contracts.Incidents;
@@ -14,6 +15,9 @@ using SmartRail.Api.Endpoints.Incidents;
 using SmartRail.Api.Endpoints.Operations;
 using SmartRail.Api.Errors;
 using SmartRail.Infrastructure;
+using SmartRail.Application.Identity.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +41,22 @@ builder.Services.AddScoped<IAuthorizationHandler, SmartRailAuthorizationHandler>
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SmartRailAuthorizationMiddlewareResultHandler>();
 
 builder.Services.AddSmartRailInfrastructure(builder.Configuration);
+builder.Services.AddDbContext<CateringDbContext>(options => options.UseNpgsql(
+    builder.Configuration.GetConnectionString("SmartRailDbContext")));
+builder.Services.RemoveAll<IPassengerOrderOwnershipEvidence>();
+builder.Services.AddScoped<IPassengerOrderOwnershipEvidence, CateringOwnershipEvidence>();
+var holyRiceUrl = builder.Configuration["HolyRice:BaseUrl"] ?? "http://localhost:5110";
+if (!builder.Environment.IsDevelopment() && !builder.Environment.IsEnvironment("Testing") &&
+    builder.Configuration["HolyRice:BaseUrl"] is not null && new Uri(holyRiceUrl).Scheme != Uri.UriSchemeHttps)
+    throw new InvalidOperationException("HolyRice:BaseUrl must use HTTPS outside local development.");
+var holyRiceKey = builder.Configuration["HolyRice:ApiKey"];
+if (holyRiceKey is not null && holyRiceKey.Length < 32)
+    throw new InvalidOperationException("HolyRice:ApiKey must contain at least 32 characters.");
+builder.Services.AddHttpClient<HolyRiceClient>(client =>
+{
+    client.BaseAddress = new Uri(holyRiceUrl);
+    client.Timeout = TimeSpan.FromSeconds(5);
+});
 builder.Services.AddHealthChecks();
 builder.Services.AddSmartRailProblemDetails();
 
@@ -206,6 +226,7 @@ app.MapJourneysStatusPublicationEndpoints();
 app.MapDriverOperationsEndpoints();
 app.MapIncidentEndpoints();
 app.MapOperationsOverviewEndpoints();
+app.MapCateringEndpoints();
 
 
 app.Run();

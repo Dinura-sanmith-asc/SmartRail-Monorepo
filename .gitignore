@@ -12,6 +12,7 @@
 **/obj/
 **/build/
 **/dist/
+.build/catering/
 
 # Copies of the old workspace
 worktrees/

@@ -14,6 +14,7 @@ using SmartRail.Infrastructure.RailwayNetwork;
 using SmartRail.IntegrationTests.Identity;
 using SmartRail.IntegrationTests.JourneysStatus.Fixtures;
 using SmartRail.IntegrationTests.RailwayNetwork;
+using SmartRail.Api.Catering;
 
 namespace SmartRail.IntegrationTests.Incidents;
 
@@ -53,11 +54,11 @@ public sealed class IncidentBoundaryRegressionTests(PostgreSqlTestDatabaseFixtur
             Assert.DoesNotContain(hostileText, snapshot.ToString(), StringComparison.Ordinal);
         }
 
-        // This real infrastructure default intentionally reports unavailable Catering evidence;
-        // incident create/read and lifecycle operations have no dependency on it.
+        // A missing Catering correlation store fails closed without affecting incidents.
         await using (var scope = factory.Services.CreateAsyncScope())
         {
-            Assert.IsType<UnavailableOwnerEvidence>(scope.ServiceProvider.GetRequiredService<IPassengerOrderOwnershipEvidence>());
+            var evidence = Assert.IsType<CateringOwnershipEvidence>(scope.ServiceProvider.GetRequiredService<IPassengerOrderOwnershipEvidence>());
+            Assert.Equal(EvidenceOutcome.Unavailable, (await evidence.CheckOwnershipAsync("passenger", Guid.NewGuid())).Outcome);
             Assert.IsType<Feature001IncidentReferenceVerifier>(scope.ServiceProvider.GetRequiredService<IFeature001IncidentReferenceVerifier>());
             Assert.IsType<Feature003IncidentReferenceVerifier>(scope.ServiceProvider.GetRequiredService<IFeature003IncidentReferenceVerifier>());
         }

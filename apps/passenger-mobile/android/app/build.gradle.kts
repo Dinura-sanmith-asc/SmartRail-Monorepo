@@ -15,6 +15,7 @@ android {
     }
 
     defaultConfig {
+        manifestPlaceholders.putAll(mapOf("appAuthRedirectScheme" to "smartrailpassenger"))
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.smartrail_passenger"
         // You can update the following values to match your application needs.

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smartrail_passenger/core/network/api_failure.dart';
 import 'package:smartrail_passenger/features/journey_status/application/journey_status_notifier.dart';
@@ -11,9 +12,14 @@ import 'package:smartrail_passenger/features/journey_status/presentation/journey
 import 'package:smartrail_passenger/features/journey_status/presentation/journey_updates_list.dart';
 
 class JourneyStatusScreen extends ConsumerStatefulWidget {
-  const JourneyStatusScreen({required this.journeyInstanceId, super.key});
+  const JourneyStatusScreen({
+    required this.journeyInstanceId,
+    this.journeyLabel,
+    super.key,
+  });
 
   final String journeyInstanceId;
+  final String? journeyLabel;
 
   @override
   ConsumerState<JourneyStatusScreen> createState() =>
@@ -69,6 +75,14 @@ class _JourneyStatusScreenState extends ConsumerState<JourneyStatusScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            FilledButton.icon(
+              onPressed: () => context.push(
+                '/catering/journeys/${widget.journeyInstanceId}',
+                extra: widget.journeyLabel,
+              ),
+              icon: const Icon(Icons.restaurant),
+              label: const Text('Order food for this journey'),
+            ),
             Semantics(
               button: true,
               label: 'Refresh journey information',

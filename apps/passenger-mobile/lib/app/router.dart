@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smartrail_passenger/app/passenger_navigation_shell.dart';
 import 'package:smartrail_passenger/features/home/presentation/home_screen.dart';
 import 'package:smartrail_passenger/features/home/presentation/passenger_tab_screens.dart';
+import 'package:smartrail_passenger/features/catering/presentation/catering_screens.dart';
 import 'package:smartrail_passenger/features/journey_status/application/journey_lookup_state.dart';
 import 'package:smartrail_passenger/features/journey_status/presentation/journey_lookup_screen.dart';
 import 'package:smartrail_passenger/features/journey_status/presentation/journey_status_screen.dart';
@@ -20,6 +21,8 @@ abstract final class AppRoutes {
   static const String serviceDetails = '/railway/services/:serviceId';
   static const String journeyLookup = '/journeys/lookup';
   static const String journeyStatus = '/journeys/:journeyInstanceId';
+  static const String cateringMenu = '/catering/journeys/:journeyInstanceId';
+  static const String cateringOrders = '/catering/orders';
 }
 
 final GoRouter appRouter = GoRouter(
@@ -47,8 +50,23 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: AppRoutes.services,
           name: 'services',
+          builder: (context, state) => const CateringServicesScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.cateringMenu,
+          builder: (context, state) => CateringMenuScreen(
+            journeyId: state.pathParameters['journeyInstanceId']!,
+            journeyLabel: state.extra as String?,
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.cateringOrders,
+          builder: (context, state) => const CateringOrdersScreen(),
+        ),
+        GoRoute(
+          path: '${AppRoutes.cateringOrders}/:id',
           builder: (context, state) =>
-              ServicesTabScreen(onSearch: () => context.go(AppRoutes.explore)),
+              CateringOrderDetailScreen(id: state.pathParameters['id']!),
         ),
         GoRoute(
           path: AppRoutes.explore,
@@ -99,7 +117,11 @@ final GoRouter appRouter = GoRouter(
                 'Journey route identity does not match its context.',
               );
             }
-            return JourneyStatusScreen(journeyInstanceId: pathId);
+            return JourneyStatusScreen(
+              journeyInstanceId: pathId,
+              journeyLabel:
+                  '${selection.choice.serviceCode} · ${selection.travelDate.toIsoDate()}',
+            );
           },
         ),
         GoRoute(
