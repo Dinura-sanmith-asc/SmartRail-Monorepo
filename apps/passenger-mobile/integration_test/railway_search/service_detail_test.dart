@@ -61,6 +61,9 @@ void main() {
           child: SmartRailApp(config: appConfig),
         ),
       );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('home-search-action')));
+      await tester.pumpAndSettle();
       await _waitFor(tester, find.text('Select origin station'));
       await _selectStation(tester, label: 'origin', name: origin.name);
       await _selectStation(

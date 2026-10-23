@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { ApiRequestError } from '../../shared/api/fetchJson'
 import { apiErrorMessage, operationsApi, type ManagedRoute, type ManagedTrainService, type OperationsApiOptions } from './operationsApi'
 
@@ -23,6 +23,11 @@ export function TrainServiceManagement({ options, onUnauthorized }: Props) {
   const [selectedRouteStopIds, setSelectedRouteStopIds] = useState<string[]>([])
   const [direction, setDirection] = useState<'forward' | 'reverse'>('forward')
   const [expandedServiceId, setExpandedServiceId] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  function revealEditor() {
+    requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }
 
   const selectedRoute = routes.find((route) => route.routeId === selectedRouteId)
   const routeStops = selectedRoute?.stops ?? []
@@ -35,6 +40,7 @@ export function TrainServiceManagement({ options, onUnauthorized }: Props) {
     setSelectedRouteStopIds([])
     setDirection('forward')
     setError('')
+    revealEditor()
   }
 
   function startEdit(service: ManagedTrainService) {
@@ -49,6 +55,7 @@ export function TrainServiceManagement({ options, onUnauthorized }: Props) {
     const assigned = new Set(savedIds)
     setSelectedRouteStopIds((reverse ? [...routeOrder].reverse() : routeOrder).filter((stop) => assigned.has(stop.routeStopId)).map((stop) => stop.routeStopId))
     setError('')
+    revealEditor()
   }
 
   function changeRoute(routeId: string) {
@@ -146,7 +153,7 @@ export function TrainServiceManagement({ options, onUnauthorized }: Props) {
     <div className="operations__panel-heading"><div><span className="operations__section-kicker">RAILWAY NETWORK</span><h2>Train Services</h2><p>Add, edit, search, and remove train services.</p></div><button className="button button--primary" type="button" onClick={startAdd}>Add Train Service</button></div>
     {error && <div className="operations__feedback operations__feedback--error" role="alert">{error}</div>}
     {notice && <div className="operations__feedback" role="status">{notice}</div>}
-    {(adding || editing) && <form className="operations-form train-service-form" onSubmit={(event) => void saveService(event)}>
+    {(adding || editing) && <form key={editing?.serviceId ?? 'new'} ref={formRef} className="operations-form train-service-form" onSubmit={(event) => void saveService(event)}>
       <label className="operations-control"><span>Service code</span><input name="serviceCode" required maxLength={50} defaultValue={editing?.serviceCode ?? ''} /></label>
       <label className="operations-control"><span>Route</span><select name="routeId" required value={selectedRouteId} onChange={(event) => changeRoute(event.target.value)}><option value="" disabled>Select a route</option>{routes.map((route) => <option key={route.routeId} value={route.routeId}>{route.routeCode} · {route.name}{route.isPublished ? '' : ' (unpublished)'}</option>)}</select></label>
       <label className="operations-control"><span>Display name</span><input name="displayName" maxLength={200} defaultValue={editing?.displayName ?? ''} /></label>

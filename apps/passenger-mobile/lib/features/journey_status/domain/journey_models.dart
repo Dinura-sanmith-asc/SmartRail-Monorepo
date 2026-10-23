@@ -164,9 +164,8 @@ class JourneyCorrectionChange extends JourneyPublicChange {
 }
 
 String _uuid(String value, String field) {
-  if (!RegExp(
-    r'^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$',
-  ).hasMatch(value)) {
+  if (!RegExp(r'^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$')
+      .hasMatch(value)) {
     throw FormatException('$field must be a UUID.');
   }
   return value;

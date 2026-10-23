@@ -126,6 +126,9 @@ Future<void> _openApp(WidgetTester tester, AppConfig config) async {
       child: SmartRailApp(config: config),
     ),
   );
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('home-search-action')));
+  await tester.pumpAndSettle();
 }
 
 Future<void> _selectStation(
