@@ -18,6 +18,8 @@ public sealed class SmartRailDbContext(DbContextOptions<SmartRailDbContext> opti
     public DbSet<TrainService> TrainServices => Set<TrainService>();
     public DbSet<TrainServiceRouteStop> TrainServiceRouteStops => Set<TrainServiceRouteStop>();
     public DbSet<ServiceScheduleRevision> ServiceScheduleRevisions => Set<ServiceScheduleRevision>();
+    public DbSet<ServiceScheduleCalendar> ServiceScheduleCalendars => Set<ServiceScheduleCalendar>();
+    public DbSet<ServiceScheduleDateException> ServiceScheduleDateExceptions => Set<ServiceScheduleDateException>();
     public DbSet<ServiceCallingPoint> ServiceCallingPoints => Set<ServiceCallingPoint>();
     public DbSet<ServiceDateManifest> ServiceDateManifests => Set<ServiceDateManifest>();
     public DbSet<ServiceOperationDate> ServiceOperationDates => Set<ServiceOperationDate>();

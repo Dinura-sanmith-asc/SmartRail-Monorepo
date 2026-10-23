@@ -36,6 +36,11 @@ public sealed class ServiceSearchRepository(SmartRailDbContext dbContext) : ISer
                 : (DateOnly?)null);
         var requestedOperationDates = operationDates.Values.Where(item => item.HasValue).Select(item => item!.Value).Distinct().ToArray();
         var scheduleIds = operationDates.Keys.ToArray();
+        var calendars = await dbContext.ServiceScheduleCalendars.AsNoTracking()
+            .Where(item => scheduleIds.Contains(item.ScheduleId)).ToDictionaryAsync(item => item.ScheduleId, cancellationToken);
+        var exceptions = await dbContext.ServiceScheduleDateExceptions.AsNoTracking()
+            .Where(item => scheduleIds.Contains(item.ScheduleId) && requestedOperationDates.Contains(item.Date))
+            .ToDictionaryAsync(item => (item.ScheduleId, item.Date), cancellationToken);
         var manifests = await dbContext.ServiceDateManifests.AsNoTracking()
             .Where(item => requestedOperationDates.Contains(item.OperationDate))
             .ToDictionaryAsync(item => item.OperationDate, cancellationToken);
@@ -51,6 +56,20 @@ public sealed class ServiceSearchRepository(SmartRailDbContext dbContext) : ISer
                 return new(false, []);
 
             var operationDate = operationDates[candidate.Schedule.ScheduleId]!.Value;
+            if (calendars.TryGetValue(candidate.Schedule.ScheduleId, out var calendar))
+            {
+                var runs = exceptions.TryGetValue((candidate.Schedule.ScheduleId, operationDate), out var exception)
+                    ? exception.Runs : calendar.RunsOn(operationDate);
+                if (!runs) continue;
+                results.Add(new(candidate.Service.ServiceId, candidate.Service.ServiceCode, candidate.Route.RouteId,
+                    candidate.Route.RouteCode, candidate.Schedule.Revision,
+                    ToScheduledCall(candidate.OriginStation.StationId, candidate.OriginStation.Name,
+                        candidate.OriginCall.StopOrder, operationDate, candidate.Schedule.FirstDepartureLocalTime, originOffset),
+                    ToScheduledCall(candidate.DestinationStation.StationId, candidate.DestinationStation.Name,
+                        candidate.DestinationCall.StopOrder, operationDate, candidate.Schedule.FirstDepartureLocalTime, destinationOffset),
+                    candidate.Service.DisplayName, candidate.Service.PublicServiceNumber));
+                continue;
+            }
             if (!manifests.TryGetValue(operationDate, out var dateManifest) || !dateManifest.IsComplete)
                 return new(false, []);
             operations.TryGetValue((candidate.Schedule.ScheduleId, operationDate), out var operation);
@@ -71,6 +90,9 @@ public sealed class ServiceSearchRepository(SmartRailDbContext dbContext) : ISer
 
         if (candidates.Count == 0)
         {
+            if (await dbContext.ServiceScheduleCalendars.AsNoTracking().AnyAsync(item =>
+                item.ValidFrom <= query.TravelDate && item.ValidThrough >= query.TravelDate, cancellationToken))
+                return new(true, []);
             var requestedDateCovered = await dbContext.ServiceDateManifests.AsNoTracking()
                 .AnyAsync(item => item.OperationDate == query.TravelDate && item.IsComplete, cancellationToken);
             if (!requestedDateCovered) return new(false, []);

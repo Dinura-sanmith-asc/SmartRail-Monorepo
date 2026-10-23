@@ -39,6 +39,9 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         var service = await db.TrainServices.SingleOrDefaultAsync(item => item.ServiceId == serviceId, cancellationToken);
         if (service is null) return null;
         if (!await db.Routes.AnyAsync(route => route.RouteId == request.RouteId, cancellationToken)) throw new KeyNotFoundException("The selected route does not exist.");
+        if (service.RouteId != request.RouteId && await db.ServiceScheduleRevisions.AnyAsync(item =>
+            item.ServiceId == serviceId && item.IsPublished && item.SupersededAt == null, cancellationToken))
+            throw new InvalidOperationException("A service with a published timetable cannot change routes.");
         var routeStops = await db.RouteStops.Where(item => item.RouteId == request.RouteId).OrderBy(item => item.StopOrder).ToListAsync(cancellationToken);
         var existingStops = await db.TrainServiceRouteStops.Where(item => item.ServiceId == serviceId).ToListAsync(cancellationToken);
         var requestedIds = request.RouteStopIds ?? (service.RouteId == request.RouteId && existingStops.Count > 0
@@ -71,6 +74,10 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         var schedules = await db.ServiceScheduleRevisions.AsNoTracking().Where(item => item.ServiceId == serviceId)
             .OrderByDescending(item => item.Revision).ToListAsync(cancellationToken);
         var ids = schedules.Select(item => item.ScheduleId).ToArray();
+        var calendars = await db.ServiceScheduleCalendars.AsNoTracking().Where(item => ids.Contains(item.ScheduleId))
+            .ToDictionaryAsync(item => item.ScheduleId, cancellationToken);
+        var exceptions = await db.ServiceScheduleDateExceptions.AsNoTracking().Where(item => ids.Contains(item.ScheduleId))
+            .ToListAsync(cancellationToken);
         var calls = await (from call in db.ServiceCallingPoints.AsNoTracking()
                            join stop in db.RouteStops.AsNoTracking() on call.RouteStopId equals stop.RouteStopId
                            join station in db.Stations.AsNoTracking() on stop.StationId equals station.StationId
@@ -89,7 +96,12 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
             {
                 manifests.TryGetValue(item.OperationDate, out var manifest);
                 return new ScheduleOperationDateView(item.OperationDate, manifest?.IsComplete ?? false, manifest?.SourceRevision);
-            }).OrderBy(item => item.OperationDate).ToArray())).ToArray();
+            }).OrderBy(item => item.OperationDate).ToArray(),
+            calendars.TryGetValue(schedule.ScheduleId, out var calendar)
+                ? new ScheduleCalendarInput(calendar.ValidFrom, calendar.ValidThrough, calendar.WeekdaysMask,
+                    exceptions.Where(item => item.ScheduleId == schedule.ScheduleId).OrderBy(item => item.Date)
+                        .Select(item => new ScheduleDateExceptionInput(item.Date, item.Runs)).ToArray())
+                : null)).ToArray();
     }
 
     public async Task<ScheduleRevisionView> CreateScheduleAsync(Guid serviceId, ScheduleRevisionInput request, CancellationToken cancellationToken = default)
@@ -100,11 +112,12 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         var revision = revisions.Count == 0 ? 1 : checked(revisions.Max(item => item.Revision) + 1);
         var schedule = new ServiceScheduleRevision(Guid.NewGuid(), service.ServiceId, revision,
             request.FirstDepartureLocalTime, DateTimeOffset.UtcNow);
-        var calls = await BuildCallingPoints(service.RouteId, schedule.ScheduleId, request.CallingPoints,
+        var calls = await BuildCallingPoints(service.RouteId, serviceId, schedule.ScheduleId, request.CallingPoints,
             await db.RouteStops.Where(item => item.RouteId == service.RouteId).ToListAsync(cancellationToken),
             cancellationToken);
         db.ServiceScheduleRevisions.Add(schedule);
         db.ServiceCallingPoints.AddRange(calls);
+        AddCalendar(schedule.ScheduleId, request.Calendar);
         await db.SaveChangesAsync(cancellationToken);
         return (await GetSchedulesAsync(serviceId, cancellationToken))!.Single(item => item.ScheduleId == schedule.ScheduleId);
     }
@@ -116,14 +129,20 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         var schedule = await db.ServiceScheduleRevisions.SingleOrDefaultAsync(item => item.ServiceId == serviceId && item.ScheduleId == scheduleId, cancellationToken);
         if (schedule is null) return null;
         if (schedule.IsPublished) throw new InvalidOperationException("Published schedule revisions are immutable. Create a new revision to make changes.");
+        var calls = await BuildCallingPoints(service.RouteId, serviceId, scheduleId, request.CallingPoints,
+            await db.RouteStops.Where(item => item.RouteId == service.RouteId).ToListAsync(cancellationToken), cancellationToken);
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         schedule.ChangeDraftDepartureTime(request.FirstDepartureLocalTime);
         var existing = await db.ServiceCallingPoints.Where(item => item.ScheduleId == scheduleId).ToListAsync(cancellationToken);
         db.ServiceCallingPoints.RemoveRange(existing);
-        var calls = await BuildCallingPoints(service.RouteId, scheduleId, request.CallingPoints,
-            await db.RouteStops.Where(item => item.RouteId == service.RouteId).ToListAsync(cancellationToken), cancellationToken);
-        // Schedule revisions are immutable value objects; draft edits replace only their calling points.
-        db.ServiceCallingPoints.AddRange(calls);
+        var existingCalendar = await db.ServiceScheduleCalendars.SingleOrDefaultAsync(item => item.ScheduleId == scheduleId, cancellationToken);
+        if (existingCalendar is not null) db.ServiceScheduleCalendars.Remove(existingCalendar);
+        db.ServiceScheduleDateExceptions.RemoveRange(db.ServiceScheduleDateExceptions.Where(item => item.ScheduleId == scheduleId));
         await db.SaveChangesAsync(cancellationToken);
+        db.ServiceCallingPoints.AddRange(calls);
+        AddCalendar(scheduleId, request.Calendar);
+        await db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
         return (await GetSchedulesAsync(serviceId, cancellationToken))!.Single(item => item.ScheduleId == scheduleId);
     }
 
@@ -135,6 +154,8 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         if (await db.ServiceOperationDates.AnyAsync(item => item.ScheduleId == scheduleId, cancellationToken))
             throw new InvalidOperationException("A schedule with assigned operating dates cannot be deleted.");
         db.ServiceCallingPoints.RemoveRange(db.ServiceCallingPoints.Where(item => item.ScheduleId == scheduleId));
+        db.ServiceScheduleCalendars.RemoveRange(db.ServiceScheduleCalendars.Where(item => item.ScheduleId == scheduleId));
+        db.ServiceScheduleDateExceptions.RemoveRange(db.ServiceScheduleDateExceptions.Where(item => item.ScheduleId == scheduleId));
         db.ServiceScheduleRevisions.Remove(schedule);
         await db.SaveChangesAsync(cancellationToken);
         return true;
@@ -151,9 +172,24 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         var candidate = revisions.SingleOrDefault(item => item.ScheduleId == scheduleId)
             ?? throw new KeyNotFoundException("Schedule revision not found.");
         if (candidate.IsCurrentPublished) throw new InvalidOperationException("The schedule revision is already current and published.");
+        var calendar = await db.ServiceScheduleCalendars.AsNoTracking().SingleOrDefaultAsync(item => item.ScheduleId == scheduleId, cancellationToken);
+        if (calendar is null) throw new InvalidOperationException("An operating calendar is required before publication.");
+        if (revisions.Any(item => item.IsCurrentPublished) && calendar.ValidFrom > DateOnly.FromDateTime(DateTime.UtcNow.AddHours(5.5)))
+            throw new InvalidOperationException("A replacement timetable can be published when its validity period starts.");
+        var selectedIds = await db.TrainServiceRouteStops.AsNoTracking().Where(item => item.ServiceId == serviceId)
+            .OrderBy(item => item.StopOrder).Select(item => item.RouteStopId).ToArrayAsync(cancellationToken);
+        var candidateCalls = await db.ServiceCallingPoints.AsNoTracking().Where(item => item.ScheduleId == scheduleId)
+            .OrderBy(item => item.StopOrder).ToArrayAsync(cancellationToken);
+        if (!candidateCalls.Select(item => item.RouteStopId).SequenceEqual(selectedIds))
+            throw new InvalidOperationException("Timetable calls must match the service's selected stations in travel order.");
+        if (candidateCalls.Length < 2 || candidateCalls[0].DepartureOffsetMinutes != 0 ||
+            candidateCalls[^1].ArrivalOffsetMinutes is null ||
+            candidateCalls.Skip(1).SkipLast(1).Any(item => item.ArrivalOffsetMinutes is null || item.DepartureOffsetMinutes is null))
+            throw new InvalidOperationException("Every station needs its required arrival and departure times.");
         foreach (var current in revisions.Where(item => item.IsCurrentPublished)) current.Supersede(publishedAt);
         await db.SaveChangesAsync(cancellationToken);
         candidate.Publish(publishedAt);
+        route.Publish();
         service.Publish();
         var stops = await db.RouteStops.Where(item => item.RouteId == route.RouteId).ToListAsync(cancellationToken);
         var calls = await db.ServiceCallingPoints.Where(item => revisions.Select(revision => revision.ScheduleId).Contains(item.ScheduleId)).ToListAsync(cancellationToken);
@@ -220,13 +256,17 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         return ToManifestView(manifest, scheduleIds);
     }
 
-    private Task<List<ServiceCallingPoint>> BuildCallingPoints(Guid routeId, Guid scheduleId,
+    private async Task<List<ServiceCallingPoint>> BuildCallingPoints(Guid routeId, Guid serviceId, Guid scheduleId,
         IReadOnlyList<CallingPointInput> inputs, IReadOnlyCollection<RouteStop> routeStops, CancellationToken cancellationToken)
     {
         if (inputs is null || inputs.Count < 2) throw new ArgumentException("A schedule requires at least two calling points.", nameof(inputs));
         if (inputs.Select(item => item.RouteStopId).Distinct().Count() != inputs.Count)
             throw new ArgumentException("A route stop may appear only once in a schedule.", nameof(inputs));
         var byId = routeStops.ToDictionary(item => item.RouteStopId);
+        var serviceStopIds = await db.TrainServiceRouteStops.AsNoTracking().Where(item => item.ServiceId == serviceId)
+            .OrderBy(item => item.StopOrder).Select(item => item.RouteStopId).ToArrayAsync(cancellationToken);
+        if (!inputs.Select(item => item.RouteStopId).SequenceEqual(serviceStopIds))
+            throw new ArgumentException("Schedule calls must exactly match this train service's selected stations and travel order.", nameof(inputs));
         var calls = new List<ServiceCallingPoint>(inputs.Count);
         var previousOffset = -1;
         for (var index = 0; index < inputs.Count; index++)
@@ -241,7 +281,19 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
             }
             calls.Add(new ServiceCallingPoint(scheduleId, input.RouteStopId, input.ArrivalOffsetMinutes, input.DepartureOffsetMinutes, index + 1));
         }
-        return Task.FromResult(calls);
+        return calls;
+    }
+
+    private void AddCalendar(Guid scheduleId, ScheduleCalendarInput? input)
+    {
+        if (input is null) return;
+        if (input.Exceptions is null || input.Exceptions.Select(item => item.Date).Distinct().Count() != input.Exceptions.Count)
+            throw new ArgumentException("Calendar exception dates must be unique.", nameof(input));
+        var calendar = new ServiceScheduleCalendar(scheduleId, input.ValidFrom, input.ValidThrough, input.WeekdaysMask);
+        if (input.Exceptions.Any(item => item.Date < calendar.ValidFrom || item.Date > calendar.ValidThrough))
+            throw new ArgumentException("Calendar exceptions must fall within the validity dates.", nameof(input));
+        db.ServiceScheduleCalendars.Add(calendar);
+        db.ServiceScheduleDateExceptions.AddRange(input.Exceptions.Select(item => new ServiceScheduleDateException(scheduleId, item.Date, item.Runs)));
     }
 
     private static IReadOnlyList<RouteStop> ResolveServiceStops(IReadOnlyList<RouteStop> routeStops, IReadOnlyList<Guid>? requestedIds)

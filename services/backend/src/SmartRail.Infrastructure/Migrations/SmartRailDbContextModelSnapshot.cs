@@ -1050,10 +1050,6 @@ namespace SmartRail.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("route_stop_id");
 
-                    b.Property<int>("StopOrder")
-                        .HasColumnType("integer")
-                        .HasColumnName("stop_order");
-
                     b.Property<Guid>("RouteId")
                         .HasColumnType("uuid")
                         .HasColumnName("route_id");
@@ -1092,10 +1088,6 @@ namespace SmartRail.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("route_stop_id");
 
-                    b.Property<int>("StopOrder")
-                        .HasColumnType("integer")
-                        .HasColumnName("stop_order");
-
                     b.Property<int?>("ArrivalOffsetMinutes")
                         .HasColumnType("integer")
                         .HasColumnName("arrival_offset_minutes");
@@ -1103,6 +1095,10 @@ namespace SmartRail.Infrastructure.Migrations
                     b.Property<int?>("DepartureOffsetMinutes")
                         .HasColumnType("integer")
                         .HasColumnName("departure_offset_minutes");
+
+                    b.Property<int>("StopOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("stop_order");
 
                     b.HasKey("ScheduleId", "RouteStopId")
                         .HasName("pk_service_calling_point");
@@ -1187,6 +1183,51 @@ namespace SmartRail.Infrastructure.Migrations
                         .HasDatabaseName("ix_service_operation_date_schedule");
 
                     b.ToTable("service_operation_date", (string)null);
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleCalendar", b =>
+                {
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("schedule_id");
+
+                    b.Property<DateOnly>("ValidFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("valid_from");
+
+                    b.Property<DateOnly>("ValidThrough")
+                        .HasColumnType("date")
+                        .HasColumnName("valid_through");
+
+                    b.Property<int>("WeekdaysMask")
+                        .HasColumnType("integer")
+                        .HasColumnName("weekdays_mask");
+
+                    b.HasKey("ScheduleId");
+
+                    b.ToTable("service_schedule_calendar", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_schedule_calendar_dates", "valid_through >= valid_from");
+                        });
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleDateException", b =>
+                {
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("schedule_id");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("operation_date");
+
+                    b.Property<bool>("Runs")
+                        .HasColumnType("boolean")
+                        .HasColumnName("runs");
+
+                    b.HasKey("ScheduleId", "Date");
+
+                    b.ToTable("service_schedule_date_exception", (string)null);
                 });
 
             modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleRevision", b =>
@@ -1452,16 +1493,16 @@ namespace SmartRail.Infrastructure.Migrations
                     b.HasKey("ServiceId")
                         .HasName("pk_train_service");
 
+                    b.HasIndex("PublicServiceNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ux_train_service_public_service_number")
+                        .HasFilter("public_service_number IS NOT NULL");
+
                     b.HasIndex("RouteId");
 
                     b.HasIndex("ServiceCode")
                         .IsUnique()
                         .HasDatabaseName("ux_train_service_service_code");
-
-                    b.HasIndex("PublicServiceNumber")
-                        .IsUnique()
-                        .HasFilter("public_service_number IS NOT NULL")
-                        .HasDatabaseName("ux_train_service_public_service_number");
 
                     b.ToTable("train_service", null, t =>
                         {
@@ -1704,6 +1745,24 @@ namespace SmartRail.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_service_operation_schedule");
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleCalendar", b =>
+                {
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleRevision", null)
+                        .WithOne()
+                        .HasForeignKey("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleCalendar", "ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleDateException", b =>
+                {
+                    b.HasOne("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleRevision", null)
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SmartRail.Domain.RailwayNetwork.Entities.ServiceScheduleRevision", b =>

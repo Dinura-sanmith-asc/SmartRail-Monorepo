@@ -20,7 +20,79 @@ public static class TrainServiceManagementEndpoints
         Secure(endpoints.MapPost("/api/services", CreateAsync).WithName("CreateTrainService").WithTags("Train Service Management").RequireAuthorization());
         Secure(group.MapPatch("/{id}", UpdateAsync).WithName("UpdateTrainService"));
         Secure(group.MapDelete("/{id}", DeleteAsync).WithName("DeleteTrainService"));
+        Secure(group.MapGet("/{id}/schedules", ListSchedulesAsync).WithName("ListTrainServiceSchedules"));
+        Secure(group.MapPost("/{id}/schedules", CreateScheduleAsync).WithName("CreateTrainServiceSchedule"));
+        Secure(group.MapPatch("/{id}/schedules/{scheduleId}", UpdateScheduleAsync).WithName("UpdateTrainServiceSchedule"));
+        Secure(group.MapDelete("/{id}/schedules/{scheduleId}", DeleteScheduleAsync).WithName("DeleteTrainServiceSchedule"));
+        Secure(group.MapPost("/{id}/schedules/{scheduleId}/publish", PublishScheduleAsync).WithName("PublishTrainServiceSchedule"));
         return endpoints;
+    }
+
+    private static async Task<IResult> ListSchedulesAsync(Guid id, ITrainServiceManagementRepository repository,
+        IAuthorizationService authorization, HttpContext context, CancellationToken token)
+    {
+        var denied = await AuthorizeAsync(authorization, context);
+        if (denied is not null) return denied;
+        var schedules = await repository.GetSchedulesAsync(id, token);
+        return schedules is null ? ProblemDetailsConfiguration.Create(404, "Train service not found.", "service_not_found") : Results.Ok(schedules);
+    }
+
+    private static async Task<IResult> CreateScheduleAsync(Guid id, ScheduleRevisionInput? request,
+        ITrainServiceManagementRepository repository, IAuthorizationService authorization, HttpContext context, CancellationToken token)
+    {
+        var denied = await AuthorizeAsync(authorization, context);
+        if (denied is not null) return denied;
+        if (request?.Calendar is null) return Invalid("An operating calendar is required.");
+        try
+        {
+            var created = await repository.CreateScheduleAsync(id, request, token);
+            return Results.Created($"/api/services/{id:D}/schedules/{created.ScheduleId:D}", created);
+        }
+        catch (KeyNotFoundException ex) { return ProblemDetailsConfiguration.Create(404, ex.Message, "service_not_found"); }
+        catch (ArgumentException ex) { return Invalid(ex.Message); }
+        catch (DbUpdateException ex) { return MapWriteConflict(ex); }
+    }
+
+    private static async Task<IResult> UpdateScheduleAsync(Guid id, Guid scheduleId, ScheduleRevisionInput? request,
+        ITrainServiceManagementRepository repository, IAuthorizationService authorization, HttpContext context, CancellationToken token)
+    {
+        var denied = await AuthorizeAsync(authorization, context);
+        if (denied is not null) return denied;
+        if (request?.Calendar is null) return Invalid("An operating calendar is required.");
+        try
+        {
+            var updated = await repository.UpdateScheduleAsync(id, scheduleId, request, token);
+            return updated is null ? ProblemDetailsConfiguration.Create(404, "Schedule not found.", "schedule_not_found") : Results.Ok(updated);
+        }
+        catch (ArgumentException ex) { return Invalid(ex.Message); }
+        catch (InvalidOperationException ex) { return ProblemDetailsConfiguration.Create(409, ex.Message, "schedule_immutable"); }
+        catch (DbUpdateException ex) { return MapWriteConflict(ex); }
+    }
+
+    private static async Task<IResult> DeleteScheduleAsync(Guid id, Guid scheduleId,
+        ITrainServiceManagementRepository repository, IAuthorizationService authorization, HttpContext context, CancellationToken token)
+    {
+        var denied = await AuthorizeAsync(authorization, context);
+        if (denied is not null) return denied;
+        try { return await repository.DeleteScheduleAsync(id, scheduleId, token) ? Results.NoContent()
+            : ProblemDetailsConfiguration.Create(404, "Schedule not found.", "schedule_not_found"); }
+        catch (InvalidOperationException ex) { return ProblemDetailsConfiguration.Create(409, ex.Message, "schedule_in_use"); }
+        catch (DbUpdateException ex) { return MapWriteConflict(ex); }
+    }
+
+    private static async Task<IResult> PublishScheduleAsync(Guid id, Guid scheduleId,
+        ITrainServiceManagementRepository repository, IAuthorizationService authorization, HttpContext context, CancellationToken token)
+    {
+        var denied = await AuthorizeAsync(authorization, context);
+        if (denied is not null) return denied;
+        try
+        {
+            await repository.PublishScheduleAsync(id, scheduleId, DateTimeOffset.UtcNow, token);
+            return Results.NoContent();
+        }
+        catch (KeyNotFoundException ex) { return ProblemDetailsConfiguration.Create(404, ex.Message, "schedule_not_found"); }
+        catch (InvalidOperationException ex) { return ProblemDetailsConfiguration.Create(409, ex.Message, "schedule_publication_conflict"); }
+        catch (DbUpdateException ex) { return MapWriteConflict(ex); }
     }
 
     private static async Task<IResult> ListAsync(ITrainServiceManagementRepository repository, IAuthorizationService authorization, HttpContext context, CancellationToken token)
@@ -60,6 +132,7 @@ public static class TrainServiceManagementEndpoints
             return updated is null ? ProblemDetailsConfiguration.Create(404, "Train service not found.", "service_not_found") : Results.Ok(updated);
         }
         catch (KeyNotFoundException ex) { return ProblemDetailsConfiguration.Create(404, ex.Message, "route_not_found"); }
+        catch (InvalidOperationException ex) { return ProblemDetailsConfiguration.Create(409, ex.Message, "service_schedule_conflict"); }
         catch (DbUpdateException ex) { return MapWriteConflict(ex); }
         catch (ArgumentException ex) { return Invalid(ex.Message); }
     }

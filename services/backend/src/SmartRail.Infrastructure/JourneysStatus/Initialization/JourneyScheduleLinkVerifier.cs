@@ -24,9 +24,16 @@ public sealed class JourneyScheduleLinkVerifier(SmartRailDbContext dbContext) : 
             .AnyAsync(x => x.ScheduleId == request.ScheduleId && x.OperationDate == request.OperationDate, cancellationToken);
         var completeness = await dbContext.ServiceDateManifests.AsNoTracking()
             .SingleOrDefaultAsync(x => x.OperationDate == request.OperationDate, cancellationToken);
+        var calendar = await dbContext.ServiceScheduleCalendars.AsNoTracking()
+            .SingleOrDefaultAsync(x => x.ScheduleId == request.ScheduleId, cancellationToken);
+        var exception = await dbContext.ServiceScheduleDateExceptions.AsNoTracking()
+            .SingleOrDefaultAsync(x => x.ScheduleId == request.ScheduleId && x.Date == request.OperationDate, cancellationToken);
+        var operates = calendar is not null
+            ? exception?.Runs ?? calendar.RunsOn(request.OperationDate)
+            : hasDate && completeness is { IsComplete: true };
         if (service is null || schedule is null || !service.IsPublished || !schedule.IsCurrentPublished ||
             schedule.ServiceId != service.ServiceId || schedule.Revision != request.ScheduleRevision ||
-            !hasDate || completeness is null || !completeness.IsComplete ||
+            !operates ||
             schedule.FirstDepartureLocalTime != request.FirstDepartureOccurrence)
             return new(ScheduleLinkVerificationStatus.Invalid, null);
 

@@ -8,11 +8,12 @@ import { WorkspaceNavigation } from '../staff-access/workspaces/WorkspaceNavigat
 import { apiErrorMessage, operationsApi, type Departure, type DriverObservation, type Incident, type Journey, type JourneyUpdate, type Station } from './operationsApi'
 import { ControllerOverview } from './ControllerOverview'
 import { TrainServiceManagement } from './TrainServiceManagement'
+import { TimetableManagement } from './TimetableManagement'
 import { RouteManagement } from './RouteManagement'
 import './operations.css'
 import { LanguageSelect, useLanguage } from '../../shared/i18n/language'
 
-type Tab = 'overview' | 'journeys' | 'incidents' | 'stations' | 'routes' | 'services'
+type Tab = 'overview' | 'journeys' | 'incidents' | 'stations' | 'routes' | 'services' | 'timetables'
 type Column<T> = { key: string; label: string; render: (row: T) => ReactNode }
 
 function colomboDate() {
@@ -34,6 +35,7 @@ const roleMenuItems: Record<'Controller' | 'Station Staff', Record<Tab, { label:
     stations: { label: 'Stations', description: 'Manage railway stations' },
     routes: { label: 'Routes', description: 'Railway routes and ordered stops' },
     services: { label: 'Train Services', description: 'Manage train services' },
+    timetables: { label: 'Timetables & Schedules', description: 'Calling times and operating days' },
   },
   'Station Staff': {
     overview: { label: 'Station overview', description: 'Local departures and station details' },
@@ -42,6 +44,7 @@ const roleMenuItems: Record<'Controller' | 'Station Staff', Record<Tab, { label:
     stations: null,
     routes: null,
     services: null,
+    timetables: null,
   },
 }
 
@@ -63,7 +66,7 @@ const sidebarGroups: { id: SidebarGroupId; label: string; items: SidebarItem[] }
     { id: 'stations', label: 'Stations', description: 'Add, edit and manage stations', icon: 'pin', target: 'stations' },
     { id: 'routes', label: 'Routes', description: 'Railway routes and ordered stops', icon: 'route', target: 'routes' },
     { id: 'train-services', label: 'Train Services', description: 'Service numbers and names', icon: 'train', target: 'services' },
-    { id: 'timetables', label: 'Timetables & Schedules', description: 'Calling points, revisions and operating dates', icon: 'calendar' },
+    { id: 'timetables', label: 'Timetables & Schedules', description: 'Calling points, revisions and operating dates', icon: 'calendar', target: 'timetables' },
   ] },
   { id: 'system', label: 'System', items: [
     { id: 'my-profile', label: 'My Profile', description: '', icon: 'profile' },
@@ -389,6 +392,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
         {tab === 'stations' && role === 'Controller' && <StationManagement stations={stations} loading={stationsLoading} options={options} onRefresh={loadStations} onUnauthorized={onOverviewUnauthorized} />}
         {tab === 'routes' && role === 'Controller' && <RouteManagement options={options} onUnauthorized={onOverviewUnauthorized} />}
         {tab === 'services' && role === 'Controller' && <TrainServiceManagement options={options} onUnauthorized={onOverviewUnauthorized} />}
+        {tab === 'timetables' && role === 'Controller' && <TimetableManagement options={options} onUnauthorized={onOverviewUnauthorized} />}
       </main>
     </div>
   )

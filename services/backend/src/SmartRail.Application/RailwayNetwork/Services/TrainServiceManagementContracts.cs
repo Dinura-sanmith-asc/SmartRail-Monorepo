@@ -7,7 +7,11 @@ public sealed record UpdateTrainServiceRequest(string ServiceCode, Guid RouteId,
 public sealed record TrainServiceManagementView(Guid ServiceId, string ServiceCode, string? DisplayName,
     string? PublicServiceNumber, Guid RouteId, string RouteCode, string RouteName, bool IsPublished, IReadOnlyList<Guid> RouteStopIds);
 public sealed record CallingPointInput(Guid RouteStopId, int? ArrivalOffsetMinutes, int? DepartureOffsetMinutes);
-public sealed record ScheduleRevisionInput(TimeOnly FirstDepartureLocalTime, IReadOnlyList<CallingPointInput> CallingPoints);
+public sealed record ScheduleDateExceptionInput(DateOnly Date, bool Runs);
+public sealed record ScheduleCalendarInput(DateOnly ValidFrom, DateOnly ValidThrough, int WeekdaysMask,
+    IReadOnlyList<ScheduleDateExceptionInput> Exceptions);
+public sealed record ScheduleRevisionInput(TimeOnly FirstDepartureLocalTime, IReadOnlyList<CallingPointInput> CallingPoints,
+    ScheduleCalendarInput? Calendar = null);
 public sealed record ScheduleCallingPointView(Guid RouteStopId, Guid StationId, string StationName, int StopOrder,
     int? ArrivalOffsetMinutes, int? DepartureOffsetMinutes);
 public sealed record ScheduleOperationDateView(DateOnly OperationDate, bool IsManifestComplete, string? ManifestSourceRevision);
@@ -15,7 +19,8 @@ public sealed record ServiceDateManifestView(DateOnly OperationDate, string Sour
     bool IsComplete, DateTimeOffset? PublishedAt, string? PublishedBy, string ContentHash, IReadOnlyList<Guid> ScheduleIds);
 public sealed record ScheduleRevisionView(Guid ScheduleId, int Revision, TimeOnly FirstDepartureLocalTime,
     bool IsPublished, DateTimeOffset? PublishedAt, DateTimeOffset? SupersededAt,
-    IReadOnlyList<ScheduleCallingPointView> CallingPoints, IReadOnlyList<ScheduleOperationDateView> OperationDates);
+    IReadOnlyList<ScheduleCallingPointView> CallingPoints, IReadOnlyList<ScheduleOperationDateView> OperationDates,
+    ScheduleCalendarInput? Calendar = null);
 
 public interface ITrainServiceManagementRepository
 {
