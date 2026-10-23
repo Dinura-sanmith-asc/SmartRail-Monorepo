@@ -47,7 +47,7 @@ export function RouteManagement({ options, onUnauthorized }: Props) {
     setLoading(false)
   }, [onUnauthorized, options])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => { void Promise.resolve().then(load) }, [load])
 
   function clearEditor() {
     setAdding(false)
