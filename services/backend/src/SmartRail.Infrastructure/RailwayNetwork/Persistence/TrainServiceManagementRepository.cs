@@ -253,10 +253,17 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
         var byId = routeStops.Select((stop, index) => (stop, index)).ToDictionary(item => item.stop.RouteStopId);
         var result = new List<RouteStop>(ids.Count);
         var previousIndex = -1;
+        var direction = 0;
         foreach (var id in ids)
         {
             if (!byId.TryGetValue(id, out var item)) throw new ArgumentException("Every service station must be on the selected route.");
-            if (item.index <= previousIndex) throw new ArgumentException("Service stations must follow the route stop order.");
+            if (previousIndex >= 0)
+            {
+                var step = Math.Sign(item.index - previousIndex);
+                if (step == 0 || direction != 0 && step != direction)
+                    throw new ArgumentException("Service stations must follow the route in one travel direction.");
+                direction = step;
+            }
             result.Add(item.stop);
             previousIndex = item.index;
         }

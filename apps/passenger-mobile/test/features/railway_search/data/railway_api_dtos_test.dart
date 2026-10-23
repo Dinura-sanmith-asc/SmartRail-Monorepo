@@ -66,6 +66,8 @@ void main() {
           {
             'serviceId': _serviceId,
             'serviceCode': 'SR-1',
+            'displayName': 'Coastal Express',
+            'publicServiceNumber': 'T100',
             'routeId': _routeId,
             'routeCode': 'R1',
             'scheduleRevision': 2,
@@ -85,6 +87,8 @@ void main() {
         ],
       });
       expect(response.travelDate, '2026-10-18');
+      expect(response.services.single.displayName, 'Coastal Express');
+      expect(response.services.single.publicServiceNumber, 'T100');
       expect(
         response.services.single.origin.scheduledAt,
         '2026-10-18T23:30:00+05:30',
@@ -110,6 +114,8 @@ void main() {
         final detail = ServiceDetailDto.fromJson({
           'serviceId': _serviceId,
           'serviceCode': 'SR-1',
+          'displayName': null,
+          'publicServiceNumber': 'T100',
           'route': {
             'routeId': _routeId,
             'routeCode': 'R1',
@@ -118,6 +124,8 @@ void main() {
           'schedule': {'revision': 2, 'firstDepartureTimeLocal': '05:45:00'},
         });
         expect(detail.route.name, 'Coastal line');
+        expect(detail.displayName, isNull);
+        expect(detail.publicServiceNumber, 'T100');
         expect(detail.schedule.firstDepartureTimeLocal, '05:45:00');
       },
     );
@@ -136,6 +144,20 @@ void main() {
     });
 
     test('rejects malformed UUIDs, dates, types and undocumented fields', () {
+      expect(
+        () => ServiceDetailDto.fromJson({
+          'serviceId': _serviceId,
+          'serviceCode': 'SR-1',
+          'displayName': 42,
+          'route': {
+            'routeId': _routeId,
+            'routeCode': 'R1',
+            'name': 'Coastal line',
+          },
+          'schedule': {'revision': 2, 'firstDepartureTimeLocal': '05:45:00'},
+        }),
+        throwsFormatException,
+      );
       expect(
         () =>
             StationDto.fromJson({'stationId': 'not-a-uuid', 'name': 'Central'}),

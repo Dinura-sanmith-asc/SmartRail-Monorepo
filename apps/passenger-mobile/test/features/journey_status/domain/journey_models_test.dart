@@ -2,8 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smartrail_passenger/features/journey_status/domain/journey_models.dart';
 import 'package:smartrail_passenger/features/journey_status/domain/journey_timestamp.dart';
 
-const _journeyId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-const _serviceId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+const _journeyId = '45000000-0000-0000-0000-000000000019';
+const _serviceId = '30000000-0000-0000-0000-000000000001';
 const _scheduleId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 const _stationA = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
 const _stationB = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';

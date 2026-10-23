@@ -10,6 +10,19 @@ Object _fixture(String name) => jsonDecode(
 
 void main() {
   group('journey API DTOs', () {
+    test('accepts backend seeded GUID identifiers', () {
+      final candidate = (_fixture('station_departures.json') as List).first
+          as Map<String, dynamic>;
+      candidate['journeyInstanceId'] =
+          '45000000-0000-0000-0000-000000000019';
+      candidate['serviceId'] = '30000000-0000-0000-0000-000000000001';
+      final parsed = StationDeparturesDto.fromJson([candidate]);
+      expect(
+        parsed.items.single.journeyInstanceId,
+        '45000000-0000-0000-0000-000000000019',
+      );
+    });
+
     test('parses departure candidates and preserves response order', () {
       final candidates = StationDeparturesDto.fromJson(
         _fixture('station_departures.json'),

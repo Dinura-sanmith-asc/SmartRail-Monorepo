@@ -8,8 +8,8 @@ import 'package:smartrail_passenger/core/network/http_api_client.dart';
 import 'package:smartrail_passenger/features/journey_status/data/journey_status_api.dart';
 
 const _base = 'https://api.example.test';
-const _station = '11111111-1111-4111-8111-111111111111';
-const _journey = '22222222-2222-4222-8222-222222222222';
+const _station = '10000000-0000-0000-0000-000000000001';
+const _journey = '45000000-0000-0000-0000-000000000019';
 
 HttpApiClient _client(http.Client transport, {Duration? timeout}) =>
     HttpApiClient(

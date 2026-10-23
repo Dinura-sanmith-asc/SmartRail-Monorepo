@@ -80,7 +80,7 @@ class JourneyStatusApi implements JourneyStatusApiClient {
 
   void _requireUuid(String value, String name) {
     if (!RegExp(
-      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
+      r'^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$',
     ).hasMatch(value)) {
       throw ArgumentError.value(value, name, 'Must be a UUID.');
     }

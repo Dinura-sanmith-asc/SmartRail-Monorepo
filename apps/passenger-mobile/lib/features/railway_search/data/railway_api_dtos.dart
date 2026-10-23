@@ -44,6 +44,11 @@ String _string(Object? value, String at, {bool nonEmpty = false}) {
   return value;
 }
 
+String? _nullableString(Map<String, Object?> json, String key, String at) {
+  final value = json[key];
+  return value == null ? null : _string(value, at);
+}
+
 int _integer(Object? value, String at, {int minimum = 0}) {
   if (value is! int || value < minimum) {
     throw FormatException('$at must be an integer >= $minimum.');
@@ -259,6 +264,8 @@ class ServiceChoiceDto {
   const ServiceChoiceDto({
     required this.serviceId,
     required this.serviceCode,
+    this.displayName,
+    this.publicServiceNumber,
     required this.routeId,
     required this.routeCode,
     required this.scheduleRevision,
@@ -266,24 +273,36 @@ class ServiceChoiceDto {
     required this.destination,
   });
   final String serviceId, serviceCode, routeId, routeCode;
+  final String? displayName, publicServiceNumber;
   final int scheduleRevision;
   final ScheduledCallDto origin, destination;
   factory ServiceChoiceDto.fromJson(
     Object? json, {
     String at = 'ServiceChoice',
   }) {
-    final map = _object(json, at, {
-      'serviceId',
-      'serviceCode',
-      'routeId',
-      'routeCode',
-      'scheduleRevision',
-      'origin',
-      'destination',
-    });
+    final map = _object(
+      json,
+      at,
+      {
+        'serviceId',
+        'serviceCode',
+        'routeId',
+        'routeCode',
+        'scheduleRevision',
+        'origin',
+        'destination',
+      },
+      {'displayName', 'publicServiceNumber'},
+    );
     return ServiceChoiceDto(
       serviceId: _uuid(map['serviceId'], '$at.serviceId'),
       serviceCode: _string(map['serviceCode'], '$at.serviceCode'),
+      displayName: _nullableString(map, 'displayName', '$at.displayName'),
+      publicServiceNumber: _nullableString(
+        map,
+        'publicServiceNumber',
+        '$at.publicServiceNumber',
+      ),
       routeId: _uuid(map['routeId'], '$at.routeId'),
       routeCode: _string(map['routeCode'], '$at.routeCode'),
       scheduleRevision: _integer(
@@ -332,22 +351,31 @@ class ServiceDetailDto {
   const ServiceDetailDto({
     required this.serviceId,
     required this.serviceCode,
+    this.displayName,
+    this.publicServiceNumber,
     required this.route,
     required this.schedule,
   });
   final String serviceId, serviceCode;
+  final String? displayName, publicServiceNumber;
   final ServiceRouteDto route;
   final ServiceScheduleDto schedule;
   factory ServiceDetailDto.fromJson(Object? json) {
-    final map = _object(json, 'ServiceDetail', {
-      'serviceId',
-      'serviceCode',
-      'route',
-      'schedule',
-    });
+    final map = _object(
+      json,
+      'ServiceDetail',
+      {'serviceId', 'serviceCode', 'route', 'schedule'},
+      {'displayName', 'publicServiceNumber'},
+    );
     return ServiceDetailDto(
       serviceId: _uuid(map['serviceId'], 'serviceId'),
       serviceCode: _string(map['serviceCode'], 'serviceCode'),
+      displayName: _nullableString(map, 'displayName', 'displayName'),
+      publicServiceNumber: _nullableString(
+        map,
+        'publicServiceNumber',
+        'publicServiceNumber',
+      ),
       route: ServiceRouteDto.fromJson(map['route']),
       schedule: ServiceScheduleDto.fromJson(map['schedule']),
     );

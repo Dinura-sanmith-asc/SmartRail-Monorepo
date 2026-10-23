@@ -87,7 +87,7 @@ String? _timestamp(
 String _uuid(Map<String, Object?> value, String key) {
   final raw = _string(value, key);
   if (!RegExp(
-    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89ABab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
+    r'^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$',
   ).hasMatch(raw)) {
     throw FormatException('$key must be a UUID.');
   }
