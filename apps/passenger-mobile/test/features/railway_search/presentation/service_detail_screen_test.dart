@@ -46,6 +46,8 @@ void main() {
         findsOneWidget,
       );
       repository.failStops = false;
+      await tester.ensureVisible(find.byKey(const Key('retry-route-stops')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('retry-route-stops')));
       await tester.pumpAndSettle();
       expect(repository.serviceCalls, 1);
@@ -71,6 +73,8 @@ void main() {
       tester.getTopLeft(find.byType(ListTile).first).dy,
       lessThan(tester.getTopLeft(find.byType(ListTile).last).dy),
     );
+    await tester.ensureVisible(find.byKey(const Key('retry-service-detail')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('retry-service-detail')));
     await tester.pumpAndSettle();
     expect(repository.serviceCalls, 2);

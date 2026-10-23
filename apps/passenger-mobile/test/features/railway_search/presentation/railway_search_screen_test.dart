@@ -111,6 +111,7 @@ void main() {
     );
     await _pumpScreen(tester, repository);
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Search services'));
     await tester.tap(find.text('Search services'));
     await tester.pumpAndSettle();
     expect(find.text('Choose an origin station.'), findsOneWidget);
@@ -142,6 +143,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Search services'));
     await tester.tap(find.text('Search services'));
     await tester.pumpAndSettle();
 

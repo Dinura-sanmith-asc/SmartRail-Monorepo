@@ -67,6 +67,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Scheduled service details'), findsOneWidget);
 
+      await tester.tap(find.byKey(const Key('choose-food-for-service')));
+      await tester.pumpAndSettle();
+      expect(find.text('Choose a journey'), findsOneWidget);
+      expect(find.text('See food for this journey'), findsOneWidget);
+      appRouter.pop();
+      await tester.pumpAndSettle();
+
       await tester.tap(find.byKey(const Key('open-journey-status')));
       await tester.pumpAndSettle();
       expect(journeyRepository.requestedStationId, _originId);

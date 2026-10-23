@@ -54,6 +54,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Search services'));
     await tester.tap(find.text('Search services'));
     await tester.pumpAndSettle();
 
@@ -75,6 +76,7 @@ void main() {
     expect(cleared.response, isNull);
     expect(repository.searchCalls, 1);
 
+    await tester.ensureVisible(find.text('Search services'));
     await tester.tap(find.text('Search services'));
     await tester.pumpAndSettle();
     expect(repository.searchCalls, 2);
