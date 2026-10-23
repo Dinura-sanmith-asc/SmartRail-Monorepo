@@ -193,6 +193,13 @@ class StationDepartureDto {
       'source',
       'updatedAt',
       'ambiguity',
+      'scheduledArrivalAt',
+      'operationalArrivalAt',
+      'serviceCode',
+      'displayName',
+      'publicServiceNumber',
+      'originName',
+      'destinationName',
     }, 'StationDeparture');
     final status = JourneyStatus.parse(_string(json, 'status'));
     final ambiguity = JourneyAmbiguity.parse(_string(json, 'ambiguity'));
@@ -208,6 +215,19 @@ class StationDepartureDto {
     final operational = json.containsKey('operationalDepartureAt')
         ? _timestamp(json, 'operationalDepartureAt', nullable: true)
         : null;
+    // These public projection fields were added after the original departure
+    // contract. Validate them while keeping the journey-selection model small.
+    _timestamp(json, 'scheduledArrivalAt', nullable: true, optional: true);
+    _timestamp(json, 'operationalArrivalAt', nullable: true, optional: true);
+    for (final key in [
+      'serviceCode',
+      'displayName',
+      'publicServiceNumber',
+      'originName',
+      'destinationName',
+    ]) {
+      _nullableString(json, key);
+    }
     if (json['platform'] != null && json['platform'] is! String) {
       throw const FormatException('platform must be a string or null.');
     }

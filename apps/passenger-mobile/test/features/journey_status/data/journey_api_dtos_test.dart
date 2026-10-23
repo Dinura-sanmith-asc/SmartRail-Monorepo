@@ -49,6 +49,28 @@ void main() {
       );
     });
 
+    test('accepts the current public station departure projection', () {
+      final departure =
+          Map<String, Object?>.from(
+              ((_fixture('station_departures.json') as List).first as Map),
+            )
+            ..['scheduledArrivalAt'] = null
+            ..['operationalArrivalAt'] = '2026-10-19T08:20:00+05:30'
+            ..['serviceCode'] = 'DEV-SEED-REF-001'
+            ..['displayName'] = 'Gampaha Express'
+            ..['publicServiceNumber'] = 'T0008'
+            ..['originName'] = 'Colombo Fort'
+            ..['destinationName'] = 'Gampaha';
+      final parsed = StationDepartureDto.fromJson(departure);
+      expect(parsed.journeyInstanceId, departure['journeyInstanceId']);
+
+      departure['operationalArrivalAt'] = 'not-a-timestamp';
+      expect(
+        () => StationDepartureDto.fromJson(departure),
+        throwsFormatException,
+      );
+    });
+
     test('parses baseline and populated snapshots without UTC conversion', () {
       final baseline = JourneySnapshotDto.fromJson(
         _fixture('journey_snapshot_baseline.json'),
