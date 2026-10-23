@@ -10,11 +10,13 @@ class JourneyLookupScreen extends ConsumerStatefulWidget {
   const JourneyLookupScreen({
     required this.request,
     required this.onJourneySelected,
+    this.forCatering = false,
     super.key,
   });
 
   final JourneyLookupRequest request;
   final ValueChanged<JourneyCandidate> onJourneySelected;
+  final bool forCatering;
 
   @override
   ConsumerState<JourneyLookupScreen> createState() =>
@@ -37,7 +39,7 @@ class _JourneyLookupScreenState extends ConsumerState<JourneyLookupScreen> {
     final state = ref.watch(journeyLookupNotifierProvider(widget.request));
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Journey status'),
+        title: Text(widget.forCatering ? 'Choose a journey' : 'Journey status'),
         leading: Semantics(
           button: true,
           label: 'Back',
@@ -76,6 +78,9 @@ class _JourneyLookupScreenState extends ConsumerState<JourneyLookupScreen> {
     JourneyLookupStatus.ready => JourneyCandidatesScreen(
       request: widget.request,
       onJourneySelected: widget.onJourneySelected,
+      actionLabel: widget.forCatering
+          ? 'See food for this journey'
+          : 'Open journey status',
     ),
     JourneyLookupStatus.unavailable ||
     JourneyLookupStatus.invalid ||

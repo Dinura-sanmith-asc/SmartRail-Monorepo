@@ -48,6 +48,20 @@ class ServiceDetailScreen extends ConsumerWidget {
                 label: const Text('Journey status and updates'),
               ),
             ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.icon(
+                key: const Key('choose-food-for-service'),
+                onPressed: () => context.pushNamed(
+                  'journey-lookup',
+                  queryParameters: const {'catering': '1'},
+                  extra: (choice: choice, travelDate: travelDate),
+                ),
+                icon: const Icon(Icons.restaurant_rounded),
+                label: const Text('Choose food for this train'),
+              ),
+            ),
             const SizedBox(height: 24),
             _section(
               context,

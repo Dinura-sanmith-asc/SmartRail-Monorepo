@@ -27,7 +27,7 @@ class RailwaySearchScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('SmartRail Passenger')),
+      appBar: AppBar(title: const Text('Explore')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -37,37 +37,86 @@ class RailwaySearchScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const Icon(
+                    Icons.explore_rounded,
+                    color: Color(0xFF126C73),
+                    size: 36,
+                  ),
+                  const SizedBox(height: 10),
                   Text(
                     'Search railway services',
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: Theme.of(context).textTheme.headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Choose your origin, destination, and travel date.',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  const SizedBox(height: 24),
-                  _stationChoices(
-                    context,
-                    ref: ref,
-                    state: state,
-                    controller: controller,
-                    origin: origin,
-                    destination: destination,
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: () =>
-                        _chooseDate(context, state, controller, ref),
-                    icon: const Icon(Icons.calendar_month_outlined),
-                    label: Text(
-                      _dateButtonLabel(context, state.criteria.travelDate),
+                    'Where would you like to go?',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    style: OutlinedButton.styleFrom(
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 18,
+                  ),
+                  const SizedBox(height: 23),
+                  Card(
+                    margin: EdgeInsets.zero,
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'YOUR ROUTE',
+                            style: TextStyle(
+                              color: Color(0xFF126C73),
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          _stationChoices(
+                            context,
+                            ref: ref,
+                            state: state,
+                            controller: controller,
+                            origin: origin,
+                            destination: destination,
+                          ),
+                          if (origin != null && destination != null)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton.icon(
+                                onPressed: () {
+                                  ref
+                                      .read(
+                                        searchResultsNotifierProvider.notifier,
+                                      )
+                                      .clear();
+                                  controller.selectOrigin(destination.id);
+                                  controller.selectDestination(origin.id);
+                                },
+                                icon: const Icon(Icons.swap_vert_rounded),
+                                label: const Text('Swap stations'),
+                              ),
+                            ),
+                          const SizedBox(height: 13),
+                          OutlinedButton.icon(
+                            onPressed: () =>
+                                _chooseDate(context, state, controller, ref),
+                            icon: const Icon(Icons.calendar_month_outlined),
+                            label: Text(
+                              _dateButtonLabel(
+                                context,
+                                state.criteria.travelDate,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 18,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

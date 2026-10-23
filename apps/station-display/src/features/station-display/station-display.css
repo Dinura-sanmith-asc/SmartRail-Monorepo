@@ -32,6 +32,50 @@
   overflow-wrap: anywhere;
 }
 
+.station-display__station-select-wrap {
+  display: inline-block;
+  max-width: 100%;
+  position: relative;
+}
+
+.station-display__station-select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0.3rem;
+  top: 43%;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 0.16rem solid currentColor;
+  border-bottom: 0.16rem solid currentColor;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.station-display__station-select {
+  appearance: none;
+  max-width: 100%;
+  border: 0;
+  border-radius: 0.2rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  padding: 0.1rem 1.8rem 0.1rem 0;
+  cursor: pointer;
+}
+
+.station-display__station-select:focus-visible {
+  outline: 0.15rem solid #67e8f9;
+  outline-offset: 0.25rem;
+}
+
+.station-display__station-select option {
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
 .display-state-message {
   margin: 1.25rem clamp(1rem, 2.2vw, 2.75rem) 0;
   border-left: 0.35rem solid #fbbf24;

@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
     kind: 'valid',
     config: { stationId: '00000000-0000-4000-8000-000000000101', apiBaseUrl: 'https://api.example.test/api' },
   })),
-  findStation: vi.fn(),
+  listStations: vi.fn(),
 }))
 
 vi.mock('./app/config', async (importOriginal) => ({
@@ -14,7 +14,7 @@ vi.mock('./app/config', async (importOriginal) => ({
   readStationDisplayConfig: mocks.readConfig,
 }))
 vi.mock('./features/station-display/api/station-reference-client', () => ({
-  findPublishedStation: mocks.findStation,
+  listPublishedStations: mocks.listStations,
 }))
 
 import App from './App'
@@ -25,9 +25,9 @@ describe('App fixture composition', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     const fixture = stationDisplayFixtures[0]
-    mocks.findStation.mockResolvedValue({
+    mocks.listStations.mockResolvedValue({
       kind: 'found',
-      station: { stationId: fixture.station.stationId, name: 'Published Test Station' },
+      stations: [{ stationId: fixture.station.stationId, name: 'Published Test Station' }],
     })
   })
 
@@ -59,10 +59,10 @@ describe('App fixture composition', () => {
   })
 
   it('does not render fixture departures when station validation fails', async () => {
-    mocks.findStation.mockResolvedValue({ kind: 'unpublished' })
+    mocks.listStations.mockResolvedValue({ kind: 'found', stations: [] })
     render(<App />)
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('The configured station is not published.')
+    expect(await screen.findByRole('alert')).toHaveTextContent('No published stations are available.')
     await waitFor(() => expect(screen.queryByText('DEMO TEST Service A')).not.toBeInTheDocument())
     expect(screen.queryByText('DEMO DATA — NOT LIVE')).not.toBeInTheDocument()
   })

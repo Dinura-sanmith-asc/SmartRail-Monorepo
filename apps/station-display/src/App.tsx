@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { readStationDisplayConfig, type ConfigErrorReason } from './app/config'
-import { findPublishedStation } from './features/station-display/api/station-reference-client'
+import { listPublishedStations } from './features/station-display/api/station-reference-client'
 import { createFixtureDepartureSource } from './features/station-display/api/fixtures/fixture-departure-source'
 import { stationDisplayFixtures } from './features/station-display/api/fixtures/station-display.fixture'
 import { createStationDepartureAdapter } from './features/station-display/api/station-departure-adapter'
@@ -11,6 +11,7 @@ import { useDepartureUpdates } from './features/station-display/hooks/use-depart
 import { createHttpClient } from './shared/api/http-client'
 import './features/station-display/station-display.css'
 import { DisplayLanguageProvider, useDisplayLanguage } from './app/language'
+import type { StationContext } from './features/station-display/model/display-model'
 
 const stationDisplayConfig = readStationDisplayConfig()
 const fixtureDepartureSource = createFixtureDepartureSource(stationDisplayFixtures)
@@ -24,6 +25,15 @@ const liveDepartureSource = stationDisplayConfig.kind === 'valid'
 const defaultDepartureSource = import.meta.env.PROD || import.meta.env.VITE_STATION_DISPLAY_SOURCE === 'live'
   ? liveDepartureSource
   : fixtureDepartureSource
+const selectedStationKey = 'smartrail.station-display.station-id'
+
+function rememberedStationId(): string | null {
+  try { return window.localStorage.getItem(selectedStationKey) } catch { return null }
+}
+
+function rememberStationId(stationId: string): void {
+  try { window.localStorage.setItem(selectedStationKey, stationId) } catch { /* Storage may be disabled. */ }
+}
 
 function configurationMessage(reason: ConfigErrorReason): string {
   switch (reason) {
@@ -65,6 +75,7 @@ function StationDisplay({ departureSource = defaultDepartureSource }: AppProps) 
       ? { kind: 'loading' }
       : { kind: 'unavailable', message: t(configurationMessage(stationDisplayConfig.reason)) },
   )
+  const [stations, setStations] = useState<StationContext[]>([])
 
   useEffect(() => {
     if (departureSource !== fixtureDepartureSource || !import.meta.env.DEV) return
@@ -80,12 +91,18 @@ function StationDisplay({ departureSource = defaultDepartureSource }: AppProps) 
 
     let active = true
     const client = createHttpClient({ baseUrl: stationDisplayConfig.config.apiBaseUrl })
-    void findPublishedStation(stationDisplayConfig.config.stationId, client).then((lookup) => {
+    void listPublishedStations(client).then((lookup) => {
       if (!active) return
       if (lookup.kind === 'found') {
-        setState({ kind: 'ready', station: lookup.station })
-      } else if (lookup.kind === 'unpublished') {
-        setState({ kind: 'unavailable', message: 'The configured station is not published.' })
+        const available = lookup.stations.sort((a, b) => a.name.localeCompare(b.name))
+        setStations(available)
+        const preferredId = rememberedStationId() ?? stationDisplayConfig.config.stationId
+        const selected = available.find((station) => station.stationId === preferredId)
+          ?? available.find((station) => station.stationId === stationDisplayConfig.config.stationId)
+          ?? available[0]
+        setState(selected
+          ? { kind: 'ready', station: selected }
+          : { kind: 'unavailable', message: 'No published stations are available.' })
       } else {
         setState({ kind: 'unavailable', message: 'Station information is unavailable.' })
       }
@@ -98,8 +115,13 @@ function StationDisplay({ departureSource = defaultDepartureSource }: AppProps) 
 
   return (
     <main className="station-display">
-      <StationHeader state={state} />
-      {state.kind === 'ready' && activeDepartureSource ? <FixtureDepartures stationId={state.station.stationId} source={activeDepartureSource} /> : null}
+      <StationHeader state={state} stations={stations} onStationChange={(stationId) => {
+        const station = stations.find((item) => item.stationId === stationId)
+        if (!station) return
+        rememberStationId(stationId)
+        setState({ kind: 'ready', station })
+      }} />
+      {state.kind === 'ready' && activeDepartureSource ? <FixtureDepartures key={state.station.stationId} stationId={state.station.stationId} source={activeDepartureSource} /> : null}
     </main>
   )
 }

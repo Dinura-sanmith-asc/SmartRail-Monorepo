@@ -80,23 +80,31 @@ final GoRouter appRouter = GoRouter(
             final selection =
                 state.extra!
                     as ({ScheduledServiceChoice choice, TravelDate travelDate});
+            final forCatering = state.uri.queryParameters['catering'] == '1';
             final request = JourneyLookupRequest(
               choice: selection.choice,
               travelDate: selection.travelDate,
             );
             return JourneyLookupScreen(
               request: request,
-              onJourneySelected: (candidate) => context.pushNamed(
-                'journey-status',
-                pathParameters: {
-                  'journeyInstanceId': candidate.journeyInstanceId,
-                },
-                extra: (
-                  choice: selection.choice,
-                  travelDate: selection.travelDate,
-                  journeyInstanceId: candidate.journeyInstanceId,
-                ),
-              ),
+              forCatering: forCatering,
+              onJourneySelected: (candidate) => forCatering
+                  ? context.push(
+                      '/catering/journeys/${candidate.journeyInstanceId}',
+                      extra:
+                          '${selection.choice.serviceCode} · ${selection.travelDate.toIsoDate()}',
+                    )
+                  : context.pushNamed(
+                      'journey-status',
+                      pathParameters: {
+                        'journeyInstanceId': candidate.journeyInstanceId,
+                      },
+                      extra: (
+                        choice: selection.choice,
+                        travelDate: selection.travelDate,
+                        journeyInstanceId: candidate.journeyInstanceId,
+                      ),
+                    ),
             );
           },
         ),

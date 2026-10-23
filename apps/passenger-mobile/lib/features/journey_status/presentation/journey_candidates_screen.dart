@@ -8,11 +8,13 @@ class JourneyCandidatesScreen extends ConsumerWidget {
   const JourneyCandidatesScreen({
     required this.request,
     required this.onJourneySelected,
+    this.actionLabel = 'Open journey status',
     super.key,
   });
 
   final JourneyLookupRequest request;
   final ValueChanged<JourneyCandidate> onJourneySelected;
+  final String actionLabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,7 +36,7 @@ class JourneyCandidatesScreen extends ConsumerWidget {
                 notifier.openUniqueUnambiguous();
                 onJourneySelected(candidates.single);
               },
-              child: const Text('Open journey status'),
+              child: Text(actionLabel),
             ),
           ),
         Expanded(

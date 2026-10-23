@@ -28,15 +28,26 @@ class CateringServicesScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.ramen_dining_rounded,
-                  color: Color(0xFFFFD59E), size: 40),
+              const Icon(
+                Icons.ramen_dining_rounded,
+                color: Color(0xFFFFD59E),
+                size: 40,
+              ),
               const SizedBox(height: 22),
-              const Text('Good food,\nright on your route.',
-                  style: TextStyle(color: Colors.white, fontSize: 27,
-                      height: 1.12, fontWeight: FontWeight.w800)),
+              const Text(
+                'Good food,\nright on your route.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 27,
+                  height: 1.12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: 12),
-              const Text('Holy-Rice makes your journey a little more delicious. Order ahead and collect at an eligible station.',
-                  style: TextStyle(color: Color(0xFFD7EFED), height: 1.45)),
+              const Text(
+                'Holy-Rice makes your journey a little more delicious. Order ahead and collect at an eligible station.',
+                style: TextStyle(color: Color(0xFFD7EFED), height: 1.45),
+              ),
               const SizedBox(height: 23),
               FilledButton.icon(
                 onPressed: () => context.go(AppRoutes.explore),
@@ -51,23 +62,46 @@ class CateringServicesScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 27),
-        Text('How it works', style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.w800,
-        )),
+        Text(
+          'How it works',
+          style: Theme.of(context).textTheme.titleLarge
+              ?.copyWith(fontWeight: FontWeight.w800),
+        ),
         const SizedBox(height: 10),
-        const _ServiceStep(number: '01', icon: Icons.search_rounded,
-          title: 'Choose your train', detail: 'Search by route and travel date.'),
-        const _ServiceStep(number: '02', icon: Icons.restaurant_menu_rounded,
-          title: 'Pick your food', detail: 'Open a dated journey to see the menu.'),
-        const _ServiceStep(number: '03', icon: Icons.place_rounded,
-          title: 'Collect on the way', detail: 'Choose a supported station.'),
+        const _ServiceStep(
+          number: '01',
+          icon: Icons.search_rounded,
+          title: 'Choose your train',
+          detail: 'Search by route and travel date.',
+        ),
+        const _ServiceStep(
+          number: '02',
+          icon: Icons.restaurant_menu_rounded,
+          title: 'Pick your food',
+          detail: 'Open a dated journey to see the menu.',
+        ),
+        const _ServiceStep(
+          number: '03',
+          icon: Icons.place_rounded,
+          title: 'Collect on the way',
+          detail: 'Choose a supported station.',
+        ),
         const SizedBox(height: 18),
         Card(
           margin: EdgeInsets.zero,
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
-            leading: const Icon(Icons.receipt_long_rounded, color: Color(0xFF126C73)),
-            title: const Text('My catering orders', style: TextStyle(fontWeight: FontWeight.w700)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 9,
+            ),
+            leading: const Icon(
+              Icons.receipt_long_rounded,
+              color: Color(0xFF126C73),
+            ),
+            title: const Text(
+              'My catering orders',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
             subtitle: const Text('Track an order or check its status'),
             trailing: const Icon(Icons.arrow_forward_rounded),
             onTap: () => context.push(AppRoutes.cateringOrders),
@@ -79,24 +113,52 @@ class CateringServicesScreen extends StatelessWidget {
 }
 
 class _ServiceStep extends StatelessWidget {
-  const _ServiceStep({required this.number, required this.icon,
-    required this.title, required this.detail});
+  const _ServiceStep({
+    required this.number,
+    required this.icon,
+    required this.title,
+    required this.detail,
+  });
   final String number, title, detail;
   final IconData icon;
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 5),
-    child: Row(children: [
-      Container(width: 47, height: 47,
-        decoration: BoxDecoration(color: const Color(0xFFE2F2EF),
-          borderRadius: BorderRadius.circular(15)),
-        child: Icon(icon, color: const Color(0xFF126C73))),
-      const SizedBox(width: 13),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-        children: [Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-          Text(detail, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant))])),
-      Text(number, style: const TextStyle(color: Color(0xFF91A9A5), fontWeight: FontWeight.w700)),
-    ]),
+    child: Row(
+      children: [
+        Container(
+          width: 47,
+          height: 47,
+          decoration: BoxDecoration(
+            color: const Color(0xFFE2F2EF),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Icon(icon, color: const Color(0xFF126C73)),
+        ),
+        const SizedBox(width: 13),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(
+                detail,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Text(
+          number,
+          style: const TextStyle(
+            color: Color(0xFF91A9A5),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    ),
   );
 }
 
@@ -118,6 +180,7 @@ class _CateringMenuScreenState extends ConsumerState<CateringMenuScreen> {
   String? stationId, error, pendingKey;
   bool loading = true, submitting = false;
   CateringOrder? confirmed;
+  String? selectedCategory;
 
   @override
   void initState() {
@@ -207,18 +270,101 @@ class _CateringMenuScreenState extends ConsumerState<CateringMenuScreen> {
   );
 
   Widget _menu() => ListView(
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.fromLTRB(18, 10, 18, 26),
     children: [
+      Container(
+        padding: const EdgeInsets.all(21),
+        decoration: BoxDecoration(
+          color: const Color(0xFF153F4B),
+          borderRadius: BorderRadius.circular(23),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.dinner_dining_rounded,
+              size: 38,
+              color: Color(0xFFFFD59E),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Holy-Rice',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    widget.journeyLabel ?? 'Food for your selected journey',
+                    style: const TextStyle(color: Color(0xFFD7EFED)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 24),
       const Text(
         'Choose food',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 23, fontWeight: FontWeight.w800),
       ),
+      const SizedBox(height: 4),
+      const Text('Fresh picks for the journey ahead.'),
+      const SizedBox(height: 14),
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final category in <String?>[
+              null,
+              ...options!.items.map((item) => item.category).toSet(),
+            ])
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ChoiceChip(
+                  label: Text(category ?? 'All'),
+                  selected: selectedCategory == category,
+                  onSelected: (_) =>
+                      setState(() => selectedCategory = category),
+                ),
+              ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 6),
       if (options!.items.isEmpty)
         const Text('No menu items are available for this journey.'),
-      for (final item in options!.items)
+      for (final item in options!.items.where(
+        (item) => selectedCategory == null || item.category == selectedCategory,
+      ))
         Card(
+          margin: const EdgeInsets.symmetric(vertical: 6),
           child: ListTile(
-            title: Text(item.name),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 10,
+            ),
+            leading: Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF1E3),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: const Icon(
+                Icons.restaurant_rounded,
+                color: Color(0xFFB9652C),
+              ),
+            ),
+            title: Text(
+              item.name,
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
             subtitle: Text(
               '${item.description}\n${item.price.toStringAsFixed(2)} ${item.currency}${item.available ? '' : ' · Unavailable'}',
             ),
@@ -261,10 +407,42 @@ class _CateringMenuScreenState extends ConsumerState<CateringMenuScreen> {
       const SizedBox(height: 18),
       const Text(
         'Cart and collection',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
       ),
-      Text(widget.journeyLabel ?? 'Selected dated journey'),
-      Text('Estimated total: ${total.toStringAsFixed(2)} LKR'),
+      const SizedBox(height: 10),
+      Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.shopping_bag_outlined,
+                    color: Color(0xFF126C73),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${cart.values.fold<int>(0, (sum, value) => sum + value)} items in your cart',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Estimated total: ${total.toStringAsFixed(2)} LKR',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: 13),
       if (options!.points.isEmpty)
         const Text('No eligible collection stations for this journey.'),
       if (options!.points.isNotEmpty)

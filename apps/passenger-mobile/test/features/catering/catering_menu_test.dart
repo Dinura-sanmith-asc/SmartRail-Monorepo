@@ -98,11 +98,21 @@ void main() {
       await tester.tap(find.byTooltip('Add Chicken rice'));
       await tester.tap(find.byTooltip('Add Chicken rice'));
       await tester.pump();
+      await tester.scrollUntilVisible(
+        find.text('Estimated total: 1900.00 LKR'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Estimated total: 1900.00 LKR'), findsOneWidget);
       await tester.tap(find.text('Collection station'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Colombo Fort').last);
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Submit order'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Submit order'));
       await tester.pumpAndSettle();
       expect(api.submissions, 1);

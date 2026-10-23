@@ -152,6 +152,7 @@ export function createStationDepartureAdapter(
   let stationId: string | undefined
   let timer: ReturnType<typeof setInterval> | undefined
   let request: Promise<StationDepartureSnapshot> | undefined
+  let requestStationId: string | undefined
   let disposed = false
   const subscribers = new Set<{
     listener: (snapshot: StationDepartureSnapshot) => void
@@ -165,6 +166,7 @@ export function createStationDepartureAdapter(
       const requestedStation = stationId
       const current = read(requestedStation)
       request = current
+      requestStationId = requestedStation
       void current.then(
         (snapshot) => {
           if (disposed || requestedStation !== stationId) return
@@ -174,23 +176,24 @@ export function createStationDepartureAdapter(
           }
         },
         (error: unknown) => {
-          if (disposed) return
+          if (disposed || requestedStation !== stationId) return
           const message = error instanceof Error ? error.message : 'Departure information could not be refreshed.'
           for (const subscriber of subscribers) subscriber.handlers?.onRefreshFailure?.(message)
         },
-      ).finally(() => { if (request === current) request = undefined })
+      ).finally(() => { if (request === current) { request = undefined; requestStationId = undefined } })
     }, refreshIntervalMs)
   }
 
   const fetch = (id: string) => {
     stationId = id
     startPolling()
-    if (request) return request
+    if (request && requestStationId === id) return request
     const current = read(id)
     request = current
+    requestStationId = id
     void current.then(
-      () => { if (request === current) request = undefined },
-      () => { if (request === current) request = undefined },
+      () => { if (request === current) { request = undefined; requestStationId = undefined } },
+      () => { if (request === current) { request = undefined; requestStationId = undefined } },
     )
     return current
   }

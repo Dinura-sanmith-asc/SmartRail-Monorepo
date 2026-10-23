@@ -10,6 +10,10 @@ export type StationLookupResult =
   | { kind: 'unpublished' }
   | { kind: 'unavailable'; failure: 'network' | 'http' | 'malformed-response' }
 
+export type StationListResult =
+  | { kind: 'found'; stations: StationContext[] }
+  | { kind: 'unavailable'; failure: 'network' | 'http' | 'malformed-response' }
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
@@ -39,10 +43,9 @@ function isStationList(value: unknown): value is StationList {
   )
 }
 
-export async function findPublishedStation(
-  configuredStationId: string,
+export async function listPublishedStations(
   client: Pick<HttpClient, 'get'>,
-): Promise<StationLookupResult> {
+): Promise<StationListResult> {
   let response: unknown
   try {
     response = await client.get<unknown>('/stations')
@@ -53,6 +56,15 @@ export async function findPublishedStation(
 
   if (!isStationList(response)) return { kind: 'unavailable', failure: 'malformed-response' }
 
-  const station = response.items.find((item) => item.stationId === configuredStationId)
-  return station ? { kind: 'found', station: { stationId: station.stationId, name: station.name } } : { kind: 'unpublished' }
+  return { kind: 'found', stations: response.items.map(({ stationId, name }) => ({ stationId, name })) }
+}
+
+export async function findPublishedStation(
+  configuredStationId: string,
+  client: Pick<HttpClient, 'get'>,
+): Promise<StationLookupResult> {
+  const result = await listPublishedStations(client)
+  if (result.kind === 'unavailable') return result
+  const station = result.stations.find((item) => item.stationId === configuredStationId)
+  return station ? { kind: 'found', station } : { kind: 'unpublished' }
 }

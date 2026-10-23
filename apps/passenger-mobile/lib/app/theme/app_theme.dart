@@ -10,16 +10,17 @@ abstract final class AppSpacing {
 
 abstract final class AppTheme {
   static ThemeData light() {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF126C73),
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: const Color(0xFF126C73),
-      onPrimary: Colors.white,
-      secondary: const Color(0xFFDC884C),
-      surface: const Color(0xFFFFFFFF),
-      surfaceContainerLow: const Color(0xFFF0F6F5),
-    );
+    final colorScheme =
+        ColorScheme.fromSeed(
+          seedColor: const Color(0xFF126C73),
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: const Color(0xFF126C73),
+          onPrimary: Colors.white,
+          secondary: const Color(0xFFDC884C),
+          surface: const Color(0xFFFFFFFF),
+          surfaceContainerLow: const Color(0xFFF0F6F5),
+        );
 
     return ThemeData(
       useMaterial3: true,
@@ -48,14 +49,18 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(0, 52),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(0, 50),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           side: const BorderSide(color: Color(0xFFCBDDDA)),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
         ),
