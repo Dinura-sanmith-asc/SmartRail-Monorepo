@@ -30,10 +30,14 @@ public sealed class ServiceSearchRepository(SmartRailDbContext dbContext) : ISer
         ).ToListAsync(cancellationToken);
 
         var results = new List<ServiceChoiceView>();
-        var operationDates = candidates.ToDictionary(candidate => candidate.Schedule.ScheduleId, candidate =>
+        var operationDates = candidates.GroupBy(candidate => candidate.Schedule.ScheduleId).ToDictionary(group => group.Key, group =>
+        {
+            var candidate = group.First();
+            return
             candidate.OriginCall.DepartureOffsetMinutes is { } offset
                 ? ServiceSearchEligibility.CalculateOperationDate(query.TravelDate, candidate.Schedule.FirstDepartureLocalTime, offset)
-                : (DateOnly?)null);
+                : (DateOnly?)null;
+        });
         var requestedOperationDates = operationDates.Values.Where(item => item.HasValue).Select(item => item!.Value).Distinct().ToArray();
         var scheduleIds = operationDates.Keys.ToArray();
         var calendars = await dbContext.ServiceScheduleCalendars.AsNoTracking()

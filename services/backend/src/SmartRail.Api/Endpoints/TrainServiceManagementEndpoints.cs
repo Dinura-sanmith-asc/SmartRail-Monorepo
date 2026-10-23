@@ -77,7 +77,12 @@ public static class TrainServiceManagementEndpoints
         try { return await repository.DeleteScheduleAsync(id, scheduleId, token) ? Results.NoContent()
             : ProblemDetailsConfiguration.Create(404, "Schedule not found.", "schedule_not_found"); }
         catch (InvalidOperationException ex) { return ProblemDetailsConfiguration.Create(409, ex.Message, "schedule_in_use"); }
-        catch (DbUpdateException ex) { return MapWriteConflict(ex); }
+        catch (DbUpdateException ex)
+        {
+            if (ex.GetBaseException() is NpgsqlException { SqlState: PostgresErrorCodes.ForeignKeyViolation })
+                return ProblemDetailsConfiguration.Create(409, "This schedule is referenced by operational history and cannot be deleted.", "schedule_in_use");
+            return MapWriteConflict(ex);
+        }
     }
 
     private static async Task<IResult> PublishScheduleAsync(Guid id, Guid scheduleId,

@@ -1260,6 +1260,10 @@ namespace SmartRail.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("service_id");
 
+                    b.Property<Guid>("SlotId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("slot_id");
+
                     b.Property<DateTimeOffset?>("SupersededAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("superseded_at");
@@ -1274,14 +1278,14 @@ namespace SmartRail.Infrastructure.Migrations
                     b.HasKey("ScheduleId")
                         .HasName("pk_service_schedule_revision");
 
-                    b.HasIndex("ServiceId")
-                        .IsUnique()
-                        .HasDatabaseName("ux_schedule_current_published_service")
-                        .HasFilter("is_published = TRUE AND superseded_at IS NULL");
-
                     b.HasIndex("ServiceId", "Revision")
                         .IsUnique()
                         .HasDatabaseName("ux_schedule_service_revision");
+
+                    b.HasIndex("ServiceId", "SlotId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_schedule_current_published_slot")
+                        .HasFilter("is_published = TRUE AND superseded_at IS NULL");
 
                     b.ToTable("service_schedule_revision", null, t =>
                         {

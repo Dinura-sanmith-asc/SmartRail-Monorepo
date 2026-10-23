@@ -12,6 +12,7 @@ public sealed class ServiceScheduleRevisionConfiguration : IEntityTypeConfigurat
         builder.HasKey(schedule => schedule.ScheduleId).HasName("pk_service_schedule_revision");
         builder.Property(schedule => schedule.ScheduleId).HasColumnName("schedule_id").ValueGeneratedNever();
         builder.Property(schedule => schedule.ServiceId).HasColumnName("service_id").IsRequired();
+        builder.Property(schedule => schedule.SlotId).HasColumnName("slot_id").IsRequired();
         builder.Property(schedule => schedule.Revision).HasColumnName("revision").IsRequired();
         builder.Property(schedule => schedule.FirstDepartureLocalTime).HasColumnName("first_departure_local_time").HasColumnType("time without time zone").IsRequired();
         builder.Property(schedule => schedule.TimeZoneId).HasColumnName("time_zone_id").HasDefaultValue(ServiceScheduleRevision.RailwayTimeZoneId).IsRequired();
@@ -21,9 +22,9 @@ public sealed class ServiceScheduleRevisionConfiguration : IEntityTypeConfigurat
         builder.Property(schedule => schedule.SupersededAt).HasColumnName("superseded_at").HasColumnType("timestamp with time zone");
         builder.HasOne<TrainService>().WithMany().HasForeignKey(schedule => schedule.ServiceId).OnDelete(DeleteBehavior.Restrict).HasConstraintName("fk_schedule_revision_service");
         builder.HasIndex(schedule => new { schedule.ServiceId, schedule.Revision }).IsUnique().HasDatabaseName("ux_schedule_service_revision");
-        builder.HasIndex(schedule => schedule.ServiceId).IsUnique()
+        builder.HasIndex(schedule => new { schedule.ServiceId, schedule.SlotId }).IsUnique()
             .HasFilter("is_published = TRUE AND superseded_at IS NULL")
-            .HasDatabaseName("ux_schedule_current_published_service");
+            .HasDatabaseName("ux_schedule_current_published_slot");
         builder.ToTable(table => table.HasCheckConstraint("ck_schedule_publication_timestamps", "(is_published AND published_at IS NOT NULL) OR (NOT is_published AND published_at IS NULL)"));
         builder.ToTable(table => table.HasCheckConstraint("ck_schedule_superseded_after_published", "superseded_at IS NULL OR (is_published AND superseded_at >= published_at)"));
     }

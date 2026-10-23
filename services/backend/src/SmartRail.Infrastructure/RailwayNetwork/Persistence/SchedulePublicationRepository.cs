@@ -29,7 +29,7 @@ public sealed class SchedulePublicationRepository(SmartRailDbContext dbContext) 
         var candidate = revisions.SingleOrDefault(item => item.ScheduleId == request.ScheduleId)
             ?? throw new InvalidOperationException("The schedule revision does not belong to the train service.");
         if (candidate.IsCurrentPublished) throw new InvalidOperationException("The schedule revision is already current and published.");
-        foreach (var current in revisions.Where(item => item.IsCurrentPublished)) current.Supersede(request.PublishedAt);
+        foreach (var current in revisions.Where(item => item.SlotId == candidate.SlotId && item.IsCurrentPublished)) current.Supersede(request.PublishedAt);
         // Clear the partial unique index before making the replacement current; both writes remain atomic.
         await dbContext.SaveChangesAsync(cancellationToken);
         candidate.Publish(request.PublishedAt);
@@ -79,7 +79,7 @@ public sealed class SchedulePublicationRepository(SmartRailDbContext dbContext) 
             ?? throw new InvalidOperationException("The schedule revision does not belong to the train service.");
         if (candidate.IsCurrentPublished) throw new InvalidOperationException("The schedule revision is already current and published.");
 
-        foreach (var current in revisions.Where(item => item.IsCurrentPublished)) current.Supersede(publishedAt);
+        foreach (var current in revisions.Where(item => item.SlotId == candidate.SlotId && item.IsCurrentPublished)) current.Supersede(publishedAt);
         // Clear the partial unique index before making the replacement current; both writes remain atomic.
         await dbContext.SaveChangesAsync(cancellationToken);
         candidate.Publish(publishedAt);

@@ -7,6 +7,7 @@ public sealed class ServiceScheduleRevision
 
     public Guid ScheduleId { get; }
     public Guid ServiceId { get; }
+    public Guid SlotId { get; }
     public int Revision { get; }
     public TimeOnly FirstDepartureLocalTime { get; private set; }
     public string TimeZoneId { get; private set; }
@@ -25,9 +26,25 @@ public sealed class ServiceScheduleRevision
         bool isPublished = false,
         DateTimeOffset? publishedAt = null,
         DateTimeOffset? supersededAt = null)
+        : this(scheduleId, serviceId, revision, firstDepartureLocalTime, createdAt,
+            isPublished, publishedAt, supersededAt, scheduleId)
+    {
+    }
+
+    public ServiceScheduleRevision(
+        Guid scheduleId,
+        Guid serviceId,
+        int revision,
+        TimeOnly firstDepartureLocalTime,
+        DateTimeOffset createdAt,
+        bool isPublished,
+        DateTimeOffset? publishedAt,
+        DateTimeOffset? supersededAt,
+        Guid slotId)
     {
         if (scheduleId == Guid.Empty) throw new ArgumentException("Schedule ID must be a non-empty UUID.", nameof(scheduleId));
         if (serviceId == Guid.Empty) throw new ArgumentException("Service ID must be a non-empty UUID.", nameof(serviceId));
+        if (slotId == Guid.Empty) throw new ArgumentException("Schedule slot ID must be a non-empty UUID.", nameof(slotId));
         if (revision <= 0) throw new ArgumentOutOfRangeException(nameof(revision), "Revision must be positive.");
         if (isPublished != publishedAt.HasValue) throw new ArgumentException("Published state and publication instant must agree.", nameof(publishedAt));
         if (supersededAt.HasValue && (!isPublished || supersededAt < publishedAt))
@@ -35,6 +52,7 @@ public sealed class ServiceScheduleRevision
 
         ScheduleId = scheduleId;
         ServiceId = serviceId;
+        SlotId = slotId;
         Revision = revision;
         FirstDepartureLocalTime = firstDepartureLocalTime;
         TimeZoneId = RailwayTimeZoneId;

@@ -30,15 +30,16 @@ public static class SchedulePublicationValidator
         if (routeStops.GroupBy(stop => stop.RouteStopId).Any(group => group.Count() > 1)) errors.Add("Route stop IDs must be unique.");
 
         var current = revisions.Where(revision => revision.ServiceId == service.ServiceId && revision.IsCurrentPublished).ToArray();
-        if (service.IsPublished && current.Length != 1) errors.Add("A published service must have exactly one current published schedule revision.");
+        if (service.IsPublished && current.Length == 0) errors.Add("A published service must have a current published schedule.");
+        if (current.GroupBy(revision => revision.SlotId).Any(group => group.Count() > 1))
+            errors.Add("A schedule slot may have only one current published revision.");
         if (!service.IsPublished && current.Length > 0) errors.Add("An unpublished service cannot have a current published schedule revision.");
         if (revisions.Any(revision => revision.ServiceId != service.ServiceId)) errors.Add("Every schedule revision must belong to the supplied service.");
         var revisionIds = revisions.Select(revision => revision.ScheduleId).ToHashSet();
         if (callingPoints.Any(call => !revisionIds.Contains(call.ScheduleId))) errors.Add("A calling point must reference a known schedule revision.");
 
-        if (current.Length == 1)
+        foreach (var revision in current)
         {
-            var revision = current[0];
             var revisionCalls = callingPoints.Where(call => call.ScheduleId == revision.ScheduleId).ToArray();
             var stopsById = routeStops.GroupBy(stop => stop.RouteStopId).ToDictionary(group => group.Key, group => group.First());
             var linked = new List<(ServiceCallingPoint Call, RouteStop Stop)>();
