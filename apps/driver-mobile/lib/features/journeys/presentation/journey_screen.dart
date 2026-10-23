@@ -142,7 +142,7 @@ class JourneyScreen extends ConsumerWidget {
             child: Text(
               'Driver observations are evidence for Control review and do not change official journey status.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Color(0xff61778a)),
+              style: TextStyle(fontSize: 14, color: Color(0xff61778a)),
             ),
           ),
         ],

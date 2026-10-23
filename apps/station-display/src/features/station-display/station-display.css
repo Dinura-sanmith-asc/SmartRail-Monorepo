@@ -306,3 +306,46 @@
 .display-language { position:absolute; top:20px; right:24px; z-index:2; }
 .display-language select { min-height:40px; padding:6px 32px 6px 11px; border:1px solid #8da2b2; border-radius:8px; background:#fff; color:#17354b; font:inherit; }
 @media(max-width:700px) { .display-language { top:12px; right:12px; } }
+
+/* Public board polish */
+.station-display {
+  background: radial-gradient(circle at 85% -10%, #123a48 0, transparent 37%), #071421;
+}
+.station-display__header {
+  min-height: 8rem;
+  border-bottom-color: #447477;
+  background: linear-gradient(120deg, #10283c, #0d3541);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 17%);
+}
+.station-display__station-select-wrap { border-bottom: 2px solid transparent; transition: border-color .18s ease; }
+.station-display__station-select-wrap:hover { border-color: #58d2c6; }
+.station-display__station-select-wrap::after { color: #67d9ca; }
+.station-display__station-select { min-height: 3.6rem; }
+.display-language select { min-height: 46px; border-radius: 10px; font-size: 1rem; transition: border-color .18s ease, box-shadow .18s ease; }
+.display-language select:hover { border-color: #39b5aa; }
+.display-language select:focus-visible { outline: 3px solid #67d9ca; outline-offset: 3px; }
+.departure-board { max-width: 1800px; margin-inline: auto; }
+.departure-board__title { font-size: clamp(1.75rem, 2.3vw, 2.4rem); }
+.departure-row {
+  border-color: #33596a;
+  border-radius: 1rem;
+  background: linear-gradient(145deg, #142b3c, #112637);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 16%);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.departure-row:hover { border-color: #54b7b3; box-shadow: 0 18px 36px rgb(0 0 0 / 24%); transform: translateY(-2px); }
+.operational-change__entry { border-radius: .55rem; background: #203b4d; padding: .75rem .85rem; }
+.operational-change__entry dt { font-size: .86rem; }
+.operational-change__entry dd { font-size: 1.08rem; }
+.display-state-message { border-radius: .7rem; font-size: clamp(1rem, 1.3vw, 1.2rem); }
+@media (max-width: 700px) {
+  .station-display__header { min-height: 6.5rem; padding-top: 3.5rem; }
+  .station-display__station-name { font-size: clamp(1.7rem, 7vw, 2.4rem); }
+  .station-display__station-select { min-height: 2.7rem; }
+  .display-language { top: 12px; right: 16px; }
+  .departure-row { padding: 1.1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .departure-row, .station-display__station-select-wrap, .display-language select { transition: none; }
+  .departure-row:hover { transform: none; }
+}

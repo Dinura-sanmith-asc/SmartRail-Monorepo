@@ -25,16 +25,16 @@ abstract final class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: const Color(0xFFF5F8F7),
+      scaffoldBackgroundColor: const Color(0xFFF2F6F8),
       appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFFF5F8F7),
+        backgroundColor: const Color(0xFFF2F6F8),
         foregroundColor: colorScheme.onSurface,
         centerTitle: false,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         titleTextStyle: const TextStyle(
           color: Color(0xFF123039),
-          fontSize: 19,
+          fontSize: 20,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -52,7 +52,7 @@ abstract final class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -62,7 +62,7 @@ abstract final class AppTheme {
             borderRadius: BorderRadius.circular(16),
           ),
           side: const BorderSide(color: Color(0xFFCBDDDA)),
-          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -71,7 +71,7 @@ abstract final class AppTheme {
         elevation: 8,
         height: 72,
         labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+          const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

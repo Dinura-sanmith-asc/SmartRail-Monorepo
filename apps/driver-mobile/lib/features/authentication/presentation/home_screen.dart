@@ -31,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
       const Text(
         'SMART RAIL',
         style: TextStyle(
-          color: Color(0xff90c7f5),
+          color: Color(0xff79d8cf),
           fontWeight: FontWeight.w700,
           letterSpacing: 2.2,
         ),
@@ -83,11 +83,11 @@ class HomeScreen extends ConsumerWidget {
     children.add(
       const Text(
         'Authentication is handled by your organization’s secure sign-in service.',
-        style: TextStyle(color: Color(0xffc3d7e9), fontSize: 13, height: 1.45),
+        style: TextStyle(color: Color(0xffc4e1df), fontSize: 14, height: 1.45),
       ),
     );
     return Scaffold(
-      backgroundColor: const Color(0xff092846),
+      backgroundColor: const Color(0xff10283c),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -134,7 +134,7 @@ class _Dashboard extends ConsumerWidget {
         padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xff1769aa), Color(0xff104273)],
+            colors: [Color(0xff126c73), Color(0xff174759)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -146,8 +146,8 @@ class _Dashboard extends ConsumerWidget {
             const Text(
               'CURRENT DUTIES',
               style: TextStyle(
-                color: Color(0xffc8e3fb),
-                fontSize: 12,
+                color: Color(0xffbde9e2),
+                fontSize: 14,
                 letterSpacing: 1.5,
                 fontWeight: FontWeight.w700,
               ),
@@ -312,7 +312,7 @@ class _AssignmentCard extends StatelessWidget {
                 const Icon(
                   Icons.pin_drop_outlined,
                   size: 18,
-                  color: Color(0xff1769aa),
+                  color: Color(0xff126c73),
                 ),
                 const SizedBox(width: 7),
                 Expanded(
@@ -366,7 +366,7 @@ class _QuickTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xff1769aa)),
+            Icon(icon, color: const Color(0xff126c73)),
             const SizedBox(width: 10),
             Flexible(
               child: Text(
@@ -392,7 +392,7 @@ class _EmptyCard extends StatelessWidget {
           Icon(
             Icons.event_available_outlined,
             size: 30,
-            color: Color(0xff5981a3),
+            color: Color(0xff5e8290),
           ),
           SizedBox(height: 10),
           Text(
@@ -504,7 +504,7 @@ class _StatusChip extends StatelessWidget {
         status,
         style: TextStyle(
           color: color,
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: FontWeight.w700,
         ),
       ),

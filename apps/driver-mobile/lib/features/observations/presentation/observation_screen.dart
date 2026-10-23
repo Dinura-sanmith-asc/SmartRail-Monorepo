@@ -73,14 +73,14 @@ class _ObservationScreenState extends ConsumerState<ObservationScreen> {
                       Text(
                         'Reference ${s.observation!.id}',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           color: Color(0xff526b83),
                         ),
                       ),
                       Text(
                         'Received ${DateFormat('d MMM yyyy, HH:mm').format(s.observation!.reportedAtUtc.toLocal())}',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           color: Color(0xff526b83),
                         ),
                       ),
