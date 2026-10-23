@@ -24,4 +24,6 @@ public sealed record JourneyStationDeparturesReadResult(JourneyReadOutcome Outco
     IReadOnlyList<JourneyStationDepartureCandidate>? Candidates = null);
 
 public sealed record JourneyStationDepartureCandidate(Journey Journey, JourneyRevision Revision,
-    JourneyRevisionStop Stop, string StationName);
+    JourneyRevisionStop Stop, string StationName, string? ServiceCode = null,
+    string? DisplayName = null, string? PublicServiceNumber = null,
+    string? OriginName = null, string? DestinationName = null);

@@ -150,6 +150,8 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
     setDeparturesLoading(true)
     setError('')
     try {
+      const preparation = await operationsApi.prepareJourneys(date, options, stationId)
+      if (preparation.needsReview) setNotice(`${preparation.needsReview} journey(s) use an older timetable or a date that no longer runs. Review their status.`)
       setDepartures(await operationsApi.departures(stationId, date, options))
     } catch (failure) {
       onError(failure)
@@ -286,7 +288,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
   const selectedStation = stations.find((item) => item.stationId === stationId)
   const visibleDepartures = departures.filter((item) => {
     const query = departureQuery.trim().toLowerCase()
-    const matchesQuery = !query || `${item.stationName} ${item.serviceId} ${item.journeyInstanceId} ${item.status}`.toLowerCase().includes(query)
+    const matchesQuery = !query || `${item.stationName} ${item.serviceCode} ${item.displayName} ${item.publicServiceNumber} ${item.originName} ${item.destinationName} ${item.status}`.toLowerCase().includes(query)
     return matchesQuery && (departureStatus === 'all' || item.status === departureStatus)
   })
   const visibleIncidents = incidents.filter((item) => {
@@ -366,13 +368,13 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
               <code>{selectedStation.stationId}</code>
             </section>}
             <section className="operations__panel">
-              <PanelHeading title={t('Departure board')} description={t('Published journey departures and current operational status.')} />
+              <PanelHeading title={t('Station journeys')} description={t('Scheduled arrivals and departures with their current operational status.')} />
               <DepartureFilters stations={stations} stationId={stationId} setStationId={setStationId} date={date} setDate={setDate} loading={departuresLoading} refresh={() => void loadDepartures()} />
               <div className="operations__table-tools">
-                <SearchInput label={t('Search departures')} value={departureQuery} onChange={setDepartureQuery} placeholder={t('Service, station, journey…')} />
+                <SearchInput label={t('Search station journeys')} value={departureQuery} onChange={setDepartureQuery} placeholder={t('Train number, name, direction…')} />
                 <label className="operations-control"><span>{t('Operational status')}</span><select value={departureStatus} onChange={(event) => setDepartureStatus(event.target.value)}><option value="all">{t('All statuses')}</option>{['Scheduled', 'Running', 'Delayed', 'Interrupted', 'Cancelled', 'Completed', 'Terminated'].map((status) => <option key={status} value={status}>{t(status)}</option>)}</select></label>
               </div>
-              {departuresLoading ? <TableSkeleton /> : visibleDepartures.length ? <DepartureTable departures={visibleDepartures} onOpen={openJourney} /> : <EmptyState title={t(departures.length ? 'No matching departures' : 'No departures found')} text={t(departures.length ? 'Try changing the search or status filters.' : 'There are no departures for this station and date.')} />}
+              {departuresLoading ? <TableSkeleton /> : visibleDepartures.length ? <DepartureTable departures={visibleDepartures} onOpen={openJourney} /> : <EmptyState title={t(departures.length ? 'No matching journeys' : 'No trains found')} text={t(departures.length ? 'Try changing the search or status filters.' : 'There are no scheduled trains for this station and date.')} />}
             </section>
           </>
         )}
@@ -416,7 +418,7 @@ function DepartureFilters({ stations, stationId, setStationId, date, setDate, lo
   const { t } = useLanguage()
   return <div className="operations__filters"><label className="operations-control"><span>{t('Station')}</span><select value={stationId} onChange={(event) => setStationId(event.target.value)}><option value="">{t('Choose a published station')}</option>{stations.map((station) => <option key={station.stationId} value={station.stationId}>{station.name}</option>)}</select></label>
     <label className="operations-control"><span>{t('Station-local date')}</span><input type="date" value={date} onChange={(event) => setDate(event.target.value)} /></label>
-    <button className="button button--primary" type="button" onClick={refresh} disabled={loading || !stationId || !date}><CalendarIcon />{loading ? t('Loading') : t('Load departures')}</button></div>
+    <button className="button button--primary" type="button" onClick={refresh} disabled={loading || !stationId || !date}><CalendarIcon />{loading ? t('Loading') : t('Load trains')}</button></div>
 }
 
 function DataTable<T>({ columns, rows, rowKey, label }: { columns: Column<T>[]; rows: T[]; rowKey: (row: T) => string; label: string }) {
@@ -426,8 +428,8 @@ function DataTable<T>({ columns, rows, rowKey, label }: { columns: Column<T>[]; 
 function DepartureTable({ departures, onOpen }: { departures: Departure[]; onOpen: (id: string) => void }) {
   const { t } = useLanguage()
   const columns: Column<Departure>[] = [
-    { key: 'departure', label: t('Departure time'), render: (item) => <><b>{timestamp(item.operationalDepartureAt ?? item.scheduledDepartureAt)}</b>{item.ambiguity === 'ambiguous' && <small className="operations-table__note">{t('Ambiguous departure descriptor')}</small>}</> },
-    { key: 'service', label: t('Service'), render: (item) => <code>{item.serviceId}</code> },
+    { key: 'departure', label: t('Station time'), render: (item) => <><b>{item.scheduledDepartureAt ? t('Departs') : t('Arrives')} {timestamp(item.operationalDepartureAt ?? item.scheduledDepartureAt ?? item.operationalArrivalAt ?? item.scheduledArrivalAt)}</b>{item.ambiguity === 'ambiguous' && <small className="operations-table__note">{t('Ambiguous departure descriptor')}</small>}</> },
+    { key: 'service', label: t('Train and direction'), render: (item) => <><b>{item.displayName || item.serviceCode || t('Train service')}</b><small className="operations-table__note">{t('Train No:')} {item.publicServiceNumber || item.serviceCode || t('Unknown')}</small><small className="operations-table__note">{item.originName} → {item.destinationName}</small></> },
     { key: 'status', label: t('Operational status'), render: (item) => <StatusBadge value={item.status} /> },
     { key: 'platform', label: t('Platform'), render: (item) => item.platform || t('Unknown') },
     { key: 'updated', label: t('Data updated'), render: (item) => timestamp(item.updatedAt) },

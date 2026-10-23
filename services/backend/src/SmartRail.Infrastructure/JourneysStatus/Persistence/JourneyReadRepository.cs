@@ -118,7 +118,35 @@ public sealed class JourneyReadRepository(SmartRailDbContext dbContext) : IJourn
                 .CountAsync(item => referencedStationIds.Contains(item.StationId) && item.IsPublished, cancellationToken);
             if (publishedStationCount != referencedStationIds.Length) return new(JourneyReadOutcome.Unavailable);
         }
+        var serviceIds = candidates.Select(item => item.Journey.ServiceId).Distinct().ToArray();
+        var services = await dbContext.TrainServices.AsNoTracking()
+            .Where(item => serviceIds.Contains(item.ServiceId))
+            .ToDictionaryAsync(item => item.ServiceId, cancellationToken);
+        var boundaries = await (from journey in dbContext.Journeys.AsNoTracking()
+                                join stop in dbContext.JourneyRevisionStops.AsNoTracking()
+                                    on new { journey.JourneyInstanceId, Revision = journey.CurrentRevision }
+                                    equals new { stop.JourneyInstanceId, stop.Revision }
+                                where candidateJourneyIds.Contains(journey.JourneyInstanceId)
+                                select new { journey.JourneyInstanceId, stop.StopOrder, stop.StationId })
+            .ToArrayAsync(cancellationToken);
+        var boundaryStationIds = boundaries.Select(stop => stop.StationId).Distinct().ToArray();
+        var boundaryNames = await dbContext.Stations.AsNoTracking()
+            .Where(item => boundaryStationIds.Contains(item.StationId))
+            .ToDictionaryAsync(item => item.StationId, item => item.Name, cancellationToken);
+        var directions = boundaries.GroupBy(item => item.JourneyInstanceId).ToDictionary(group => group.Key, group =>
+        {
+            var ordered = group.OrderBy(item => item.StopOrder).ToArray();
+            return (Origin: boundaryNames[ordered[0].StationId], Destination: boundaryNames[ordered[^1].StationId]);
+        });
+        var enriched = candidates.Select(item =>
+        {
+            services.TryGetValue(item.Journey.ServiceId, out var service);
+            directions.TryGetValue(item.Journey.JourneyInstanceId, out var direction);
+            return item with { ServiceCode = service?.ServiceCode, DisplayName = service?.DisplayName,
+                PublicServiceNumber = service?.PublicServiceNumber, OriginName = direction.Origin,
+                DestinationName = direction.Destination };
+        }).ToArray();
         await transaction.CommitAsync(cancellationToken);
-        return new(JourneyReadOutcome.Found, candidates);
+        return new(JourneyReadOutcome.Found, enriched);
     }
 }

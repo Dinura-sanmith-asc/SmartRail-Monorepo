@@ -223,6 +223,7 @@ app.MapTrainServiceManagementEndpoints();
 app.MapIdentityEndpoints();
 app.MapJourneysStatusReadEndpoints();
 app.MapJourneysStatusPublicationEndpoints();
+app.MapPrepareScheduledJourneys();
 app.MapDriverOperationsEndpoints();
 app.MapIncidentEndpoints();
 app.MapOperationsOverviewEndpoints();

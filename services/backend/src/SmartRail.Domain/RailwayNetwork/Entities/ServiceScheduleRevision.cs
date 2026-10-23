@@ -15,6 +15,7 @@ public sealed class ServiceScheduleRevision
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? PublishedAt { get; private set; }
     public DateTimeOffset? SupersededAt { get; private set; }
+    public DateTimeOffset? RemovedAt { get; private set; }
     public bool IsCurrentPublished => IsPublished && SupersededAt is null;
 
     public ServiceScheduleRevision(
@@ -81,5 +82,12 @@ public sealed class ServiceScheduleRevision
         if (!IsCurrentPublished || !PublishedAt.HasValue) throw new InvalidOperationException("Only a current published revision can be superseded.");
         if (supersededAt < PublishedAt.Value) throw new ArgumentOutOfRangeException(nameof(supersededAt), "Supersession cannot precede publication.");
         SupersededAt = supersededAt;
+    }
+
+    public void RemoveFromManagement(DateTimeOffset removedAt)
+    {
+        if (!IsPublished || !SupersededAt.HasValue)
+            throw new InvalidOperationException("Only superseded revisions can be removed while operational history remains.");
+        RemovedAt = removedAt;
     }
 }

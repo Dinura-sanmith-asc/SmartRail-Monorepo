@@ -25,6 +25,8 @@ internal static class StationDepartureProblemMapping
             .Select(item => new StationDepartureResponse(item.JourneyInstanceId, item.ServiceId,
                 item.OperationDate, item.StationLocalDepartureDate, item.Revision, item.Status,
                 item.StationId, item.StationName, item.StopOrder, item.ScheduledDepartureAt,
-                item.OperationalDepartureAt, item.Platform, item.Source, item.UpdatedAt, item.Ambiguity)).ToArray())
+                item.OperationalDepartureAt, item.Platform, item.Source, item.UpdatedAt, item.Ambiguity,
+                item.ScheduledArrivalAt, item.OperationalArrivalAt, item.ServiceCode, item.DisplayName,
+                item.PublicServiceNumber, item.OriginName, item.DestinationName)).ToArray())
     };
 }

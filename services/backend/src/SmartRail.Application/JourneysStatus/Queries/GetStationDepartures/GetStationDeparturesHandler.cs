@@ -36,7 +36,11 @@ public sealed class GetStationDeparturesHandler(IJourneyReadRepository repositor
             DateTimeOffset? operational = stop.OperationalDepartureAt is not null &&
                 stop.TimingSource is "ControllerManual" or "ApprovedRailwayFeed"
                 ? stop.OperationalDepartureAt : null;
-            var effective = scheduled ?? (stop.RouteStopId is null ? operational : null);
+            var scheduledArrival = stop.PlannedArrivalAt;
+            var operationalArrival = stop.OperationalArrivalAt is not null &&
+                stop.TimingSource is "ControllerManual" or "ApprovedRailwayFeed"
+                ? stop.OperationalArrivalAt : null;
+            var effective = scheduled ?? scheduledArrival ?? (stop.RouteStopId is null ? operational ?? operationalArrival : null);
             if (!effective.HasValue || DateOnly.FromDateTime(effective.Value.ToOffset(ColomboOffset).DateTime) != requestedDate)
                 continue;
 
@@ -46,7 +50,9 @@ public sealed class GetStationDeparturesHandler(IJourneyReadRepository repositor
             projected.Add((new(candidate.Journey.JourneyInstanceId, candidate.Journey.ServiceId,
                 candidate.Journey.OperationDate, requestedDate, revision.Revision, revision.Status.ToString(),
                 stop.StationId, candidate.StationName, stop.StopOrder, scheduled, operational,
-                stop.Platform, revision.Source.ToString(), updatedAt, stop.AmbiguityState), effective.Value));
+                stop.Platform, revision.Source.ToString(), updatedAt, stop.AmbiguityState,
+                scheduledArrival, operationalArrival, candidate.ServiceCode, candidate.DisplayName,
+                candidate.PublicServiceNumber, candidate.OriginName, candidate.DestinationName), effective.Value));
         }
 
         var ambiguousKeys = projected.GroupBy(item => SelectionKey(item.View))

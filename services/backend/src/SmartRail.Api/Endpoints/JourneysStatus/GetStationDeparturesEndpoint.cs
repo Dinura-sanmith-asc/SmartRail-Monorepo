@@ -10,7 +10,7 @@ public static class GetStationDeparturesEndpoint
         endpoints.MapGet("/api/stations/{id}/departures", HandleAsync)
             .WithName("GetStationDepartures").WithTags("Station departures")
             .WithSummary("Get dated journey departures at a station")
-            .WithDescription("Returns public departures filtered by station-local calendar date in Asia/Colombo. Missing times are never inferred.")
+            .WithDescription("Returns dated journeys calling at the station, including terminating arrivals, filtered by station-local calendar date in Asia/Colombo. Missing times are never inferred.")
             .AddOpenApiOperationTransformer((operation, _, _) =>
             {
                 if (operation.Parameters is not null)

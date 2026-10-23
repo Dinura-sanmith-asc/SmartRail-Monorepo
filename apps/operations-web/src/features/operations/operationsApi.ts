@@ -8,7 +8,7 @@ export type ScheduleCall = { routeStopId: string; stationId: string; stationName
 export type ScheduleCalendar = { validFrom: string; validThrough: string; weekdaysMask: number; exceptions: { date: string; runs: boolean }[] }
 export type ManagedSchedule = { scheduleId: string; slotId: string; revision: number; firstDepartureLocalTime: string; isPublished: boolean; publishedAt: string | null; supersededAt: string | null; callingPoints: ScheduleCall[]; calendar: ScheduleCalendar | null }
 export type ScheduleDraft = { slotId?: string; firstDepartureLocalTime: string; callingPoints: { routeStopId: string; arrivalOffsetMinutes: number | null; departureOffsetMinutes: number | null }[]; calendar: ScheduleCalendar }
-export type Departure = { journeyInstanceId: string; serviceId: string; operationDate: string; stationLocalDepartureDate: string; revision: number; status: string; stationId: string; stationName: string; stopOrder: number; scheduledDepartureAt: string | null; operationalDepartureAt: string | null; platform: string | null; source: string; updatedAt: string; ambiguity: string }
+export type Departure = { journeyInstanceId: string; serviceId: string; operationDate: string; stationLocalDepartureDate: string; revision: number; status: string; stationId: string; stationName: string; stopOrder: number; scheduledDepartureAt: string | null; operationalDepartureAt: string | null; scheduledArrivalAt: string | null; operationalArrivalAt: string | null; serviceCode: string | null; displayName: string | null; publicServiceNumber: string | null; originName: string | null; destinationName: string | null; platform: string | null; source: string; updatedAt: string; ambiguity: string }
 export type JourneyStop = { journeyStopId: string; stopOrder: number; stationId: string; stationName: string; plannedArrivalAt: string | null; plannedDepartureAt: string | null; operationalArrivalAt: string | null; operationalDepartureAt: string | null; platform: string | null; ambiguity: string }
 export type Journey = { journeyInstanceId: string; serviceId: string; operationDate: string; revision: number; status: string; stops: JourneyStop[]; source: string; publishedAt: string | null; lastUpdatedAt: string | null; eta: { value: string; updatedAt: string; freshness: string } | null }
 export type JourneyUpdate = { updateId: string; revision: number; kind: string; status: string; source: string; publishedAt: string; publicChange: Record<string, unknown> }
@@ -119,6 +119,7 @@ export const operationsApi = {
     try { return parseOperationsOverview(response) }
     catch { throw new ApiRequestError('malformed-response') }
   },
+  prepareJourneys: (date: string, o: Options, stationId?: string) => request<{ date: string; created: number; replanned: number; needsReview: number }>(`/api/operations/journeys/prepare?date=${encodeURIComponent(date)}${stationId ? `&stationId=${encodeURIComponent(stationId)}` : ''}`, o, { method: 'POST' }),
   stations: (o: Options) => request<{ items: Station[] }>('/api/stations', o),
   managedServices: (o: Options) => request<ManagedTrainService[]>('/api/services/management', o),
   managedRoutes: (o: Options) => request<ManagedRoute[]>('/api/routes/management', o),

@@ -88,6 +88,7 @@ public static class DependencyInjection
         services.AddScoped<IJourneyScheduleLinkVerifier, JourneyScheduleLinkVerifier>();
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<InitializeJourneyHandler>();
+        services.AddScoped<ScheduledJourneyMaterializer>();
         services.AddJourneysStatusReadServices();
         services.AddJourneysStatusPublicationServices();
         services.AddJourneysStatusOwnerBoundaryServices();

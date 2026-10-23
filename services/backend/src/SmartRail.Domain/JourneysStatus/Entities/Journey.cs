@@ -49,6 +49,15 @@ public sealed class Journey
         CurrentRevision = checked(CurrentRevision + 1);
     }
 
+    public void ReplaceUntouchedPlan(Guid scheduleId, int scheduleRevision, TimeOnly firstDepartureOccurrence)
+    {
+        if (CurrentRevision != 1) throw new InvalidOperationException("A journey with operational updates cannot be replanned automatically.");
+        if (scheduleId == Guid.Empty || scheduleRevision <= 0) throw new ArgumentException("A published schedule is required.");
+        ScheduleId = scheduleId;
+        ScheduleRevision = scheduleRevision;
+        FirstDepartureOccurrence = firstDepartureOccurrence;
+    }
+
     private static string Required(string value, string name, int maxLength)
     {
         if (string.IsNullOrWhiteSpace(value) || value.Trim().Length > maxLength)

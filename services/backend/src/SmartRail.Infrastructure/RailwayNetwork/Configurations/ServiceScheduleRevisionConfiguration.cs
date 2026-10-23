@@ -20,6 +20,7 @@ public sealed class ServiceScheduleRevisionConfiguration : IEntityTypeConfigurat
         builder.Property(schedule => schedule.CreatedAt).HasColumnName("created_at").HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(schedule => schedule.PublishedAt).HasColumnName("published_at").HasColumnType("timestamp with time zone");
         builder.Property(schedule => schedule.SupersededAt).HasColumnName("superseded_at").HasColumnType("timestamp with time zone");
+        builder.Property(schedule => schedule.RemovedAt).HasColumnName("removed_at").HasColumnType("timestamp with time zone");
         builder.HasOne<TrainService>().WithMany().HasForeignKey(schedule => schedule.ServiceId).OnDelete(DeleteBehavior.Restrict).HasConstraintName("fk_schedule_revision_service");
         builder.HasIndex(schedule => new { schedule.ServiceId, schedule.Revision }).IsUnique().HasDatabaseName("ux_schedule_service_revision");
         builder.HasIndex(schedule => new { schedule.ServiceId, schedule.SlotId }).IsUnique()

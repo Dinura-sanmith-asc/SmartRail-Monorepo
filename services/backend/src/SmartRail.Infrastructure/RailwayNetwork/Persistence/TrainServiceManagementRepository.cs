@@ -74,7 +74,7 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
     public async Task<IReadOnlyList<ScheduleRevisionView>?> GetSchedulesAsync(Guid serviceId, CancellationToken cancellationToken = default)
     {
         if (!await db.TrainServices.AnyAsync(item => item.ServiceId == serviceId, cancellationToken)) return null;
-        var schedules = await db.ServiceScheduleRevisions.AsNoTracking().Where(item => item.ServiceId == serviceId)
+        var schedules = await db.ServiceScheduleRevisions.AsNoTracking().Where(item => item.ServiceId == serviceId && item.RemovedAt == null)
             .OrderByDescending(item => item.Revision).ToListAsync(cancellationToken);
         var ids = schedules.Select(item => item.ScheduleId).ToArray();
         var calendars = await db.ServiceScheduleCalendars.AsNoTracking().Where(item => ids.Contains(item.ScheduleId))
@@ -158,10 +158,16 @@ public sealed class TrainServiceManagementRepository(SmartRailDbContext db) : IT
     {
         var schedule = await db.ServiceScheduleRevisions.SingleOrDefaultAsync(item => item.ServiceId == serviceId && item.ScheduleId == scheduleId, cancellationToken);
         if (schedule is null) return false;
-        if (await db.ServiceOperationDates.AnyAsync(item => item.ScheduleId == scheduleId, cancellationToken))
-            throw new InvalidOperationException("A schedule with assigned operating dates cannot be deleted.");
-        if (await db.Journeys.AnyAsync(item => item.ScheduleId == scheduleId, cancellationToken))
-            throw new InvalidOperationException("A schedule used by recorded journeys cannot be deleted.");
+        var hasHistory = await db.ServiceOperationDates.AnyAsync(item => item.ScheduleId == scheduleId, cancellationToken) ||
+            await db.Journeys.AnyAsync(item => item.ScheduleId == scheduleId, cancellationToken);
+        if (hasHistory)
+        {
+            if (!schedule.IsPublished || schedule.SupersededAt is null)
+                throw new InvalidOperationException("An active schedule with operational history cannot be deleted. Publish a replacement revision first.");
+            schedule.RemoveFromManagement(DateTimeOffset.UtcNow);
+            await db.SaveChangesAsync(cancellationToken);
+            return true;
+        }
         await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         db.ServiceCallingPoints.RemoveRange(db.ServiceCallingPoints.Where(item => item.ScheduleId == scheduleId));
         db.ServiceScheduleCalendars.RemoveRange(db.ServiceScheduleCalendars.Where(item => item.ScheduleId == scheduleId));

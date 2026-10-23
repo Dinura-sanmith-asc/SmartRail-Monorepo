@@ -31,6 +31,7 @@ export function ControllerOverview({ options, onOpenJourney, onOpenIncidents, on
   const [overview, setOverview] = useState<OperationsOverview | null>(null)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [needsReview, setNeedsReview] = useState(0)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [reload, setReload] = useState(0)
@@ -49,12 +50,14 @@ export function ControllerOverview({ options, onOpenJourney, onOpenIncidents, on
       controller = new AbortController()
       setRefreshing(true)
       try {
+        const preparation = await operationsApi.prepareJourneys(date, { ...options, signal: controller.signal })
         const result = await operationsApi.operationsOverview(date, { ...options, signal: controller.signal })
         if (result.operationalDate !== date) throw new ApiRequestError('malformed-response')
         if (active) {
           setOverview(result)
           setLastUpdated(new Date().toISOString())
           setError(null)
+          setNeedsReview(preparation.needsReview)
         }
       } catch (failure) {
         if (active && !controller.signal.aborted) {
@@ -86,6 +89,7 @@ export function ControllerOverview({ options, onOpenJourney, onOpenIncidents, on
     setOverview(null)
     setLastUpdated(null)
     setError(null)
+    setNeedsReview(0)
     setLoading(true)
     setFilter('all')
     setDate(value)
@@ -118,6 +122,7 @@ export function ControllerOverview({ options, onOpenJourney, onOpenIncidents, on
       </div>
     </div>
 
+    {needsReview > 0 && <div className="operations__feedback" role="status">{needsReview} previously created journey{needsReview === 1 ? '' : 's'} use an older timetable or a date that no longer runs. Review their status before relying on this board.</div>}
     {error && <div className={`operations__feedback ${overview ? 'operations__feedback--stale' : 'operations__feedback--error'}`} role="alert">
       <span><b>{overview ? 'Showing stale overview data' : 'Overview unavailable'}</b><small>{t(error)}{overview && lastUpdated ? ` Last successful update: ${time(lastUpdated)}.` : ''}</small></span>
       <button className="button button--secondary" type="button" onClick={() => setReload((value) => value + 1)}>{t('Retry request')}</button>
