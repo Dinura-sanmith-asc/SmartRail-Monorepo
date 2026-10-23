@@ -171,9 +171,10 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
   useEffect(() => { void Promise.resolve().then(loadStations) }, [loadStations])
   useEffect(() => { void Promise.resolve().then(loadIncidents) }, [loadIncidents])
   useEffect(() => { if (stationId) void Promise.resolve().then(loadDepartures) }, [loadDepartures, stationId])
+  const activeJourneyId = journey?.journeyInstanceId
   useEffect(() => {
-    if (tab !== 'journeys' || !journey || mutating) return
-    const journeyId = journey.journeyInstanceId
+    if (tab !== 'journeys' || !activeJourneyId || mutating) return
+    const journeyId = activeJourneyId
     const interval = window.setInterval(() => {
       void Promise.all([operationsApi.journey(journeyId, options), operationsApi.journeyUpdates(journeyId, options)]).then(([updated, history]) => {
         setJourney((current) => current?.journeyInstanceId === journeyId && updated.revision >= current.revision ? updated : current)
@@ -182,7 +183,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
       }).catch(() => setJourneyRefreshFailed(true))
     }, 30_000)
     return () => window.clearInterval(interval)
-  }, [journey?.journeyInstanceId, mutating, options, tab])
+  }, [activeJourneyId, mutating, options, tab])
   useEffect(() => {
     if (!notice) return
     const timeout = window.setTimeout(() => setNotice(''), 5000)
@@ -399,7 +400,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
               {departuresLoading ? <TableSkeleton /> : <DepartureTable departures={visibleDepartures} onOpen={openJourney} />}
             </section>
             {journeyRefreshFailed && <div className="operations__feedback operations__feedback--stale" role="status">Live journey refresh failed. Showing the last loaded report. Use Refresh journey to try again.</div>}
-            {journey && <JourneyDetail key={journey.journeyInstanceId} journey={journey} role={role} selectedStationId={stationId} updates={updates} observations={observations} busy={mutating} onRefresh={() => void openJourney(journey.journeyInstanceId)} onPublishStatus={publishStatus} onSaveStop={saveStop} />}
+            {journey && <JourneyDetail key={`${journey.journeyInstanceId}:${journey.status}`} journey={journey} role={role} selectedStationId={stationId} updates={updates} observations={observations} busy={mutating} onRefresh={() => void openJourney(journey.journeyInstanceId)} onPublishStatus={publishStatus} onSaveStop={saveStop} />}
           </>
         )}
 
@@ -469,7 +470,6 @@ function StatusBadge({ value }: { value: string }) {
 function JourneyDetail({ journey, role, selectedStationId, updates, observations, busy, onRefresh, onPublishStatus, onSaveStop }: { journey: Journey; role: 'Controller' | 'Station Staff'; selectedStationId: string; updates: JourneyUpdate[]; observations: DriverObservation[]; busy: boolean; onRefresh: () => void; onPublishStatus: (event: FormEvent<HTMLFormElement>) => void; onSaveStop: (stopId: string, change: { platform?: string; operationalArrivalAt?: string; operationalDepartureAt?: string }) => void }) {
   const { t } = useLanguage()
   const [statusDraft, setStatusDraft] = useState(journey.status)
-  useEffect(() => setStatusDraft(journey.status), [journey.status])
   const stopColumns: Column<Journey['stops'][number]>[] = [
     { key: 'station', label: t('Calling point'), render: (stop) => <b>{stop.stopOrder}. {stop.stationName || stop.stationId}</b> },
     { key: 'planned', label: t('Planned arrival'), render: (stop) => timestamp(stop.plannedArrivalAt) },

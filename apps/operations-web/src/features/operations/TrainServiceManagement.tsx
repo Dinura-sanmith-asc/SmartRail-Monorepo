@@ -100,7 +100,7 @@ export function TrainServiceManagement({ options, onUnauthorized }: Props) {
     }
   }, [onUnauthorized, options])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => { void Promise.resolve().then(load) }, [load])
 
   function clearEditor() {
     setAdding(false)

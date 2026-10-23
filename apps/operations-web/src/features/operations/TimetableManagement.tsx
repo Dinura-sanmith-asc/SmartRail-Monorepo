@@ -23,23 +23,23 @@ export function TimetableManagement({ options, onUnauthorized }: Props) {
   const service = services.find((item) => item.serviceId === serviceId)
   const route = routes.find((item) => item.routeId === service?.routeId)
 
-  function failure(reason: unknown) {
+  const failure = useCallback((reason: unknown) => {
     if (reason instanceof ApiRequestError && reason.status === 401) onUnauthorized()
     setError(apiErrorMessage(reason))
-  }
+  }, [onUnauthorized])
 
   const loadServices = useCallback(async () => {
     try {
       const [serviceRows, routeRows] = await Promise.all([operationsApi.managedServices(options), operationsApi.managedRoutes(options)])
       setServices(serviceRows); setRoutes(routeRows)
     } catch (reason) { failure(reason) }
-  }, [options, onUnauthorized])
+  }, [options, failure])
   const loadSchedules = useCallback(async () => {
     if (!serviceId) { setSchedules([]); return }
     try { setSchedules(await operationsApi.serviceSchedules(serviceId, options)) } catch (reason) { failure(reason) }
-  }, [serviceId, options, onUnauthorized])
-  useEffect(() => { void loadServices() }, [loadServices])
-  useEffect(() => { void loadSchedules() }, [loadSchedules])
+  }, [serviceId, options, failure])
+  useEffect(() => { void Promise.resolve().then(loadServices) }, [loadServices])
+  useEffect(() => { void Promise.resolve().then(loadSchedules) }, [loadSchedules])
 
   function begin(source?: ManagedSchedule) {
     if (!service || service.routeStopIds.length < 2) return
