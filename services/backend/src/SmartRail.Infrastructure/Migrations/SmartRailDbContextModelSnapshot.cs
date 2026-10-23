@@ -914,7 +914,7 @@ namespace SmartRail.Infrastructure.Migrations
 
                             t.HasCheckConstraint("ck_journey_revision_previous", "previous_revision IS NULL OR (previous_revision > 0 AND previous_revision < revision)");
 
-                            t.HasCheckConstraint("ck_journey_revision_source", "(publication_kind = 'InitializationBaseline' AND source = 'ScheduledBaseline') OR (publication_kind <> 'InitializationBaseline' AND source IN ('ControllerManual', 'ApprovedRailwayFeed'))");
+                            t.HasCheckConstraint("ck_journey_revision_source", "(publication_kind = 'InitializationBaseline' AND source = 'ScheduledBaseline') OR (publication_kind <> 'InitializationBaseline' AND source IN ('ControllerManual', 'StationStaffManual', 'ApprovedRailwayFeed'))");
 
                             t.HasCheckConstraint("ck_journey_revision_status", "status IN ('Scheduled','Running','Delayed','Interrupted','Cancelled','Completed','Terminated')");
 

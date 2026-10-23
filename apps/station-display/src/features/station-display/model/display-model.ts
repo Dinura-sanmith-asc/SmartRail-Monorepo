@@ -19,6 +19,7 @@ export interface OperationalInformation {
   status: PublishedValue<string>
   platform: PublishedValue<string>
   operationalDepartureTime?: PublishedValue<string>
+  operationalArrivalTime?: PublishedValue<string>
   delay: PublishedValue<string>
   cancellation: PublishedValue<boolean>
   updateTime?: {
@@ -33,6 +34,8 @@ export interface StationDeparture {
   /** Date label for this fixture/presentation concept; semantics remain source-owned. */
   serviceDate: string
   serviceLabel: string
+  routeLabel?: string
+  callType?: 'arrival' | 'departure'
   scheduledTime: ScheduledDepartureTime
   operational: OperationalInformation
   /** Source revision, when the authoritative contract supplies one. */

@@ -15,26 +15,88 @@ class CateringServicesScreen extends StatelessWidget {
     body: ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Card(
-          child: ListTile(
-            leading: Icon(Icons.restaurant),
-            title: Text('Holy-Rice'),
-            subtitle: Text(
-              'Order food for an eligible dated journey and collect at a supported station.',
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF153F4B), Color(0xFF126C73)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.ramen_dining_rounded,
+                  color: Color(0xFFFFD59E), size: 40),
+              const SizedBox(height: 22),
+              const Text('Good food,\nright on your route.',
+                  style: TextStyle(color: Colors.white, fontSize: 27,
+                      height: 1.12, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 12),
+              const Text('Holy-Rice makes your journey a little more delicious. Order ahead and collect at an eligible station.',
+                  style: TextStyle(color: Color(0xFFD7EFED), height: 1.45)),
+              const SizedBox(height: 23),
+              FilledButton.icon(
+                onPressed: () => context.go(AppRoutes.explore),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF14535D),
+                ),
+                icon: const Icon(Icons.arrow_forward_rounded),
+                label: const Text('Find a journey to order food'),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 12),
-        FilledButton(
-          onPressed: () => context.go(AppRoutes.explore),
-          child: const Text('Find a journey to order food'),
-        ),
-        OutlinedButton(
-          onPressed: () => context.push(AppRoutes.cateringOrders),
-          child: const Text('My catering orders'),
+        const SizedBox(height: 27),
+        Text('How it works', style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w800,
+        )),
+        const SizedBox(height: 10),
+        const _ServiceStep(number: '01', icon: Icons.search_rounded,
+          title: 'Choose your train', detail: 'Search by route and travel date.'),
+        const _ServiceStep(number: '02', icon: Icons.restaurant_menu_rounded,
+          title: 'Pick your food', detail: 'Open a dated journey to see the menu.'),
+        const _ServiceStep(number: '03', icon: Icons.place_rounded,
+          title: 'Collect on the way', detail: 'Choose a supported station.'),
+        const SizedBox(height: 18),
+        Card(
+          margin: EdgeInsets.zero,
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+            leading: const Icon(Icons.receipt_long_rounded, color: Color(0xFF126C73)),
+            title: const Text('My catering orders', style: TextStyle(fontWeight: FontWeight.w700)),
+            subtitle: const Text('Track an order or check its status'),
+            trailing: const Icon(Icons.arrow_forward_rounded),
+            onTap: () => context.push(AppRoutes.cateringOrders),
+          ),
         ),
       ],
     ),
+  );
+}
+
+class _ServiceStep extends StatelessWidget {
+  const _ServiceStep({required this.number, required this.icon,
+    required this.title, required this.detail});
+  final String number, title, detail;
+  final IconData icon;
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 5),
+    child: Row(children: [
+      Container(width: 47, height: 47,
+        decoration: BoxDecoration(color: const Color(0xFFE2F2EF),
+          borderRadius: BorderRadius.circular(15)),
+        child: Icon(icon, color: const Color(0xFF126C73))),
+      const SizedBox(width: 13),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+        children: [Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+          Text(detail, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant))])),
+      Text(number, style: const TextStyle(color: Color(0xFF91A9A5), fontWeight: FontWeight.w700)),
+    ]),
   );
 }
 

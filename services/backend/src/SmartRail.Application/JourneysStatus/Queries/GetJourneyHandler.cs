@@ -32,6 +32,6 @@ public sealed class GetJourneyHandler(IJourneyReadRepository repository)
             revision.Source.ToString(), publishedAt, publishedAt, stops));
     }
 
-    private static string? SafeTimingSource(string? value) => value is "ControllerManual" or "ApprovedRailwayFeed"
+    private static string? SafeTimingSource(string? value) => value is "ControllerManual" or "StationStaffManual" or "ApprovedRailwayFeed"
         ? value : null;
 }

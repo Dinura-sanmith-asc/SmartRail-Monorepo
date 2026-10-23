@@ -12,6 +12,18 @@ const words: Record<DisplayLanguage, Record<string, string>> = {
     'Loading station information': 'நிலையத் தகவல் ஏற்றப்படுகிறது', 'Loading departure information.': 'புறப்பாட்டுத் தகவல் ஏற்றப்படுகிறது.', 'Departure information is unavailable.': 'புறப்பாட்டுத் தகவல் கிடைக்கவில்லை.', 'Network connection is unavailable. Departure information may be outdated.': 'இணைய இணைப்பு இல்லை. புறப்பாட்டுத் தகவல் பழையதாக இருக்கலாம்.', 'Departure information may be outdated.': 'புறப்பாட்டுத் தகவல் பழையதாக இருக்கலாம்.', 'Checking departure information. Displayed information may be outdated.': 'புறப்பாட்டுத் தகவல் சரிபார்க்கப்படுகிறது. காட்டப்படும் தகவல் பழையதாக இருக்கலாம்.', 'Departure information has been revalidated.': 'புறப்பாட்டுத் தகவல் மீண்டும் சரிபார்க்கப்பட்டது.', 'Last updated:': 'கடைசியாகப் புதுப்பிக்கப்பட்டது:', 'DEMO DATA — NOT LIVE': 'மாதிரி தரவு — நேரலை அல்ல', 'Departures': 'புறப்பாடுகள்', 'Departure information is unavailable for this station.': 'இந்த நிலையத்திற்கான புறப்பாட்டுத் தகவல் கிடைக்கவில்லை.', 'No fixture departures are available for this station.': 'இந்த நிலையத்திற்கு மாதிரி புறப்பாடுகள் இல்லை.', 'No departures are currently available.': 'தற்போது புறப்பாடுகள் இல்லை.', 'Station departures': 'நிலையப் புறப்பாடுகள்', 'Service date:': 'சேவை தேதி:', 'Scheduled departure': 'திட்டமிட்ட புறப்பாடு', 'Status': 'நிலை', 'Platform': 'நடைமேடை', 'Operational departure': 'செயல்பாட்டு புறப்பாடு', 'Delay': 'தாமதம்', 'Cancellation': 'ரத்து', 'Cancelled': 'ரத்து செய்யப்பட்டது', 'No cancellation reported': 'ரத்து செய்யப்பட்டதாகத் தகவல் இல்லை', 'Unknown': 'தெரியவில்லை', 'Unavailable': 'கிடைக்கவில்லை', 'Fixture update time': 'மாதிரி புதுப்பிப்பு நேரம்', 'Updated': 'புதுப்பிக்கப்பட்டது', 'Language': 'மொழி', 'Display station configuration is missing.': 'காட்சி நிலைய அமைப்பு இல்லை.', 'Display station configuration is invalid.': 'காட்சி நிலைய அமைப்பு தவறானது.', 'Station information is unavailable because API configuration is invalid.': 'API அமைப்பு தவறானதால் நிலையத் தகவல் கிடைக்கவில்லை.', 'Station information is unavailable because refresh configuration is invalid.': 'புதுப்பிப்பு அமைப்பு தவறானதால் நிலையத் தகவல் கிடைக்கவில்லை.', 'The configured station is not published.': 'அமைக்கப்பட்ட நிலையம் வெளியிடப்படவில்லை.',
   },
 }
+Object.assign(words.si, {
+  'Arrivals and departures': 'පැමිණීම් සහ පිටත්වීම්',
+  'Scheduled arrival': 'නියමිත පැමිණීම',
+  'Operational arrival': 'සැබෑ පැමිණීම',
+  'No arrivals or departures are currently available.': 'දැනට පැමිණීම් හෝ පිටත්වීම් නොමැත.',
+})
+Object.assign(words.ta, {
+  'Arrivals and departures': 'வருகைகள் மற்றும் புறப்பாடுகள்',
+  'Scheduled arrival': 'திட்டமிட்ட வருகை',
+  'Operational arrival': 'உண்மையான வருகை',
+  'No arrivals or departures are currently available.': 'தற்போது வருகைகளோ புறப்பாடுகளோ இல்லை.',
+})
 type ContextValue = { language: DisplayLanguage; setLanguage: (language: DisplayLanguage) => void; t: (text: string) => string }
 const Context = createContext<ContextValue>({ language: 'en', setLanguage: () => undefined, t: (text) => text })
 export function DisplayLanguageProvider({ children }: { children: ReactNode }) {

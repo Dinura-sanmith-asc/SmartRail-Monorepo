@@ -14,7 +14,7 @@ public sealed class JourneyRevisionConfiguration : IEntityTypeConfiguration<Jour
             table.HasCheckConstraint("ck_journey_revision_positive", "revision > 0");
             table.HasCheckConstraint("ck_journey_revision_previous", "previous_revision IS NULL OR (previous_revision > 0 AND previous_revision < revision)");
             table.HasCheckConstraint("ck_journey_revision_update_id", "(publication_kind = 'InitializationBaseline' AND update_id IS NULL) OR (publication_kind <> 'InitializationBaseline' AND update_id IS NOT NULL)");
-            table.HasCheckConstraint("ck_journey_revision_source", "(publication_kind = 'InitializationBaseline' AND source = 'ScheduledBaseline') OR (publication_kind <> 'InitializationBaseline' AND source IN ('ControllerManual', 'ApprovedRailwayFeed'))");
+            table.HasCheckConstraint("ck_journey_revision_source", "(publication_kind = 'InitializationBaseline' AND source = 'ScheduledBaseline') OR (publication_kind <> 'InitializationBaseline' AND source IN ('ControllerManual', 'StationStaffManual', 'ApprovedRailwayFeed'))");
             table.HasCheckConstraint("ck_journey_revision_actor", "publication_kind = 'InitializationBaseline' OR (published_by_subject IS NOT NULL AND length(trim(published_by_subject)) > 0)");
             table.HasCheckConstraint("ck_journey_revision_status", "status IN ('Scheduled','Running','Delayed','Interrupted','Cancelled','Completed','Terminated')");
         });

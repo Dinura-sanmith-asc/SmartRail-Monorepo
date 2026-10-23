@@ -39,7 +39,7 @@ const roleMenuItems: Record<'Controller' | 'Station Staff', Record<Tab, { label:
   },
   'Station Staff': {
     overview: { label: 'Station overview', description: 'Local departures and station details' },
-    journeys: null,
+    journeys: { label: 'Live Journeys', description: 'Progress and local station reports' },
     incidents: { label: 'Incident reporting', description: 'Scoped station incidents' },
     stations: null,
     routes: null,
@@ -90,6 +90,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
   const [departures, setDepartures] = useState<Departure[]>([])
   const [incidents, setIncidents] = useState<Incident[]>([])
   const [journey, setJourney] = useState<Journey | null>(null)
+  const [journeyRefreshFailed, setJourneyRefreshFailed] = useState(false)
   const [updates, setUpdates] = useState<JourneyUpdate[]>([])
   const [observations, setObservations] = useState<DriverObservation[]>([])
   const [departureQuery, setDepartureQuery] = useState('')
@@ -171,6 +172,18 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
   useEffect(() => { void Promise.resolve().then(loadIncidents) }, [loadIncidents])
   useEffect(() => { if (stationId) void Promise.resolve().then(loadDepartures) }, [loadDepartures, stationId])
   useEffect(() => {
+    if (tab !== 'journeys' || !journey || mutating) return
+    const journeyId = journey.journeyInstanceId
+    const interval = window.setInterval(() => {
+      void Promise.all([operationsApi.journey(journeyId, options), operationsApi.journeyUpdates(journeyId, options)]).then(([updated, history]) => {
+        setJourney((current) => current?.journeyInstanceId === journeyId && updated.revision >= current.revision ? updated : current)
+        setUpdates(history)
+        setJourneyRefreshFailed(false)
+      }).catch(() => setJourneyRefreshFailed(true))
+    }, 30_000)
+    return () => window.clearInterval(interval)
+  }, [journey?.journeyInstanceId, mutating, options, tab])
+  useEffect(() => {
     if (!notice) return
     const timeout = window.setTimeout(() => setNotice(''), 5000)
     return () => window.clearTimeout(timeout)
@@ -186,8 +199,9 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
         operationsApi.journeyUpdates(id, options),
       ])
       setJourney(snapshot)
+      setJourneyRefreshFailed(false)
       setUpdates(history)
-      selectTab('journeys', 'operations')
+      selectTab('journeys', role === 'Controller' ? 'operations' : 'main', role === 'Controller' ? 'journey-status' : 'live-journeys')
       if (role === 'Controller') {
         const evidence = await operationsApi.driverObservations(id, options)
         setObservations(evidence.items)
@@ -263,21 +277,19 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
     }
   }
 
-  async function saveStop(event: FormEvent<HTMLFormElement>, stopId: string) {
-    event.preventDefault()
+  async function saveStop(stopId: string, change: { platform?: string; operationalArrivalAt?: string; operationalDepartureAt?: string }) {
     if (!journey) return
-    const platform = String(new FormData(event.currentTarget).get('platform') ?? '').trim()
-    if (!platform) return
     setMutating(true)
     setError('')
     try {
       const updated = await operationsApi.updateStop(journey.journeyInstanceId, stopId, {
         expectedJourneyRevision: journey.revision,
-        platform,
+        ...change,
       }, options)
       setJourney(updated)
       setUpdates(await operationsApi.journeyUpdates(updated.journeyInstanceId, options))
-      setNotice('Stop platform update published.')
+      setNotice('Station report published.')
+      await loadDepartures()
     } catch (failure) {
       onError(failure)
     } finally {
@@ -313,7 +325,7 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
               </button>
               <div className="operations-menu__items" id={`operations-menu-${group.id}`} hidden={!expanded}>
                 {group.items.map((item) => {
-                  const available = item.target ? roleMenuItems[role][item.target] !== null : false
+                  const available = item.target ? roleMenuItems[role][item.target] !== null && !(role === 'Station Staff' && item.id === 'journey-status') : false
                   const active = available && activeMenuItem === item.id
                   return <button key={item.id} type="button" aria-label={t(item.label)} aria-disabled={!available}
                     className={`operations-menu__item${active ? ' is-active' : ''}${available ? '' : ' is-placeholder'}`}
@@ -379,14 +391,15 @@ export function OperationsWorkspace({ role }: { role: 'Controller' | 'Station St
           </>
         )}
 
-        {tab === 'journeys' && role === 'Controller' && (
+        {tab === 'journeys' && (
           <>
             <section className="operations__panel">
-              <PanelHeading title={t('Journey control')} description={t('Select a dated journey from the supported departure feed to inspect its revision and published history.')} />
+              <PanelHeading title={t(role === 'Controller' ? 'Journey control' : 'Station journeys')} description={t('Select a dated journey to inspect its route and reported progress.')} />
               <DepartureFilters stations={stations} stationId={stationId} setStationId={setStationId} date={date} setDate={setDate} loading={departuresLoading} refresh={() => void loadDepartures()} />
               {departuresLoading ? <TableSkeleton /> : <DepartureTable departures={visibleDepartures} onOpen={openJourney} />}
             </section>
-            {journey && <JourneyDetail key={`${journey.journeyInstanceId}-${journey.revision}`} journey={journey} updates={updates} observations={observations} busy={mutating} onRefresh={() => void openJourney(journey.journeyInstanceId)} onPublishStatus={publishStatus} onSaveStop={saveStop} />}
+            {journeyRefreshFailed && <div className="operations__feedback operations__feedback--stale" role="status">Live journey refresh failed. Showing the last loaded report. Use Refresh journey to try again.</div>}
+            {journey && <JourneyDetail key={journey.journeyInstanceId} journey={journey} role={role} selectedStationId={stationId} updates={updates} observations={observations} busy={mutating} onRefresh={() => void openJourney(journey.journeyInstanceId)} onPublishStatus={publishStatus} onSaveStop={saveStop} />}
           </>
         )}
 
@@ -453,24 +466,77 @@ function StatusBadge({ value }: { value: string }) {
   return <span className={`operations-status operations-status--${styleKey}`}><i aria-hidden="true" />{t(value)}</span>
 }
 
-function JourneyDetail({ journey, updates, observations, busy, onRefresh, onPublishStatus, onSaveStop }: { journey: Journey; updates: JourneyUpdate[]; observations: DriverObservation[]; busy: boolean; onRefresh: () => void; onPublishStatus: (event: FormEvent<HTMLFormElement>) => void; onSaveStop: (event: FormEvent<HTMLFormElement>, stopId: string) => void }) {
+function JourneyDetail({ journey, role, selectedStationId, updates, observations, busy, onRefresh, onPublishStatus, onSaveStop }: { journey: Journey; role: 'Controller' | 'Station Staff'; selectedStationId: string; updates: JourneyUpdate[]; observations: DriverObservation[]; busy: boolean; onRefresh: () => void; onPublishStatus: (event: FormEvent<HTMLFormElement>) => void; onSaveStop: (stopId: string, change: { platform?: string; operationalArrivalAt?: string; operationalDepartureAt?: string }) => void }) {
   const { t } = useLanguage()
   const [statusDraft, setStatusDraft] = useState(journey.status)
+  useEffect(() => setStatusDraft(journey.status), [journey.status])
   const stopColumns: Column<Journey['stops'][number]>[] = [
-    { key: 'station', label: t('Calling point'), render: (stop) => <><b>{stop.stopOrder}. {stop.stationName || stop.stationId}</b><small className="operations-table__note">{stop.stationId}</small></> },
+    { key: 'station', label: t('Calling point'), render: (stop) => <b>{stop.stopOrder}. {stop.stationName || stop.stationId}</b> },
     { key: 'planned', label: t('Planned arrival'), render: (stop) => timestamp(stop.plannedArrivalAt) },
     { key: 'actual', label: t('Operational arrival'), render: (stop) => timestamp(stop.operationalArrivalAt) },
     { key: 'platform', label: t('Platform'), render: (stop) => stop.platform || t('Unknown') },
-    { key: 'action', label: t('Operational action'), render: (stop) => <form className="operations-inline-form" onSubmit={(event) => onSaveStop(event, stop.journeyStopId)}><label className="sr-only" htmlFor={`platform-${stop.journeyStopId}`}>{t('Set platform for')} {stop.stationName || `${t('stop')} ${stop.stopOrder}`}</label><input id={`platform-${stop.journeyStopId}`} name="platform" defaultValue={stop.platform ?? ''} required maxLength={30} placeholder={t('Platform')} /><button className="button button--secondary button--small" disabled={busy}>{t('Publish')}</button></form> },
+    { key: 'action', label: t('Operational action'), render: (stop) => role === 'Station Staff' && stop.stationId !== selectedStationId
+      ? <span className="operations__muted">{t('Reports belong to the assigned station')}</span>
+      : <StopActions key={`${stop.journeyStopId}-${journey.revision}`} stop={stop} busy={busy} onSave={(change) => onSaveStop(stop.journeyStopId, change)} /> },
   ]
   return <section className="operations__panel operations__journey-panel" aria-label={t('Selected journey details')}>
     <div className="operations__panel-heading"><div><span className="operations__section-kicker">{t('JOURNEY DETAIL')}</span><h2>{journey.journeyInstanceId}</h2><p>{t('Operation date')} {journey.operationDate} · {t('revision')} {journey.revision}</p></div><button className="button button--secondary" type="button" onClick={onRefresh} disabled={busy}><RefreshIcon />{t('Refresh journey')}</button></div>
     <div className="operations__journey-summary"><div><small>{t('OFFICIAL STATUS')}</small><StatusBadge value={journey.status} /></div><div><small>{t('LAST UPDATED')}</small><b>{timestamp(journey.lastUpdatedAt)}</b></div><div><small>{t('ESTIMATED ARRIVAL')}</small><b>{journey.eta ? timestamp(journey.eta.value) : t('Unknown')}</b></div></div>
+    <JourneyProgress journey={journey} />
     <DataTable columns={stopColumns} rows={journey.stops} rowKey={(stop) => stop.journeyStopId} label={t('Journey calling points and operational times')} />
-    <div className="operations__action-box"><div><span className="operations__section-kicker">{t('CONTROLLER ACTION')}</span><h3>{t('Publish official status')}</h3><p>{t('This updates the public operational journey record.')}</p></div><form className="operations__status-form" onSubmit={onPublishStatus}><label className="operations-control"><span>{t('New status')}</span><select name="status" value={statusDraft} onChange={(event) => setStatusDraft(event.target.value)}>{['Scheduled', 'Running', 'Delayed', 'Interrupted', 'Cancelled', 'Completed', 'Terminated'].map((status) => <option key={status} value={status}>{t(status)}</option>)}</select></label><button className="button button--primary" disabled={busy || statusDraft === journey.status}>{t(busy ? 'Publishing…' : 'Publish status')}</button></form></div>
+    {role === 'Controller' && <div className="operations__action-box"><div><span className="operations__section-kicker">{t('CONTROLLER ACTION')}</span><h3>{t('Publish official status')}</h3><p>{t('This updates the public operational journey record.')}</p></div><form className="operations__status-form" onSubmit={onPublishStatus}><label className="operations-control"><span>{t('New status')}</span><select name="status" value={statusDraft} onChange={(event) => setStatusDraft(event.target.value)}>{['Scheduled', 'Running', 'Delayed', 'Interrupted', 'Cancelled', 'Completed', 'Terminated'].map((status) => <option key={status} value={status}>{t(status)}</option>)}</select></label><button className="button button--primary" disabled={busy || statusDraft === journey.status}>{t(busy ? 'Publishing…' : 'Publish status')}</button></form></div>}
     <div className="operations__detail-columns"><div><h3>Official update history</h3>{updates.length ? <ol className="operations-timeline">{updates.map((item) => <li key={item.updateId}><span className="operations-timeline__dot" /><div><b>{item.kind} · {item.status}</b><small>Revision {item.revision} · {timestamp(item.publishedAt)}</small></div></li>)}</ol> : <EmptyState title="No published updates" text="No official operational updates are recorded for this journey." />}</div>
-      <div><h3>Driver observations</h3><p className="operations__muted">Protected evidence. It does not change official journey status.</p>{observations.length ? <ul className="operations-observations">{observations.map((item) => <li key={item.observationId}><p>{item.text}</p><small>{timestamp(item.reportedAtUtc)} · journey revision {item.journeyRevision}</small></li>)}</ul> : <EmptyState title="No observations" text="No driver observations are available for this journey." />}</div></div>
+      {role === 'Controller' && <div><h3>Driver observations</h3><p className="operations__muted">Protected evidence. It does not change official journey status.</p>{observations.length ? <ul className="operations-observations">{observations.map((item) => <li key={item.observationId}><p>{item.text}</p><small>{timestamp(item.reportedAtUtc)} · journey revision {item.journeyRevision}</small></li>)}</ul> : <EmptyState title="No observations" text="No driver observations are available for this journey." />}</div>}</div>
   </section>
+}
+
+function JourneyProgress({ journey }: { journey: Journey }) {
+  const stops = [...journey.stops].sort((a, b) => a.stopOrder - b.stopOrder)
+  const reports = stops.filter((stop) => stop.operationalArrivalAt || stop.operationalDepartureAt)
+  const latest = reports.reduce<Journey['stops'][number] | null>((current, stop) => {
+    if (!current) return stop
+    const currentAt = current.timingUpdatedAt ?? current.operationalDepartureAt ?? current.operationalArrivalAt ?? ''
+    const stopAt = stop.timingUpdatedAt ?? stop.operationalDepartureAt ?? stop.operationalArrivalAt ?? ''
+    return stopAt > currentAt ? stop : current
+  }, null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selected = stops.find((stop) => stop.journeyStopId === selectedId) ?? latest ?? stops[0]
+  const origin = stops[0]?.stationName || 'Origin unknown'
+  const destination = stops.at(-1)?.stationName || 'Destination unknown'
+  return <section className="journey-progress" aria-label="Reported journey progress">
+    <div className="journey-progress__heading"><h3>Railway Route — {origin} → {destination}</h3><StatusBadge value={journey.status} /></div>
+    <p className="journey-progress__last">{latest
+      ? `Last station report: ${latest.stationName} · ${timestamp(latest.timingUpdatedAt ?? latest.operationalDepartureAt ?? latest.operationalArrivalAt)}. Current position between stations is unknown.`
+      : 'No station arrival or departure has been reported. Current position is unknown.'}</p>
+    <ol className="journey-progress__stops">{stops.map((stop) => {
+      const reported = Boolean(stop.operationalArrivalAt || stop.operationalDepartureAt)
+      return <li key={stop.journeyStopId}><button type="button" className={`journey-progress__stop${reported ? ' is-reported' : ''}${latest?.journeyStopId === stop.journeyStopId ? ' is-latest' : ''}${selected?.journeyStopId === stop.journeyStopId ? ' is-selected' : ''}`} aria-current={latest?.journeyStopId === stop.journeyStopId ? 'step' : undefined} aria-pressed={selected?.journeyStopId === stop.journeyStopId} onClick={() => setSelectedId(stop.journeyStopId)}><span className="journey-progress__dot" aria-hidden="true" /><span>{stop.stationName || `Stop ${stop.stopOrder}`}</span><small>{reported ? latest?.journeyStopId === stop.journeyStopId ? 'Last report' : 'Reported' : 'No report'}</small></button></li>
+    })}</ol>
+    {selected && <div className="journey-progress__detail"><b>{selected.stationName}</b><span>Planned arrival: {timestamp(selected.plannedArrivalAt)}</span><span>Operational arrival: {timestamp(selected.operationalArrivalAt)}</span><span>Operational departure: {timestamp(selected.operationalDepartureAt)}</span><span>Platform: {selected.platform || 'Unknown'}</span><span>Report updated: {timestamp(selected.timingUpdatedAt)}</span></div>}
+  </section>
+}
+
+function colomboInputTime(value: string | null) {
+  if (!value) return ''
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Colombo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(value))
+  const byType = Object.fromEntries(parts.map(({ type, value: part }) => [type, part]))
+  return `${byType.year}-${byType.month}-${byType.day}T${byType.hour}:${byType.minute}`
+}
+
+function StopActions({ stop, busy, onSave }: { stop: Journey['stops'][number]; busy: boolean; onSave: (change: { platform?: string; operationalArrivalAt?: string; operationalDepartureAt?: string }) => void }) {
+  const [arrival, setArrival] = useState(colomboInputTime(stop.operationalArrivalAt))
+  const [departure, setDeparture] = useState(colomboInputTime(stop.operationalDepartureAt))
+  const [platform, setPlatform] = useState(stop.platform ?? '')
+  const saveTime = (kind: 'operationalArrivalAt' | 'operationalDepartureAt', value: string) => {
+    const parsed = new Date(`${value}+05:30`)
+    if (!value || Number.isNaN(parsed.getTime())) return
+    onSave({ [kind]: parsed.toISOString() })
+  }
+  return <div className="stop-actions">
+    {stop.plannedArrivalAt && <div className="stop-actions__row"><label>Arrival time (Asia/Colombo)<input type="datetime-local" value={arrival} onChange={(event) => setArrival(event.target.value)} /></label><button className="button button--secondary button--small" type="button" disabled={busy || !arrival} onClick={() => saveTime('operationalArrivalAt', arrival)}>Save arrival</button><button className="button button--secondary button--small" type="button" disabled={busy || Boolean(stop.operationalArrivalAt)} onClick={() => onSave({ operationalArrivalAt: new Date().toISOString() })}>Arrived now</button></div>}
+    {stop.plannedDepartureAt && <div className="stop-actions__row"><label>Departure time (Asia/Colombo)<input type="datetime-local" value={departure} onChange={(event) => setDeparture(event.target.value)} /></label><button className="button button--secondary button--small" type="button" disabled={busy || !departure} onClick={() => saveTime('operationalDepartureAt', departure)}>Save departure</button><button className="button button--secondary button--small" type="button" disabled={busy || Boolean(stop.operationalDepartureAt)} onClick={() => onSave({ operationalDepartureAt: new Date().toISOString() })}>Departed now</button></div>}
+    <form className="stop-actions__row" onSubmit={(event) => { event.preventDefault(); if (platform.trim()) onSave({ platform: platform.trim() }) }}><label>Platform<input value={platform} onChange={(event) => setPlatform(event.target.value)} maxLength={30} placeholder="Platform" /></label><button className="button button--secondary button--small" disabled={busy || !platform.trim()}>Save platform</button></form>
+  </div>
 }
 
 function StationManagement({ stations, loading, options, onRefresh, onUnauthorized }: { stations: Station[]; loading: boolean; options: { apiBaseUrl: string; accessToken: string | null }; onRefresh: () => Promise<void>; onUnauthorized: () => void }) {

@@ -6,7 +6,7 @@ import { DEFAULT_STATION_DEPARTURE_REFRESH_INTERVAL_MS } from '../../../app/conf
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const statuses = ['Scheduled', 'Running', 'Delayed', 'Interrupted', 'Cancelled', 'Completed', 'Terminated']
-const sources = ['ScheduledBaseline', 'ControllerManual', 'ApprovedRailwayFeed']
+const sources = ['ScheduledBaseline', 'ControllerManual', 'StationStaffManual', 'ApprovedRailwayFeed']
 
 interface StationDepartureResponse {
   journeyInstanceId: string
@@ -20,6 +20,13 @@ interface StationDepartureResponse {
   stopOrder: number
   scheduledDepartureAt?: string | null
   operationalDepartureAt?: string | null
+  scheduledArrivalAt?: string | null
+  operationalArrivalAt?: string | null
+  serviceCode?: string | null
+  displayName?: string | null
+  publicServiceNumber?: string | null
+  originName?: string | null
+  destinationName?: string | null
   platform?: string | null
   source?: string
   updatedAt?: string
@@ -47,6 +54,13 @@ function isDeparture(value: unknown): value is StationDepartureResponse {
     Number.isInteger(value.stopOrder) && (value.stopOrder as number) >= 1 &&
     (value.scheduledDepartureAt === undefined || value.scheduledDepartureAt === null || isDateTime(value.scheduledDepartureAt)) &&
     (value.operationalDepartureAt === undefined || value.operationalDepartureAt === null || isDateTime(value.operationalDepartureAt)) &&
+    (value.scheduledArrivalAt === undefined || value.scheduledArrivalAt === null || isDateTime(value.scheduledArrivalAt)) &&
+    (value.operationalArrivalAt === undefined || value.operationalArrivalAt === null || isDateTime(value.operationalArrivalAt)) &&
+    (value.serviceCode === undefined || value.serviceCode === null || typeof value.serviceCode === 'string') &&
+    (value.displayName === undefined || value.displayName === null || typeof value.displayName === 'string') &&
+    (value.publicServiceNumber === undefined || value.publicServiceNumber === null || typeof value.publicServiceNumber === 'string') &&
+    (value.originName === undefined || value.originName === null || typeof value.originName === 'string') &&
+    (value.destinationName === undefined || value.destinationName === null || typeof value.destinationName === 'string') &&
     (value.platform === undefined || value.platform === null || typeof value.platform === 'string') &&
     (value.stationName === undefined || typeof value.stationName === 'string') &&
     (value.source === undefined || (typeof value.source === 'string' && sources.includes(value.source))) &&
@@ -82,9 +96,10 @@ function mapOperational(item: StationDepartureResponse): OperationalInformation 
     status: { kind: 'known', value: item.status },
     platform: stringValue(item.platform),
     operationalDepartureTime: localTime(item.operationalDepartureAt),
+    operationalArrivalTime: localTime(item.operationalArrivalAt),
     delay: { kind: 'unknown' },
     cancellation: { kind: 'known', value: item.status === 'Cancelled' },
-    ...(item.updatedAt ? { updateTime: { displayValue: item.updatedAt, meaning: 'unverified' as const } } : {}),
+    ...(item.updatedAt ? { updateTime: { displayValue: new Intl.DateTimeFormat('en-LK', { timeZone: 'Asia/Colombo', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(item.updatedAt)), meaning: 'authoritative-verified' as const } } : {}),
   }
 }
 
@@ -115,11 +130,16 @@ export function createStationDepartureAdapter(
       station: stationResult.station,
       origin: 'authoritative',
       departures: payload.map((item) => {
-        const scheduled = localTime(item.scheduledDepartureAt)
+        const callType = item.scheduledDepartureAt || item.operationalDepartureAt ? 'departure' : 'arrival'
+        const scheduled = localTime(callType === 'departure' ? item.scheduledDepartureAt : item.scheduledArrivalAt)
+        const number = item.publicServiceNumber?.trim()
+        const name = item.displayName?.trim()
         return {
           departureId: `${item.journeyInstanceId}:${item.stopOrder}`,
           serviceDate: item.stationLocalDepartureDate,
-          serviceLabel: `Service ID ${item.serviceId}`,
+          serviceLabel: [number, name].filter(Boolean).join(' · ') || item.serviceCode?.trim() || 'Train service',
+          routeLabel: item.originName && item.destinationName ? `${item.originName} → ${item.destinationName}` : undefined,
+          callType,
           scheduledTime: { displayValue: scheduled.kind === 'known' ? scheduled.value : 'Unknown' },
           operational: mapOperational(item),
           sourceRevision: item.revision,

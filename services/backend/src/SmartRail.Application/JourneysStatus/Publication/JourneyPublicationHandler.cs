@@ -23,11 +23,6 @@ public sealed class JourneyPublicationHandler(
         if (!JourneyPublicationValidator.IsValidStopRequest(command))
             return JourneyPublicationResult.Of(JourneyPublicationOutcome.Invalid);
 
-        var decision = await AuthorizeAsync(command.VerifiedActorSubject!, command.JourneyInstanceId,
-            PermissionAction.ChangePlatformOrOperationalTiming, cancellationToken);
-        if (decision.Outcome == PublicationAuthorizationOutcome.Unavailable) return JourneyPublicationResult.Of(JourneyPublicationOutcome.Unavailable);
-        if (decision.Outcome != PublicationAuthorizationOutcome.Allowed) return JourneyPublicationResult.Of(JourneyPublicationOutcome.Unauthorized);
-
         var state = await FindCurrentAsync(command.JourneyInstanceId, cancellationToken);
         if (state.Unavailable) return JourneyPublicationResult.Of(JourneyPublicationOutcome.Unavailable);
         var currentState = state.Value;
@@ -35,6 +30,12 @@ public sealed class JourneyPublicationHandler(
         if (currentState.Journey.CurrentRevision != command.ExpectedJourneyRevision) return JourneyPublicationResult.Of(JourneyPublicationOutcome.Conflict);
         var currentStop = currentState.Stops.SingleOrDefault(x => x.JourneyStopId == command.JourneyStopId);
         if (currentStop is null) return JourneyPublicationResult.Of(JourneyPublicationOutcome.NotFound);
+
+        var decision = await AuthorizeStopAsync(command.VerifiedActorSubject!, command.JourneyInstanceId,
+            currentStop.StationId, cancellationToken);
+        if (decision.Outcome == PublicationAuthorizationOutcome.Unavailable) return JourneyPublicationResult.Of(JourneyPublicationOutcome.Unavailable);
+        if (decision.Outcome != PublicationAuthorizationOutcome.Allowed) return JourneyPublicationResult.Of(JourneyPublicationOutcome.Unauthorized);
+        var timingSource = decision.Source ?? JourneySource.ControllerManual;
 
         var observation = await VerifyObservationAsync(command.VerifiedActorSubject!, command.DriverObservationId, command.JourneyInstanceId, cancellationToken);
         if (observation is not null) return JourneyPublicationResult.Of(observation.Value);
@@ -49,19 +50,23 @@ public sealed class JourneyPublicationHandler(
         var platformSpecified = command.PlatformSpecified || command.Platform is not null;
         var arrivalSpecified = command.OperationalArrivalSpecified || command.OperationalArrivalAt.HasValue;
         var departureSpecified = command.OperationalDepartureSpecified || command.OperationalDepartureAt.HasValue;
+        var effectiveArrival = arrivalSpecified ? command.OperationalArrivalAt : currentStop.OperationalArrivalAt;
+        var effectiveDeparture = departureSpecified ? command.OperationalDepartureAt : currentStop.OperationalDepartureAt;
+        if (effectiveArrival.HasValue && effectiveDeparture.HasValue && effectiveArrival > effectiveDeparture)
+            return JourneyPublicationResult.Of(JourneyPublicationOutcome.Invalid);
         var evidence = JsonSerializer.Serialize(new { changeType = "stopChange", journeyStopId = command.JourneyStopId,
             platform = command.Platform, operationalArrivalAt = command.OperationalArrivalAt,
             operationalDepartureAt = command.OperationalDepartureAt,
             platformSpecified, arrivalSpecified, departureSpecified });
         var revision = new JourneyRevision(command.JourneyInstanceId, next, currentState.Revision.Status, now,
-            JourneySource.ControllerManual.ToString(), publicType, updateId, kind, command.ExpectedJourneyRevision,
+            timingSource.ToString(), publicType, updateId, kind, command.ExpectedJourneyRevision,
             command.VerifiedActorSubject, command.DriverObservationId, command.CorrectionOfUpdateId, evidence);
         var stops = currentState.Stops.Select(stop => Copy(stop, next,
             stop.JourneyStopId == command.JourneyStopId && platformSpecified ? command.Platform : stop.Platform,
             stop.JourneyStopId == command.JourneyStopId && arrivalSpecified ? command.OperationalArrivalAt : stop.OperationalArrivalAt,
             stop.JourneyStopId == command.JourneyStopId && departureSpecified ? command.OperationalDepartureAt : stop.OperationalDepartureAt,
             stop.JourneyStopId == command.JourneyStopId && (arrivalSpecified || departureSpecified) ? now : stop.TimingUpdatedAt,
-            stop.JourneyStopId == command.JourneyStopId && (arrivalSpecified || departureSpecified) ? JourneySource.ControllerManual.ToString() : stop.TimingSource)).ToArray();
+            stop.JourneyStopId == command.JourneyStopId && (arrivalSpecified || departureSpecified) ? timingSource.ToString() : stop.TimingSource)).ToArray();
         return await AppendAsync(command.JourneyInstanceId, command.ExpectedJourneyRevision, revision, stops, cancellationToken);
     }
 
@@ -182,6 +187,14 @@ public sealed class JourneyPublicationHandler(
         return current.Unavailable || current.Value is null
             ? JourneyPublicationResult.Of(JourneyPublicationOutcome.Unavailable)
             : new(JourneyPublicationOutcome.Published, current.Value);
+    }
+
+    private async Task<PublicationAuthorizationDecision> AuthorizeStopAsync(string subject, Guid journeyId,
+        Guid stationId, CancellationToken cancellationToken)
+    {
+        try { return await authorization.AuthorizeStopAsync(subject, journeyId, stationId, cancellationToken); }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+        catch { return new(PublicationAuthorizationOutcome.Unavailable); }
     }
 
     private async Task<PublicationAuthorizationDecision> AuthorizeAsync(string subject, Guid journeyId,

@@ -6,13 +6,17 @@ using SmartRail.Application.JourneysStatus.Persistence;
 namespace SmartRail.Application.JourneysStatus.Publication;
 
 public enum PublicationAuthorizationOutcome { Allowed, Denied, Unavailable }
-public sealed record PublicationAuthorizationDecision(PublicationAuthorizationOutcome Outcome);
+public sealed record PublicationAuthorizationDecision(PublicationAuthorizationOutcome Outcome, JourneySource? Source = null);
 
 /// <summary>Evaluates current Feature 002 grants and resource scope for this protected write.</summary>
 public interface IJourneyPublicationAuthorization
 {
     Task<PublicationAuthorizationDecision> AuthorizeAsync(string verifiedSubject, Guid journeyInstanceId,
         PermissionAction action, CancellationToken cancellationToken = default);
+
+    Task<PublicationAuthorizationDecision> AuthorizeStopAsync(string verifiedSubject, Guid journeyInstanceId,
+        Guid stationId, CancellationToken cancellationToken = default) =>
+        AuthorizeAsync(verifiedSubject, journeyInstanceId, PermissionAction.ChangePlatformOrOperationalTiming, cancellationToken);
 }
 
 public sealed record JourneyPublicationState(Journey Journey, JourneyRevision Revision,

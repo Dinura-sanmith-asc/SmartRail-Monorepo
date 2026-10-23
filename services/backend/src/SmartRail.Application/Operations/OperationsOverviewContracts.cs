@@ -91,10 +91,10 @@ public sealed class OperationsOverviewHandler(
         var last = orderedStops[^1];
         var observations = orderedStops.SelectMany(item => new[]
         {
-            item.Stop.TimingSource is "ControllerManual" or "ApprovedRailwayFeed" && item.Stop.TimingUpdatedAt.HasValue && item.Stop.OperationalArrivalAt.HasValue
+            item.Stop.TimingSource is "ControllerManual" or "StationStaffManual" or "ApprovedRailwayFeed" && item.Stop.TimingUpdatedAt.HasValue && item.Stop.OperationalArrivalAt.HasValue
                 ? (At: item.Stop.TimingUpdatedAt.Value, Stop: item, Actual: item.Stop.OperationalArrivalAt.Value, Planned: item.Stop.PlannedArrivalAt)
                 : ((DateTimeOffset At, OperationsJourneyStop Stop, DateTimeOffset Actual, DateTimeOffset? Planned)?)null,
-            item.Stop.TimingSource is "ControllerManual" or "ApprovedRailwayFeed" && item.Stop.TimingUpdatedAt.HasValue && item.Stop.OperationalDepartureAt.HasValue
+            item.Stop.TimingSource is "ControllerManual" or "StationStaffManual" or "ApprovedRailwayFeed" && item.Stop.TimingUpdatedAt.HasValue && item.Stop.OperationalDepartureAt.HasValue
                 ? (At: item.Stop.TimingUpdatedAt.Value, Stop: item, Actual: item.Stop.OperationalDepartureAt.Value, Planned: item.Stop.PlannedDepartureAt)
                 : ((DateTimeOffset At, OperationsJourneyStop Stop, DateTimeOffset Actual, DateTimeOffset? Planned)?)null
         }).Where(item => item.HasValue).Select(item => item!.Value).OrderBy(item => item.At).ToArray();

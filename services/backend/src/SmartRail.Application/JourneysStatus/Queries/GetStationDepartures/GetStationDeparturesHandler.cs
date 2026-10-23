@@ -34,11 +34,11 @@ public sealed class GetStationDeparturesHandler(IJourneyReadRepository repositor
             var stop = candidate.Stop;
             DateTimeOffset? scheduled = stop.PlannedDepartureAt;
             DateTimeOffset? operational = stop.OperationalDepartureAt is not null &&
-                stop.TimingSource is "ControllerManual" or "ApprovedRailwayFeed"
+                stop.TimingSource is "ControllerManual" or "StationStaffManual" or "ApprovedRailwayFeed"
                 ? stop.OperationalDepartureAt : null;
             var scheduledArrival = stop.PlannedArrivalAt;
             var operationalArrival = stop.OperationalArrivalAt is not null &&
-                stop.TimingSource is "ControllerManual" or "ApprovedRailwayFeed"
+                stop.TimingSource is "ControllerManual" or "StationStaffManual" or "ApprovedRailwayFeed"
                 ? stop.OperationalArrivalAt : null;
             var effective = scheduled ?? scheduledArrival ?? (stop.RouteStopId is null ? operational ?? operationalArrival : null);
             if (!effective.HasValue || DateOnly.FromDateTime(effective.Value.ToOffset(ColomboOffset).DateTime) != requestedDate)

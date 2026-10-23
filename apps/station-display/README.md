@@ -1,75 +1,13 @@
-# React + TypeScript + Vite
+# SmartRail station display
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This public screen shows today's arrivals and departures for one published station. It reads the SmartRail API every 30 seconds and shows the last known data if a refresh fails.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Start the backend API, then run `npm install` and `npm run dev` from this directory. Vite uses port 5174. The local development configuration points to Colombo Fort (`10000000-0000-0000-0000-000000000001`) and `http://127.0.0.1:5237/api`.
 
-## React Compiler
+To display another station, copy `.env.example` to `.env.local` and change `VITE_STATION_ID` to the station ID returned by `GET /api/stations`. Restart Vite after changing environment values. `VITE_API_BASE_URL` must include `/api`. The screen never stores credentials in these public variables.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Production builds require `VITE_API_BASE_URL` and `VITE_STATION_ID` for the target station. `VITE_STATION_DISPLAY_SOURCE=live` selects the API in development; fixture data is reserved for explicitly configured demos.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+The backend prepares today's published timetable journeys when the public station departure endpoint is read, so the board does not depend on a Controller first opening the operations dashboard. An unpublished station or unavailable API is shown as an error instead of as an empty timetable.

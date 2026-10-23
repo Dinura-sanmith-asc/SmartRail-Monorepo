@@ -3,6 +3,7 @@ import { useDisplayLanguage } from '../../../app/language'
 
 interface OperationalChangeProps {
   operational: OperationalInformation
+  callType?: 'arrival' | 'departure'
 }
 
 function renderValue(label: string, value: PublishedValue<string>, kind = '', t: (text: string) => string) {
@@ -15,14 +16,17 @@ function renderValue(label: string, value: PublishedValue<string>, kind = '', t:
   )
 }
 
-export function OperationalChange({ operational }: OperationalChangeProps) {
+export function OperationalChange({ operational, callType = 'departure' }: OperationalChangeProps) {
   const { t } = useDisplayLanguage()
   return (
     <section aria-label={t('Operational information')} className="operational-change">
       <dl className="operational-change__grid">
         {renderValue(t('Status'), operational.status, operational.status.kind === 'known' ? 'operational-change__entry--status' : '', t)}
         {renderValue(t('Platform'), operational.platform, '', t)}
-        {operational.operationalDepartureTime
+        {callType === 'arrival' && operational.operationalArrivalTime
+          ? renderValue(t('Operational arrival'), operational.operationalArrivalTime, '', t)
+          : null}
+        {callType === 'departure' && operational.operationalDepartureTime
           ? renderValue(t('Operational departure'), operational.operationalDepartureTime, '', t)
           : null}
         {renderValue(t('Delay'), operational.delay, operational.delay.kind === 'known' ? 'operational-change__entry--delay' : '', t)}

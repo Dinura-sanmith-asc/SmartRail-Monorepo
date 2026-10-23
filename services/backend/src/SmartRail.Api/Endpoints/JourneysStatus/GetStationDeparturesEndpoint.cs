@@ -1,6 +1,8 @@
+using System.Globalization;
 using Microsoft.OpenApi;
 using SmartRail.Api.Contracts.RailwayNetwork;
 using SmartRail.Application.JourneysStatus.Queries.GetStationDepartures;
+using SmartRail.Infrastructure.JourneysStatus.Initialization;
 
 namespace SmartRail.Api.Endpoints.JourneysStatus;
 
@@ -10,7 +12,7 @@ public static class GetStationDeparturesEndpoint
         endpoints.MapGet("/api/stations/{id}/departures", HandleAsync)
             .WithName("GetStationDepartures").WithTags("Station departures")
             .WithSummary("Get dated journey departures at a station")
-            .WithDescription("Returns dated journeys calling at the station, including terminating arrivals, filtered by station-local calendar date in Asia/Colombo. Missing times are never inferred.")
+            .WithDescription("Returns dated journeys calling at the station, including terminating arrivals, filtered by station-local calendar date in Asia/Colombo. Today's published schedules are prepared before reading so a public display does not depend on a controller opening the dashboard. Missing times are never inferred.")
             .AddOpenApiOperationTransformer((operation, _, _) =>
             {
                 if (operation.Parameters is not null)
@@ -44,11 +46,25 @@ public static class GetStationDeparturesEndpoint
             .AllowAnonymous();
 
     private static async Task<IResult> HandleAsync(string? id, string? date,
-        GetStationDeparturesHandler handler, CancellationToken cancellationToken)
+        GetStationDeparturesHandler handler, ScheduledJourneyMaterializer materializer,
+        TimeProvider clock, CancellationToken cancellationToken)
     {
         if (!Guid.TryParse(id, out var stationId) || stationId == Guid.Empty) return JourneyReadProblemMapping.InvalidId("id");
+        if (!DateOnly.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var requestedDate) ||
+            requestedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) != date)
+            return StationDepartureProblemMapping.InvalidDate();
         var result = await JourneyReadProblemMapping.Safe(async () =>
         {
+            var today = DateOnly.FromDateTime(clock.GetUtcNow().ToOffset(TimeSpan.FromHours(5.5)).DateTime);
+            if (requestedDate == today)
+            {
+                try
+                {
+                    await materializer.PrepareAsync(today.AddDays(-1), stationId, cancellationToken);
+                    await materializer.PrepareAsync(today, stationId, cancellationToken);
+                }
+                catch (InvalidOperationException) { return StationDepartureProblemMapping.Unavailable(); }
+            }
             var response = await handler.HandleAsync(new GetStationDeparturesQuery(stationId, date), cancellationToken);
             return StationDepartureProblemMapping.Map(response);
         });

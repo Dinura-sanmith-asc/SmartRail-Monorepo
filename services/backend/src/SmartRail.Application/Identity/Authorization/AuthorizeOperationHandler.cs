@@ -35,7 +35,7 @@ public sealed class AuthorizeOperationHandler(
         foreach (var role in candidateRoles)
         {
             ProtectedResource? requiredScope = null;
-            if (role == RoleCode.StationStaff && request.Action is PermissionAction.ViewOperationsDashboard or PermissionAction.CreateIncident or PermissionAction.ViewIncidents or PermissionAction.UpdateIncidentLifecycle)
+            if (role == RoleCode.StationStaff && request.Action is PermissionAction.ViewOperationsDashboard or PermissionAction.CreateIncident or PermissionAction.ViewIncidents or PermissionAction.UpdateIncidentLifecycle or PermissionAction.ChangePlatformOrOperationalTiming)
             {
                 if (request.Resource.Kind == ProtectedResourceKind.Incident && incidentAction)
                 {
@@ -48,6 +48,8 @@ public sealed class AuthorizeOperationHandler(
                 else if (request.Action == PermissionAction.ViewOperationsDashboard && request.Resource.Kind == ProtectedResourceKind.Station)
                     requiredScope = request.Resource;
                 else if (request.Action is PermissionAction.ViewIncidents or PermissionAction.UpdateIncidentLifecycle && request.Resource.Kind == ProtectedResourceKind.Station)
+                    requiredScope = request.Resource;
+                else if (request.Action == PermissionAction.ChangePlatformOrOperationalTiming && request.Resource.Kind == ProtectedResourceKind.Station)
                     requiredScope = request.Resource;
                 else
                     continue;
@@ -65,7 +67,7 @@ public sealed class AuthorizeOperationHandler(
 
             if (requiredScope is null)
             {
-                if (role == RoleCode.StationStaff && request.Action is PermissionAction.ViewOperationsDashboard or PermissionAction.CreateIncident or PermissionAction.ViewIncidents or PermissionAction.UpdateIncidentLifecycle)
+                if (role == RoleCode.StationStaff && request.Action is PermissionAction.ViewOperationsDashboard or PermissionAction.CreateIncident or PermissionAction.ViewIncidents or PermissionAction.UpdateIncidentLifecycle or PermissionAction.ChangePlatformOrOperationalTiming)
                     continue;
                 if (role == RoleCode.Driver && request.Action is PermissionAction.ViewDriverAssignments or PermissionAction.SubmitDriverProgressObservation)
                     continue;

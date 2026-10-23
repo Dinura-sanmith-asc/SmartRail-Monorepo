@@ -79,6 +79,27 @@
 .route-stops-detail>span { color:#63798a; }
 .operations-empty { display:flex; flex-direction:column; gap:5px; padding:17px; border:1px dashed #cbd9df; border-radius:8px; color:#355167; font-size:11px; }
 .operations-empty span { color:#63798a; font-size:10px; }
+.journey-progress { margin:18px 0; padding:19px; border-radius:10px; background:#15283a; color:#f5fafb; }
+.journey-progress__heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.journey-progress__heading h3 { margin:0; color:#fff; font-size:16px; }
+.journey-progress__last { margin:12px 0 20px; color:#c6d7df; font-size:11px; }
+.journey-progress__stops { display:flex; overflow-x:auto; margin:0; padding:3px 0 13px; list-style:none; }
+.journey-progress__stops li { position:relative; flex:1 0 130px; min-width:130px; }
+.journey-progress__stops li:not(:last-child)::after { content:""; position:absolute; z-index:0; top:17px; left:50%; width:100%; height:5px; background:#91a5b4; }
+.journey-progress__stop { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:7px; width:100%; border:0; padding:0 8px; background:transparent; color:#f4f8fa; text-align:center; font:inherit; }
+.journey-progress__dot { display:block; width:34px; height:34px; box-sizing:border-box; border:3px solid #effbfc; border-radius:50%; background:#657b8a; }
+.journey-progress__stop.is-reported .journey-progress__dot { background:#0e938c; }
+.journey-progress__stop.is-latest .journey-progress__dot { box-shadow:0 0 0 5px #56d2c866; }
+.journey-progress__stop.is-selected { color:#9ef1e5; }
+.journey-progress__stop>span:nth-child(2) { font-size:12px; font-weight:650; }
+.journey-progress__stop small { color:#b6c9d2; font-size:10px; }
+.journey-progress__detail { display:flex; flex-wrap:wrap; gap:9px 17px; border-top:1px solid #ffffff30; padding-top:14px; color:#d9e9ed; font-size:11px; }
+.journey-progress__detail b { width:100%; color:#fff; font-size:13px; }
+.stop-actions { display:flex; flex-direction:column; gap:8px; min-width:250px; }
+.stop-actions__row { display:flex; align-items:end; flex-wrap:wrap; gap:6px; margin:0; }
+.stop-actions__row label { display:flex; flex-direction:column; gap:4px; flex:1 1 150px; color:#4a6173; font-size:10px; font-weight:650; }
+.stop-actions__row input { min-height:32px; box-sizing:border-box; border:1px solid #cbd7df; border-radius:6px; padding:5px 7px; color:#1d3447; background:#fff; }
+.stop-actions__row .button { white-space:nowrap; }
 @media(max-width:760px) { .train-service-form { grid-template-columns:1fr; }.train-service-form .operations-station-form__actions { grid-column:auto; } }
 @media(max-width:760px) { .route-management-form { grid-template-columns:1fr; }.route-stop-editor { grid-column:auto; }.route-stop-editor__add { align-items:stretch; flex-direction:column; }.route-management-panel .operations-table { min-width:420px; } }
 .operations-menu { min-width:0; }

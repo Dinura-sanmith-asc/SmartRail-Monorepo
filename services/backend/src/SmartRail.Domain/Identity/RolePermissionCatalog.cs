@@ -66,6 +66,7 @@ public static class RolePermissionCatalog
                 PermissionAction.ViewPublishedJourneyStatus,
                 PermissionAction.ViewStationDepartures,
                 PermissionAction.ViewOperationsDashboard,
+                PermissionAction.ChangePlatformOrOperationalTiming,
                 PermissionAction.CreateIncident,
                 PermissionAction.ViewIncidents,
                 PermissionAction.UpdateIncidentLifecycle,

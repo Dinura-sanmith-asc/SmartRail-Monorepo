@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:smartrail_passenger/app/theme/app_theme.dart';
 
-/// Passenger landing screen for scheduled service search and journey status.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     required this.onSearch,
@@ -14,102 +13,111 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(Icons.train_rounded, color: colors.primary),
-            const SizedBox(width: AppSpacing.sm),
-            const Text('SmartRail'),
-          ],
-        ),
+        title: const Row(children: [
+          Icon(Icons.train_rounded, color: Color(0xFF126C73)),
+          SizedBox(width: 10),
+          Text('SmartRail'),
+        ]),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
+              constraints: const BoxConstraints(maxWidth: 580),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Welcome to SmartRail', style: textTheme.headlineSmall),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Where are you travelling today?',
-                    style: textTheme.bodyLarge?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const _SearchHint(
-                            icon: Icons.trip_origin,
-                            label: 'From (origin)',
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          const _SearchHint(
-                            icon: Icons.location_on_outlined,
-                            label: 'To (destination)',
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          const _SearchHint(
-                            icon: Icons.calendar_month_outlined,
-                            label: 'Date of travel',
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          FilledButton.icon(
-                            key: const Key('home-search-action'),
-                            onPressed: onSearch,
-                            icon: const Icon(Icons.search),
-                            label: const Text('Find trains'),
-                          ),
-                        ],
+                  Text('GOOD TO GO', style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2,
+                  )),
+                  const SizedBox(height: 7),
+                  Text('Where to next?', style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF123039),
+                  )),
+                  const SizedBox(height: 18),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF153F4B), Color(0xFF126C73)],
                       ),
+                      borderRadius: BorderRadius.circular(28),
                     ),
+                    child: Stack(children: [
+                      Positioned(
+                        right: -35,
+                        top: -35,
+                        child: Icon(Icons.route_rounded, size: 195,
+                          color: Colors.white.withValues(alpha: 0.09)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(25),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.directions_railway_filled_rounded,
+                              color: Color(0xFFFFD59E), size: 35),
+                            const SizedBox(height: 18),
+                            const Text('Your next journey starts here',
+                              style: TextStyle(color: Colors.white, fontSize: 25,
+                                height: 1.12, fontWeight: FontWeight.w800)),
+                            const SizedBox(height: 9),
+                            const Text('Find a train, follow its journey, and plan the little things along the way.',
+                              style: TextStyle(color: Color(0xFFD7EFED), height: 1.45)),
+                            const SizedBox(height: 22),
+                            FilledButton.icon(
+                              key: const Key('home-search-action'),
+                              onPressed: onSearch,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color(0xFF14535D),
+                              ),
+                              icon: const Icon(Icons.search_rounded),
+                              label: const Text('Find trains'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ]),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text('QUICK INQUIRIES', style: textTheme.labelLarge),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.xl),
+                  Text('Your travel tools', style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  )),
+                  const SizedBox(height: 5),
+                  Text('Everything you need for a smoother trip.',
+                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
+                  const SizedBox(height: 14),
                   Card(
+                    margin: EdgeInsets.zero,
                     child: ListTile(
                       key: const Key('home-journey-status-action'),
-                      leading: Icon(
-                        Icons.notifications_none_rounded,
-                        color: colors.primary,
-                      ),
-                      title: const Text('Journey status'),
-                      subtitle: const Text(
-                        'Choose a dated service to view published status and updates.',
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      leading: const _ToolIcon(Icons.near_me_rounded),
+                      title: const Text('Journey status', style: TextStyle(fontWeight: FontWeight.w700)),
+                      subtitle: const Text('See live updates for a dated journey.'),
+                      trailing: const Icon(Icons.arrow_forward_rounded),
                       onTap: onJourneyStatus,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: 12),
                   Card(
-                    color: colors.surfaceContainerLow,
-                    child: const Padding(
-                      padding: EdgeInsets.all(AppSpacing.md),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(Icons.verified_outlined),
-                          SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Text(
-                              'Search scheduled services by station and date. Published journey status is shown separately when available.',
-                            ),
-                          ),
-                        ],
-                      ),
+                    margin: EdgeInsets.zero,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      leading: const _ToolIcon(Icons.restaurant_rounded),
+                      title: const Text('Food for the ride', style: TextStyle(fontWeight: FontWeight.w700)),
+                      subtitle: const Text('Pick a journey, then explore Holy-Rice.'),
+                      trailing: const Icon(Icons.arrow_forward_rounded),
+                      onTap: onSearch,
                     ),
                   ),
                 ],
@@ -122,40 +130,17 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _SearchHint extends StatelessWidget {
-  const _SearchHint({required this.icon, required this.label});
-
+class _ToolIcon extends StatelessWidget {
+  const _ToolIcon(this.icon);
   final IconData icon;
-  final String label;
-
   @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: colors.primary),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label.toUpperCase(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const Text('Choose a station or date'),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+    width: 48,
+    height: 48,
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Icon(icon, color: Theme.of(context).colorScheme.primary),
+  );
 }
